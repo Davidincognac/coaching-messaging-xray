@@ -814,7 +814,18 @@ def render_and_extract(domain):
         with sync_playwright() as p:
             b = p.chromium.launch()
             pg = b.new_page(viewport={"width": 1200, "height": 750})
-            pg.goto("https://" + domain, timeout=30000, wait_until="load")
+            try:
+                pg.goto("https://" + domain, timeout=30000, wait_until="load")
+            except Exception:
+                # Some sites ONLY serve on www: the bare domain refuses the connection or has no redirect
+                # (yourjoyfulsolutions.com closes the connection; www.yourjoyfulsolutions.com is fine). Retry with a
+                # www. prefix so a working site isn't reported 'dead' purely over the www split. The failed navigation
+                # leaves the page unusable, so the retry needs a FRESH page.
+                if domain.startswith("www."):
+                    raise
+                pg.close()
+                pg = b.new_page(viewport={"width": 1200, "height": 750})
+                pg.goto("https://www." + domain, timeout=30000, wait_until="load")
             pg.wait_for_timeout(1500)          # let JS sliders/animations paint their first slide
             # Scroll the whole page so LAZY-LOADED below-the-fold content actually loads (product shops, proof
             # strips, testimonials, magnets often sit low and never render until scrolled into view). Then return to

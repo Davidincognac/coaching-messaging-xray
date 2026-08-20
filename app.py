@@ -254,9 +254,11 @@ PROGRESS_UI = """
   <img class="p-angelo" src="/angelo.png" alt="Angelo">
   <div class="p-title">Angelo is reading <span id="p-domain">your homepage</span>&hellip;</div>
   <ul class="p-steps">
-    <li>Accessing the website</li>
-    <li>Scanning the images</li>
-    <li>Scanning the text</li>
+    <li>Opening your homepage in a real browser</li>
+    <li>Waiting for it to fully load, like a real visitor</li>
+    <li>Taking a full-page screenshot</li>
+    <li>Reading your headline</li>
+    <li>Finding your logos, badges and images</li>
     <li>Processing</li>
     <li>Analysing</li>
     <li>Creating the report</li>
