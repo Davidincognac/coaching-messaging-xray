@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+*.png
+*.bak
+sweep_findings.json
+analysed_domains.txt
+analysed_domains.txt.bak
+.DS_Store
