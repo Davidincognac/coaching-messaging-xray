@@ -1967,7 +1967,7 @@ def audit_url(url):
             f"not your whole website."
         ),
         "media_note": (
-            ("Your homepage leads with video. We read the words on the page, not the video, and that's the point: "
+            ("You've got video on your homepage. We read the words on the page, not the video, and that's the point: "
              "search engines can't watch it, and plenty of visitors won't press play. If your reasons to buy live only "
              "in the video, plenty of people never actually get them.")
             if row.get("has_video") == "yes" else None
