@@ -1664,7 +1664,23 @@ _GROUND_EXEMPT = re.compile(
     r"google|facebook|trustpilot|linkedin|yelp|instagram|youtube|twitter|\btv\b|"
     r"career development|professional certified|life coach|discovery call|human design|social media|"
     r"mental health|treasure valley|new york|los angeles|united states|united kingdom|"
-    r"free consultation|free call|book now|learn more|contact us|privacy policy", re.I)
+    r"free consultation|free call|book now|learn more|contact us|privacy policy|"
+    # Media outlets / recognised brands cited as PROOF ('as seen in Forbes, Sky News') are not fabricated client names.
+    r"forbes|\babc\b|\bbbc\b|\bcnn\b|\bnbc\b|\bcbs\b|sky news|huffington|huffpost|business insider|entrepreneur|"
+    r"sydney morning|wall street|financial times|new york times|washington post|fast company|tech ?crunch|bloomberg|"
+    r"reuters|good morning|today show|usa today|women'?s health|men'?s health|psychology today|fast ?company|"
+    r"\bnpr\b|\bted\b|tedx|oprah|marie claire|harvard business|inc magazine|the times|the guardian", re.I)
+# Second words that mark a Capitalised pair as a media outlet / org / place, NOT a person: 'Sky News', 'Business
+# Insider', 'Sydney Morning [Herald]'. A real client testimonial pairs two personal names, so if the second word is
+# one of these we never treat the pair as a fabricated client (the false positive that nuked real media proof).
+_NOT_SURNAME = frozenset((
+    "news insider herald times post journal magazine mag morning weekly daily today media group institute university "
+    "college academy network show radio press business tech review digest report gazette tribune chronicle standard "
+    "mail express mirror guardian telegraph observer economist monthly quarterly live online digital world global "
+    "international national city valley street house foundation council board society association federation union "
+    "league club center centre studio agency partners ventures capital holdings industries solutions systems services "
+    "works labs podcast channel francisco diego vegas jersey hampshire orleans zealand wales magazine company corp inc"
+).split())
 # Common Capitalised words that get glued onto a real first name (sentence-starters, role/marketing nouns). We strip
 # them off the ends of a Capitalised run before judging, so 'Client Ash Aives' resolves to 'Ash Aives' (not 'Client
 # Ash') and 'Read Mark Jones' to 'Mark Jones' (no false strip when Mark Jones IS on the page).
@@ -1691,7 +1707,10 @@ def _ungrounded_claims(text, copy, money=True):
             digits = re.sub(r"[^\d]", "", m)
             if digits and digits not in low_digits:
                 bad.append(m.strip())
-    for run in re.findall(r"(?:[A-Z][A-Za-z'’]+\s+){1,}[A-Z][A-Za-z'’]+", text):   # a run of 2+ Capitalised words
+    # A run of 2+ TITLE-CASE words (capital + lowercase). Requiring a lowercase letter excludes ALL-CAPS section
+    # labels ('AS SEEN IN', 'TRUSTED BY', 'OUR CLIENTS') that are not person names; the AI writes fabricated client
+    # names in Title case ('Jaimee Carson'), so real fabrications are still caught.
+    for run in re.findall(r"(?:[A-Z][a-z][A-Za-z'’]*\s+){1,}[A-Z][a-z][A-Za-z'’]*", text):
         words = run.split()
         while words and words[0].lower() in _NAME_STOP: words.pop(0)    # strip glued sentence/role words off the ends
         while words and words[-1].lower() in _NAME_STOP: words.pop()
@@ -1699,6 +1718,8 @@ def _ungrounded_claims(text, copy, money=True):
             continue
         name = " ".join(words[:2])                                      # the surviving Firstname Lastname
         if name.lower() in low or _GROUND_EXEMPT.search(name):
+            continue
+        if words[1].lower() in _NOT_SURNAME:                            # 'Sky News'/'Business Insider' = media, not a client
             continue
         bad.append(name)
     return bad
