@@ -259,8 +259,10 @@ PROGRESS_UI = """
     <li>Taking a full-page screenshot</li>
     <li>Reading your headline</li>
     <li>Finding your logos, badges and images</li>
-    <li>Processing</li>
-    <li>Analysing</li>
+    <li>Reading it the way a cold buyer would</li>
+    <li>Checking who it&rsquo;s for and what you sell</li>
+    <li>Hunting for proof a stranger would believe</li>
+    <li>Scoring you against 10,982 coaching sites</li>
     <li>Creating the report</li>
   </ul>
 </div>
