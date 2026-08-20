@@ -41,9 +41,10 @@ sys.path.insert(0, SCORECARD)
 import scrape_missing as sm      # fetch() + extract()
 import score_all as S           # CRITERIA + helpers
 
-# --- model for the audit: cheap on purpose (high-volume free tier ~1p/audit).
-#     Bump to claude-opus-5 only for the paid Intelligence File. Override via env. ---
-AUDIT_MODEL = os.getenv("AUDIT_MODEL", "claude-haiku-4-5")
+# --- model for the audit: Sonnet 4.6. Haiku was cheaper but scored the SAME page differently every run (clarity
+#     6/6/9, proof 4/6/7); Sonnet holds a steady, sensible opinion. ~3c/audit. Bump to claude-opus-5 for the paid
+#     Intelligence File. Override via env AUDIT_MODEL. ---
+AUDIT_MODEL = os.getenv("AUDIT_MODEL", "claude-sonnet-4-6")
 
 # --- market benchmarks, from our full run of 10,954 live sites (strict scoring) ---
 MARKET_AVG_10 = 3.7
@@ -300,8 +301,7 @@ def _is_nav_context(low, phrase):
 # A page whose main form is an APPLICATION (many fields, 'fill out the application', 'apply below') is a high-friction
 # capture for people ready to commit, NOT a low-friction way to catch the many who aren't ready. Score it low.
 _APPLICATION_RE = re.compile(
-    r"\bapply (?:below|now|here|today|to work|for|to join|to enroll|to enrol)\b|"
-    r"fill (?:out|in) (?:the |your |an )?application|"
+    r"\bapply (?:below|now|here|today|to work)\b|fill (?:out|in) (?:the |your |an )?application|"
     r"\bapplication form\b|complete (?:the |your |an )?application|submit (?:your |an )?application", re.I)
 
 # A 'book a call / consultation / discovery call' is a HIGH-COMMITMENT capture: it catches people ready to TALK now,
@@ -311,12 +311,7 @@ _CONSULT_RE = re.compile(
     r"book (?:a |your |an )?(?:free |complimentary )?(?:consultation|discovery call|strategy (?:call|session)|"
     r"intro(?:ductory)? call|clarity call|call|session|chat|appointment)|"
     r"(?:free|complimentary) (?:consultation|discovery call|strategy (?:call|session)|intro call|clarity call)|"
-    r"schedule (?:a |your |an |w/ |with )?(?:free )?(?:call|consultation|session|appointment|chiropractor)|"
-    # An embedded scheduling widget (Calendly / Acuity / Squarespace scheduling) shows these cues in the copy.
-    r"choose a (?:date|time)|select a (?:date|time)|pick a time|book (?:an )?appointment|book online|"
-    r"calendly|acuityscheduling|youcanbook|squarespace-scheduling|\bcal\.com\b|"
-    # French booking (Réservez votre appel / rendez-vous / appel découverte).
-    r"r[ée]serve[rz]|rendez-?vous|prene[rz] rendez|appel (?:d[ée]couverte|gratuit|de courtoisie|strat[ée]gique)", re.I)
+    r"schedule (?:a |your )?(?:free )?(?:call|consultation|session|appointment)", re.I)
 
 def _has_real_optin(rl):
     """True only when the page gives a visitor a real place to ENTER an email: an <input type=email>, an input
@@ -331,12 +326,8 @@ def _has_real_optin(rl):
                re.search(r"<input[^>]+(?:placeholder|aria-label)=[\"'][^\"']*e-?mail", rl))
     # cdn-cgi/l/email is Cloudflare OBFUSCATING a printed address (the opposite of a sign-up), so it's excluded.
     esp = bool(re.search(r"list-manage\.com|mailchimp|convertkit|ck\.page|klaviyo|mailerlite|aweber|activecampaign|"
-                         r"getresponse|kit\.com|flodesk|beehiiv|mailpoet", rl)) and "<form" in rl
-    # Substack embeds its sign-up form inside an iframe, so there's no <form> on the parent page; the embed / subscribe
-    # widget IS the opt-in, so we accept it on its own markup.
-    substack = bool(re.search(r"substack\.com/(?:embed|subscribe|api)|substackcdn|substack-subscribe|"
-                              r"class=[\"'][^\"']*subscribe-widget", rl))
-    return tag or esp or substack
+                         r"getresponse|substack\.com/subscribe|kit\.com|flodesk|beehiiv|mailpoet", rl)) and "<form" in rl
+    return tag or esp
 
 def detect_capture(row):
     """Classify and NAME what a page offers to capture a visitor, so the note always says EXACTLY what's there and
@@ -355,14 +346,7 @@ def detect_capture(row):
         buried = bool(bt) and low.find(phrase.lower()) > 0.55 * len(bt)
         gated = bool(_GATED_FREEBIE_RE.search(bt))
         return {"kind": "magnet", "desc": f"a free resource (‘{phrase}’)", "buried": buried, "gated": gated}
-    # 1b) An APPLICATION form ('apply for X', 'fill out the application') behind a real form. Checked BEFORE the
-    #     custom-magnet branch: 'apply' is an unambiguous application signal, whereas a Title-Case phrase like
-    #     'UNFAIR ADVANTAGE' is an ambiguous benefit line the custom-magnet scan would misread as a downloadable
-    #     resource. A REAL free resource (branch 1, _MAGNET_RE) still wins over this, so only the ambiguous custom
-    #     magnet defers to a clear application. High-friction, for people ready to commit, so it's a weak capture.
-    if _APPLICATION_RE.search(bt) and str(row.get("optin_present", "")).lower() == "yes":
-        return {"kind": "application", "desc": "an application form"}
-    # 1c) A CUSTOM-NAMED magnet ('Get my Permission Slips') behind an actual opt-in form. Requires the form so a
+    # 1b) A CUSTOM-NAMED magnet ('Get my Permission Slips') behind an actual opt-in form. Requires the form so a
     #     stray 'get your results' in body copy can't fake a magnet; skips booking-type objects.
     if str(row.get("optin_present", "")).lower() == "yes":
         for mm in _MAGNET_CTA_RE.finditer(bt):
@@ -372,6 +356,10 @@ def detect_capture(row):
                 free = "free " if mm.group(1) else ""
                 buried = bool(bt) and low.find(name.lower()) > 0.55 * len(bt)
                 return {"kind": "magnet", "desc": f"a {free}‘{name}’", "buried": buried}
+    # 1c) An APPLICATION form ('fill out the application below', 'apply now') behind a real form. High-friction, for
+    #     people ready to commit, so it's a weak capture, NOT a lead magnet and NOT a low-friction opt-in.
+    if _APPLICATION_RE.search(bt) and str(row.get("optin_present", "")).lower() == "yes":
+        return {"kind": "application", "desc": "an application form"}
     # 2) A contact / enquiry form, named by the fields it actually shows. This is for people ready to reach out,
     #    NOT a way to capture the not-ready-yet, so it must never be called a newsletter or a lead magnet.
     fields = [f for f in ["name", "email", "phone", "subject", "message"]
@@ -456,27 +444,19 @@ def build_capture(row):
     if not (kinds & {"newsletter", "email_optin", "magnet"}):
         if row.get("popup_optin"):
             caps.append({"kind": "newsletter", "desc": "a newsletter sign-up", "popup": True})
-        # A non-pop-up html_optin only becomes a separate newsletter when there ISN'T already a form capture: an
-        # application / contact form has its OWN email field, and html_optin is likely detecting THAT input, not a
-        # second newsletter, so we must not mint a phantom newsletter over a real application (the-entourage bug).
-        elif row.get("html_optin") and not (kinds & {"application", "contact_form"}):
+        elif row.get("html_optin"):
             caps.append({"kind": "newsletter", "desc": "a newsletter sign-up"})
     if "community" not in kinds and row.get("html_community"):
         caps.append({"kind": "community", "desc": "a ‘join the community’ sign-up"})
     caps = [c for c in caps if c.get("kind") != "none"] or [{"kind": "none", "desc": ""}]
-    # PER-CANDIDATE pop-up reconcile, BEFORE choosing the best: an email opt-in whose form lives in a pop-up
-    # (popup_optin, derived from a real email field + a pop-up/overlay signal) is thrown OVER the page on load, so it
-    # is the OPPOSITE of 'buried' (its buried flag only came from the form sitting late in the DOM). Mark it and clear
-    # buried so it wins on its true prominence (score 3/5, not the buried 2) and the note says the truth. Keyed on
-    # popup_optin (an EMAIL pop-up), never bare has_popup, so a SEPARATE overlay can't un-bury an unrelated footer
-    # form; and only newsletter/email_optin (the kinds popup_optin is derived from) are ever relabelled a pop-up, so a
-    # community link or a magnet is never mislabelled. Done before max() so the un-buried opt-in can win the primary.
-    if row.get("popup_optin"):
-        for c in caps:
-            if c.get("kind") in ("newsletter", "email_optin"):
-                c["popup"] = True
-                c["buried"] = False
     best = dict(max(caps, key=lead_capture_score))
+    # A pop-up capture is thrown OVER the page the moment someone lands, so it is the OPPOSITE of 'buried'. When the
+    # page fires a marketing pop-up and the best capture is its newsletter/opt-in, mark it a pop-up and CLEAR the
+    # buried flag (which came from the form sitting late in the DOM), so we never tell a coach their in-your-face
+    # pop-up is 'stuck at the bottom where no one reaches it', the mistake that reads as a broken tool.
+    if (row.get("has_popup") or row.get("popup_optin")) and best.get("kind") in ("newsletter", "email_optin", "community"):
+        best["popup"] = True
+        best["buried"] = False
     best["also"] = [c for c in caps if c is not None and c.get("desc") != best.get("desc")]
     return best
 
@@ -521,8 +501,6 @@ def build_evidence(row):
         "niche": detect_niche(" ".join([h1_tag or "", " ".join(h2s),
                                         _tidy_headline(row.get("page_title")) or ""]), full=body),
         "has_logos": any(p in body for p in LOGO_PHRASES),
-        "client_logos": row.get("client_logos") or [],     # logo names from image ALT text (a screenshot can't read them)
-        "logo_heading": row.get("logo_heading") or "",      # the heading over the logo strip
         "capture_line": capture_line,
         "capture": build_capture(row),       # PRIMARY capture (best of possibly several) + 'also' for the rest
         "subheadings": h2s,
@@ -986,13 +964,7 @@ def render_and_extract(domain):
         _popup_markup = bool(re.search(
             r"sqs-popup|popup-overlay|overlay-popup|newsletter-?popup|optin-?(?:popup|modal|overlay)|exit-?intent|"
             r"optinmonster|mailmunch|sumome|privy-|convertbox|getsitecontrol|hello-?bar|popmake|popup-maker|"
-            r"pum-overlay|elementor-popup|om-holder|poptin|wisepops|justuno|"
-            # More builders seen in the sweep: Substack subscribe modals, MailerLite / Klaviyo / Mailchimp pop-ups,
-            # and the generic case of a subscribe/newsletter form inside a modal/dialog/lightbox container.
-            r"substack|ml-form-embed|ml-form-popup|ml-subscribe|klaviyo-form|kl-private|mc-modal|"
-            r"(?:subscribe|newsletter|sign[- ]?up)[^<>{}]{0,40}(?:modal|popup|pop-up|lightbox|overlay)|"
-            r"(?:modal|popup|pop-up|lightbox|overlay)[^<>{}]{0,40}(?:subscribe|newsletter|sign[- ]?up)|"
-            r"role=[\"']dialog[\"'][^>]{0,200}(?:subscribe|newsletter|email)", _rl))
+            r"pum-overlay|elementor-popup|om-holder|poptin|wisepops|justuno", _rl))
         row["popup_optin"] = bool((row["has_popup"] or _popup_markup) and row["html_optin"])
         if row["popup_optin"]:
             row["has_popup"] = True     # a pop-up the geometry pass missed is still a pop-up thrown at cold visitors
@@ -1342,13 +1314,17 @@ def ai_analyse(row, scores, score_10, ev=None):
     for attempt in range(2):
         try:
             client = anthropic.Anthropic()
-            resp = client.messages.create(
+            _kw = dict(
                 model=AUDIT_MODEL, max_tokens=1800,
-                temperature=0,   # scoring must be stable: the same homepage should get the same numbers every run
                 system=[{"type": "text", "text": VOICE, "cache_control": {"type": "ephemeral"}}],
                 messages=[{"role": "user", "content": content}],
                 output_config={"format": {"type": "json_schema", "schema": AI_ANALYSE_SCHEMA}},
             )
+            # Only Haiku / older 3.x models accept an explicit temperature; Sonnet 4.6 and Opus 4.x REJECT it (400
+            # 'temperature is deprecated for this model'). The newer models are stable at their default, so omit it.
+            if "haiku" in AUDIT_MODEL or "claude-3" in AUDIT_MODEL:
+                _kw["temperature"] = 0
+            resp = client.messages.create(**_kw)
             text = next((b.text for b in resp.content if b.type == "text"), "")
             return json.loads(text)   # banned-word handling is per-field in the caller
         except Exception as e:
@@ -1392,10 +1368,7 @@ def rule_critique(row, scores, score_10, ev):
     W = getattr(S, "WEIGHTS", {})
     def _cost(k, v):
         return W.get(k, 1.0) * max(0, 7 - v)
-    # Exclude proof AND credibility (not just the merged proof_cred): in the AI path both hold the same merged value,
-    # so leaving them in would let one weak proof bar take two of the three fix slots and crowd out a real weakness.
-    ranked = [k for k, _ in sorted(((k, v) for k, v in scores.items()
-                                    if k not in ("pricing_shown", "proof_cred", "proof", "credibility")),
+    ranked = [k for k, _ in sorted(((k, v) for k, v in scores.items() if k not in ("pricing_shown", "proof_cred")),
                                     key=lambda kv: _cost(kv[0], kv[1]), reverse=True)]
     worst_key = ranked[0]
 
@@ -1472,10 +1445,7 @@ def criterion_note(key, sc, ev=None):
                             "and it can't catch the visitor who isn't ready to pay yet. Offer one genuinely free thing "
                             "that solves a small piece of their problem, no paid plan needed, so a cold visitor has a "
                             "real reason to leave their email before they leave.")
-                # Only claim it's 'buried at the bottom' when there's NO pop-up on the page. With a pop-up present we
-                # can't be sure this magnet is buried rather than delivered by the pop-up, so we critique the value
-                # instead (always safe) and never contradict the separate pop-up note.
-                if cap.get("buried") and not ev.get("has_popup"):
+                if cap.get("buried"):
                     return (f"You offer {desc}, a real reason for someone not ready to book to leave their details. "
                             "But it's buried below everything else on the page, so most visitors never reach it. Move "
                             "it up near the top, and spell out exactly what they'll get from it, the specific things "
@@ -1485,10 +1455,6 @@ def criterion_note(key, sc, ev=None):
                         "they'll get from it, the specific wins, so more people hand over their details.")
             if kind == "email_optin":
                 base = f"You offer {desc}, a real reason for someone not ready to book to leave their details. Good."
-                if cap.get("popup"):
-                    return (base + " It pops up on load, so it's hard to miss, though a cold visitor who hasn't read "
-                            "a word yet may close it before the offer lands. Show it in the page too, and make sure "
-                            "it solves one specific piece of their problem.")
                 if cap.get("buried"):
                     return (base + " But it's buried well below the fold, where hardly anyone reaches it. Move it up, "
                             "or repeat it near the top, so cold visitors actually see it before they leave.")
@@ -1534,10 +1500,6 @@ def criterion_note(key, sc, ev=None):
                 pop = " that pops up" if extra.get("popup") else ""
                 note += (f" You also run a newsletter sign-up{pop}, which is better for catching the not-ready, but "
                          "only if it offers them something; right now it just asks them to subscribe with no reason to.")
-            elif ek == "email_optin":
-                pop = " that pops up" if extra.get("popup") else ""
-                note += (f" You also have an email sign-up{pop} with a real hook, a genuine way to catch the not-ready; "
-                         "just make sure the offer solves one specific piece of their problem.")
             elif ek == "consultation":
                 note += " You also push a call booking, which only catches the people already ready to commit."
         return note
@@ -1688,23 +1650,7 @@ _GROUND_EXEMPT = re.compile(
     r"google|facebook|trustpilot|linkedin|yelp|instagram|youtube|twitter|\btv\b|"
     r"career development|professional certified|life coach|discovery call|human design|social media|"
     r"mental health|treasure valley|new york|los angeles|united states|united kingdom|"
-    r"free consultation|free call|book now|learn more|contact us|privacy policy|"
-    # Media outlets / recognised brands cited as PROOF ('as seen in Forbes, Sky News') are not fabricated client names.
-    r"forbes|\babc\b|\bbbc\b|\bcnn\b|\bnbc\b|\bcbs\b|sky news|huffington|huffpost|business insider|entrepreneur|"
-    r"sydney morning|wall street|financial times|new york times|washington post|fast company|tech ?crunch|bloomberg|"
-    r"reuters|good morning|today show|usa today|women'?s health|men'?s health|psychology today|fast ?company|"
-    r"\bnpr\b|\bted\b|tedx|oprah|marie claire|harvard business|inc magazine|the times|the guardian", re.I)
-# Second words that mark a Capitalised pair as a media outlet / org / place, NOT a person: 'Sky News', 'Business
-# Insider', 'Sydney Morning [Herald]'. A real client testimonial pairs two personal names, so if the second word is
-# one of these we never treat the pair as a fabricated client (the false positive that nuked real media proof).
-_NOT_SURNAME = frozenset((
-    "news insider herald times post journal magazine mag morning weekly daily today media group institute university "
-    "college academy network show radio press business tech review digest report gazette tribune chronicle standard "
-    "mail express mirror guardian telegraph observer economist monthly quarterly live online digital world global "
-    "international national city valley street house foundation council board society association federation union "
-    "league club center centre studio agency partners ventures capital holdings industries solutions systems services "
-    "works labs podcast channel francisco diego vegas jersey hampshire orleans zealand wales magazine company corp inc"
-).split())
+    r"free consultation|free call|book now|learn more|contact us|privacy policy", re.I)
 # Common Capitalised words that get glued onto a real first name (sentence-starters, role/marketing nouns). We strip
 # them off the ends of a Capitalised run before judging, so 'Client Ash Aives' resolves to 'Ash Aives' (not 'Client
 # Ash') and 'Read Mark Jones' to 'Mark Jones' (no false strip when Mark Jones IS on the page).
@@ -1719,16 +1665,6 @@ _NAME_STOP = frozenset((
     "july august september october november december monday tuesday wednesday thursday friday saturday sunday"
 ).split())
 
-# A note ABOUT logos / media / a client list cites COMPANY and OUTLET names (NHS, Electoral Commission, Sky News),
-# which live on the page as logo IMAGES (alt text), not in the body text, so the name check would false-flag them as
-# invented clients. When the note is in this context we skip the name check entirely: the trust-killer we actually
-# guard against is a fabricated TESTIMONIAL PERSON ('a testimonial from Jaimee Carson'), and those notes don't talk
-# about logo strips or 'as seen in'.
-_LOGO_MEDIA_CTX = re.compile(
-    r"logo strip|\blogos\b|as seen (?:in|on)|featured (?:in|on)|as featured|clients? include|worked with|"
-    r"our clients|client list|\bbrands\b|media (?:features?|logos|mentions?)|recognisable (?:brands|clients|logos|"
-    r"media|major)|trusted by|household (?:brands|names)|major brands|client logos", re.I)
-
 def _ungrounded_claims(text, copy, money=True):
     """Return the person-NAMES (always) and MONEY figures (when money=True) a note asserts that do NOT appear in the
     copy, i.e. fabrications. money=False for advice copy where a $-figure is a hypothetical, not a claimed on-page fact."""
@@ -1741,12 +1677,7 @@ def _ungrounded_claims(text, copy, money=True):
             digits = re.sub(r"[^\d]", "", m)
             if digits and digits not in low_digits:
                 bad.append(m.strip())
-    if _LOGO_MEDIA_CTX.search(text):       # a logo / media / client-list note: its proper nouns are companies, not clients
-        return bad
-    # A run of 2+ TITLE-CASE words (capital + lowercase). Requiring a lowercase letter excludes ALL-CAPS section
-    # labels ('AS SEEN IN', 'TRUSTED BY', 'OUR CLIENTS') that are not person names; the AI writes fabricated client
-    # names in Title case ('Jaimee Carson'), so real fabrications are still caught.
-    for run in re.findall(r"(?:[A-Z][a-z][A-Za-z'’]*\s+){1,}[A-Z][a-z][A-Za-z'’]*", text):
+    for run in re.findall(r"(?:[A-Z][A-Za-z'’]+\s+){1,}[A-Z][A-Za-z'’]+", text):   # a run of 2+ Capitalised words
         words = run.split()
         while words and words[0].lower() in _NAME_STOP: words.pop(0)    # strip glued sentence/role words off the ends
         while words and words[-1].lower() in _NAME_STOP: words.pop()
@@ -1754,8 +1685,6 @@ def _ungrounded_claims(text, copy, money=True):
             continue
         name = " ".join(words[:2])                                      # the surviving Firstname Lastname
         if name.lower() in low or _GROUND_EXEMPT.search(name):
-            continue
-        if words[1].lower() in _NOT_SURNAME:                            # 'Sky News'/'Business Insider' = media, not a client
             continue
         bad.append(name)
     return bad
@@ -1903,14 +1832,13 @@ def audit_url(url):
             bool(re.search(r"\blearn more\b|\bread more\b", _cb, re.I)),                     # 'learn more' style links
             bool(re.search(r"\bbook (?:a |your )?(?:call|session|consultation|appointment)\b", _cb, re.I)),  # a booking CTA
         ])
-        # A real SHOP the AI can see (add-to-cart / product grid) or an invest-CTA is UNAMBIGUOUS chaos, so it can
-        # hard-cap the CTA at 3. A high priced_offer_count is NOT: a coach can list five session prices under ONE clear
-        # 'Book a call' (theclosingcoach), and the AI, looking at the screenshot, is the authority on whether that reads
-        # as a shop, so priced_offer_count and a 4+-ask count only LIFT the floor (let a genuinely-overloaded low AI
-        # score stand); the note-based consistency cap below still pulls the CTA to <=3 when the AI says the asks
-        # compete. This keeps us from nuking a focused, one-CTA page to 3 just because it lists its prices.
-        _shop_chaos = bool(row.get("has_shop") or ai.get("has_visible_shop") or _fin_cta)
-        _overload = bool(_shop_chaos or row.get("priced_offer_count", 0) >= 3 or _asks >= 4)
+        # A real shop / a wall of priced offers / an invest-CTA is UNAMBIGUOUS chaos, so it can hard-cap the CTA at 3.
+        # A bare 4+-ask count is softer (a focused page may still list a footer phone + email), so it only LIFTS the
+        # floor, letting a genuinely-overloaded low AI score stand; the note-based consistency cap below pulls it to
+        # <=3 when the AI itself says the asks compete. This keeps us from wrongly nuking a focused page to 3.
+        _shop_chaos = bool(row.get("has_shop") or ai.get("has_visible_shop")
+                           or row.get("priced_offer_count", 0) >= 3 or _fin_cta)
+        _overload = bool(_shop_chaos or _asks >= 4)
         if _shop_chaos and scores.get("clear_cta", 10) > 3:
             scores["clear_cta"] = 3
         elif not _overload and scores.get("clear_cta", 10) < 4:
@@ -1936,15 +1864,10 @@ def audit_url(url):
         # Lead capture MUST name exactly what's on the page (form vs newsletter vs magnet). The AI can mislabel a
         # contact form as a newsletter, so we always use the deterministic, detector-driven note for it.
         ai_notes.pop("lead_capture", None)
-        # The MODEL's own proof note, captured before any gate rebuilds it. The self-consistency gate reads THIS (not a
-        # rebuilt fallback) so it grades what the model actually said, never the tool's own generated wording.
-        _orig_proof_note = ai_notes.get("proof_cred", "")
         # Guard the diagnosis PER FIELD (each is its own labelled section in the report, so a mix reads fine): a
         # banned word in one part only swaps THAT part for the rule version. This stops one stray word wiping the
         # whole AI diagnosis, including the felt "what it's costing you" copy, back to the generic rule text.
         _rc = None
-        _rule_keys = set()          # diagnosis parts that fell back to the rule text, so we can refresh them off FINAL scores
-        _note_replaced = set()      # per-criterion notes the grounding gate rebuilt (rule text, safe to rebuild again)
         critique = {}
         for k in ("headline_problem", "why_it_costs_clients", "top_fixes", "money_left_on_table"):
             v = ai.get(k)
@@ -1956,25 +1879,24 @@ def audit_url(url):
             else:
                 if _rc is None:
                     _rc = rule_critique(row, scores, score_10, ev)
-                critique[k] = _rc[k]; _rule_keys.add(k)
+                critique[k] = _rc[k]
         # GROUNDING GATE (fabrication guard): the AI must never assert a client name, testimonial or $-figure that
         # isn't on the page. Verify every note and diagnosis part against the actual copy; if a piece cites a name or
         # number the page doesn't contain, it's invented, so we drop that piece back to the safe rule wording. And if
-        # the PROOF note was the fabrication, the cited proof isn't on the page at all, so cap proof_cred into the
-        # honest "we didn't spot proof" band (<=2). The replacement note is then built from that score and they agree.
+        # the PROOF note was the fabrication, the score it justified was propped up by nothing, so cap proof_cred to a
+        # middling 5 (honest "we couldn't verify strong proof"), never letting a hallucinated testimonial mint a 7-9.
         _gcopy = " ".join([_clean(row.get("body_text")) or "", _clean(row.get("visible_text")) or "",
                            str(row.get("h1") or ""), str(row.get("page_title") or ""),
                            " ".join(row.get("big_texts") or []), " ".join(row.get("client_logos") or []),
                            str(row.get("logo_heading") or "")])
-        # Cap proof FIRST when its note is fabricated, so the safe replacement note is built from the capped score. Cap
-        # to 2 (not 5): a fabricated proof note means nothing verifiable is on the page, and only sc<3 yields the honest
-        # "We didn't spot the proof..." note; sc 3-5 would still say "there's some here", contradicting the finding.
+        # Cap proof FIRST when its note is fabricated (the score it justified was propped up by nothing), so the safe
+        # replacement note is then built from the capped score and the two agree.
         if _ungrounded_claims(ai_notes.get("proof_cred", ""), _gcopy):
-            scores["proof_cred"] = min(scores.get("proof_cred", 2), 2)
+            scores["proof_cred"] = min(scores.get("proof_cred", 5), 5)
             scores["proof"] = scores["credibility"] = scores["proof_cred"]
         for k in list(ai_notes.keys()):
             if _ungrounded_claims(ai_notes[k], _gcopy):
-                ai_notes[k] = criterion_note(k, scores.get(k, 0), ev); _note_replaced.add(k)
+                ai_notes[k] = criterion_note(k, scores.get(k, 0), ev)
         # Names are proof claims anywhere; money in the diagnosis is only a fact-claim in the problem sections (top_fixes
         # / money_left_on_table use $-figures as hypothetical advice, so we don't strip those for a number).
         for k in ("headline_problem", "why_it_costs_clients", "top_fixes", "money_left_on_table"):
@@ -1983,34 +1905,21 @@ def audit_url(url):
             if _ungrounded_claims(blob, _gcopy, money=_money):
                 if _rc is None:
                     _rc = rule_critique(row, scores, score_10, ev)
-                critique[k] = _rc[k]; _rule_keys.add(k)
-        # SELF-CONSISTENCY GATE (issue 5): a score can't contradict its OWN note. Read the MODEL's own note and, when it
-        # plainly states a fault the rubric bands as low, cap the score. Record what we capped so its note + diagnosis
-        # can be rebuilt off the FINAL score below (a cap paired with a pre-cap note is itself a contradiction).
-        _capped = set()
+                critique[k] = _rc[k]
+        # SELF-CONSISTENCY GATE (issue 5): a score can't contradict its OWN note. Read each finalised note and, when it
+        # plainly states a fault the rubric bands as low, cap the score to that band. Narrow, own-words triggers only.
         if _CTA_MANY_RE.search(ai_notes.get("clear_cta", "")) and scores.get("clear_cta", 0) > 3:
-            scores["clear_cta"] = 3; _capped.add("clear_cta")          # note says the asks compete -> decision overload
+            scores["clear_cta"] = 3          # note says the asks compete -> genuine decision overload, cap at 3
         if _CLARITY_NOPROBLEM_RE.search(ai_notes.get("clarity_5sec", "")) and scores.get("clarity_5sec", 0) > 6:
-            scores["clarity_5sec"] = 6; _capped.add("clarity_5sec")    # headline never names the problem -> not 'clear'
-        if _PROOF_NONE_RE.search(_orig_proof_note):
-            scores["proof_cred"] = min(scores.get("proof_cred", 0), 3); _capped.add("proof_cred")   # nothing to trust
-        elif _PROOF_NOCLIENT_RE.search(_orig_proof_note):
-            scores["proof_cred"] = min(scores.get("proof_cred", 0), 7); _capped.add("proof_cred")   # no client proof
+            scores["clarity_5sec"] = 6       # note says the headline never names the problem -> can't be 'clear' (7+)
+        _pnote = ai_notes.get("proof_cred", "")
+        if _PROOF_NONE_RE.search(_pnote):
+            scores["proof_cred"] = min(scores.get("proof_cred", 0), 3)    # note says NOTHING to trust -> weak (<=3)
+        elif _PROOF_NOCLIENT_RE.search(_pnote):
+            scores["proof_cred"] = min(scores.get("proof_cred", 0), 7)    # no client proof -> can't be STRONG (8-10)
         scores["proof"] = scores["credibility"] = scores["proof_cred"]
         if _STORY_BURIED_RE.search(ai_notes.get("story", "")) and scores.get("story", 0) > 5:
-            scores["story"] = 5; _capped.add("story")                  # reader-facing story is buried low
-        # A capped score whose note is a RULE fallback (grounding-replaced) is now stale: rebuild that note off the
-        # final score. A capped score whose note is the MODEL's own words is left alone, those words triggered the cap,
-        # so they already describe the fault and agree with the lower score.
-        for k in _capped & _note_replaced:
-            if k != "lead_capture":
-                ai_notes[k] = criterion_note(k, scores.get(k, 0), ev)
-        # The diagnosis ranks by lowest score, so a post-cap change can move the 'biggest problem'. Refresh any
-        # rule-sourced diagnosis part off the FINAL scores so the prose matches the final bars.
-        if _capped and _rule_keys:
-            _rcf = rule_critique(row, scores, score_10, ev)
-            for k in _rule_keys:
-                critique[k] = _rcf[k]
+            scores["story"] = 5              # note says the reader-facing story is buried low -> placement caps it at 5
         # Any cap above changes the content scores, so recompute the headline total off them.
         total_100 = S.weighted_total(scores); score_10 = round(total_100 / 10)
     else:
@@ -2019,9 +1928,8 @@ def audit_url(url):
     # On the rules-only fallback there's no merged score, so build one from the stronger of proof/credibility.
     scores.setdefault("proof_cred", max(scores.get("proof", 0), scores.get("credibility", 0)))
 
-    # The bars a coach sees. Proof and credibility are MERGED into proof_cred; pricing has NO display bar (it gets its
-    # own balanced note) but is still weighted into total_100 for parity with the corpus curve; the separate proof/
-    # credibility keys stay in `scores` only for the total math.
+    # The bars a coach sees. Proof and credibility are MERGED into proof_cred; pricing isn't scored on a homepage
+    # (it gets its own balanced note); the separate proof/credibility keys stay in `scores` only for the total math.
     DISPLAY_CRIT = ["clarity_5sec", "specificity", "offer_clarity", "proof_cred",
                     "clear_cta", "lead_capture", "story", "technical_health"]
     comparison = {
