@@ -258,7 +258,7 @@ PROGRESS_UI = """
     <li>Waiting for it to fully load, like a real visitor</li>
     <li>Taking a full-page screenshot</li>
     <li>Reading your headline</li>
-    <li>Finding your logos, badges and images</li>
+    <li>Reading your words, we can&rsquo;t watch videos (and nor can Google)</li>
     <li>Reading it the way a cold buyer would</li>
     <li>Checking who it&rsquo;s for and what you sell</li>
     <li>Hunting for proof a stranger would believe</li>
@@ -756,6 +756,9 @@ class Handler(BaseHTTPRequestHandler):
     def _send(self, body):
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
+        # Never cache the tool's HTML, so a code change always shows on a plain refresh (no more stale pages).
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+        self.send_header("Pragma", "no-cache")
         self.end_headers()
         self.wfile.write(body.encode("utf-8"))
 
