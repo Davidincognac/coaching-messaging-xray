@@ -347,6 +347,69 @@ VERDICTS = {
     "poor": "Right now, when someone arrives on your page, they can't quickly tell that you're the one who can help them, so they don't get in touch.",
 }
 
+
+def overall_copy(clarity, tier, in_top_tier):
+    """The three lines of the overall-score box — VERDICT, STANDING (den) and GAP — all derived from the SAME two
+    facts so they can NEVER contradict each other: does the page read fast (the 5-second CLARITY score is the only
+    thing that decides whether a stranger can tell who it's for), and how it ranks overall (tier / top-tier).
+    ONE rule, obeyed by all three lines: if it reads fast we never say 'they can't tell it's for them'; if it doesn't
+    we never say 'gets it fast'. Returns (verdict, den_line, gap_line). Pure + unit-tested across every combination."""
+    reads_fast = clarity is not None and clarity >= 6
+    if reads_fast:
+        # A stranger CAN tell who this is for, fast. The only thing left to fix is turning that into action — never clarity.
+        if tier == "strong":
+            return (
+                "Strong. A visitor gets who you help fast, and you're ahead of the field.",
+                "You're in the top few coaching homepages we've read. The notes below are the final polish.",
+                "<p>A visitor here gets it fast, and your page reads like the answer to a problem. That's rare. The "
+                "notes below are where the last few clients are hiding.</p>")
+        if tier == "decent":
+            return (
+                "Nearly there. A visitor gets who you help fast, so the gaps below are what stand between you and a "
+                "page that turns readers into enquiries.",
+                "You're ahead of most coaching homepages we've read. Close the gaps below and more of the people who "
+                "land here get in touch.",
+                "<p>A visitor gets who you help fast, which most coaching pages never manage. What's left is turning "
+                "that recognition into action, and the notes below show where it leaks, usually the proof a stranger "
+                "can check, or no way to catch the ones who aren't ready to book yet.</p>")
+        # Reads fast, but weak/poor overall: the message LANDS, yet real gaps (thin proof, no opt-in, hazy offer) cost
+        # clients. We say exactly that — never 'they can't tell it's for them', which would contradict the clear score.
+        return (
+            "A visitor can tell who you help, and quickly, so that part works. What's costing you clients sits below: "
+            "real gaps a cold buyer trips on before they act.",
+            "You read more clearly than most coaching homepages. But clear isn't the same as convincing, and the gaps "
+            "below are where the clients slip away.",
+            "<p>Your page does the hard part, a stranger gets who it's for. But getting it and acting on it are two "
+            "different things. Without strong proof they can check, and without a way to catch the ones who aren't "
+            "ready to book yet, they read, nod, and leave.</p>"
+            "<p>The notes below are exactly where that happens, and what to do about it.</p>")
+    if in_top_tier:
+        # Doesn't read fast, yet ranks top-tier (a strong booking / CTA / story propping up a weak headline). Ahead of
+        # most, but the 5-second test still fails — so we say THAT, and never 'gets it fast'.
+        return (
+            "You're ahead of most coaching pages, but the first thing a stranger sees still doesn't tell them who it's "
+            "for in five seconds, so people leave before they reach the good stuff.",
+            "You're in the top few coaching homepages we've read. But that's a low bar, most are poor, and top few "
+            "still isn't landing in five seconds. Your headline doesn't yet. That's what the notes below are for.",
+            "<p>Here's the honest bit. You're already ahead of most coaching pages, and plenty on here works. But the "
+            "first thing a stranger sees, your headline, doesn't tell them in five seconds who it's for or what you "
+            "fix. So even here, people leave before they reach the good stuff.</p>"
+            "<p>Ahead of most isn't the same as landing. Getting a stranger to think &lsquo;that's me&rsquo; in "
+            "seconds isn't a headline you polish on your own. It's knowing their real problem in their own words, and "
+            "that's the part you can't see from the inside.</p>")
+    # Doesn't read fast, and behind the field: the 5-second test failing IS the headline problem. The verdict MUST be a
+    # clarity-fail line here (never VERDICTS['strong']/['decent'], which claim 'gets it fast') — a not-fast page can
+    # never say it reads fast, whatever the tier nominally is.
+    return (
+        VERDICTS["poor"] if tier == "poor" else VERDICTS["weak"],
+        "Only about 1 in 10 coaching homepages score 6 or more. That's the difference between a page people scroll "
+        "past and one that gets you enquiries and paying clients.",
+        "<p>The best coaching homepages make a visitor think &lsquo;that's exactly my problem, and they can fix "
+        "it&rsquo; within seconds. Yours doesn't yet, so a potential client looks, doesn't see themselves in it, and "
+        "leaves to find someone who does.</p>"
+        "<p>And getting a stranger to feel that isn't a headline you can polish on your own. It's knowing their real "
+        "problem in their own words, and that's the part you can't see from the inside.</p>")
+
 # The list above reads like a to-do. This stops a coach thinking the checklist IS the cure. It isn't:
 # every one of those fixes needs their buyer's real words, and that's the part you can't guess.
 FIXES_CAVEAT = (
@@ -414,36 +477,10 @@ def render_result(res):
     scope = (f'<div class="scope">{html.escape(res["scope_note"])} '
              f'<span class="date">Analysed {html.escape(res["analysed_on"])}.</span></div>')
 
-    # gap-to-the-top (never a complacent "better than X%"). "A visitor gets it fast" is a CLARITY claim, so we gate
-    # it on the actual 5-second score, NOT the overall, which a strong booking/CTA/story can prop up. In a weak market
-    # a page can rank top-10% yet still fail its headline, so we never tell that coach "gets it fast" (self-contradiction
-    # + factually wrong). We reconcile instead: ahead of most, but still not landing in five seconds.
+    # Verdict, standing and gap all come from ONE function driven by the same two facts (clarity + tier/top-tier), so
+    # they can never disagree — see overall_copy(). Unit-tested across every (clarity, tier, top-tier) combination.
     _clar = (res["comparison"].get("clarity_5sec") or {}).get("you")
-    reads_fast = _clar is not None and _clar >= 6
-    if res["in_top_tier"] and reads_fast:
-        gap_line = ("<p>A visitor here mostly gets it fast. You're in the small group of coaches whose homepage "
-                    "reads like the answer to a problem. The notes below are where the last few clients are "
-                    "hiding.</p>")
-        den_line = "You're in the top few coaching homepages we've read. The notes below are the final polish."
-    elif res["in_top_tier"] and not reads_fast:
-        gap_line = ("<p>Here's the honest bit. You're already ahead of most coaching pages, and plenty on here "
-                    "works. But the first thing a stranger sees, your headline, doesn't tell them in five seconds "
-                    "who it's for or what you fix. So even here, people leave before they reach the good stuff.</p>"
-                    "<p>Ahead of most isn't the same as landing. Getting a stranger to think &lsquo;that's me&rsquo; "
-                    "in seconds isn't a headline you polish on your own. It's knowing their real problem in their "
-                    "own words, and that's the part you can't see from the inside.</p>")
-        den_line = ("You're in the top few coaching homepages we've read. But that's a low bar, most are poor, and "
-                    "top few still isn't landing in five seconds. Your headline doesn't yet. That's what the notes "
-                    "below are for.")
-    else:
-        gap_line = ("<p>The best coaching homepages make a visitor think &lsquo;that's exactly my problem, and "
-                    "they can fix it&rsquo; within seconds. Yours doesn't yet, so a potential client looks, "
-                    "doesn't see themselves in it, and leaves to find someone who does.</p>"
-                    "<p>And getting a stranger to feel that isn't a headline you can polish on your own. It's "
-                    "knowing their real problem in their own words, and that's the part you can't see from the "
-                    "inside.</p>")
-        den_line = ("Only about 1 in 10 coaching homepages score 6 or more. That's the difference between a page "
-                    "people scroll past and one that gets you enquiries and paying clients.")
+    verdict, den_line, gap_line = overall_copy(_clar, res.get("tier"), res.get("in_top_tier"))
 
     # optional thumbnail, only if we actually captured one (never a broken image)
     thumb = f'<img class="thumb" src="{res["thumbnail"]}" alt="Your homepage">' if res.get("thumbnail") else ""
@@ -597,7 +634,7 @@ def render_result(res):
         '<div class="reveal"><div class="h"><span class="secnum">5 / 5</span>Your overall score</div>'
         '<div class="grade">'
         f'<div class="num {g}">{res.get("score_10_display", res["score_10"])}<span class="den">/10</span></div>'
-        f'<div><div class="verdict">{VERDICTS.get(res["tier"], "")}</div>'
+        f'<div><div class="verdict">{verdict}</div>'
         f'<div class="den">{den_line}</div></div>'
         '</div>'
         f'<div class="gap" style="margin-top:14px">{gap_line}</div>'
