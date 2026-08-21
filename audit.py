@@ -70,12 +70,16 @@ DEFINITIONS = {
     "specificity": "Your whole page: is it clear who it's for and the exact problem you solve, in their words?",
     "offer_clarity": "Can a cold buyer see what you actually fix, and one clear thing to do next?",
     "proof_cred": "Real reasons to believe you: results, reviews, and names a stranger recognises.",
-    "clear_cta": "Focus: is the page aimed at ONE next step, or scattered across competing asks? (not whether the step is good, that's Booking)",
+    "clear_cta": "Focus: is your whole page aimed at ONE next step, or split across several DIFFERENT competing asks? (repeating the same button is fine)",
     "opt_in": "Something for the not-ready-yet: a free thing they get without booking a call.",
     "booking": "The next step for the ready: a booking or enquiry, and how strong that step is.",
     "story": "Does the copy connect to the reader's own situation, not just your CV?",
     "technical_health": "The basics: secure, loads well, real content on the page.",
 }
+# The order the bars READ in (grouped by theme, not sorted by gap): first impression, then the offer, then trust,
+# then the three 'getting the lead' scores TOGETHER (opt-in -> focus -> booking), then the human, then the basics.
+DISPLAY_CRIT = ["clarity_5sec", "specificity", "offer_clarity", "proof_cred",
+                "opt_in", "clear_cta", "booking", "story", "technical_health"]
 
 # --- real percentile curve, loaded from the 10,954-site results (for "better than X%") ---
 _PCTL = []
@@ -2003,10 +2007,8 @@ def audit_url(url):
     # On the rules-only fallback there's no merged score, so build one from the stronger of proof/credibility.
     scores.setdefault("proof_cred", max(scores.get("proof", 0), scores.get("credibility", 0)))
 
-    # The bars a coach sees. Proof and credibility are MERGED into proof_cred; pricing isn't scored on a homepage
-    # (it gets its own balanced note); the separate proof/credibility keys stay in `scores` only for the total math.
-    DISPLAY_CRIT = ["clarity_5sec", "specificity", "offer_clarity", "proof_cred",
-                    "clear_cta", "opt_in", "booking", "story", "technical_health"]
+    # The bars a coach sees, in the module-level DISPLAY_CRIT order (grouped by theme). Proof and credibility are
+    # MERGED into proof_cred; the separate proof/credibility keys stay in `scores` only for the total math.
     # booking can be None (N/A). Keep it None all the way through so the display shows 'N/A', never a 0 or a crash.
     comparison = {
         k: {"you": scores.get(k), "market": BENCH.get(k),

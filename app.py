@@ -14,7 +14,7 @@ import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
-from audit import audit_url, LABELS, DEFINITIONS, websites_read_count  # the engine we built
+from audit import audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count  # the engine we built
 
 PORT = int(os.getenv("PORT", "8000"))
 
@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded',function(){   // wait for #result (
     var i=0; paint(0);
     var timer=setInterval(function(){ if(i<steps.length-1){i++;paint(i);} else {clearInterval(timer);} },3800);
     var t0=Date.now();
-    fetch('/audit?url='+encodeURIComponent(url)).then(function(r){return r.text();}).then(function(html){
+    fetch('/audit?url='+encodeURIComponent(url)+'&_t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
       clearInterval(timer);
       steps.forEach(function(s){s.className='done';});
       setTimeout(function(){
@@ -526,8 +526,11 @@ def render_result(res):
                     if res.get("pricing_note") else "")
 
     rows = []
-    # N/A (booking with no form on the page) has gap None: sort it to the end (it isn't a problem to fix).
-    for k, c in sorted(res["comparison"].items(), key=lambda kv: (99 if kv[1]["gap"] is None else kv[1]["gap"])):
+    # Render in the grouped, readable DISPLAY_CRIT order (opt-in -> focus -> booking sit together), not worst-first.
+    for k in DISPLAY_CRIT:
+        c = res["comparison"].get(k)
+        if not c:
+            continue
         info = res["notes"].get(k, {"pass": None, "note": ""})
         _def = html.escape(DEFINITIONS.get(k, ""))
         if c["you"] is None:                     # N/A: no bar, no red cross, an honest 'N/A'
