@@ -997,6 +997,20 @@ def render_and_extract(domain):
                 pg.wait_for_load_state("networkidle", timeout=4000)
             except Exception:
                 pass
+            # networkidle CUTS OFF EARLY on iframe-heavy funnel platforms (HubSpot embeds, custom landing builders): the
+            # outer page goes quiet while the embed is still fetching its own form/widget. So after networkidle we hold a
+            # mandatory 3.5s for those third-party embeds to finish, THEN scroll to the very bottom and back to the top so
+            # every lazy-loaded / on-scroll asset fires the SAME way on every run, THEN capture. This is what stops the
+            # funnel-page scores wobbling; cost is ~4.5s added to every audit, which we accept for run-to-run stability.
+            pg.wait_for_timeout(3500)
+            try:
+                pg.evaluate("""() => new Promise((res) => {
+                  window.scrollTo(0, document.body.scrollHeight);
+                  setTimeout(() => { window.scrollTo(0, 0); res(true); }, 700);
+                })""")
+                pg.wait_for_timeout(600)
+            except Exception:
+                pass
             rendered_html = pg.content()
             final_url = pg.url
             try:
@@ -1184,14 +1198,92 @@ CRITIQUE_SCHEMA = {
 
 # The AI re-scores these CONTENT criteria by reading the page (technical_health stays rule-based, it's factual).
 # proof_cred is the MERGED proof+credibility criterion; the corpus scorer still keeps them separate for its stats.
-AI_SCORE_CRIT = ["clarity_5sec", "specificity", "offer_clarity", "proof_cred",
-                 "clear_cta", "story"]   # opt_in + booking are deterministic (from detection), not AI-scored
+# ---- FLAG-JUDGE: specificity + clarity are no longer scored by the AI (a vibe number that drifts). The AI emits
+# structured FLAGS; these PURE, DETERMINISTIC Python judges turn the flags into a score. Same flags -> same score,
+# every run, and every gate is auditable. Every lookup is .get()-defaulted and type-coerced so a missing key, a null,
+# a string 'true'/'false', or a non-dict payload can NEVER raise. (Safeguard 1: malformed-JSON fail-safe.)
+def _flag(v):
+    """Coerce ANY JSON value to a strict bool. Handles real bools, numbers, and string variants. NOTE: a naive
+    bool('false') is True in Python, so we must test the string explicitly — this is the whole point of the helper."""
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, (int, float)):
+        return v != 0
+    if isinstance(v, str):
+        return v.strip().lower() in ("true", "1", "yes", "y")
+    return False
+
+def _as_int(v, default=0):
+    """Coerce ANY JSON value to a strict int, safely ('3', 3.0, None, junk all handled)."""
+    try:
+        return int(float(v))
+    except (TypeError, ValueError):
+        return default
+
+def judge_specificity(f):
+    """IMMUTABLE JUDGE -> 0-10 from specificity flags. Breadth cap and generic gate are hard-wired, not felt."""
+    f = f if isinstance(f, dict) else {}
+    demo = _flag(f.get("specific_demographic"))
+    pain = _flag(f.get("concrete_pain"))
+    mech = _flag(f.get("unique_mechanism"))
+    breadth = _as_int(f.get("distinct_audiences_or_problems"), 1)
+    # BREADTH HARD CAP: several genuinely DIFFERENT audiences/problems land for no one -> cap 3. EXEMPTION: a page that
+    # has BOTH a specific demographic AND a concrete pain is a focused niche described in facets, not real breadth, so
+    # a facet miscount can never nuke it -- it skips the cap and is judged on its merits below.
+    if breadth >= 2 and not (demo and pain):
+        return 3
+    if demo and pain and mech:
+        return 9                                    # focused audience + concrete pain + a real 'how'
+    if demo and pain:
+        return 7                                    # focused audience + concrete pain, no differentiated how
+    if demo or pain:
+        return 5                                    # exactly one is concrete, the other generic
+    named = bool(f.get("generic_tokens")) or bool(f.get("demographic_quote")) or bool(f.get("pain_quote"))
+    return 3 if named else 1                        # named-but-generic -> 3; nothing named -> 1
+
+def judge_clarity(f):
+    """IMMUTABLE JUDGE -> 0-10 from first-screen clarity flags."""
+    f = f if isinstance(f, dict) else {}
+    demo = _flag(f.get("hero_specific_audience"))
+    prob = _flag(f.get("hero_concrete_problem_or_outcome"))
+    if demo and prob:
+        return 9                                    # right person sees themselves AND the change
+    if demo or prob:
+        return 7                                    # one specific element, recognises themselves fast
+    if _flag(f.get("hero_is_broad_everyone_appeal")):
+        return 3
+    if _flag(f.get("hero_is_metaphor_or_feeling_only")):
+        return 4
+    if _flag(f.get("hero_names_field_or_category")):
+        return 4                                    # names the area, not the person
+    return 2                                        # no field/topic clue at all
+
+# clarity_5sec + specificity moved OUT of AI_SCORE_CRIT: the AI emits flags for them (judged above), not a number.
+AI_SCORE_CRIT = ["offer_clarity", "proof_cred", "clear_cta", "story"]
+FLAG_CRIT = {"specificity": ("specificity_flags", judge_specificity),
+             "clarity_5sec": ("clarity_flags", judge_clarity)}
 _SCORE_FIELD = {"type": "object", "additionalProperties": False,
                 # reason FIRST so the model thinks before it commits a number (steadier and more accurate than
                 # picking a score cold then justifying it); score is 0-10, clamped in code (schema can't bound it).
                 "properties": {"reason": {"type": "string"},
                                "score": {"type": "integer"}},
                 "required": ["reason", "score"]}
+# The AI EXTRACTS these flags (it does not score) for specificity + clarity. judge_specificity / judge_clarity turn
+# them into the number. Every boolean carries its grounding QUOTE so a 'true' is evidenced and auditable.
+_SPECIFICITY_FLAGS = {"type": "object", "additionalProperties": False, "properties": {
+    "specific_demographic": {"type": "boolean"}, "demographic_quote": {"type": "string"},
+    "concrete_pain": {"type": "boolean"}, "pain_quote": {"type": "string"},
+    "unique_mechanism": {"type": "boolean"}, "mechanism_quote": {"type": "string"},
+    "generic_tokens": {"type": "array", "items": {"type": "string"}},
+    "distinct_audiences_or_problems": {"type": "integer"}},
+    "required": ["specific_demographic", "demographic_quote", "concrete_pain", "pain_quote", "unique_mechanism",
+                 "mechanism_quote", "generic_tokens", "distinct_audiences_or_problems"]}
+_CLARITY_FLAGS = {"type": "object", "additionalProperties": False, "properties": {
+    "hero_quote": {"type": "string"}, "hero_specific_audience": {"type": "boolean"},
+    "hero_concrete_problem_or_outcome": {"type": "boolean"}, "hero_names_field_or_category": {"type": "boolean"},
+    "hero_is_metaphor_or_feeling_only": {"type": "boolean"}, "hero_is_broad_everyone_appeal": {"type": "boolean"}},
+    "required": ["hero_quote", "hero_specific_audience", "hero_concrete_problem_or_outcome",
+                 "hero_names_field_or_category", "hero_is_metaphor_or_feeling_only", "hero_is_broad_everyone_appeal"]}
 AI_ANALYSE_SCHEMA = {
     "type": "object", "additionalProperties": False,
     "properties": {
@@ -1203,12 +1295,15 @@ AI_ANALYSE_SCHEMA = {
         "has_visible_shop": {"type": "boolean"},
         "scores": {"type": "object", "additionalProperties": False,
                    "properties": {c: _SCORE_FIELD for c in AI_SCORE_CRIT}, "required": AI_SCORE_CRIT},
+        "specificity_flags": _SPECIFICITY_FLAGS,   # AI extracts, judge_specificity scores
+        "clarity_flags": _CLARITY_FLAGS,           # AI extracts, judge_clarity scores
         "headline_problem": {"type": "string"},
         "why_it_costs_clients": {"type": "string"},
         "top_fixes": {"type": "array", "items": {"type": "string"}},
         "money_left_on_table": {"type": "string"},
     },
     "required": ["main_headline", "shop_reason", "has_visible_shop", "scores",
+                 "specificity_flags", "clarity_flags",
                  "headline_problem", "why_it_costs_clients", "top_fixes", "money_left_on_table"],
 }
 
@@ -1304,8 +1399,8 @@ def ai_critique(row, scores, score_10):
     return result
 
 _AI_RUBRIC = {
-    "clarity_5sec": "In 5 seconds, does the RIGHT person (a cold visitor who HAS this problem) know this page is for them, and sense what changes? A headline that names the reader's real SITUATION or PROBLEM in their words is strong reader-first copy, score it high, NEVER call that 'abstract' or dock it for being 'about the reader'. Grade on a SPECTRUM, not just sharp-vs-vague: 9-10 = the right person instantly sees themselves AND senses the outcome; 7-8 = sharply names their real situation/problem so they recognise themselves fast, even if the outcome/service isn't spelled out; 5-6 = names a clear audience OR a clear service/outcome but not sharply, a visitor gets the gist but doesn't feel 'that's exactly me'. A clever METAPHOR or evocative line that only gestures at a FEELING ('you can't read the label from inside the jar', 'you're stuck', 'something feels off', 'reclaim your spark') WITHOUT naming a specific audience OR a concrete problem in plain words is a 3-4, NOT a 5-6, no matter how relatable it sounds, because a cold visitor still can't tell if it's for THEM or what you actually fix. A VAGUE / feel-good outcome ('build authentic connections', 'live your best life', 'find your purpose', 'transform your life', 'unlock your potential') does NOT count as a concrete outcome, so audience-named + fluffy-outcome caps at 5, it does NOT reach 7-8; only the reader's real SITUATION / PROBLEM or a CONCRETE specific outcome they'd recognise earns 7-8; 3-4 = names a broad CATEGORY, FIELD or TOPIC (even as a vague tagline, e.g. 'Divorce Differently' names the field divorce; 'leadership coaching'; or a generic benefit like 'live your best life'), so a cold visitor at least knows what area this is about, but the right person isn't singled out and doesn't feel 'that's exactly me'; 0-2 = gives NO clue what field or topic it's even about: just the coach's personal NAME, or pure field-less abstraction ('You Are Worthy', 'Reimagine what's possible'), so a cold visitor can't even tell what area you work in. RESERVE 0-2 for a name or a field-less abstraction ONLY; the moment the headline names the topic/field at all, it is at least a 3, never a 2. Judge the WHOLE above-fold, not just the single biggest line: if the hero has an 'I help [who] [do what]' line (e.g. 'I help entrepreneurs plan, start and grow businesses') OR any line that names the field or audience, clarity is AT LEAST 3, even when the biggest line is a name or a stats-brag ('Coached 1000+ entrepreneurs'). A 2 requires that NOTHING above the fold names the field or the audience.",
-    "specificity": "Is it clear WHO it's for and WHAT problem it solves, in their words? Judge CLARITY of the problem, not narrowness. A coach can serve a BROAD audience (several related problems, e.g. all compulsive behaviours: drink, food, work) and still score HIGH if the SHARED problem is named clearly and concretely so each person recognises themselves. Breadth is fine; VAGUENESS is not. 10=who + problem unmistakable (a narrow niche OR a clearly-named shared problem); 5=one is clear; 1=could be anyone, no real problem named.",
+    "clarity_5sec": "In 5 seconds, does the RIGHT person (a cold visitor who HAS this problem) know this page is for them, and sense what changes? A headline that names the reader's real SITUATION or PROBLEM in their words is strong reader-first copy, score it high, NEVER call that 'abstract' or dock it for being 'about the reader'. Grade on a SPECTRUM, not just sharp-vs-vague: 9-10 = the right person instantly sees themselves AND senses the outcome; 7-8 = sharply names their real situation/problem so they recognise themselves fast, even if the outcome/service isn't spelled out; 5-6 = names a clear audience OR a clear service/outcome but not sharply, a visitor gets the gist but doesn't feel 'that's exactly me'. A clever METAPHOR or evocative line that only gestures at a FEELING ('you can't read the label from inside the jar', 'you're stuck', 'something feels off', 'reclaim your spark') WITHOUT naming a specific audience OR a concrete problem in plain words is a 3-4, NOT a 5-6, no matter how relatable it sounds, because a cold visitor still can't tell if it's for THEM or what you actually fix. A VAGUE / feel-good outcome ('build authentic connections', 'live your best life', 'find your purpose', 'transform your life', 'unlock your potential') does NOT count as a concrete outcome, so audience-named + fluffy-outcome caps at 5, it does NOT reach 7-8; only the reader's real SITUATION / PROBLEM or a CONCRETE specific outcome they'd recognise earns 7-8. A hero with BROAD, everyone-welcome appeal, general all-purpose life coaching (no single person or problem signalled), or one juggling several DIFFERENT audiences or problems at once, caps at 3, because a cold visitor can't tell in five seconds it is aimed at THEM specifically; 3-4 = names a broad CATEGORY, FIELD or TOPIC (even as a vague tagline, e.g. 'Divorce Differently' names the field divorce; 'leadership coaching'; or a generic benefit like 'live your best life'), so a cold visitor at least knows what area this is about, but the right person isn't singled out and doesn't feel 'that's exactly me'; 0-2 = gives NO clue what field or topic it's even about: just the coach's personal NAME, or pure field-less abstraction ('You Are Worthy', 'Reimagine what's possible'), so a cold visitor can't even tell what area you work in. RESERVE 0-2 for a name or a field-less abstraction ONLY; the moment the headline names the topic/field at all, it is at least a 3, never a 2. Judge the WHOLE above-fold, not just the single biggest line: if the hero has an 'I help [who] [do what]' line (e.g. 'I help entrepreneurs plan, start and grow businesses') OR any line that names the field or audience, clarity is AT LEAST 3, even when the biggest line is a name or a stats-brag ('Coached 1000+ entrepreneurs'). A 2 requires that NOTHING above the fold names the field or the audience.",
+    "specificity": "Is the page FOCUSED on ONE clear audience and ONE clear problem, in their words? Here NARROWNESS is the whole point: focus scores high, breadth scores low. HARD CAP AT 3: broad appeal ('for anyone ready to grow', 'helping people live their best life'), general all-purpose life coaching with no named niche, OR a page that spreads across SEVERAL different audiences or problems at once (e.g. 'career change, redundancy, mid-life, identity shift' or 'career AND relationships AND health') is trying to be for everyone, so it lands for no one. Naming five problems clearly is STILL five problems, that is BREADTH not specificity, and it caps at 3 no matter how cleanly each separate item is written. To score high a page must NARROW: 8-10 = a laser-focused, singular target audience (e.g. 'executive women in tech leadership', 'newly-qualified therapists', 'founders who can't switch off after work') AND ONE clear problem stated in the buyer's own words. 6-7 = a single clear audience and one problem, but with some blur (a second audience creeping in, or the problem drawn a little broadly). 4-5 = a real single problem OR a single clear audience, but not both, and no scatter. 1-3 = broad appeal / general life coaching / several audiences or problems at once. 0 = could be literally anyone, nothing named. Judge FOCUS, not merely how clearly each separate thing is written.",
     "offer_clarity": "TWO things: (1) can a cold buyer see what you actually FIX, the outcome/transformation and why it's worth it (the value); AND (2) is there one clear, defined thing to buy or an obvious way to start? Judge the VALUE and the OFFER, NOT the price, showing a price does not earn marks and hiding it does not lose them. 10=the fix/outcome is vivid AND there's a clear thing to buy; 5=one of the two; 0=neither, just a vague sense of 'coaching'.",
     "proof_cred": "MERGED proof + credibility: does a cold buyer get real reason to BELIEVE you, both that you get results and that you're legit? Judge by how COSTLY TO FAKE the signal is, and SCORE THE STRONGEST SIGNAL PRESENT, do NOT average down. A real third-party review-platform RATING (a Google / Facebook / Trustpilot star rating with a real review count, e.g. '5.0 from 58 reviews') is STRONG on its own = 8-9, it is costly to fake; if the page ALSO has plain text testimonials, those are a bonus and must NOT drag the score below what the Google/Trustpilot rating already earns. CLIENT TESTIMONIALS come in tiers by format: a VIDEO testimonial is STRONG (hard to fake); a SCREENSHOT of a real review showing the person's name AND their photo/face (a Google/Facebook/Trustpilot card, a LinkedIn recommendation) is STRONG; a neat copy-paste TEXT quote from an ordinary client, even with a first name and initial, is MIDDLING (it counts, it's not poor, but it's easy to type up, so on its own it is NOT strong, cap it around 4-6). This format rule is ONLY for ordinary-client testimonials. It does NOT weaken these, which stay STRONG (8-10) in any format including plain text or a logo: a named endorsement from a RECOGNISED AUTHORITY (a well-known bestselling author) is costly to fake because they'd object if it were invented; media features shown as logos you recognise (real TV networks, national publications); named institutional clients you recognise (companies, universities); real third-party review widgets; specific results/numbers; case studies. Several together = strong. LOGO WALLS, JUDGE BY WHETHER YOU RECOGNISE THE BRANDS (the logo names are given to you in the FACTS block as image alt text, because a downscaled screenshot can't read a logo strip): (a) RECOGNISABLE major / household brands (e.g. KPMG, BCG, Red Bull, John Deere, Google, a real TV network or national publication) under a 'trusted by' / 'our clients' claim ARE a real, costly-to-fake signal, because a coach claiming Fortune-tier clients would be exposed if they were lying; credit it and score the proof UP to 6-7. BUT hold ONE honest caveat and put it in the note: a logo does not reveal the DEPTH of the relationship, they might have run a single half-day workshop years ago, not a long-term engagement, so recognisable client logos on their own are a solid 6-7, NOT a 9-10. (b) UNRECOGNISABLE or unlabelled local / ordinary-org logos are AMBIGUOUS: they could be audiences he merely spoke in front of or events he attended, not clients, so score them middling at best, never strong. (c) LIVE THIRD-PARTY REVIEWS are the strongest tier: a LIVE embedded Google / Trustpilot widget feeding real stars AND a visible review count (e.g. '5.0 from 200+ reviews') = 9-10. A mere SCREENSHOT or static graphic of stars, or a bare 'we're 5 stars on Google', is a CLAIM not proof, credit it only a little and say in the note they should embed the LIVE Google widget with the real review count so a cold buyer can verify it. WEAK/self-stated (score low): things they say about themselves, awards, bare 'bestselling'/'as seen on' with no recognisable names, accreditation/membership badges (ICF, WBENC, 'certified coach'). A reachable real business is a small plus. 10=strong; 0=nothing. WHEN YOU WRITE THE ONE-LINE REASON FOR THIS SCORE, BE HONEST, DO NOT FLATTER: if the proof is real but SOFT (named text testimonials with no photo, an unlabelled logo wall, 'as seen in' with no outlet you recognise), do NOT call it 'solid' or 'strong'; say plainly what would make a cold buyer doubt it (no photo so they can't tell it's a real person, logos that could just be event audiences) and that the lift is cheap and easy (add the person's photo or a screenshot of the real review, label the logos, add a Google/Facebook rating). A soft 6 that could reach 8 with small changes should read like that, not like a pat on the back. NEVER use vague grading words in the note ('middling', 'moderate', 'decent', 'somewhat', 'reasonable', 'a mixed picture'), they tell the coach nothing; say CONCRETELY what is working, what specific thing is missing, and the exact change that would lift it (e.g. not 'middling proof' but 'real recognisable brands, but a cold buyer can't tell if they were clients or one-off audiences, and there's no photo on the testimonials, add a face and say what you did for them'). DO NOT state the NAME FORMAT of testimonials (do not say 'first names only', 'full names', or invent a name), you cannot reliably read that off a screenshot and getting it wrong is a factual error; instead describe what a cold buyer can VERIFY: say 'text testimonials with no photo and no third-party source (Google / Facebook / Trustpilot) to verify them', and focus on what's missing. CREDIT WHAT IS ACTUALLY THERE, do not undercount it: a NAMED award (a proper-noun award title, e.g. 'Absolutely Mama Awards 2025') is a real if minor third-party signal, NEVER describe a named award as 'unnamed' or as having 'no recognisable authority'; and a NAMED founder / expert with STATED years of experience (e.g. 'Heidi Skudder, founder, 18 years in childcare') is real, verifiable credibility a stranger can check. When a named award AND a named expert-with-tenure both appear on the page, proof is AT LEAST a 4 even if the testimonials are anonymous. MULTIPLE NAMED CLIENTS with SPECIFIC QUANTIFIED results ('grew revenue by $500k', 'went from 1-in-10 to 1-in-2 close rate', 'from $1.5M to $2M') are STRONG, concrete, costly-to-fabricate proof: two or more such hard-number cases set a base of 6-7 even as plain text, docked only for missing photos / third-party verification, NEVER scored a middling 5. Specific numbers beat vague praise, do not under-credit them. A VERIFIABLE PROFESSIONAL LICENCE / accreditation from a real body (a licensed therapist / counsellor / psychologist, chartered, registered with a named professional body) OR TWO OR MORE named RECOGNISABLE mainstream MEDIA outlets you actually recognise (e.g. the Today Show, BBC, Forbes, Huffington Post, Women's Health) is STRONG, checkable authority that is costly to fake, and it FLOORS proof_cred at 7 even with no review widget and no logo strip. Do NOT cap real, named, checkable authority at 5 just because there is no Google/Trustpilot widget, that purism makes the score useless for ranking. Below 7 you dock ONLY for what is genuinely missing, above all CLIENT RESULTS: testimonials, case studies, before/after, numbers. A page with strong authority but NO client proof of results is a 7 (say so plainly: 'strong credentials and real media, but no client testimonials or results to show it works for others'); a real third-party review widget / rating ON TOP of that pushes it to 8-9.",
     "clear_cta": "This measures FOCUS: is the whole page pointed at ONE next step, or does it scatter a cold visitor across many COMPETING asks (decision overload)? Whether the step itself is a good TYPE (a free call vs a paid one vs a contact form) is scored SEPARATELY under Booking & enquiry, so judge ONLY the focus here, not the quality of the step. Is there ONE clear, STRONG next step toward becoming a client (book/apply), not just 'contact'/'subscribe', AND is it the obvious single thing to do? TWO different failures both score LOW. (a) No real step, or only 'contact'/'subscribe', is low. (b) DECISION OVERLOAD: the page throws many DIFFERENT competing actions at a cold visitor (e.g. book a call AND buy several priced packages / 'add to cart' AND download an ebook AND watch a wall of videos AND sponsor a child AND a contact form). When the actions pull in many different directions the visitor doesn't know which to pick and freezes, so they do nothing. That is NOT a strong CTA, it is a mess, score it DOWN (3-4); never reward a page for having 'lots of buttons'. HOW TO JUDGE OVERLOAD, use this test: count the number of DIFFERENT JOBS the page asks a visitor to do, book a call, buy priced package A, buy priced package B, 'add to cart', download an ebook, watch a wall of videos, donate/sponsor, fill a contact form. Each distinct job is a separate ask. 1 job (even if the button is repeated) = focused. 3 OR MORE different jobs = DECISION OVERLOAD, cap the score at 3-4 no matter how strong or repeated any single one is. CRUCIAL: repetition does NOT rescue an overloaded page. The 'repeated action = good' rule ONLY applies when that repeated action is essentially the ONLY job on the page; if the page ALSO sells multiple priced products / has 'add to cart' / pushes an ebook and videos and a donation, the repetition is drowned out and it is still a mess, score 3-4. Multiple priced packages with 'add to cart' on a coaching homepage is by itself a strong sign of overload. Distinguish this from the SAME single action repeated down an otherwise-clean page ('Book a Free Session' three times, nothing else competing), which is GOOD consistency and scores HIGH. SCORE VIA A LADDER, but FIRST collapse repeats BY DESTINATION, not by wording: buttons with DIFFERENT text that lead to the SAME next step ('BOOK A CALL', 'I'M READY TO SCALE', 'GET STARTED' all going to the same booking) are ONE action, NOT three, and repeating one action with varied wording is a STRENGTH that RAISES the score, never overload. 'Learn More' six times, 'Contact' in header and footer, likewise ONE job. Count only genuinely DIFFERENT destinations/asks (a booking vs a purchase vs a download vs a donation). A dominant single action repeated down the page, even with a secondary 'watch video' or a service description lower down, is NOT decision overload, it's a focused page, score it 7-9. THEN judge, and MIND THE DIFFERENCE between a WEAK page and a CHAOTIC page, they score differently: 9-10 = one strong action (book a call / apply), clearly the only main thing, repeated consistently; 7-8 = one clear strong step plus at most one secondary; 5-6 = a real strong step exists but it's one of two or three competing options; 4 = NO strong step, the page only offers soft actions ('Learn More', 'Contact', 'read the blog', 'join a workshop'), however many, and never a real 'book a call' / 'apply' / 'get this free thing', OR several different asks with no shop, so it's weak and scattered but not a chaotic store; 3 = a priced SHOP is present but small (two or three products) alongside other asks; 2 = a big priced SHOP (many products / 'add to cart') PLUS several other heavy asks (a video wall, a donation, downloads, multiple booking types), a cold visitor is totally lost; 0 = no real next step at all. HARD RULE, do not break it: if there is NO shop (no priced products, no 'add to cart') the score CANNOT go below 4, no matter how many soft 'Learn More' buttons there are, because weak-and-cluttered is a 4, not chaos. Only a genuine priced store drops a page to 3 or 2. A weak page and a chaotic shop are DIFFERENT failures. WRITE THE NOTE FOR THE RIGHT FAILURE: if the problem is OVERLOAD (several competing asks), the note must SAY it's overload, list the competing asks, and say 'pick ONE clear next step', NEVER say 'no clear next step stands out' or 'no call to action', that describes ABSENCE, the opposite problem, and tells the coach to ADD when they need to CUT. Only say a CTA is missing/absent when there genuinely isn't a real next step on the page.",
@@ -1325,7 +1420,8 @@ def ai_analyse(row, scores, score_10, ev=None):
     except ImportError:
         return None
     ev = ev or {}
-    rubric_txt = "\n".join(f"- {LABELS[k]} ({k}): {d}" for k, d in _AI_RUBRIC.items())
+    # Only the AI-SCORED criteria go in the rubric-to-score list. specificity + clarity are extracted as FLAGS instead.
+    rubric_txt = "\n".join(f"- {LABELS[k]} ({k}): {_AI_RUBRIC[k]}" for k in AI_SCORE_CRIT)
     # Copy the AI reads. clean_text strips nav/menu noise, but on some markup it over-strips and leaves almost
     # nothing (e.g. one site collapsed to just "pri leadership"). So use clean_text ONLY when it actually kept the
     # bulk of the page; otherwise fall back to the full body_text, a little nav noise beats scoring an empty page.
@@ -1408,6 +1504,31 @@ def ai_analyse(row, scores, score_10, ev=None):
         "almost always be one of the ON-PAGE LINES listed below, copy that line verbatim; only if the headline "
         "genuinely isn't in that list, read it exactly off the screenshot. Never return the browser-tab/site name.\n\n"
         f"CRITERIA + rubric:\n{rubric_txt}\n\n"
+        "SPECIFICITY + CLARITY — DO NOT SCORE THESE, EXTRACT THEIR FLAGS (they are judged in code). Read as a harsh, "
+        "skeptical stranger: assume GENERIC until the page proves SPECIFIC.\n"
+        "GENERIC AUDIENCE tokens (a bare category, do NOT count as a specific audience): people, professionals, "
+        "individuals, entrepreneurs, business owners, leaders, executives, managers, women, men, high-achievers, "
+        "'ambitious X', anyone, everyone.\n"
+        "GENERIC PROBLEM/OUTCOME tokens (a fluffy state, do NOT count as a concrete problem): confidence, clarity, "
+        "mindset, alignment, purpose, potential, growth, transformation, balance, fulfilment, overwhelm, stuck, "
+        "thrive, authentic, best self, next level, breakthrough, limiting beliefs, success, freedom, happiness.\n"
+        "Judge each element AS A WHOLE: a generic word INSIDE a concrete phrase still counts as concrete ('no "
+        "confidence to speak up in board meetings' = a concrete situation). A token only fails when the element is "
+        "expressed SOLELY via generic tokens.\n"
+        "specificity_flags: specific_demographic = a REAL role+context (not a bare category), with demographic_quote; "
+        "concrete_pain = a REAL situation in the buyer's words (not a fluffy state), with pain_quote; unique_mechanism "
+        "= a NAMED method or a CONCRETE measurable outcome (not 'coaching/support'), with mechanism_quote; "
+        "generic_tokens = the fluff words the page leans on; distinct_audiences_or_problems = how many GENUINELY "
+        "DIFFERENT, UNRELATED audiences or problems it serves. Count SEPARATE audiences ('entrepreneurs AND stay-at-home "
+        "mums AND retirees' = 3) or unrelated problems ('career change, weight loss, grief' = 3). Do NOT count MULTIPLE "
+        "FACETS OF ONE niche as separate: 'women with late-diagnosed ADHD navigating their career' is ONE audience "
+        "described by facets (women + ADHD + career + late diagnosis), so count 1, not 4. If the facets all describe the "
+        "SAME person, the count is 1.\n"
+        "clarity_flags (the FIRST SCREEN / biggest text only): hero_quote = the headline verbatim; "
+        "hero_specific_audience = names a SPECIFIC audience (not generic); hero_concrete_problem_or_outcome = a "
+        "CONCRETE situation/outcome (not fluffy); hero_names_field_or_category = at least names the topic/area; "
+        "hero_is_metaphor_or_feeling_only = gestures at a feeling, names no person/problem; "
+        "hero_is_broad_everyone_appeal = 'for anyone' / general all-purpose life coaching.\n\n"
         f"THE PAGE'S ON-PAGE TEXT LINES (biggest first, pick the headline from here):\n{cand_txt}\n\n"
         f"FACTS:\n{facts}\n\n"
         f"THE ACTUAL PAGE COPY (judge story/specificity/offer/proof from THIS):\n\"\"\"\n{copy}\n\"\"\"\n\n"
@@ -1985,6 +2106,18 @@ def audit_url(url):
             s = ai["scores"].get(k)
             if s:
                 scores[k] = max(0, min(10, int(s["score"])))
+        # FLAG-JUDGE (safeguard 2 — global integration fail-safe): specificity + clarity now come from the AI's FLAGS
+        # via the pure Python judges, not an AI number. Wrapped so an empty / missing / malformed flag payload can
+        # NEVER crash the audit — on ANY problem we simply leave the deterministic proxy score already in `scores`
+        # (set from S.CRITERIA at the top of audit_url), so the page always renders a real number, never a 500.
+        for _crit, (_flagkey, _judge) in FLAG_CRIT.items():
+            try:
+                _flags = ai.get(_flagkey)
+                if isinstance(_flags, dict) and _flags:
+                    scores[_crit] = max(0, min(10, int(_judge(_flags))))
+                # else: no / empty flags -> keep the deterministic proxy already in scores (silent, safe fallback)
+            except Exception:
+                pass   # any error whatsoever -> keep the proxy; never blank the page
         # CTA FLOOR: the only thing that earns a 2 or 3 for the CTA is genuine priced-shop chaos (many products /
         # add-to-cart competing with everything else). A page with NO shop, however cluttered with soft 'Learn More'
         # buttons, is a WEAK CTA, not chaos, so it floors at 4. The AI won't reliably hold this line, so we enforce it
