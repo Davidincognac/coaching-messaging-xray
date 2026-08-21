@@ -14,7 +14,7 @@ import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
-from audit import audit_url, LABELS, websites_read_count  # the engine we built
+from audit import audit_url, LABELS, DEFINITIONS, websites_read_count  # the engine we built
 
 PORT = int(os.getenv("PORT", "8000"))
 
@@ -76,7 +76,8 @@ PAGE = """<!doctype html><html lang="en"><head>
   .mark.ok::before{{content:"✓";color:var(--good);font-weight:700}}
   .mark.no::before{{content:"✗";color:var(--critical);font-weight:700}}
   .mark.na::before{{content:"–";color:#9aa0a6;font-weight:700}}
-  .barnote{{font-size:13px;color:var(--muted);margin:1px 0 0 18px;line-height:1.45;max-width:60ch}}
+  .def{{font-size:12px;color:#8a9098;margin:2px 0 0 18px;line-height:1.4;font-style:italic;max-width:62ch}}
+  .barnote{{font-size:13px;color:var(--muted);margin:3px 0 0 18px;line-height:1.45;max-width:60ch}}
   .scores-h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
     color:var(--muted);margin:26px 0 12px}}
   .honest{{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);
@@ -528,12 +529,14 @@ def render_result(res):
     # N/A (booking with no form on the page) has gap None: sort it to the end (it isn't a problem to fix).
     for k, c in sorted(res["comparison"].items(), key=lambda kv: (99 if kv[1]["gap"] is None else kv[1]["gap"])):
         info = res["notes"].get(k, {"pass": None, "note": ""})
+        _def = html.escape(DEFINITIONS.get(k, ""))
         if c["you"] is None:                     # N/A: no bar, no red cross, an honest 'N/A'
             rows.append(
                 f'<div class="barwrap"><div class="bar">'
                 f'<div class="lbl"><span class="mark na"></span>{html.escape(LABELS[k])}</div>'
                 f'<div class="track"><div class="fill na" style="width:0%"></div></div>'
                 f'<div class="vs"><b>N/A</b></div></div>'
+                f'<div class="def">{_def}</div>'
                 f'<div class="barnote">{html.escape(info["note"])}</div></div>'
             )
             continue
@@ -544,6 +547,7 @@ def render_result(res):
             f'<div class="lbl"><span class="mark {mark}"></span>{html.escape(LABELS[k])}</div>'
             f'<div class="track"><div class="fill {sev_class(c["you"])}" style="width:{pct}%"></div></div>'
             f'<div class="vs"><b>{c["you"]}</b>/10 &middot; mkt {c["market"]}</div></div>'
+            f'<div class="def">{_def}</div>'
             f'<div class="barnote">{html.escape(info["note"])}</div></div>'
         )
     cr = res["critique"]
