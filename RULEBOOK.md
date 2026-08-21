@@ -78,6 +78,9 @@ Does the RIGHT person (a cold visitor who HAS this problem) know the page is for
 
 ### Technical health
 - Loads, safe, basics handled = 10. Dock for real technical weakness only.
+- NOT part of the overall score. Almost every site passes it (market ~9), so counting it only pads the number.
+  Still scored and shown (labelled "not counted"), and flagged if something is genuinely broken. The overall
+  score is about how well the page speaks to a buyer, not the plumbing.
 
 ---
 

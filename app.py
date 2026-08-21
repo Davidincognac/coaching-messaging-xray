@@ -69,25 +69,26 @@ PAGE = """<!doctype html><html lang="en"><head>
   .den{{font-family:"Inter",sans-serif;color:var(--muted);font-size:15px}}
   .tier{{margin-left:auto;font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--muted)}}
-  .bar{{display:grid;grid-template-columns:220px 1fr 92px;align-items:center;gap:12px;padding:7px 0}}
-  .bar .lbl{{font-size:14px}}
-  .barwrap{{margin:4px 0 12px}}
-  .mark{{display:inline-block;width:18px}}
+  .barwrap{{padding:16px 0;border-top:1px solid var(--line)}}
+  .barwrap:first-child{{border-top:0;padding-top:2px}}
+  .barhead{{display:flex;align-items:baseline;justify-content:space-between;gap:16px}}
+  .lbl{{font-size:15.5px;font-weight:600;color:var(--ink);line-height:1.3}}
+  .mark{{display:inline-block;width:22px}}
   .mark.ok::before{{content:"✓";color:var(--good);font-weight:700}}
   .mark.no::before{{content:"✗";color:var(--critical);font-weight:700}}
   .mark.na::before{{content:"–";color:#9aa0a6;font-weight:700}}
-  .def{{font-size:12px;color:#8a9098;margin:2px 0 0 18px;line-height:1.4;font-style:italic;max-width:62ch}}
-  .barnote{{font-size:13px;color:var(--muted);margin:3px 0 0 18px;line-height:1.45;max-width:60ch}}
-  .scores-h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--muted);margin:26px 0 12px}}
-  .honest{{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);
-    padding-top:14px}}
-  .track{{height:9px;background:var(--soft);border-radius:6px;overflow:hidden}}
+  .track{{height:8px;background:var(--soft);border-radius:6px;overflow:hidden;margin:12px 0 0}}
   .fill{{height:100%;border-radius:6px}}
   .fill.crit{{background:var(--critical)}} .fill.warn{{background:var(--warn)}} .fill.good{{background:var(--good)}}
   .fill.na{{background:transparent}}
-  .vs{{font-family:"Inter",sans-serif;font-size:13px;text-align:right;color:var(--muted)}}
-  .vs b{{color:var(--ink)}}
+  .vs{{font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap;text-align:right;line-height:1.1}}
+  .vs .den{{font-weight:600;color:var(--muted);font-size:13px}}
+  .vs .mkt{{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:3px}}
+  .def{{font-size:13px;color:var(--muted);margin:12px 0 0;line-height:1.5;max-width:64ch}}
+  .barnote{{font-size:14px;color:var(--ink);margin:7px 0 0;line-height:1.55;max-width:62ch}}
+  .scores-h{{font-size:15px;color:var(--muted);line-height:1.55;margin:30px 0 18px;max-width:62ch}}
+  .honest{{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);
+    padding-top:14px}}
   .diag{{margin-top:24px;border-top:1px solid var(--line);padding-top:20px}}
   .diag h3{{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 12px}}
   .diag .row{{margin:10px 0}}
@@ -104,8 +105,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .err{{color:var(--critical)}}
   .pctl{{font-family:"Inter",sans-serif;font-size:13px;color:var(--accent-ink);font-weight:600}}
   .ev{{background:#f6f8f7;border:1px solid var(--line);border-radius:11px;padding:18px 20px;margin:20px 0}}
-  .ev .h{{font-family:"Inter",sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--muted);margin-bottom:12px}}
+  .ev .h{{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:14px}}
   .ev .q{{font-family:"Inter",sans-serif;font-style:italic;font-size:16px;color:var(--ink);
     border-left:3px solid var(--accent);padding-left:12px;margin:8px 0}}
   .ev .meta{{font-size:13px;color:var(--muted);margin-top:6px}}
@@ -414,12 +414,27 @@ def render_result(res):
     scope = (f'<div class="scope">{html.escape(res["scope_note"])} '
              f'<span class="date">Analysed {html.escape(res["analysed_on"])}.</span></div>')
 
-    # gap-to-the-top (never a complacent "better than X%"); den_line stays true even for a high scorer
-    if res["in_top_tier"]:
+    # gap-to-the-top (never a complacent "better than X%"). "A visitor gets it fast" is a CLARITY claim, so we gate
+    # it on the actual 5-second score, NOT the overall, which a strong booking/CTA/story can prop up. In a weak market
+    # a page can rank top-10% yet still fail its headline, so we never tell that coach "gets it fast" (self-contradiction
+    # + factually wrong). We reconcile instead: ahead of most, but still not landing in five seconds.
+    _clar = (res["comparison"].get("clarity_5sec") or {}).get("you")
+    reads_fast = _clar is not None and _clar >= 6
+    if res["in_top_tier"] and reads_fast:
         gap_line = ("<p>A visitor here mostly gets it fast. You're in the small group of coaches whose homepage "
                     "reads like the answer to a problem. The notes below are where the last few clients are "
                     "hiding.</p>")
         den_line = "You're in the top few coaching homepages we've read. The notes below are the final polish."
+    elif res["in_top_tier"] and not reads_fast:
+        gap_line = ("<p>Here's the honest bit. You're already ahead of most coaching pages, and plenty on here "
+                    "works. But the first thing a stranger sees, your headline, doesn't tell them in five seconds "
+                    "who it's for or what you fix. So even here, people leave before they reach the good stuff.</p>"
+                    "<p>Ahead of most isn't the same as landing. Getting a stranger to think &lsquo;that's me&rsquo; "
+                    "in seconds isn't a headline you polish on your own. It's knowing their real problem in their "
+                    "own words, and that's the part you can't see from the inside.</p>")
+        den_line = ("You're in the top few coaching homepages we've read. But that's a low bar, most are poor, and "
+                    "top few still isn't landing in five seconds. Your headline doesn't yet. That's what the notes "
+                    "below are for.")
     else:
         gap_line = ("<p>The best coaching homepages make a visitor think &lsquo;that's exactly my problem, and "
                     "they can fix it&rsquo; within seconds. Yours doesn't yet, so a potential client looks, "
@@ -535,21 +550,23 @@ def render_result(res):
         _def = html.escape(DEFINITIONS.get(k, ""))
         if c["you"] is None:                     # N/A: no bar, no red cross, an honest 'N/A'
             rows.append(
-                f'<div class="barwrap"><div class="bar">'
+                f'<div class="barwrap"><div class="barhead">'
                 f'<div class="lbl"><span class="mark na"></span>{html.escape(LABELS[k])}</div>'
-                f'<div class="track"><div class="fill na" style="width:0%"></div></div>'
-                f'<div class="vs"><b>N/A</b></div></div>'
+                f'<div class="vs" style="color:var(--muted);font-size:14px">N/A</div></div>'
                 f'<div class="def">{_def}</div>'
                 f'<div class="barnote">{html.escape(info["note"])}</div></div>'
             )
             continue
         pct = c["you"] * 10
         mark = "ok" if info["pass"] else "no"
+        # technical_health is shown but NOT part of the overall score, so it shows 'not counted', not a market gap.
+        _mkt = 'not counted' if k == "technical_health" else f'market {c["market"]}'
         rows.append(
-            f'<div class="barwrap"><div class="bar">'
+            f'<div class="barwrap"><div class="barhead">'
             f'<div class="lbl"><span class="mark {mark}"></span>{html.escape(LABELS[k])}</div>'
+            f'<div class="vs"><b>{c["you"]}</b><span class="den">/10</span>'
+            f'<span class="mkt">{_mkt}</span></div></div>'
             f'<div class="track"><div class="fill {sev_class(c["you"])}" style="width:{pct}%"></div></div>'
-            f'<div class="vs"><b>{c["you"]}</b>/10 &middot; mkt {c["market"]}</div></div>'
             f'<div class="def">{_def}</div>'
             f'<div class="barnote">{html.escape(info["note"])}</div></div>'
         )

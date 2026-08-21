@@ -74,7 +74,7 @@ DEFINITIONS = {
     "opt_in": "Something for the not-ready-yet: a free thing they get without booking a call.",
     "booking": "The next step for the ready: a booking or enquiry, and how strong that step is.",
     "story": "Does the copy connect to the reader's own situation, not just your CV?",
-    "technical_health": "The basics: secure, loads well, real content on the page.",
+    "technical_health": "The basics: secure, loads well, real content on the page. We check this but leave it out of your overall score, almost every site passes it, so counting it would only pad your number. If something here were broken, we'd flag it.",
 }
 # The order the bars READ in (grouped by theme, not sorted by gap): first impression, then the offer, then trust,
 # then the three 'getting the lead' scores TOGETHER (opt-in -> focus -> booking), then the human, then the basics.
