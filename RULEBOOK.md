@@ -63,15 +63,22 @@ Does the RIGHT person (a cold visitor who HAS this problem) know the page is for
 - HARD RULE: no shop → the score cannot go below 4, however many soft buttons there are.
 - The NOTE must name the real failure — overload ("cut to one"), never "no CTA" (that's absence).
 
-### Lead capture
-- Real on-page magnet, up top: 8.
-- Buried magnet (low on the page): 4.
+### Opt-in form (mandatory — none = 0)
+The freebie the NOT-ready get without a call.
+- Real on-page magnet, up top: 8. Buried magnet (low on the page): 4.
 - Gated "free" resource (locked behind membership/purchase): 5.
-- Email opt-in with a value hook: 5 (buried: 3).
-- Newsletter: 3 (buried in the footer with no reason: 2).
-- Contact form: 2. Application form: 2.
+- Email opt-in with a value hook: 5 (buried: 3). Newsletter: 3 (buried in the footer with no reason: 2).
 - A magnet keyword that only appears as a NAV-MENU link is NOT an on-page magnet — skip it.
 - Nothing: 0.
+
+### Booking & enquiry (optional — none = N/A, excluded from the total)
+The reach-out step for the READY. Scored by the TYPE of step, NOT free vs paid (a call is a commitment either way; "is
+there a free way in" is the Opt-in criterion's job).
+- Direct booking (book a time now): 8. Detected by a scheduler LINK (Calendly, Acuity, GoHighLevel `/widget/bookings/`,
+  a `/book` path, etc.) OR booking words — the link is definitive and robust to whatever the button says.
+- Direct booking LOST among competing buy-CTAs (a shop, 3+ priced offers, or 4+ distinct booking links): 5 — it's
+  there, but the ready have to hunt for it through the clutter (the same clutter that tanks clear_cta).
+- Contact / enquiry form: 4 (passive). Application: 3 (high friction). None: N/A.
 
 ### Story
 - Does the copy connect to the READER's own situation, or is it the coach's CV? Reader-focused = high.

@@ -502,16 +502,46 @@ _BOOKING_RE = re.compile(
     r"schedule (?:a |your )?(?:free )?(?:call|consultation|session|appointment|review|audit)|"
     r"(?:free|complimentary) (?:consultation|discovery call|strategy (?:call|session)|review|audit|assessment)", re.I)
 
+# A booking is often just a "Book" button wired to a scheduler (Calendly, Acuity, GoHighLevel, etc.) whose text alone
+# says nothing. So we ALSO read where buttons LINK, not only the words. Known scheduler hosts + booking-path URLs are a
+# definitive signal, robust to button wording. We match REAL schedulers only, so a 'Book' that goes to a shop checkout
+# is never miscounted. Hosts are anchored to a domain boundary so short ones (cal.com) don't match inside other domains.
+_BOOKING_HOST_RE = re.compile(
+    r"(?:^|//|\.)(?:calendly\.com|acuityscheduling\.com|squarespacescheduling\.com|savvycal\.com|tidycal\.com|"
+    r"youcanbook\.me|cal\.com|setmore\.com|simplybook\.[a-z]+|koalendar\.com|zcal\.co|appointlet\.com|10to8\.com|"
+    r"vcita\.com|picktime\.com|book\.squareup\.com|paperbell\.com|satoriapp\.com|coachaccountable\.com|"
+    r"practicebetter\.io|honeybook\.com|dubsado\.com|leadconnectorhq\.com|msgsndr\.com|oncehub\.com|bookwhen\.com|"
+    r"checkfront\.com|timetap\.com|meetings\.hubspot\.com)", re.I)
+_BOOKING_PATH_RE = re.compile(
+    r"/widget/bookings?/|/book-a-(?:call|consult|session|discovery)|/book-now\b|/bookings?\b|/appointments?\b|"
+    r"/schedule-a-(?:call|consult|session)|/discovery-call\b|/free-(?:call|consultation)\b|squareup\.com/appointments",
+    re.I)
+
+def booking_links(html):
+    """Distinct scheduler/booking URLs on the page (known host or booking-path). Robust to button wording. Used both to
+    DETECT a booking AND to judge whether it's LOST among many competing session options (a wall of 'Book' buttons)."""
+    found = set()
+    for u in re.findall(r'href=["\']([^"\']+)["\']', html or "", re.I):
+        lu = u.lower()
+        if _BOOKING_HOST_RE.search(lu) or _BOOKING_PATH_RE.search(lu):
+            found.add(lu.split("#")[0].split("?")[0].rstrip("/"))   # dedupe a repeated 'Book' button by its destination
+    return found
+
+def detect_booking_link(html):
+    """True if any button/link points at a REAL scheduler. Robust to button text, so a bare 'Book' button still counts."""
+    return len(booking_links(html)) > 0
+
 def detect_booking(row):
-    """BOOKING & ENQUIRY: the reach-out/commit step. Returns a cap dict (naming the kind) or None (N/A)."""
+    """BOOKING & ENQUIRY: the reach-out/commit step. Returns a cap dict (naming the kind) or None (N/A). We score by the
+    TYPE of step, not free vs paid (a call is a commitment either way; whether there's a free way in is the Opt-in
+    criterion's job). A booking is a scheduler LINK (strongest, robust to wording) OR booking WORDS in the copy."""
     bt = _clean(row.get("body_text")) or ""
-    low = bt.lower()
-    m = _BOOKING_RE.search(bt)
+    if row.get("has_booking_link"):                              # strongest signal: a button wired to a real scheduler
+        return {"kind": "booking", "desc": "a booking a visitor can make straight off the page"}
+    m = _BOOKING_RE.search(bt)                                   # backup: booking words (inline / on-page, no widget)
     if m:
-        win = low[max(0, m.start() - 45): m.end() + 20]
-        free = bool(re.search(r"free|complimentary|no obligation|no cost|no charge|no pitch", win))
         phrase = re.sub(r"\s+", " ", m.group(0)).strip()
-        return {"kind": "booking_free" if free else "booking_paid", "free": free, "desc": f"a ‘{phrase}’ booking"}
+        return {"kind": "booking", "desc": f"a ‘{phrase}’ booking"}
     if _APPLICATION_RE.search(bt):
         return {"kind": "application", "desc": "an application form"}
     fields = [f for f in ["name", "email", "phone", "subject", "message"] if re.search(r"\b" + f + r"\b", bt, re.I)]
@@ -520,10 +550,11 @@ def detect_booking(row):
     return None
 
 def booking_score(cap):
-    """BOOKING & ENQUIRY score, or None for N/A (no booking or enquiry on the page)."""
+    """BOOKING & ENQUIRY score by the TYPE of step, or None for N/A. No free-vs-paid: a call is a commitment either way,
+    and 'is there a free way in' is scored under Opt-in. A direct booking (book a time now) is the strong version."""
     if not cap:
         return None
-    return {"booking_free": 9, "booking_paid": 6, "contact_form": 4, "application": 3}.get(cap.get("kind"))
+    return {"booking": 8, "contact_form": 4, "application": 3}.get(cap.get("kind"))
 
 def build_captures(row):
     """Split capture: {'opt_in': best opt-in cap or None, 'booking': booking cap or None}. A page can have BOTH."""
@@ -1059,6 +1090,9 @@ def render_and_extract(domain):
         if vis and vis.get("headings"):                      # clean rendered headings replace the span-split ones
             row["h2_headings"] = " | ".join(vis["headings"][:8])
         row["clean_text"] = clean_main_text(rendered_html)   # main content only, for the prominence sanity-checks
+        _blinks = booking_links(rendered_html)
+        row["has_booking_link"] = bool(_blinks)              # a 'Book' button wired to a real scheduler = a booking
+        row["booking_link_count"] = len(_blinks)             # many distinct session links = booking lost among options
         proof = detect_proof_links(rendered_html)
         row["proof_link_labels"] = proof["labels"]
         row["proof_external_reviews"] = proof["external_reviews"]
@@ -1557,27 +1591,28 @@ def criterion_note(key, sc, ev=None):
                 "who aren't ready to book today just leave and you never hear from them again. Every homepage needs one, "
                 "a free thing that solves one specific piece of their problem.")
     if key == "booking":
-        # BOOKING & ENQUIRY: the reach-out step. Name the exact kind and its weakness; None means N/A.
+        # BOOKING & ENQUIRY: the reach-out step. Score by the TYPE of step (no free vs paid); None means N/A.
         cap = (ev.get("captures") or {}).get("booking")
         if not cap:
             return ("There's no booking or enquiry form on your homepage. That isn't a fault on its own IF your opt-in "
                     "is catching people, but a visitor who IS ready to talk has no obvious way to start. The strong "
-                    "version is one clear ‘book a free call’ (or review) button.")
+                    "version is one clear ‘book a call’ button that lets them grab a time straight off the page.")
         kind, desc = cap.get("kind"), cap.get("desc")
-        if kind == "booking_free":
-            return (f"You've got {desc}, a free booking, the strong version of a next step, it catches the people ready "
-                    "to talk. Just remember it only catches the ready, which is exactly why the opt-in matters for "
-                    "everyone else.")
-        if kind == "booking_paid":
-            return (f"You've got {desc}, but charging up front is a bigger ask for a cold visitor who isn't sure of you "
-                    "yet. A free first call or review lowers the bar and catches far more of the ready.")
+        if kind == "booking":
+            if cap.get("buried"):
+                return ("You do have a booking, but it's lost among your other CTAs, the paid packages and ‘buy’ "
+                        "buttons, so a ready visitor has to hunt for it. Pull one clear ‘book a call’ out in front of "
+                        "the things to buy, so the ready don't slip away while they're deciding what to purchase.")
+            return (f"You've got {desc}, a clear, direct next step, so a visitor who's ready can act on the spot. Just "
+                    "remember it only catches the ready, which is exactly why the opt-in matters for everyone else.")
         if kind == "contact_form":
             return (f"What you've got is {desc}. That's passive, ‘reach out’ puts the work on them and catches only the "
-                    "already-convinced. Give them one clear, low-friction step instead, a ‘book a free call’ button.")
+                    "already-convinced. Give them one clear, low-friction step instead, a ‘book a call’ button that "
+                    "lets them grab a time there and then.")
         if kind == "application":
             return ("What you've got is an application form. That's high-friction, for people already sure they want to "
-                    "work with you, and it filters out the many still deciding. A free call or review is an easier first "
-                    "step.")
+                    "work with you, and it filters out the many still deciding. A booking they can make in one step is "
+                    "an easier start.")
         return "There's a way to reach out, but it isn't a clear, strong next step."
     if key == "story":
         if sc >= 6: return "Your story links to what the reader is going through."
@@ -1860,6 +1895,19 @@ def audit_url(url):
     _caps = ev.get("captures") or {}
     scores["opt_in"] = opt_in_score(_caps.get("opt_in"))
     scores["booking"] = booking_score(_caps.get("booking"))   # int, or None (N/A) -> excluded from the total
+    # A real booking LOST among competing 'buy this' CTAs (a shop / several priced packages) is a weaker next step than
+    # one clear 'book a call' — the ready visitor has to hunt for it through the clutter. Dock a strong booking (8) to 5
+    # in that priced-CTA overload, the same clutter that tanks clear_cta. Only a strong direct booking flexes; a contact
+    # form / application is already low. (David's call: her booking is a 5 because it's lost among things to buy.)
+    _bk = _caps.get("booking")
+    # 'Buried' = the booking is one of MANY competing asks. Catch it three ways, because coaches build pages differently:
+    # a real shop, several deterministically-priced offers, OR a wall of distinct booking links (a GoHighLevel-style
+    # funnel where each paid session is its own 'Book' button, which the price counter can't see).
+    if scores.get("booking") == 8 and (row.get("has_shop") or row.get("priced_offer_count", 0) >= 3
+                                       or row.get("booking_link_count", 0) >= 4):
+        scores["booking"] = 5
+        if _bk:
+            _bk["buried"] = True   # so the note explains it's lost among the buy-CTAs, not a clean single booking
     total_100 = S.weighted_total(scores); score_10 = round(total_100 / 10)
 
     # AI LAYER: one call re-scores the 8 content criteria by READING the page (keyword matching can't judge
