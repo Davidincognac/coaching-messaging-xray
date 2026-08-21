@@ -75,6 +75,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .mark{{display:inline-block;width:18px}}
   .mark.ok::before{{content:"✓";color:var(--good);font-weight:700}}
   .mark.no::before{{content:"✗";color:var(--critical);font-weight:700}}
+  .mark.na::before{{content:"–";color:#9aa0a6;font-weight:700}}
   .barnote{{font-size:13px;color:var(--muted);margin:1px 0 0 18px;line-height:1.45;max-width:60ch}}
   .scores-h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
     color:var(--muted);margin:26px 0 12px}}
@@ -83,6 +84,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .track{{height:9px;background:var(--soft);border-radius:6px;overflow:hidden}}
   .fill{{height:100%;border-radius:6px}}
   .fill.crit{{background:var(--critical)}} .fill.warn{{background:var(--warn)}} .fill.good{{background:var(--good)}}
+  .fill.na{{background:transparent}}
   .vs{{font-family:"Inter",sans-serif;font-size:13px;text-align:right;color:var(--muted)}}
   .vs b{{color:var(--ink)}}
   .diag{{margin-top:24px;border-top:1px solid var(--line);padding-top:20px}}
@@ -523,9 +525,19 @@ def render_result(res):
                     if res.get("pricing_note") else "")
 
     rows = []
-    for k, c in sorted(res["comparison"].items(), key=lambda kv: kv[1]["gap"]):
+    # N/A (booking with no form on the page) has gap None: sort it to the end (it isn't a problem to fix).
+    for k, c in sorted(res["comparison"].items(), key=lambda kv: (99 if kv[1]["gap"] is None else kv[1]["gap"])):
+        info = res["notes"].get(k, {"pass": None, "note": ""})
+        if c["you"] is None:                     # N/A: no bar, no red cross, an honest 'N/A'
+            rows.append(
+                f'<div class="barwrap"><div class="bar">'
+                f'<div class="lbl"><span class="mark na"></span>{html.escape(LABELS[k])}</div>'
+                f'<div class="track"><div class="fill na" style="width:0%"></div></div>'
+                f'<div class="vs"><b>N/A</b></div></div>'
+                f'<div class="barnote">{html.escape(info["note"])}</div></div>'
+            )
+            continue
         pct = c["you"] * 10
-        info = res["notes"].get(k, {"pass": c["you"] >= 6, "note": ""})
         mark = "ok" if info["pass"] else "no"
         rows.append(
             f'<div class="barwrap"><div class="bar">'

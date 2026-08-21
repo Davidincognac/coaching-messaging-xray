@@ -49,16 +49,16 @@ AUDIT_MODEL = os.getenv("AUDIT_MODEL", "claude-sonnet-4-6")
 # --- market benchmarks, from our full run of 10,954 live sites (strict scoring) ---
 MARKET_AVG_10 = 3.7
 TOP10_10 = 5.6
-BENCH = {   # market average per criterion, 0-10
+BENCH = {   # market average per criterion, 0-10 (opt_in/booking filled from the re-benchmark; placeholders for now)
     "clarity_5sec": 4.5, "specificity": 4.4, "offer_clarity": 2.9, "proof": 1.5,
-    "clear_cta": 5.6, "lead_capture": 4.6, "credibility": 2.7, "story": 2.5,
+    "clear_cta": 5.6, "opt_in": 4.2, "booking": 5.3, "credibility": 2.7, "story": 2.5,
     "pricing_shown": 1.8, "technical_health": 9.0,
     "proof_cred": 2.6,   # merged proof+credibility (approx market avg; corpus still scores them separately)
 }
 LABELS = {
     "clarity_5sec": "5-second clarity", "specificity": "Specificity (who + what problem)",
     "offer_clarity": "Offer clarity & value", "proof": "Proof / social proof",
-    "clear_cta": "One clear call-to-action", "lead_capture": "Lead capture",
+    "clear_cta": "One clear call-to-action", "opt_in": "Opt-in form", "booking": "Booking & enquiry",
     "credibility": "Credibility markers", "story": "Story / the human",
     "pricing_shown": "Pricing visible", "technical_health": "Technical health",
     "proof_cred": "Proof & credibility",
@@ -460,6 +460,62 @@ def build_capture(row):
     best["also"] = [c for c in caps if c is not None and c.get("desc") != best.get("desc")]
     return best
 
+# ---- OPT-IN FORM vs BOOKING & ENQUIRY (David's split of the old 'lead capture') ----
+# Opt-in form = value a NOT-ready visitor gets without a call (mandatory, none = 0). Booking & enquiry = the reach-out
+# step for the READY (optional, none = N/A). A page can have BOTH, so we detect and score them separately.
+_OPTIN_KINDS = {"magnet", "email_optin", "newsletter", "community"}
+
+def opt_in_score(cap):
+    """OPT-IN FORM score, by value tier. MANDATORY: no opt-in at all = 0."""
+    if not cap:
+        return 0
+    k = cap.get("kind")
+    if k == "magnet":
+        return 5 if cap.get("gated") else (4 if cap.get("buried") else 8)
+    if k == "email_optin":
+        return 3 if cap.get("buried") else 5
+    if k in ("newsletter", "community"):
+        return 2 if cap.get("buried") else 3
+    return 0
+
+# Broader than _CONSULT_RE: coaches book 'reviews', 'audits', 'assessments', not only 'calls'.
+_BOOKING_RE = re.compile(
+    r"book (?:a |your |my |an )?(?:free |complimentary )?(?:call|consultation|discovery call|strategy (?:call|session)|"
+    r"intro(?:ductory)? call|clarity call|session|chat|appointment|review|audit|assessment|meeting)|"
+    r"schedule (?:a |your )?(?:free )?(?:call|consultation|session|appointment|review|audit)|"
+    r"(?:free|complimentary) (?:consultation|discovery call|strategy (?:call|session)|review|audit|assessment)", re.I)
+
+def detect_booking(row):
+    """BOOKING & ENQUIRY: the reach-out/commit step. Returns a cap dict (naming the kind) or None (N/A)."""
+    bt = _clean(row.get("body_text")) or ""
+    low = bt.lower()
+    m = _BOOKING_RE.search(bt)
+    if m:
+        win = low[max(0, m.start() - 45): m.end() + 20]
+        free = bool(re.search(r"free|complimentary|no obligation|no cost|no charge|no pitch", win))
+        phrase = re.sub(r"\s+", " ", m.group(0)).strip()
+        return {"kind": "booking_free" if free else "booking_paid", "free": free, "desc": f"a ‘{phrase}’ booking"}
+    if _APPLICATION_RE.search(bt):
+        return {"kind": "application", "desc": "an application form"}
+    fields = [f for f in ["name", "email", "phone", "subject", "message"] if re.search(r"\b" + f + r"\b", bt, re.I)]
+    if len(fields) >= 3 and ("message" in fields or "subject" in fields):
+        return {"kind": "contact_form", "desc": "a contact / enquiry form"}
+    return None
+
+def booking_score(cap):
+    """BOOKING & ENQUIRY score, or None for N/A (no booking or enquiry on the page)."""
+    if not cap:
+        return None
+    return {"booking_free": 9, "booking_paid": 6, "contact_form": 4, "application": 3}.get(cap.get("kind"))
+
+def build_captures(row):
+    """Split capture: {'opt_in': best opt-in cap or None, 'booking': booking cap or None}. A page can have BOTH."""
+    cap = build_capture(row)
+    all_caps = [cap] + (cap.get("also") or [])
+    optins = [c for c in all_caps if c.get("kind") in _OPTIN_KINDS]
+    opt = dict(max(optins, key=opt_in_score)) if optins else None
+    return {"opt_in": opt, "booking": detect_booking(row)}
+
 def build_evidence(row):
     h1 = _tidy_headline(row.get("h1"))
     h2s = [p.strip() for p in _clean(row.get("h2_headings")).split("|") if len(p.strip()) > 2][:4]
@@ -502,7 +558,8 @@ def build_evidence(row):
                                         _tidy_headline(row.get("page_title")) or ""]), full=body),
         "has_logos": any(p in body for p in LOGO_PHRASES),
         "capture_line": capture_line,
-        "capture": build_capture(row),       # PRIMARY capture (best of possibly several) + 'also' for the rest
+        "capture": build_capture(row),       # PRIMARY capture (kept for the CTA ask-count + pop-up note)
+        "captures": build_captures(row),     # SPLIT: {'opt_in': cap-or-None, 'booking': cap-or-None} for the two scores
         "subheadings": h2s,
         "main_cta": ctas[0] if ctas else "",
         "testimonials_found": testi,
@@ -1029,7 +1086,7 @@ CRITIQUE_SCHEMA = {
 # The AI re-scores these CONTENT criteria by reading the page (technical_health stays rule-based, it's factual).
 # proof_cred is the MERGED proof+credibility criterion; the corpus scorer still keeps them separate for its stats.
 AI_SCORE_CRIT = ["clarity_5sec", "specificity", "offer_clarity", "proof_cred",
-                 "clear_cta", "lead_capture", "story"]
+                 "clear_cta", "story"]   # opt_in + booking are deterministic (from detection), not AI-scored
 _SCORE_FIELD = {"type": "object", "additionalProperties": False,
                 # reason FIRST so the model thinks before it commits a number (steadier and more accurate than
                 # picking a score cold then justifying it); score is 0-10, clamped in code (schema can't bound it).
@@ -1153,7 +1210,6 @@ _AI_RUBRIC = {
     "offer_clarity": "TWO things: (1) can a cold buyer see what you actually FIX, the outcome/transformation and why it's worth it (the value); AND (2) is there one clear, defined thing to buy or an obvious way to start? Judge the VALUE and the OFFER, NOT the price, showing a price does not earn marks and hiding it does not lose them. 10=the fix/outcome is vivid AND there's a clear thing to buy; 5=one of the two; 0=neither, just a vague sense of 'coaching'.",
     "proof_cred": "MERGED proof + credibility: does a cold buyer get real reason to BELIEVE you, both that you get results and that you're legit? Judge by how COSTLY TO FAKE the signal is, and SCORE THE STRONGEST SIGNAL PRESENT, do NOT average down. A real third-party review-platform RATING (a Google / Facebook / Trustpilot star rating with a real review count, e.g. '5.0 from 58 reviews') is STRONG on its own = 8-9, it is costly to fake; if the page ALSO has plain text testimonials, those are a bonus and must NOT drag the score below what the Google/Trustpilot rating already earns. CLIENT TESTIMONIALS come in tiers by format: a VIDEO testimonial is STRONG (hard to fake); a SCREENSHOT of a real review showing the person's name AND their photo/face (a Google/Facebook/Trustpilot card, a LinkedIn recommendation) is STRONG; a neat copy-paste TEXT quote from an ordinary client, even with a first name and initial, is MIDDLING (it counts, it's not poor, but it's easy to type up, so on its own it is NOT strong, cap it around 4-6). This format rule is ONLY for ordinary-client testimonials. It does NOT weaken these, which stay STRONG (8-10) in any format including plain text or a logo: a named endorsement from a RECOGNISED AUTHORITY (a well-known bestselling author) is costly to fake because they'd object if it were invented; media features shown as logos you recognise (real TV networks, national publications); named institutional clients you recognise (companies, universities); real third-party review widgets; specific results/numbers; case studies. Several together = strong. LOGO WALLS, JUDGE BY WHETHER YOU RECOGNISE THE BRANDS (the logo names are given to you in the FACTS block as image alt text, because a downscaled screenshot can't read a logo strip): (a) RECOGNISABLE major / household brands (e.g. KPMG, BCG, Red Bull, John Deere, Google, a real TV network or national publication) under a 'trusted by' / 'our clients' claim ARE a real, costly-to-fake signal, because a coach claiming Fortune-tier clients would be exposed if they were lying; credit it and score the proof UP to 6-7. BUT hold ONE honest caveat and put it in the note: a logo does not reveal the DEPTH of the relationship, they might have run a single half-day workshop years ago, not a long-term engagement, so recognisable client logos on their own are a solid 6-7, NOT a 9-10. (b) UNRECOGNISABLE or unlabelled local / ordinary-org logos are AMBIGUOUS: they could be audiences he merely spoke in front of or events he attended, not clients, so score them middling at best, never strong. (c) LIVE THIRD-PARTY REVIEWS are the strongest tier: a LIVE embedded Google / Trustpilot widget feeding real stars AND a visible review count (e.g. '5.0 from 200+ reviews') = 9-10. A mere SCREENSHOT or static graphic of stars, or a bare 'we're 5 stars on Google', is a CLAIM not proof, credit it only a little and say in the note they should embed the LIVE Google widget with the real review count so a cold buyer can verify it. WEAK/self-stated (score low): things they say about themselves, awards, bare 'bestselling'/'as seen on' with no recognisable names, accreditation/membership badges (ICF, WBENC, 'certified coach'). A reachable real business is a small plus. 10=strong; 0=nothing. WHEN YOU WRITE THE ONE-LINE REASON FOR THIS SCORE, BE HONEST, DO NOT FLATTER: if the proof is real but SOFT (named text testimonials with no photo, an unlabelled logo wall, 'as seen in' with no outlet you recognise), do NOT call it 'solid' or 'strong'; say plainly what would make a cold buyer doubt it (no photo so they can't tell it's a real person, logos that could just be event audiences) and that the lift is cheap and easy (add the person's photo or a screenshot of the real review, label the logos, add a Google/Facebook rating). A soft 6 that could reach 8 with small changes should read like that, not like a pat on the back. NEVER use vague grading words in the note ('middling', 'moderate', 'decent', 'somewhat', 'reasonable', 'a mixed picture'), they tell the coach nothing; say CONCRETELY what is working, what specific thing is missing, and the exact change that would lift it (e.g. not 'middling proof' but 'real recognisable brands, but a cold buyer can't tell if they were clients or one-off audiences, and there's no photo on the testimonials, add a face and say what you did for them'). DO NOT state the NAME FORMAT of testimonials (do not say 'first names only', 'full names', or invent a name), you cannot reliably read that off a screenshot and getting it wrong is a factual error; instead describe what a cold buyer can VERIFY: say 'text testimonials with no photo and no third-party source (Google / Facebook / Trustpilot) to verify them', and focus on what's missing. CREDIT WHAT IS ACTUALLY THERE, do not undercount it: a NAMED award (a proper-noun award title, e.g. 'Absolutely Mama Awards 2025') is a real if minor third-party signal, NEVER describe a named award as 'unnamed' or as having 'no recognisable authority'; and a NAMED founder / expert with STATED years of experience (e.g. 'Heidi Skudder, founder, 18 years in childcare') is real, verifiable credibility a stranger can check. When a named award AND a named expert-with-tenure both appear on the page, proof is AT LEAST a 4 even if the testimonials are anonymous. MULTIPLE NAMED CLIENTS with SPECIFIC QUANTIFIED results ('grew revenue by $500k', 'went from 1-in-10 to 1-in-2 close rate', 'from $1.5M to $2M') are STRONG, concrete, costly-to-fabricate proof: two or more such hard-number cases set a base of 6-7 even as plain text, docked only for missing photos / third-party verification, NEVER scored a middling 5. Specific numbers beat vague praise, do not under-credit them. A VERIFIABLE PROFESSIONAL LICENCE / accreditation from a real body (a licensed therapist / counsellor / psychologist, chartered, registered with a named professional body) OR TWO OR MORE named RECOGNISABLE mainstream MEDIA outlets you actually recognise (e.g. the Today Show, BBC, Forbes, Huffington Post, Women's Health) is STRONG, checkable authority that is costly to fake, and it FLOORS proof_cred at 7 even with no review widget and no logo strip. Do NOT cap real, named, checkable authority at 5 just because there is no Google/Trustpilot widget, that purism makes the score useless for ranking. Below 7 you dock ONLY for what is genuinely missing, above all CLIENT RESULTS: testimonials, case studies, before/after, numbers. A page with strong authority but NO client proof of results is a 7 (say so plainly: 'strong credentials and real media, but no client testimonials or results to show it works for others'); a real third-party review widget / rating ON TOP of that pushes it to 8-9.",
     "clear_cta": "Is there ONE clear, STRONG next step toward becoming a client (book/apply), not just 'contact'/'subscribe', AND is it the obvious single thing to do? TWO different failures both score LOW. (a) No real step, or only 'contact'/'subscribe', is low. (b) DECISION OVERLOAD: the page throws many DIFFERENT competing actions at a cold visitor (e.g. book a call AND buy several priced packages / 'add to cart' AND download an ebook AND watch a wall of videos AND sponsor a child AND a contact form). When the actions pull in many different directions the visitor doesn't know which to pick and freezes, so they do nothing. That is NOT a strong CTA, it is a mess, score it DOWN (3-4); never reward a page for having 'lots of buttons'. HOW TO JUDGE OVERLOAD, use this test: count the number of DIFFERENT JOBS the page asks a visitor to do, book a call, buy priced package A, buy priced package B, 'add to cart', download an ebook, watch a wall of videos, donate/sponsor, fill a contact form. Each distinct job is a separate ask. 1 job (even if the button is repeated) = focused. 3 OR MORE different jobs = DECISION OVERLOAD, cap the score at 3-4 no matter how strong or repeated any single one is. CRUCIAL: repetition does NOT rescue an overloaded page. The 'repeated action = good' rule ONLY applies when that repeated action is essentially the ONLY job on the page; if the page ALSO sells multiple priced products / has 'add to cart' / pushes an ebook and videos and a donation, the repetition is drowned out and it is still a mess, score 3-4. Multiple priced packages with 'add to cart' on a coaching homepage is by itself a strong sign of overload. Distinguish this from the SAME single action repeated down an otherwise-clean page ('Book a Free Session' three times, nothing else competing), which is GOOD consistency and scores HIGH. SCORE VIA A LADDER, but FIRST collapse repeats BY DESTINATION, not by wording: buttons with DIFFERENT text that lead to the SAME next step ('BOOK A CALL', 'I'M READY TO SCALE', 'GET STARTED' all going to the same booking) are ONE action, NOT three, and repeating one action with varied wording is a STRENGTH that RAISES the score, never overload. 'Learn More' six times, 'Contact' in header and footer, likewise ONE job. Count only genuinely DIFFERENT destinations/asks (a booking vs a purchase vs a download vs a donation). A dominant single action repeated down the page, even with a secondary 'watch video' or a service description lower down, is NOT decision overload, it's a focused page, score it 7-9. THEN judge, and MIND THE DIFFERENCE between a WEAK page and a CHAOTIC page, they score differently: 9-10 = one strong action (book a call / apply), clearly the only main thing, repeated consistently; 7-8 = one clear strong step plus at most one secondary; 5-6 = a real strong step exists but it's one of two or three competing options; 4 = NO strong step, the page only offers soft actions ('Learn More', 'Contact', 'read the blog', 'join a workshop'), however many, and never a real 'book a call' / 'apply' / 'get this free thing', OR several different asks with no shop, so it's weak and scattered but not a chaotic store; 3 = a priced SHOP is present but small (two or three products) alongside other asks; 2 = a big priced SHOP (many products / 'add to cart') PLUS several other heavy asks (a video wall, a donation, downloads, multiple booking types), a cold visitor is totally lost; 0 = no real next step at all. HARD RULE, do not break it: if there is NO shop (no priced products, no 'add to cart') the score CANNOT go below 4, no matter how many soft 'Learn More' buttons there are, because weak-and-cluttered is a 4, not chaos. Only a genuine priced store drops a page to 3 or 2. A weak page and a chaotic shop are DIFFERENT failures. WRITE THE NOTE FOR THE RIGHT FAILURE: if the problem is OVERLOAD (several competing asks), the note must SAY it's overload, list the competing asks, and say 'pick ONE clear next step', NEVER say 'no clear next step stands out' or 'no call to action', that describes ABSENCE, the opposite problem, and tells the coach to ADD when they need to CUT. Only say a CTA is missing/absent when there genuinely isn't a real next step on the page.",
-    "lead_capture": "A real free resource that solves a piece of their problem (a guide/checklist), not just a newsletter. 8+=genuine magnet; 3=newsletter only; 0=nothing.",
     "story": "Does the copy connect to the READER's own situation, in their words, not just the coach's CV? 9-10=deeply reader-focused, names their fear/situation; 5-6=some real reader connection; 3-4=mostly the coach's CV or story but a human is present; 2=a bare catalog / CV with only a token noun-gesture to the reader (e.g. 'entrepreneurs like you'); 0-1=RESERVED for a page with no human at all, or copy that talks DOWN to or alienates the reader. Do NOT give 0-1 to a page that is merely coach-focused, that is a 2-3. IMPORTANT: even ONE genuine reader-facing 'here's what changes for YOU' sentence inside a CV-heavy bio (e.g. 'I'm here to help you trust yourself, hear your own voice') is real connection and floors story at 3, not 2; reserve 2 for a bio with no such line at all.",
 }
 
@@ -1350,7 +1406,8 @@ HOMEPAGE_PROBLEMS = {
     "specificity": "on your homepage, it isn't clear enough who you help or what problem you solve, a first-time visitor may not be able to tell whether you're the right coach for them",
     "proof": "we didn't spot testimonials, results, or numbers on your homepage, the kind of proof that makes a visitor believe you can actually help",
     "story": "we couldn't find a personal story or a human on your homepage, the thing that makes a visitor trust you over the next coach",
-    "lead_capture": "your homepage doesn't give visitors who aren't ready to book yet a way to stay in touch, somewhere to make a serious enquiry, or to leave their details in exchange for something useful (a guide, a checklist, a free call). So the people who aren't ready today simply leave, and you never hear from them again",
+    "opt_in": "your homepage gives visitors who aren't ready to book yet no way to leave their details in exchange for something useful (a guide, a checklist, a short training). So the many who aren't ready today, and there are always far more of them, simply leave, and you never hear from them again",
+    "booking": "the way to take the next step here is weak or high-friction, so even a visitor who IS ready to move forward doesn't have an easy, obvious way to start",
     "credibility": "we didn't spot the kind of trust a cold buyer really believes on your homepage, reviews from other people, or a real business they can reach; badges you give yourself (awards, ‘bestselling’, ‘as seen on’) don't count for much with a stranger",
     "clarity_5sec": "in the first five seconds on your homepage, it's hard to tell who you help and what they'd get",
     "offer_clarity": "on your homepage there's no clearly defined offer, just a way to get in touch, with nothing specific behind it",
@@ -1364,7 +1421,8 @@ HOMEPAGE_FIXES = {
     "offer_clarity": "Spell out one clear thing to buy: what it is, who it's for, and roughly what it costs.",
     "proof": "Add real proof: two or three client results with actual numbers, and a testimonial that names the problem you solved.",
     "story": "Rewrite your story so it's about the reader, not your CV. Show them you've been where they are.",
-    "lead_capture": "Offer something that solves a small piece of their problem, not ‘join my newsletter’.",
+    "opt_in": "Offer a free thing that solves a small piece of their problem, not ‘join my newsletter’.",
+    "booking": "Make the next step one clear, low-friction booking (a free call/review), not a form or an application.",
     "credibility": "Add proof other people gave you: a few Google, Facebook or Trustpilot reviews. Those beat any award or ‘bestselling’ badge you hand yourself.",
     "clear_cta": "Give one strong next step high on the page, book a call or apply, not just ‘contact’ or ‘subscribe’, and stop it competing with five other buttons.",
     "technical_health": "Sort the basics: secure the site and give it real, readable content.",
@@ -1379,7 +1437,8 @@ def rule_critique(row, scores, score_10, ev):
     W = getattr(S, "WEIGHTS", {})
     def _cost(k, v):
         return W.get(k, 1.0) * max(0, 7 - v)
-    ranked = [k for k, _ in sorted(((k, v) for k, v in scores.items() if k not in ("pricing_shown", "proof_cred")),
+    ranked = [k for k, _ in sorted(((k, v) for k, v in scores.items()
+                                    if v is not None and k not in ("pricing_shown", "proof_cred")),
                                     key=lambda kv: _cost(kv[0], kv[1]), reverse=True)]
     worst_key = ranked[0]
 
@@ -1445,75 +1504,65 @@ def criterion_note(key, sc, ev=None):
         return (f"There's real credibility here, but it's a click away: you link out to {joined}, where other people "
                 "vouch for you. A cold visitor won't click in the first few seconds. Pull a couple of those reviews "
                 "onto the homepage, where a cold visitor sees them in the moment that matters.")
-    if key == "lead_capture":
-        # Name EXACTLY what's on the page (contact form vs newsletter vs magnet), never guess or mislabel.
-        cap = ev.get("capture") or {}
+    if key == "opt_in":
+        # OPT-IN FORM: value the NOT-ready get without a call. Name exactly what's there, judge its value, give a good example.
+        cap = (ev.get("captures") or {}).get("opt_in") or {}
         kind, desc = cap.get("kind"), cap.get("desc")
-        def _primary_note():
-            if kind == "magnet":
-                if cap.get("gated"):
-                    return (f"You call it {desc}, but it's locked behind a paid membership, so it isn't really free "
-                            "and it can't catch the visitor who isn't ready to pay yet. Offer one genuinely free thing "
-                            "that solves a small piece of their problem, no paid plan needed, so a cold visitor has a "
-                            "real reason to leave their email before they leave.")
+        good_eg = ("A strong one looks like ‘Free checklist: the 5 things quietly making buyers leave your homepage’, "
+                   "it fixes a specific piece of their problem before they ever talk to you.")
+        if kind == "magnet":
+            if cap.get("gated"):
+                return (f"You call it {desc}, but it's locked behind a paid membership, so it isn't really free and "
+                        f"can't catch the visitor who isn't ready to pay yet. Offer one genuinely free thing that solves "
+                        f"a small piece of their problem, no paid plan needed. {good_eg}")
+            if cap.get("buried"):
+                return (f"You offer {desc}, a real reason for the not-ready to leave their details, but it's buried "
+                        f"below everything else, so most never reach it. Move it up top and spell out the specific "
+                        f"wins. {good_eg}")
+            return (f"You offer {desc}, a real reason for someone not ready to book to leave their details. Good. One "
+                    f"lift: spell out exactly what they'll get, the specific wins, so more people hand it over.")
+        if kind == "email_optin":
+            base = f"You offer {desc}, a real reason for the not-ready to leave their email. Good."
+            if cap.get("buried"):
+                return base + f" But it's buried well below the fold, move it up so cold visitors see it. {good_eg}"
+            return base + f" Even better would be a resource that solves one specific piece of their problem. {good_eg}"
+        if kind in ("newsletter", "community"):
+            if cap.get("popup"):
+                base = (f"You've got {desc} that pops up the moment someone lands, before they've read a word. It's "
+                        "impossible to miss, but a cold visitor usually just closes it, because 'subscribe for updates' "
+                        "is about you, not a reason for them to hand over their email.")
+            else:
+                base = (f"You've got {desc}, but you're giving people no real reason to use it, 'subscribe' asks for "
+                        "their email and offers nothing back, so hardly anyone does.")
                 if cap.get("buried"):
-                    return (f"You offer {desc}, a real reason for someone not ready to book to leave their details. "
-                            "But it's buried below everything else on the page, so most visitors never reach it. Move "
-                            "it up near the top, and spell out exactly what they'll get from it, the specific things "
-                            "they'll learn, not just a title and 'download'.")
-                return (f"You offer {desc}. That gives someone who isn't ready to book a real reason to leave their "
-                        "details, so you can stay in touch until they are. Good. One lift: spell out exactly what "
-                        "they'll get from it, the specific wins, so more people hand over their details.")
-            if kind == "email_optin":
-                base = f"You offer {desc}, a real reason for someone not ready to book to leave their details. Good."
-                if cap.get("buried"):
-                    return (base + " But it's buried well below the fold, where hardly anyone reaches it. Move it up, "
-                            "or repeat it near the top, so cold visitors actually see it before they leave.")
-                return base + " Even better would be a free resource that solves one specific piece of their problem."
-            if kind == "consultation":
-                return ("Right now the only way to catch a lead is a call booking. That IS lead capture, but it's a "
-                        "big ask: it only catches people ready to commit to a call right now. The many who aren't "
-                        "ready yet, and there are always far more of them, leave with no way to stay in touch, and you "
-                        "never hear from them again. A low-commitment freebie (a short guide or checklist) alongside "
-                        "the call would catch those people too, so you can warm them up until they're ready to book.")
-            if kind == "application":
-                return ("What you've got is an application form. That's a big ask for a cold visitor: it's for people "
-                        "already sure they want to work with you, not a way to catch the many who are still deciding. "
-                        "Offer one genuinely free thing that solves a small piece of their problem first, right there "
-                        "on the page, so someone who isn't ready to apply still leaves their email.")
-            if kind == "contact_form":
-                return (f"What you've got is {desc}. That's a way for people who are already ready to reach out, not a "
-                        "way to capture the many who aren't ready yet. A free guide or checklist that solves a piece "
-                        "of their problem would give those people a reason to leave their details.")
-            if kind in ("newsletter", "community"):
-                if cap.get("popup"):
-                    base = (f"You've got {desc} that pops up almost the moment someone lands, before they've read a "
-                            "word. It's impossible to miss, but a cold visitor who hasn't decided you're worth it yet "
-                            "usually just closes it, especially when the pitch is 'subscribe for our news and updates', "
-                            "which is about you, not a reason for them to hand over their email.")
-                else:
-                    base = (f"You've got {desc}, but you're giving people no real reason to use it. 'Subscribe' asks for "
-                            "their email and offers nothing back, so hardly anyone does.")
-                    if cap.get("buried"):
-                        base += " And it's stuck at the bottom of the page where almost no one even reaches it."
-                return (base + " Give them something worth having, a short guide or checklist that fixes one piece of "
-                        "their problem, and they'll happily hand over their email to get it.")
-            return ("We didn't spot a way to stay in touch with the people who aren't ready to book today: no free "
-                    "guide or checklist, no sign-up, nothing to capture them before they leave.")
-        note = _primary_note()
-        # A page can have MORE THAN ONE capture. Critique the secondary ones too, so a coach sees the full picture.
-        for extra in (cap.get("also") or []):
-            ek = extra.get("kind")
-            if ek == "community":
-                note += (" You also have a ‘join the community’ sign-up, but on its own it's weak: it gives people no "
-                         "clear reason to join, so most won't. Say what they actually GET inside, or it just sits there.")
-            elif ek == "newsletter":
-                pop = " that pops up" if extra.get("popup") else ""
-                note += (f" You also run a newsletter sign-up{pop}, which is better for catching the not-ready, but "
-                         "only if it offers them something; right now it just asks them to subscribe with no reason to.")
-            elif ek == "consultation":
-                note += " You also push a call booking, which only catches the people already ready to commit."
-        return note
+                    base += " And it's stuck at the bottom where almost no one reaches it."
+            return base + f" Swap it for something worth having. {good_eg}"
+        return (f"You've got no opt-in, nothing a not-ready visitor can grab in exchange for their email. So the many "
+                f"who aren't ready to book today just leave and you never hear from them again. Every homepage needs "
+                f"one. {good_eg}")
+    if key == "booking":
+        # BOOKING & ENQUIRY: the reach-out step. Name the exact kind and its weakness; None means N/A.
+        cap = (ev.get("captures") or {}).get("booking")
+        if not cap:
+            return ("There's no booking or enquiry form on your homepage. That isn't a fault on its own IF your opt-in "
+                    "is catching people, but a visitor who IS ready to talk has no obvious way to start. The strong "
+                    "version is one clear ‘book a free call’ (or review) button.")
+        kind, desc = cap.get("kind"), cap.get("desc")
+        if kind == "booking_free":
+            return (f"You've got {desc}, a free booking, the strong version of a next step, it catches the people ready "
+                    "to talk. Just remember it only catches the ready, which is exactly why the opt-in matters for "
+                    "everyone else.")
+        if kind == "booking_paid":
+            return (f"You've got {desc}, but charging up front is a bigger ask for a cold visitor who isn't sure of you "
+                    "yet. A free first call or review lowers the bar and catches far more of the ready.")
+        if kind == "contact_form":
+            return (f"What you've got is {desc}. That's passive, ‘reach out’ puts the work on them and catches only the "
+                    "already-convinced. Give them one clear, low-friction step instead, a ‘book a free call’ button.")
+        if kind == "application":
+            return ("What you've got is an application form. That's high-friction, for people already sure they want to "
+                    "work with you, and it filters out the many still deciding. A free call or review is an easier first "
+                    "step.")
+        return "There's a way to reach out, but it isn't a clear, strong next step."
     if key == "story":
         if sc >= 6: return "Your story links to what the reader is going through."
         if sc >= 3: return "There's a story, but it reads as being about you, not the person you help."
@@ -1791,7 +1840,10 @@ def audit_url(url):
     # LEAD CAPTURE authority: the raw keyword scorer above naively scores any 'ebook' mention 8, even a nav-menu
     # link. detect_capture (via build_evidence) is the ONLY authority, and we apply it HERE, unconditionally, so a
     # nav-link magnet / application form / gated freebie / buried capture is scored right whether or not the AI runs.
-    scores["lead_capture"] = lead_capture_score(ev.get("capture") or {})
+    # SPLIT capture into two deterministic scores: opt-in (mandatory, 0 if none) + booking (optional, None = N/A).
+    _caps = ev.get("captures") or {}
+    scores["opt_in"] = opt_in_score(_caps.get("opt_in"))
+    scores["booking"] = booking_score(_caps.get("booking"))   # int, or None (N/A) -> excluded from the total
     total_100 = S.weighted_total(scores); score_10 = round(total_100 / 10)
 
     # AI LAYER: one call re-scores the 8 content criteria by READING the page (keyword matching can't judge
@@ -1942,9 +1994,11 @@ def audit_url(url):
     # The bars a coach sees. Proof and credibility are MERGED into proof_cred; pricing isn't scored on a homepage
     # (it gets its own balanced note); the separate proof/credibility keys stay in `scores` only for the total math.
     DISPLAY_CRIT = ["clarity_5sec", "specificity", "offer_clarity", "proof_cred",
-                    "clear_cta", "lead_capture", "story", "technical_health"]
+                    "clear_cta", "opt_in", "booking", "story", "technical_health"]
+    # booking can be None (N/A). Keep it None all the way through so the display shows 'N/A', never a 0 or a crash.
     comparison = {
-        k: {"you": scores[k], "market": BENCH[k], "gap": round(scores[k] - BENCH[k], 1)}
+        k: {"you": scores.get(k), "market": BENCH.get(k),
+            "gap": (None if scores.get(k) is None else round(scores.get(k, 0) - BENCH.get(k, 0), 1))}
         for k in DISPLAY_CRIT
     }
     return {
@@ -1973,8 +2027,9 @@ def audit_url(url):
             if row.get("has_video") == "yes" else None
         ),
         "evidence": ev,
-        "notes": {k: {"pass": (scores[k] >= (7 if k == "technical_health" else 5 if k == "specificity" else 6)),
-                      "note": ai_notes.get(k) or criterion_note(k, scores[k], ev)} for k in DISPLAY_CRIT},
+        "notes": {k: {"pass": (None if scores.get(k) is None else
+                               scores.get(k, 0) >= (7 if k == "technical_health" else 5 if k == "specificity" else 6)),
+                      "note": ai_notes.get(k) or criterion_note(k, scores.get(k), ev)} for k in DISPLAY_CRIT},
         "voice": analyse_voice(row),
         "thumbnail": thumb,
         "strength": tech_strength(row, scores),
