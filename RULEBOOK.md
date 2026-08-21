@@ -70,6 +70,10 @@ The freebie the NOT-ready get without a call.
 - Email opt-in with a value hook: 5 (buried: 3). Newsletter: 3 (buried in the footer with no reason: 2).
 - A magnet keyword that only appears as a NAV-MENU link is NOT an on-page magnet — skip it.
 - Nothing: 0.
+- Read the FORM, not just the words: an on-page email input OR a provider EMBED (HubSpot / Mailchimp / ConvertKit,
+  whose fields sit in an iframe the DOM scan can't reach) both count as a real form. A community / 'inner circle' /
+  list sign-up ('Join the Inner Circle', 'get first access to expert tips') backed by that form is an opt-in, not 0.
+  ('membership' is NOT a signup marker — 'join our X membership' is usually a PAID program.)
 
 ### Booking & enquiry (optional — none = N/A, excluded from the total)
 The reach-out step for the READY. Scored by the TYPE of step, NOT free vs paid (a call is a commitment either way; "is

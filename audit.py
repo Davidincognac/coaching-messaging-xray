@@ -295,6 +295,29 @@ _GATED_FREEBIE_RE = re.compile(
     r"[^.]{0,70}?(?:with|through|via|requires?|only (?:available )?with|once you (?:join|subscribe|become))\s+"
     r"(?:our |a |the |platform |paid )*(?:member|membership|subscri|premium|paid plan)", re.I)
 
+# An EMBEDDED email-capture form from a known provider (HubSpot, Mailchimp, ConvertKit/Kit, MailerLite, Klaviyo,
+# Flodesk, etc.). The fields sit INSIDE the provider's <iframe>/widget, so the main-DOM input scan (optin_present)
+# can't see them and we'd score a real opt-in 0. The embed's markers in the page HTML are the tell. Very common
+# coach setup — we treat the embed as a real email form, like optin_present.
+_EMAIL_EMBED_RE = re.compile(
+    r"hs-form-iframe|hbspt|js\.hsforms|/hsforms\.|mc-embedded-subscribe|mc4wp-form|list-manage\.com/subscribe|"
+    r"convertkit|ck\.page|formkit-form|mailerlite|ml-form-embed|klaviyo-form|klaviyo_form|flodesk|emailoctopus|"
+    r"email-octopus|substack\.com/embed|beehiiv|mailerlite\.com", re.I)
+
+# A COMMUNITY / list / 'inner circle' sign-up, even without the word 'newsletter'. 'Join the Inner Circle',
+# 'get first access', 'be the first to know', 'join our community / club / VIP list / waitlist'. Backed by a real
+# form (an on-page email input OR a provider embed), this is an opt-in, not nothing. We were scoring these 0.
+_COMMUNITY_SIGNUP_RE = re.compile(
+    r"join (?:the |my |our |us(?: in)?(?: the| my| our)? )?[\w'&]*(?: [\w'&]+){0,4}?\s*"
+    # 'membership' is deliberately NOT here: 'join our X membership' is usually a PAID program, not a free email list.
+    r"(?:inner circle|community|club|mailing list|the list|tribe|crew|insiders?|vip(?:\s+list)?|waitlist)\b|"
+    r"(?:get|be|want) (?:the )?first (?:access|to know|in line)|be the first to (?:know|hear)|"
+    r"sign up (?:for |to )?(?:get |receive )?(?:updates|the latest|exclusive|first access|my emails)|"
+    r"don'?t miss (?:a beat|out on)", re.I)
+_OPTIN_HOOK_WORDS_RE = re.compile(
+    r"first access|be the first|exclusive|expert tips|insider|early access|special (?:offers|events)|"
+    r"weekly|monthly|free (?:tips|guide|training|updates)|latest news", re.I)
+
 # Words that cluster in a NAV MENU. A magnet keyword ('free ebook') surrounded by these is a menu LINK to another
 # page, not an on-page lead magnet, so it must never be scored like a real on-page opt-in.
 _NAV_WORDS_RE = re.compile(
@@ -351,6 +374,9 @@ def detect_capture(row):
     never calls a contact form a newsletter. Returns {'kind': magnet|contact_form|newsletter|none, 'desc': text}."""
     bt = _clean(row.get("body_text")) or ""
     low = bt.lower()
+    # A real email-capture form is present if the DOM scan saw an email input OR a provider EMBED (HubSpot/Mailchimp/
+    # ConvertKit/etc.) whose fields sit inside an iframe we can't read. Both count as 'there's a real form here'.
+    _has_optin = str(row.get("optin_present", "")).lower() == "yes" or bool(row.get("has_email_embed"))
     # 1) A real free resource (the gold standard) — a genuine "free X" or a download/get cue, not a bare keyword.
     m = _MAGNET_RE.search(row.get("clean_text") or "") or _MAGNET_RE.search(bt)
     if m and not _is_nav_context(low, re.sub(r"\s+", " ", m.group(0)).strip()):
@@ -399,6 +425,19 @@ def detect_capture(row):
         # body_text follows DOM order, so a hook past ~60% of the text is low down / below the fold.
         buried = bool(bt) and low.find(hook.lower()) > 0.6 * len(bt)
         return {"kind": "email_optin", "desc": f"a free email sign-up: ‘{hook}’", "buried": buried}
+    # 3b) A COMMUNITY / 'inner circle' / list sign-up ('Join the Inner Circle', 'get first access to expert tips'),
+    #     backed by a real form — an on-page email input OR a provider EMBED (HubSpot etc.) whose fields sit in an
+    #     iframe the DOM scan can't reach. We were scoring these real opt-ins 0 (embedded form + non-'newsletter'
+    #     wording). A genuine value hook (first access, expert tips, exclusive) makes it a proper email opt-in;
+    #     otherwise it's a plain list sign-up (community).
+    if _has_optin:
+        cmy = _COMMUNITY_SIGNUP_RE.search(bt)
+        if cmy:
+            phrase = re.sub(r"\s+", " ", cmy.group(0)).strip()
+            buried = bool(bt) and low.find(phrase.lower()) > 0.65 * len(bt)
+            if _OPTIN_HOOK_WORDS_RE.search(bt):
+                return {"kind": "email_optin", "desc": f"a free email sign-up (‘{phrase}’)", "buried": buried}
+            return {"kind": "community", "desc": f"an email sign-up (‘{phrase}’)", "buried": buried}
     # 4) A standalone newsletter / mailing-list sign-up. Word boundaries matter: bare "subscribe" as a substring
     #    matches "oversubscribed", so we require real words, not fragments.
     # A newsletter/mailing-list sign-up is weak lead capture, and weaker still if it sits at the very bottom with
@@ -408,7 +447,6 @@ def detect_capture(row):
     # A newsletter is only REAL if there's an actual email SIGN-UP (an email input / opt-in form), not just the word
     # 'subscribe' (a social link) or a printed email address. So we require optin_present, a genuine capture signal,
     # before we ever call it a newsletter. This kills the 'phantom newsletter' where a stray word invented a form.
-    _has_optin = str(row.get("optin_present", "")).lower() == "yes"
     if news and _has_optin:
         return {"kind": "newsletter", "desc": f"a newsletter sign-up (‘{news.group(0)}’)", "buried": _news_buried(news.group(0))}
     nm = re.search(r"\bnewsletter\b|\bmailing list\b|\bjoin (?:my|our|the) list\b|"
@@ -418,7 +456,7 @@ def detect_capture(row):
     # 5) The scraper saw an email input but NO newsletter/subscribe wording (the branches above didn't fire). Do NOT
     #    invent a newsletter that isn't there. An email field with a 'get in touch' / 'contact' context is a CONTACT
     #    form, not a sign-up; name it honestly. Only if there's genuinely nothing else do we call it a bare email form.
-    if str(row.get("optin_present", "")).lower() == "yes":
+    if _has_optin:
         if re.search(r"get in touch|contact us|contact me|\benquir|send (?:us |me )?a message|"
                      r"drop (?:us |me )?a (?:line|message)", low):
             return {"kind": "contact_form", "desc": "a ‘get in touch’ contact form"}
@@ -950,6 +988,15 @@ def render_and_extract(domain):
                 pg.wait_for_timeout(500)
             except Exception:
                 pass
+            # Async widgets (booking calendars + priced-package embeds — GoHighLevel, Calendly, Acuity, etc.) can still
+            # be loading after the scroll pass. A fixed-timer capture sometimes grabs the page before they finish, so the
+            # priced offers / booking links read as absent and the score wobbles run-to-run (booking flipping 5<->8, CTA
+            # 3<->7, pricing seen<->not). Wait for the network to go quiet first so late content is in. Capped at 4s so a
+            # page with chatty analytics / websockets / video can't hang the audit; on a quiet page it returns at once.
+            try:
+                pg.wait_for_load_state("networkidle", timeout=4000)
+            except Exception:
+                pass
             rendered_html = pg.content()
             final_url = pg.url
             try:
@@ -1065,6 +1112,7 @@ def render_and_extract(domain):
         # optin_present is the corpus column detect_capture reads; the live render must set it too or the newsletter /
         # magnet-form / application branches never fire. Drive it off the real field, never off a bare keyword.
         row["optin_present"] = "yes" if _real_email_input else ""
+        row["has_email_embed"] = bool(_EMAIL_EMBED_RE.search(rendered_html))  # provider form embed (HubSpot/Mailchimp/etc.): fields sit in an iframe the DOM input scan can't reach
         _optin_words = bool(re.search(
             r"newsletter|subscribe|mailchimp|convertkit|klaviyo|mailerlite|mailpoet|email[- ]?sign[- ]?up|"
             r"sign[- ]?up form|join (?:my|our|the) (?:list|mailing|newsletter)|get (?:my|the) (?:free )?updates", _rl))
@@ -1673,7 +1721,7 @@ def criterion_note(key, sc, ev=None):
                 "they can easily reach.")
     good = {
         "clarity_5sec": "A stranger gets who you help and what they'd get, fast.",
-        "specificity": "You name who you help and the exact problem.",
+        "specificity": "You name who you help and the problem, which most coaches don't. To go higher, put it in your buyer's exact words, the specific situation they're stuck in, so they read it and think 'that's me' instead of a broad version they have to translate to themselves.",
         "offer_clarity": "A cold buyer can see what you fix and there's a clear thing to buy.",
         "proof": "There's real proof you can deliver.",
         "proof_cred": "A cold buyer gets real reason to believe you: results, and trust from other people.",
