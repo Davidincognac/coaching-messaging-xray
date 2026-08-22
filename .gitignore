@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.png
+!angelo.png
 *.bak
 sweep_findings.json
 analysed_domains.txt
