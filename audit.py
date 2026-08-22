@@ -2222,6 +2222,7 @@ def audit_url(url):
     # (it's factual). On no-key / failure / a banned word, ai_analyse returns None and we fall back to rules.
     ai = ai_analyse(row, scores, score_10, ev)
     ai_notes = {}
+    _generic_tokens = []
     if ai:
         # VISION picks the HEADLINE from the screenshot (much better than the biggest-font JS heuristic that broke on
         # sliders/hero-overlays). Pop-up detection stays in the DOM: vision can't reliably tell a cookie-consent
@@ -2233,6 +2234,7 @@ def audit_url(url):
             ev["headline"] = exact or mh
             h1t = ev.get("h1_tag") or ""
             ev["headline_differs_from_h1"] = bool(h1t and ev["headline"].strip().lower() != h1t.strip().lower())
+        _generic_tokens = (ai.get("pain_flags") or {}).get("generic_tokens_found") or []
         # Scores are clean integers, always take them. Recompute the weighted total off the AI-adjusted scores.
         # lead_capture is NOT taken from the AI: it's already been set deterministically from detect_capture above
         # (the AI's lead_capture wobbled 8/2/8 and contradicted the note), so we skip it here and never let the AI
@@ -2388,6 +2390,7 @@ def audit_url(url):
         "scores": scores, "comparison": comparison,
         "critique": critique,
         "ai_powered": ai_powered,
+        "generic_tokens_found": _generic_tokens,
         "cliffhanger": {
             "symptom": CLIFFHANGER_SYMPTOM if scores.get("symptom_resonance", 10) <= 4 else None,
             "friction": CLIFFHANGER_FRICTION if (scores.get("perceived_friction", 10) <= 4 or scores.get("risk_reversal", 10) <= 4) else None,

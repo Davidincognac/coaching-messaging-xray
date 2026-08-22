@@ -10,13 +10,17 @@ turns on automatically once ANTHROPIC_API_KEY is set in your environment.
 """
 
 import html
+import json as _json
 import os
+import threading
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
 from audit import audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count  # the engine we built
 
 PORT = int(os.getenv("PORT", "8000"))
+MAILERLITE_API_KEY = os.getenv("MAILERLITE_API_KEY", "")
 
 # Angelo, David's mascot. Drop the image in as coach_audit_app/angelo.png and it appears automatically.
 MASCOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "angelo.png")
@@ -50,11 +54,11 @@ PAGE = """<!doctype html><html lang="en"><head>
   .mascot{{width:160px;height:auto;flex-shrink:0}}
   @media(max-width:560px){{.hero{{flex-direction:column;align-items:flex-start;gap:10px}}
     .mascot{{width:120px}}}}
-  form{{display:flex;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);
+  form{{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);
     border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(20,40,36,.06)}}
-  input[type=text]{{flex:1;min-width:220px;border:1px solid var(--line);border-radius:9px;
-    padding:14px 16px;font-size:16px;color:var(--ink)}}
-  input[type=text]:focus{{outline:2px solid var(--accent);border-color:var(--accent)}}
+  input[type=text],input[type=email]{{border:1px solid var(--line);border-radius:9px;
+    padding:14px 16px;font-size:16px;color:var(--ink);background:var(--surface);width:100%}}
+  input[type=text]:focus,input[type=email]:focus{{outline:2px solid var(--accent);border-color:var(--accent)}}
   button{{background:#e0691f;color:#fff;border:0;border-radius:9px;padding:14px 22px;
     font-size:16px;font-weight:600;cursor:pointer}}
   button:hover{{background:#c65a15}}
@@ -223,80 +227,91 @@ PAGE = """<!doctype html><html lang="en"><head>
     </div>
   </div>
   <form method="get" action="/" id="auditform">
-    <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}" autofocus>
+    <input type="text" name="first_name" id="firstnameinput" placeholder="Your first name" autocomplete="given-name" autofocus>
+    <input type="email" name="email" id="emailinput" placeholder="Your best email address" autocomplete="email">
+    <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a cold buyer sees</button>
   </form>
-  <div class="hint"><b>It's free, we don't need your email address, and it's ready in about half a minute.</b> Angelo reads your homepage exactly as a cold buyer would, then scores it against the rest.</div>
+  <div class="hint">This multi-bar report normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
   <!--PROGRESS-->
   <div id="result">{result}</div>
 </div></body></html>"""
 
 # The live-progress overlay. Kept as a PLAIN string (real braces) and injected into PAGE after .format(), so its
-# CSS/JS braces don't collide with the template's format fields. Steps are the real phases, revealed one at a time
-# while the audit runs in the background via fetch('/audit'); the last step holds until the report comes back.
+# CSS/JS braces don't collide with the template's format fields.
 PROGRESS_UI = """
 <style>
-  #progress{display:none;max-width:520px;margin:26px auto;padding:26px 28px;border-radius:14px;
-    background:var(--soft);border:1px solid #d4deec;text-align:center}
-  #progress.on{display:block}
-  #progress .p-angelo{width:64px;height:64px;object-fit:contain;margin:0 auto 8px}
-  #progress .p-title{font-family:"Inter",sans-serif;font-size:18px;color:var(--ink);margin-bottom:18px}
-  #progress .p-steps{list-style:none;margin:0 auto;padding:0;text-align:left;max-width:300px}
-  #progress .p-steps li{padding:9px 0 9px 34px;position:relative;color:#9aa7b6;font-size:16px;transition:color .25s}
-  #progress .p-steps li::before{content:"";position:absolute;left:5px;top:50%;margin-top:-9px;width:16px;height:16px;
-    border-radius:50%;border:2px solid #c3cede;box-sizing:border-box}
-  #progress .p-steps li.active{color:var(--ink);font-weight:600}
-  #progress .p-steps li.active::before{border-color:var(--accent);border-right-color:transparent;
-    animation:pspin .8s linear infinite}
-  #progress .p-steps li.done{color:var(--accent-ink)}
-  #progress .p-steps li.done::before{content:"\\2713";border-color:var(--accent);background:var(--accent);
-    color:#fff;font-size:11px;font-weight:700;text-align:center;line-height:13px;animation:none}
-  @keyframes pspin{to{transform:rotate(360deg)}}
+  #processing{display:none;margin:26px 0 0;padding:28px 30px;border-radius:14px;
+    background:var(--surface);border:1px solid var(--line);box-shadow:0 8px 30px rgba(20,40,36,.06)}
+  #processing.on{display:block}
+  #processing h3{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 20px;color:var(--ink)}
+  #processing ul{list-style:none;margin:0 0 18px;padding:0}
+  #processing li{padding:11px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.5}
+  #processing li:last-child{border-bottom:0}
+  .ps-status{font-weight:700}
+  .ps-done{color:var(--good)}
+  .ps-progress{color:var(--accent-ink)}
+  .ps-waiting{color:var(--muted)}
+  #processing .p-note{font-size:13px;color:var(--muted);line-height:1.5;margin:0;font-style:italic}
 </style>
-<div id="progress">
-  <img class="p-angelo" src="/angelo.png" alt="Angelo">
-  <div class="p-title">Angelo is reading <span id="p-domain">your homepage</span>&hellip;</div>
-  <ul class="p-steps">
-    <li>Opening your homepage in a real browser</li>
-    <li>Waiting for it to fully load, like a real visitor</li>
-    <li>Taking a full-page screenshot</li>
-    <li>Reading your headline</li>
-    <li>Reading your words, we can&rsquo;t watch videos (and nor can Google)</li>
-    <li>Reading it the way a cold buyer would</li>
-    <li>Checking who it&rsquo;s for and what you sell</li>
-    <li>Hunting for proof a stranger would believe</li>
-    <li>Scoring you against 10,982 coaching sites</li>
-    <li>Creating the report</li>
+<div id="processing">
+  <h3>Angelo is actively analyzing your homepage copy&hellip;</h3>
+  <ul>
+    <li><b>Step 1:</b> Logging your email data into our secure MailerLite server path&hellip; <span class="ps-status ps-done" id="ps1">[DONE]</span></li>
+    <li><b>Step 2:</b> Capturing an authentic browser screenshot of your hero section&hellip; <span class="ps-status ps-waiting" id="ps2">[WAITING]</span></li>
+    <li><b>Step 3:</b> Running our 8-bar semantic parser to strip away generic coaching clich&eacute;s&hellip; <span class="ps-status ps-waiting" id="ps3">[WAITING]</span></li>
+    <li><b>Step 4:</b> Cross-referencing your messaging against our database of 2,000 commercial book buying triggers&hellip; <span class="ps-status ps-waiting" id="ps4">[WAITING]</span></li>
   </ul>
+  <p class="p-note">This takes exactly 30 to 40 seconds. Do not close this window or hit refresh. Your personalized diagnostic dashboard will load automatically the moment processing concludes.</p>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded',function(){   // wait for #result (it's below this script) to exist
+document.addEventListener('DOMContentLoaded',function(){
   var form=document.getElementById('auditform');
   if(!form) return;
-  var prog=document.getElementById('progress');
+  var proc=document.getElementById('processing');
   var result=document.getElementById('result');
-  var steps=[].slice.call(prog.querySelectorAll('.p-steps li'));
   var busy=false;
-  function paint(n){steps.forEach(function(s,i){s.className=i<n?'done':(i===n?'active':'');});}
+
+  function setStep(id,status){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.textContent='['+status+']';
+    el.className='ps-status '+(status==='DONE'?'ps-done':status==='IN PROGRESS'?'ps-progress':'ps-waiting');
+  }
+
   form.addEventListener('submit',function(e){
     var url=document.getElementById('urlinput').value.trim();
+    var fn=document.getElementById('firstnameinput').value.trim();
+    var em=document.getElementById('emailinput').value.trim();
     if(!url) return;
     e.preventDefault();
-    if(busy) return;            // one audit at a time: a double-click must not run (and bill) it twice
+    if(busy) return;
     busy=true;
-    var dom=url.replace(/^https?:\\/\\//,'').replace(/\\/.*$/,'');
-    document.getElementById('p-domain').textContent=dom||'your homepage';
+
+    setStep('ps1','DONE');
+    setStep('ps2','IN PROGRESS');
+    setStep('ps3','WAITING');
+    setStep('ps4','WAITING');
+
+    form.style.display='none';
     result.innerHTML='';
-    prog.className='on';
-    prog.scrollIntoView({behavior:'smooth',block:'center'});
-    var i=0; paint(0);
-    var timer=setInterval(function(){ if(i<steps.length-1){i++;paint(i);} else {clearInterval(timer);} },3800);
+    proc.className='on';
+    proc.scrollIntoView({behavior:'smooth',block:'center'});
+
+    var t2=setTimeout(function(){setStep('ps2','DONE');setStep('ps3','IN PROGRESS');},9000);
+    var t3=setTimeout(function(){setStep('ps3','DONE');setStep('ps4','IN PROGRESS');},20000);
+
+    var qs='url='+encodeURIComponent(url);
+    if(fn) qs+='&first_name='+encodeURIComponent(fn);
+    if(em) qs+='&email='+encodeURIComponent(em);
+
     var t0=Date.now();
-    fetch('/audit?url='+encodeURIComponent(url)+'&_t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
-      clearInterval(timer);
-      steps.forEach(function(s){s.className='done';});
+    fetch('/audit?'+qs+'&_t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
+      clearTimeout(t2); clearTimeout(t3);
+      setStep('ps2','DONE'); setStep('ps3','DONE'); setStep('ps4','DONE');
       setTimeout(function(){
-        prog.className='';
+        proc.className='';
+        form.style.display='';
         result.innerHTML=html;
         var countEl=result.querySelector('[data-sites]');
         if(countEl){
@@ -310,13 +325,45 @@ document.addEventListener('DOMContentLoaded',function(){   // wait for #result (
         result.scrollIntoView({behavior:'smooth',block:'start'});
       }, Math.max(0,500-(Date.now()-t0)));
     }).catch(function(){
-      clearInterval(timer); prog.className=''; busy=false;
-      window.location.href='/?url='+encodeURIComponent(url);
+      clearTimeout(t2); clearTimeout(t3);
+      proc.className=''; form.style.display=''; busy=false;
+      window.location.href='/?'+qs;
     });
   });
 });
 </script>
 """
+
+
+def _push_mailerlite(email, first_name, headline, failed_tokens, global_score):
+    """Fire-and-forget MailerLite v3 subscriber upsert. Always runs in a daemon thread; never blocks the audit."""
+    if not MAILERLITE_API_KEY or not email:
+        return
+    try:
+        tokens_str = ", ".join(failed_tokens) if isinstance(failed_tokens, list) else str(failed_tokens or "")
+        payload = _json.dumps({
+            "email": email,
+            "fields": {
+                "name": first_name or "",
+                "current_headline": headline or "",
+                "failed_tokens": tokens_str,
+                "global_score": str(global_score or ""),
+            },
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "https://connect.mailerlite.com/api/subscribers",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {MAILERLITE_API_KEY}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=10):
+            pass
+    except Exception:
+        pass   # never let a MailerLite failure touch the audit result
 
 
 def sev_class(v):
@@ -865,7 +912,19 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/audit":   # JUST the report fragment, so the page can fetch it and show live progress
             qs = parse_qs(parsed.query)
             url = (qs.get("url", [""])[0]).strip()
-            frag = render_result(audit_url(url)) if url else ""
+            first_name = (qs.get("first_name", [""])[0]).strip()
+            email = (qs.get("email", [""])[0]).strip()
+            res = audit_url(url) if url else {}
+            frag = render_result(res) if url else ""
+            if url and res.get("ok") and res.get("status") == "ok":
+                headline = (res.get("evidence") or {}).get("headline", "")
+                failed_tokens = res.get("generic_tokens_found", [])
+                global_score = res.get("score_10_display", "")
+                threading.Thread(
+                    target=_push_mailerlite,
+                    args=(email, first_name, headline, failed_tokens, global_score),
+                    daemon=True,
+                ).start()
             self._send(frag)
             return
         if path not in ("/", ""):
