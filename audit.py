@@ -1255,6 +1255,13 @@ def judge_specificity(f):
     pain = _flag(f.get("concrete_pain"))
     mech = _flag(f.get("unique_mechanism"))
     breadth = _as_int(f.get("distinct_audiences_or_problems"), 1)
+    # UNRELATED SERVICE GATE (runs FIRST, no exemption): a page selling genuinely DIFFERENT delivery categories or
+    # buyer groups (e.g. couples counselling + in-person kink/rope experiences + online corporate mentorship) is a
+    # positioning failure, full stop. These are NOT facets of one niche, so the demo+pain facet exemption below must
+    # NOT rescue them -- a page can name a sharp audience and a real pain for EACH separate business and still leave a
+    # cold visitor unable to tell what this site is. Hard floor 3.
+    if _flag(f.get("unrelated_service_categories")):
+        return 3
     # BREADTH HARD CAP: several genuinely DIFFERENT audiences/problems land for no one -> cap 3. EXEMPTION: a page that
     # has BOTH a specific demographic AND a concrete pain is a focused niche described in facets, not real breadth, so
     # a facet miscount can never nuke it -- it skips the cap and is judged on its merits below.
@@ -1303,9 +1310,15 @@ _SPECIFICITY_FLAGS = {"type": "object", "additionalProperties": False, "properti
     "concrete_pain": {"type": "boolean"}, "pain_quote": {"type": "string"},
     "unique_mechanism": {"type": "boolean"}, "mechanism_quote": {"type": "string"},
     "generic_tokens": {"type": "array", "items": {"type": "string"}},
-    "distinct_audiences_or_problems": {"type": "integer"}},
+    "distinct_audiences_or_problems": {"type": "integer"},
+    # UNRELATED SERVICE GATE: separate from the breadth count on purpose. Breadth counts audiences/problems and is
+    # exempted when demo+pain are both true (a focused niche described in facets). THIS flag is about the page
+    # selling genuinely DIFFERENT delivery categories or buyer groups, which no facet exemption may excuse.
+    "unrelated_service_categories": {"type": "boolean"},
+    "unrelated_categories_list": {"type": "array", "items": {"type": "string"}}},
     "required": ["specific_demographic", "demographic_quote", "concrete_pain", "pain_quote", "unique_mechanism",
-                 "mechanism_quote", "generic_tokens", "distinct_audiences_or_problems"]}
+                 "mechanism_quote", "generic_tokens", "distinct_audiences_or_problems",
+                 "unrelated_service_categories", "unrelated_categories_list"]}
 _CLARITY_FLAGS = {"type": "object", "additionalProperties": False, "properties": {
     "hero_quote": {"type": "string"}, "hero_specific_audience": {"type": "boolean"},
     "hero_concrete_problem_or_outcome": {"type": "boolean"}, "hero_names_field_or_category": {"type": "boolean"},
@@ -1426,6 +1439,10 @@ def ai_critique(row, scores, score_10):
         return None      # a banned word slipped through: use the safe rule-based critique instead
     return result
 
+# NOTE: rubric_txt below is built ONLY from AI_SCORE_CRIT, so the "clarity_5sec" and "specificity" entries in this
+# dict are NO LONGER SENT to the model (kept for reference/history only). Since v1.7-split those two are driven by the
+# FLAG-EXTRACTION block further down ("SPECIFICITY + CLARITY — DO NOT SCORE THESE, EXTRACT THEIR FLAGS") plus the pure
+# judges above. Editing the two entries here changes NOTHING at runtime — edit the flag-extraction block instead.
 _AI_RUBRIC = {
     "clarity_5sec": "In 5 seconds, does the RIGHT person (a cold visitor who HAS this problem) know this page is for them, and sense what changes? A headline that names the reader's real SITUATION or PROBLEM in their words is strong reader-first copy, score it high, NEVER call that 'abstract' or dock it for being 'about the reader'. Grade on a SPECTRUM, not just sharp-vs-vague: 9-10 = the right person instantly sees themselves AND senses the outcome; 7-8 = sharply names their real situation/problem so they recognise themselves fast, even if the outcome/service isn't spelled out; 5-6 = names a clear audience OR a clear service/outcome but not sharply, a visitor gets the gist but doesn't feel 'that's exactly me'. A clever METAPHOR or evocative line that only gestures at a FEELING ('you can't read the label from inside the jar', 'you're stuck', 'something feels off', 'reclaim your spark') WITHOUT naming a specific audience OR a concrete problem in plain words is a 3-4, NOT a 5-6, no matter how relatable it sounds, because a cold visitor still can't tell if it's for THEM or what you actually fix. A VAGUE / feel-good outcome ('build authentic connections', 'live your best life', 'find your purpose', 'transform your life', 'unlock your potential') does NOT count as a concrete outcome, so audience-named + fluffy-outcome caps at 5, it does NOT reach 7-8; only the reader's real SITUATION / PROBLEM or a CONCRETE specific outcome they'd recognise earns 7-8. A hero with BROAD, everyone-welcome appeal, general all-purpose life coaching (no single person or problem signalled), or one juggling several DIFFERENT audiences or problems at once, caps at 3, because a cold visitor can't tell in five seconds it is aimed at THEM specifically; 3-4 = names a broad CATEGORY, FIELD or TOPIC (even as a vague tagline, e.g. 'Divorce Differently' names the field divorce; 'leadership coaching'; or a generic benefit like 'live your best life'), so a cold visitor at least knows what area this is about, but the right person isn't singled out and doesn't feel 'that's exactly me'; 0-2 = gives NO clue what field or topic it's even about: just the coach's personal NAME, or pure field-less abstraction ('You Are Worthy', 'Reimagine what's possible'), so a cold visitor can't even tell what area you work in. RESERVE 0-2 for a name or a field-less abstraction ONLY; the moment the headline names the topic/field at all, it is at least a 3, never a 2. Judge the WHOLE above-fold, not just the single biggest line: if the hero has an 'I help [who] [do what]' line (e.g. 'I help entrepreneurs plan, start and grow businesses') OR any line that names the field or audience, clarity is AT LEAST 3, even when the biggest line is a name or a stats-brag ('Coached 1000+ entrepreneurs'). A 2 requires that NOTHING above the fold names the field or the audience.",
     "specificity": "Is the page FOCUSED on ONE clear audience and ONE clear problem, in their words? Here NARROWNESS is the whole point: focus scores high, breadth scores low. HARD CAP AT 3: broad appeal ('for anyone ready to grow', 'helping people live their best life'), general all-purpose life coaching with no named niche, OR a page that spreads across SEVERAL different audiences or problems at once (e.g. 'career change, redundancy, mid-life, identity shift' or 'career AND relationships AND health') is trying to be for everyone, so it lands for no one. Naming five problems clearly is STILL five problems, that is BREADTH not specificity, and it caps at 3 no matter how cleanly each separate item is written. To score high a page must NARROW: 8-10 = a laser-focused, singular target audience (e.g. 'executive women in tech leadership', 'newly-qualified therapists', 'founders who can't switch off after work') AND ONE clear problem stated in the buyer's own words. 6-7 = a single clear audience and one problem, but with some blur (a second audience creeping in, or the problem drawn a little broadly). 4-5 = a real single problem OR a single clear audience, but not both, and no scatter. 1-3 = broad appeal / general life coaching / several audiences or problems at once. 0 = could be literally anyone, nothing named. Judge FOCUS, not merely how clearly each separate thing is written.",
@@ -1552,6 +1569,21 @@ def ai_analyse(row, scores, score_10, ev=None):
         "FACETS OF ONE niche as separate: 'women with late-diagnosed ADHD navigating their career' is ONE audience "
         "described by facets (women + ADHD + career + late diagnosis), so count 1, not 4. If the facets all describe the "
         "SAME person, the count is 1.\n"
+        "THE UNRELATED SERVICE GATE (a MULTI-OFFER CONFUSION TRAP, judge this HARSHLY and separately from the facet "
+        "rule above): unrelated_service_categories = TRUE when the page sells genuinely DIFFERENT DELIVERY CATEGORIES "
+        "or genuinely DIFFERENT BUYER GROUPS side by side. This is an AUTOMATIC POSITIONING FAILURE and it is NOT "
+        "excused by the page naming a sharp audience or a real pain, because it can do that for EACH separate "
+        "business and a cold visitor STILL cannot tell what this site is for. Set it TRUE when the page mixes things "
+        "like: couples/relationship work AND individual corporate or executive mentorship (different buyer entirely, "
+        "a couple is not a solo professional); IN-PERSON PHYSICAL or intimate/kink experiences (rope, Shibari, tantra, "
+        "bodywork, retreats) AND online/digital consulting, courses or mentorship (different delivery category, "
+        "different risk, different buyer); therapy or healing AND business/revenue coaching; done-for-you services AND "
+        "teaching/courses. Ask yourself plainly: would ONE buyer plausibly want ALL of these, or has this coach "
+        "stacked several separate businesses onto one homepage? If it is several businesses, set it TRUE. When it is "
+        "TRUE you MUST also list each separate category in unrelated_categories_list (e.g. ['couples relationship "
+        "sessions', 'in-person rope/Shibari experiences', 'online mentorship for corporate high-achievers']) and you "
+        "MUST set distinct_audiences_or_problems to at least the number of categories you listed (2+). Only set it "
+        "FALSE when every offer on the page is the SAME kind of help, delivered the SAME way, to the SAME buyer.\n"
         "clarity_flags (the FIRST SCREEN / biggest text only): hero_quote = the headline verbatim; "
         "hero_specific_audience = names a SPECIFIC audience (not generic); hero_concrete_problem_or_outcome = a "
         "CONCRETE situation/outcome (not fluffy); hero_names_field_or_category = at least names the topic/area; "
@@ -2272,6 +2304,22 @@ def audit_url(url):
         scores["proof"] = scores["credibility"] = scores["proof_cred"]
         if _STORY_BURIED_RE.search(ai_notes.get("story", "")) and scores.get("story", 0) > 5:
             scores["story"] = 5              # note says the reader-facing story is buried low -> placement caps it at 5
+        # UNRELATED SERVICE GATE, THE NOTE: the generic sub-5 specificity note says "you don't name who you help", which
+        # is FALSE for a page caught by this gate. These pages usually name their buyer WELL, once per business, and
+        # that is the whole problem. Telling a coach she named nobody when she named three people is the kind of wrong
+        # output the rulebook ranks below a generic fallback, so we write the honest reason instead. Set LAST, after the
+        # grounding + self-consistency gates, so nothing downstream can swap it back for the false line. We deliberately
+        # do NOT print the AI's category descriptions here: they are model prose, not page quotes, so naming them would
+        # risk asserting an offer the page doesn't have.
+        _sflags = ai.get("specificity_flags")
+        if isinstance(_sflags, dict) and _flag(_sflags.get("unrelated_service_categories")):
+            ai_notes["specificity"] = (
+                "You do name who you help, and you do it well for each thing you sell. That part is working. The "
+                "problem is this one page sells several different services to several different groups of people at "
+                "once, and they don't overlap. A stranger has to work out which part is meant for her, and most won't "
+                "stay to do that. Pick the one buyer you most want, and build this page for her alone. The other "
+                "services can have their own pages."
+            )
         # Any cap above changes the content scores, so recompute the headline total off them.
         total_100 = S.weighted_total(scores); score_10 = round(total_100 / 10)
     else:
