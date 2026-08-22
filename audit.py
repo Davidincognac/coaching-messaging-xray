@@ -55,14 +55,14 @@ BENCH = {
     "perceived_friction": 4.5, "risk_reversal": 2.5,
 }
 LABELS = {
-    "clarity_5sec": "5-Second Attention (The Hook)",
-    "specificity": "Avatar Specificity (The Who)",
-    "symptom_resonance": "Symptom Resonance (The Problem)",
-    "proof_cred": "Credibility & Proof (The Trust)",
-    "offer_relevance": "Offer Relevance (The Resolution)",
-    "intent_flow": "Next-Step Intent Flow (The Clarity)",
-    "perceived_friction": "Perceived Friction Index (The Effort)",
-    "risk_reversal": "Risk Reversal & Safety (The Shield)",
+    "clarity_5sec": "Fast Grab (5-Second Hook)",
+    "specificity": "Laser Target (The Who)",
+    "symptom_resonance": "Mind Reading (The Problem)",
+    "proof_cred": "Hard Proof (The Trust)",
+    "offer_relevance": "The Perfect Cure (The Offer)",
+    "intent_flow": "One Clear Path (The Clarity)",
+    "perceived_friction": "Easy Start (The Effort)",
+    "risk_reversal": "Safety Net (The Shield)",
 }
 # A short 'what we check' line shown under each bar, so a coach knows EXACTLY what each score measures and never
 # confuses two that sound alike. Carries the scope David asked for.
@@ -1938,8 +1938,9 @@ def criterion_note(key, sc, ev=None):
         if sc >= 4:
             return ("There’s a way in, but it still asks for more than a cold stranger is ready to give. "
                     "A free resource, a quiz, or a short video series lowers the bar and catches more people.")
-        return ("The only clear next step is a sales call or consultation. That’s a big ask for someone who just "
-                "found you. Most visitors aren’t ready for that yet, so they leave. Add a smaller first step.")
+        return ("The only clear next step is a sales call or consultation. That requires massive trust. "
+                "Most new visitors are not ready to get on a phone call yet, so they leave. "
+                "You must build a smaller first step.")
     if key == "risk_reversal":
         if sc >= 7:
             return ("You’ve given a cold buyer a reason to say yes without feeling like they’re taking a risk. "
@@ -1968,6 +1969,29 @@ def criterion_note(key, sc, ev=None):
     }
     thresh = 5 if key == "specificity" else 6
     return good.get(key, "") if sc >= thresh else bad.get(key, "")
+
+
+def _mi_close(note, key, score):
+    """Append a score-conditional MI File closing line after the bar's diagnosis."""
+    if score is None:
+        return note
+    thresh = 5 if key == "specificity" else 6
+    if score >= thresh:
+        tail = (
+            f"A score of {score} here means your instincts are ahead of most coaches. "
+            "The question is whether that intuition matches thousands of real buyers out there, "
+            "or just the small group of clients you have already met. "
+            "The Market Intelligence (MI) File tells you which."
+        )
+    else:
+        tail = (
+            "Your words aren't working because you lack real-world facts. "
+            "You cannot guess what a stressed buyer wants. "
+            "The Market Intelligence (MI) File gives you the exact phrases they use "
+            "when they are ready to buy."
+        )
+    return f"{note} {tail}" if note else tail
+
 
 # ---------------------------------------------------------------- main entry
 # A bot-challenge / security-verification wall (Cloudflare 'verify you are human', a browser check, a CAPTCHA gate)
@@ -2349,7 +2373,9 @@ def audit_url(url):
         "evidence": ev,
         "notes": {k: {"pass": (None if scores.get(k) is None else
                                scores.get(k, 0) >= (5 if k == "specificity" else 6)),
-                      "note": ai_notes.get(k) or criterion_note(k, scores.get(k), ev)} for k in DISPLAY_CRIT},
+                      "note": _mi_close(
+                          ai_notes.get(k) or criterion_note(k, scores.get(k), ev),
+                          k, scores.get(k))} for k in DISPLAY_CRIT},
         "voice": analyse_voice(row),
         "thumbnail": thumb,
         "strength": tech_strength(row, scores),

@@ -718,22 +718,20 @@ def render_result(res):
       </div>
       <div class="steps">
         <div class="steps-h">So how do you fix it?</div>
-        <p>You've seen the problem. Here's the way out, step by step.</p>
+        <p>You have seen the problem. Here is the way out, step by step.</p>
         <ol class="steplist">
-          <li><b>We find out who's really buying.</b> Not {avatar_eg}. The real person, and the real problem they
-          want fixed. We work this out from what you tell us, {cnt} coaching sites, 11,384 LinkedIn profiles, 2,000
-          books people bought to fix a problem (real proof of what your market wants and why they pay), and more
-          sources besides.
-          <span class="ben">So you're talking to the people who actually buy, not a vague avatar.</span></li>
-          <li><b>We get their exact words.</b> The words your buyer uses for their problem, inside their own head.
-          What makes them buy. What makes them walk away. The stuff you'd never figure out on your own.
-          <span class="ben">So your marketing says what they're already thinking, and they feel understood.</span></li>
-          <li><b>You get it all in your Marketing Intelligence File.</b> Plain and clear. This is the piece you've
-          been missing.
-          <span class="ben">No more staring at a blank page, wondering what to write.</span></li>
-          <li><b>Then you use it everywhere.</b> Your website, so a stranger reads it and thinks &ldquo;that's
-          me&rdquo;. Your social posts, to stop the scroll and get people talking. Your emails. Even to work out
-          which services to offer, and what your clients will and won't pay for.
+          <li><b>We find out who is actually buying.</b> Not the vague, fake avatar most coaches use, like
+          &ldquo;leadership clients, aged 35 to 55.&rdquo; We find the real person and the exact burning problem
+          they will pull out their wallet to fix. We pull this data by deep-diving into 11,384 real professional
+          profiles and tracking over 2,000 specific books people are actively purchasing right now to solve their pain.
+          <span class="ben">So you are talking to the people who actually buy, not a vague avatar.</span></li>
+          <li><b>We uncover how your market lives and buys.</b> We do not estimate. Our research maps out exactly
+          how your target audience describes their day, what empty promises they are tired of hearing, and the exact
+          language that causes them to click &lsquo;buy.&rsquo;
+          <span class="ben">So your marketing says what they are already thinking, and they feel understood.</span></li>
+          <li><b>You get it all in your Marketing Intelligence File.</b> This is the exact data map you have been
+          missing. No more staring at a blank page wondering what to write. Your website, your posts, and your
+          emails will finally say exactly what your buyer is already thinking.
           <span class="ben">So everything you put out pulls the same way, not a different message in every place.</span></li>
         </ol>
         <p class="steps-foot">When your marketing sounds like your buyer, more of the right people get in touch, and more of them buy. More clients, the right ones, and the growth to reach your next level.</p>
