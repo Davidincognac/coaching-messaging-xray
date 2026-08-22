@@ -2390,7 +2390,9 @@ def audit_url(url):
         "scores": scores, "comparison": comparison,
         "critique": critique,
         "ai_powered": ai_powered,
+        "hero_quote": ev.get("headline", ""),
         "generic_tokens_found": _generic_tokens,
+        "global_score": round(total_100 / 10, 1),
         "cliffhanger": {
             "symptom": CLIFFHANGER_SYMPTOM if scores.get("symptom_resonance", 10) <= 4 else None,
             "friction": CLIFFHANGER_FRICTION if (scores.get("perceived_friction", 10) <= 4 or scores.get("risk_reversal", 10) <= 4) else None,

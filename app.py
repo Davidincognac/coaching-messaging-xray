@@ -17,6 +17,12 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"), override=False)
+except ImportError:
+    pass
+
 from audit import audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count  # the engine we built
 
 PORT = int(os.getenv("PORT", "8000"))
@@ -338,18 +344,19 @@ document.addEventListener('DOMContentLoaded',function(){
 """
 
 
-def _push_mailerlite(email, first_name, last_name, headline, failed_tokens, global_score):
+def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_found, global_score):
     """Fire-and-forget MailerLite v3 subscriber upsert. Always runs in a daemon thread; never blocks the audit."""
     if not MAILERLITE_API_KEY or not email:
         return
     try:
-        tokens_str = ", ".join(failed_tokens) if isinstance(failed_tokens, list) else str(failed_tokens or "")
+        tokens_str = (", ".join(generic_tokens_found) if isinstance(generic_tokens_found, list)
+                      else str(generic_tokens_found or ""))
         payload = _json.dumps({
             "email": email,
             "fields": {
                 "name": first_name or "",
                 "last_name": last_name or "",
-                "current_headline": headline or "",
+                "current_headline": hero_quote or "",
                 "failed_tokens": tokens_str,
                 "global_score": str(global_score or ""),
             },
@@ -922,12 +929,14 @@ class Handler(BaseHTTPRequestHandler):
             res = audit_url(url) if url else {}
             frag = render_result(res) if url else ""
             if url and res.get("ok") and res.get("status") == "ok":
-                headline = (res.get("evidence") or {}).get("headline", "")
-                failed_tokens = res.get("generic_tokens_found", [])
-                global_score = res.get("score_10_display", "")
                 threading.Thread(
                     target=_push_mailerlite,
-                    args=(email, first_name, last_name, headline, failed_tokens, global_score),
+                    args=(
+                        email, first_name, last_name,
+                        res.get("hero_quote", ""),
+                        res.get("generic_tokens_found", []),
+                        res.get("global_score", ""),
+                    ),
                     daemon=True,
                 ).start()
             self._send(frag)
