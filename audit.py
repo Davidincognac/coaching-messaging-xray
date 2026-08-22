@@ -388,7 +388,8 @@ def detect_capture(row):
         # not the same as one up top, so we flag it and the caller docks the score.
         buried = bool(bt) and low.find(phrase.lower()) > 0.55 * len(bt)
         gated = bool(_GATED_FREEBIE_RE.search(bt))
-        return {"kind": "magnet", "desc": f"a free resource (‘{phrase}’)", "buried": buried, "gated": gated}
+        return {"kind": "magnet", "desc": f"a free resource (‘{phrase}’)", "buried": buried, "gated": gated,
+                "inline_above_fold": bool(row.get("optin_inline_above_fold"))}   # DOM proof of a seamless inline form
     # 1b) A CUSTOM-NAMED magnet ('Get my Permission Slips') behind an actual opt-in form. Requires the form so a
     #     stray 'get your results' in body copy can't fake a magnet; skips booking-type objects.
     if str(row.get("optin_present", "")).lower() == "yes":
@@ -554,6 +555,14 @@ _BOOKING_PATH_RE = re.compile(
     r"/widget/bookings?/|/book-a-(?:call|consult|session|discovery)|/book-now\b|/bookings?\b|/appointments?\b|"
     r"/schedule-a-(?:call|consult|session)|/discovery-call\b|/free-(?:call|consultation)\b|squareup\.com/appointments",
     re.I)
+# A NATIVELY EMBEDDED LIVE CALENDAR (an <iframe> scheduler, or a Calendly/GoHighLevel inline widget) lets a visitor
+# pick a time WITHOUT leaving the page -- the strongest possible next step. booking_links() reads href= only, so a
+# pure inline embed (iframe src, no 'Book' link) was previously MISSED (scored N/A). This catches it off the raw HTML.
+_BOOKING_EMBED_RE = re.compile(
+    r'<iframe[^>]+src=["\'][^"\']*(?:calendly\.com|acuityscheduling\.com|app\.squarespacescheduling\.com|'
+    r'book\.squareup\.com|leadconnectorhq\.com|msgsndr\.com|youcanbook\.me|tidycal\.com|savvycal\.com|'
+    r'appointlet\.com|oncehub\.com|meetings\.hubspot\.com|cal\.com/)'
+    r'|calendly-inline-widget|data-url=["\'][^"\']*calendly\.com|/widget/booking/', re.I)
 
 def booking_links(html):
     """Distinct scheduler/booking URLs on the page (known host or booking-path). Robust to button wording. Used both to
@@ -574,7 +583,9 @@ def detect_booking(row):
     TYPE of step, not free vs paid (a call is a commitment either way; whether there's a free way in is the Opt-in
     criterion's job). A booking is a scheduler LINK (strongest, robust to wording) OR booking WORDS in the copy."""
     bt = _clean(row.get("body_text")) or ""
-    if row.get("has_booking_link"):                              # strongest signal: a button wired to a real scheduler
+    if row.get("has_booking_embed"):                            # STRONGEST: a live calendar embedded ON the page (pick a time without leaving)
+        return {"kind": "booking_live", "desc": "a live booking calendar embedded right on the page"}
+    if row.get("has_booking_link"):                              # strong: a button wired to a real scheduler
         return {"kind": "booking", "desc": "a booking a visitor can make straight off the page"}
     m = _BOOKING_RE.search(bt)                                   # backup: booking words (inline / on-page, no widget)
     if m:
@@ -592,7 +603,9 @@ def booking_score(cap):
     and 'is there a free way in' is scored under Opt-in. A direct booking (book a time now) is the strong version."""
     if not cap:
         return None
-    return {"booking": 8, "contact_form": 4, "application": 3}.get(cap.get("kind"))
+    # booking_live (an embedded live calendar) and booking (a scheduler link / booking words) both START at 8; the
+    # tech+copy marriage gate in the merge layer lifts a live calendar to 10 (strong copy) or drops it to 5 (weak copy).
+    return {"booking_live": 8, "booking": 8, "contact_form": 4, "application": 3}.get(cap.get("kind"))
 
 def build_captures(row):
     """Split capture: {'opt_in': best opt-in cap or None, 'booking': booking cap or None}. A page can have BOTH."""
@@ -1017,6 +1030,19 @@ def render_and_extract(domain):
                 vis = pg.evaluate(VISUAL_HEADLINE_JS)
             except Exception:
                 vis = None
+            # OPT-IN 10 SIGNAL: is there a REAL email input INLINE and ABOVE THE FOLD (top viewport, not inside a
+            # modal/popup)? That is the DOM proof of a seamless inline capture form (the strongest opt-in). Wrapped so
+            # ANY JS failure -> False, which falls straight back to the 8-cap magnet rules. pg is still open here.
+            try:
+                _optin_af = bool(pg.evaluate(r"""() => {
+                  const el = document.querySelector('input[type=email], input[name*="email" i], input[placeholder*="email" i]');
+                  if (!el) return false;
+                  const r = el.getBoundingClientRect();
+                  const inModal = !!el.closest('[role=dialog], .modal, .popup, [class*="modal"], [class*="popup"], [class*="overlay"]');
+                  return r.top >= 0 && r.top < (window.innerHeight || 800) && !inModal && r.width > 0 && r.height > 0;
+                }"""))
+            except Exception:
+                _optin_af = False
             # A REAL on-page shop = visible product tiles / add-to-cart BUTTONS actually rendered on the homepage,
             # NOT merely WooCommerce being installed (its scripts ship 'add_to_cart' strings on every WP site that has
             # the plugin, even when no products show). Count only VISIBLE shop elements so an installed-but-hidden
@@ -1155,6 +1181,8 @@ def render_and_extract(domain):
         _blinks = booking_links(rendered_html)
         row["has_booking_link"] = bool(_blinks)              # a 'Book' button wired to a real scheduler = a booking
         row["booking_link_count"] = len(_blinks)             # many distinct session links = booking lost among options
+        row["has_booking_embed"] = bool(_BOOKING_EMBED_RE.search(rendered_html))   # a LIVE inline calendar on the page
+        row["optin_inline_above_fold"] = _optin_af           # a real email input, inline + above the fold, not a popup
         proof = detect_proof_links(rendered_html)
         row["proof_link_labels"] = proof["labels"]
         row["proof_external_reviews"] = proof["external_reviews"]
@@ -2072,8 +2100,9 @@ def audit_url(url):
     # 'Buried' = the booking is one of MANY competing asks. Catch it three ways, because coaches build pages differently:
     # a real shop, several deterministically-priced offers, OR a wall of distinct booking links (a GoHighLevel-style
     # funnel where each paid session is its own 'Book' button, which the price counter can't see).
-    if scores.get("booking") == 8 and (row.get("has_shop") or row.get("priced_offer_count", 0) >= 3
-                                       or row.get("booking_link_count", 0) >= 4):
+    if (scores.get("booking") == 8 and (_bk or {}).get("kind") != "booking_live"    # a live embedded calendar is exempt
+            and (row.get("has_shop") or row.get("priced_offer_count", 0) >= 3
+                 or row.get("booking_link_count", 0) >= 4)):
         scores["booking"] = 5
         if _bk:
             _bk["buried"] = True   # so the note explains it's lost among the buy-CTAs, not a clean single booking
@@ -2118,6 +2147,21 @@ def audit_url(url):
                 # else: no / empty flags -> keep the deterministic proxy already in scores (silent, safe fallback)
             except Exception:
                 pass   # any error whatsoever -> keep the proxy; never blank the page
+        # TECH + COPY MARRIAGE GATE: an inline above-fold opt-in form and a live embedded booking calendar are strong
+        # TECH, but tech only converts when the COPY gives a reason to commit. So clarity + specificity (just judged
+        # above from the flags) GOVERN the final tech score. Runs here so both are final.
+        _clar = scores.get("clarity_5sec", 0)
+        _spec = scores.get("specificity", 0)
+        # BINARY marriage gate: strong copy (BOTH clarity and specificity >= 5) lifts the tech to 10; anything less is a
+        # marketing failure and ruthlessly drags the tech DOWN to 5 -- no fuzzy middle where a vague 4/10 headline still
+        # lets a technical 8 slip through. The tech only earns its top points when the copy gives a reason to commit.
+        _copy_strong = _clar >= 5 and _spec >= 5
+        _oc = _caps.get("opt_in") or {}
+        if _oc.get("kind") == "magnet" and _oc.get("inline_above_fold") and scores.get("opt_in") == 8:
+            scores["opt_in"] = 10 if _copy_strong else 5
+        _bc = _caps.get("booking") or {}
+        if _bc.get("kind") == "booking_live" and scores.get("booking") == 8:
+            scores["booking"] = 10 if _copy_strong else 5
         # CTA FLOOR: the only thing that earns a 2 or 3 for the CTA is genuine priced-shop chaos (many products /
         # add-to-cart competing with everything else). A page with NO shop, however cluttered with soft 'Learn More'
         # buttons, is a WEAK CTA, not chaos, so it floors at 4. The AI won't reliably hold this line, so we enforce it
