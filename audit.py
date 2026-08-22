@@ -60,7 +60,7 @@ LABELS = {
     "offer_clarity": "Offer clarity & value", "proof": "Proof / social proof",
     "clear_cta": "One clear call-to-action", "opt_in": "Opt-in form", "booking": "Booking & enquiry",
     "credibility": "Credibility markers", "story": "Story / the human",
-    "pricing_shown": "Pricing visible", "technical_health": "Technical health",
+    "pricing_shown": "Pricing transparency", "technical_health": "Technical health",
     "proof_cred": "Proof & credibility",
 }
 # A short 'what we check' line shown under each bar, so a coach knows EXACTLY what each score measures and never
@@ -74,12 +74,13 @@ DEFINITIONS = {
     "opt_in": "Something for the not-ready-yet: a free thing they get without booking a call.",
     "booking": "The next step for the ready: a booking or enquiry, and how strong that step is.",
     "story": "Does the copy connect to the reader's own situation, not just your CV?",
+    "pricing_shown": "Does your homepage show pricing? Showing it removes uncertainty for ready buyers; hiding it is a common deliberate choice. It's included in your score at a light weight (0.2 vs 2.0 for clarity), so it won't swing your overall number much either way.",
     "technical_health": "The basics: secure, loads well, real content on the page. We check this but leave it out of your overall score, almost every site passes it, so counting it would only pad your number. If something here were broken, we'd flag it.",
 }
 # The order the bars READ in (grouped by theme, not sorted by gap): first impression, then the offer, then trust,
 # then the three 'getting the lead' scores TOGETHER (opt-in -> focus -> booking), then the human, then the basics.
 DISPLAY_CRIT = ["clarity_5sec", "specificity", "offer_clarity", "proof_cred",
-                "opt_in", "clear_cta", "booking", "story", "technical_health"]
+                "opt_in", "clear_cta", "booking", "story", "pricing_shown", "technical_health"]
 
 # --- real percentile curve, loaded from the 10,954-site results (for "better than X%") ---
 _PCTL = []
@@ -117,14 +118,23 @@ def _load_domains():
                     s.add(d)
     except Exception:
         pass
-    try:  # add any newly-recorded domains from live audits
-        with open(_DOMAINS_FILE) as f:
-            for line in f:
-                d = line.strip().lower()
-                if d:
-                    s.add(d)
+    # Read the live-audit domains file; deduplicate it in place if it has accumulated duplicate lines
+    # (can happen after crashes or concurrent writes) so we never append a domain that's already there.
+    file_lines = []
+    try:
+        with open(_DOMAINS_FILE, encoding="utf-8") as f:
+            file_lines = [ln.strip().lower() for ln in f if ln.strip()]
     except FileNotFoundError:
         pass
+    unique_lines = list(dict.fromkeys(file_lines))   # preserves insertion order, removes duplicates
+    if len(unique_lines) < len(file_lines):          # file had duplicates — rewrite it clean
+        try:
+            with open(_DOMAINS_FILE, "w", encoding="utf-8") as f:
+                f.write("\n".join(unique_lines) + ("\n" if unique_lines else ""))
+        except Exception:
+            pass
+    for d in unique_lines:
+        s.add(d)
     _domain_set = s
     return s
 
@@ -156,6 +166,7 @@ def _tidy_headline(t):
     t = _clean(t)
     t = re.sub(r"\s*[-|–,]\s*(home|homepage|welcome)\s*$", "", t, flags=re.I)
     t = re.sub(r"^\s*(home|homepage|welcome)\s*[-|–,]\s*", "", t, flags=re.I)
+    t = re.sub(r"\s+([,\.!?;:])", r"\1", t)   # "word ," -> "word,"
     return t.strip()
 
 # markers we're confident actually indicate a testimonials/reviews section (avoids false "none found")

@@ -298,6 +298,14 @@ document.addEventListener('DOMContentLoaded',function(){   // wait for #result (
       setTimeout(function(){
         prog.className='';
         result.innerHTML=html;
+        var countEl=result.querySelector('[data-sites]');
+        if(countEl){
+          var nc=countEl.getAttribute('data-sites');
+          var ey=document.querySelector('.eyebrow');
+          if(ey) ey.textContent=nc+' coaching websites read, and counting';
+          var bbs=document.querySelectorAll('.sub b');
+          if(bbs.length>1) bbs[1].textContent=nc;
+        }
         busy=false;
         result.scrollIntoView({behavior:'smooth',block:'start'});
       }, Math.max(0,500-(Date.now()-t0)));
@@ -644,7 +652,7 @@ def render_result(res):
         'What you do about it is up to you.</div></div>'
     )
 
-    return f"""<div class="card">
+    return f"""<div class="card" data-sites="{cnt}">
       {opener}
       {reframe}
       {checklist_html}
@@ -652,7 +660,7 @@ def render_result(res):
       {media}
       {popup}
       {evidence_html}
-      <div class="scores-h"><span class="secnum">2 / 5</span>Here are your scores, with the reason behind each one. A green tick means it's working for you. A red cross means it's costing you clients. (We don't score pricing on a homepage, but there's a note on it lower down.)</div>
+      <div class="scores-h"><span class="secnum">2 / 5</span>Here are your scores, with the reason behind each one. A green tick means it's working for you. A red cross means it's costing you clients.</div>
       <div>{''.join(rows)}</div>
       <div class="diag">
         <h3><span class="secnum">3 / 5</span>What a visitor sees{ai}</h3>
