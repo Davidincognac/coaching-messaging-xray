@@ -228,11 +228,12 @@ PAGE = """<!doctype html><html lang="en"><head>
   </div>
   <form method="get" action="/" id="auditform">
     <input type="text" name="first_name" id="firstnameinput" placeholder="Your first name" autocomplete="given-name" autofocus>
+    <input type="text" name="last_name" id="lastnameinput" placeholder="Your last name" autocomplete="family-name">
     <input type="email" name="email" id="emailinput" placeholder="Your best email address" autocomplete="email">
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a cold buyer sees</button>
   </form>
-  <div class="hint">This multi-bar report normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
+  <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
   <!--PROGRESS-->
   <div id="result">{result}</div>
 </div></body></html>"""
@@ -282,6 +283,7 @@ document.addEventListener('DOMContentLoaded',function(){
   form.addEventListener('submit',function(e){
     var url=document.getElementById('urlinput').value.trim();
     var fn=document.getElementById('firstnameinput').value.trim();
+    var ln=document.getElementById('lastnameinput').value.trim();
     var em=document.getElementById('emailinput').value.trim();
     if(!url) return;
     e.preventDefault();
@@ -303,6 +305,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
     var qs='url='+encodeURIComponent(url);
     if(fn) qs+='&first_name='+encodeURIComponent(fn);
+    if(ln) qs+='&last_name='+encodeURIComponent(ln);
     if(em) qs+='&email='+encodeURIComponent(em);
 
     var t0=Date.now();
@@ -335,7 +338,7 @@ document.addEventListener('DOMContentLoaded',function(){
 """
 
 
-def _push_mailerlite(email, first_name, headline, failed_tokens, global_score):
+def _push_mailerlite(email, first_name, last_name, headline, failed_tokens, global_score):
     """Fire-and-forget MailerLite v3 subscriber upsert. Always runs in a daemon thread; never blocks the audit."""
     if not MAILERLITE_API_KEY or not email:
         return
@@ -345,6 +348,7 @@ def _push_mailerlite(email, first_name, headline, failed_tokens, global_score):
             "email": email,
             "fields": {
                 "name": first_name or "",
+                "last_name": last_name or "",
                 "current_headline": headline or "",
                 "failed_tokens": tokens_str,
                 "global_score": str(global_score or ""),
@@ -913,6 +917,7 @@ class Handler(BaseHTTPRequestHandler):
             qs = parse_qs(parsed.query)
             url = (qs.get("url", [""])[0]).strip()
             first_name = (qs.get("first_name", [""])[0]).strip()
+            last_name = (qs.get("last_name", [""])[0]).strip()
             email = (qs.get("email", [""])[0]).strip()
             res = audit_url(url) if url else {}
             frag = render_result(res) if url else ""
@@ -922,7 +927,7 @@ class Handler(BaseHTTPRequestHandler):
                 global_score = res.get("score_10_display", "")
                 threading.Thread(
                     target=_push_mailerlite,
-                    args=(email, first_name, headline, failed_tokens, global_score),
+                    args=(email, first_name, last_name, headline, failed_tokens, global_score),
                     daemon=True,
                 ).start()
             self._send(frag)
