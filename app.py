@@ -957,4 +957,4 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     print(f"\n  Coaching Website Audit is running.")
     print(f"  Open this in your browser:  http://localhost:{PORT}\n")
-    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
