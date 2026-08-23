@@ -1883,6 +1883,7 @@ def _humanlist(items):
 
 def criterion_note(key, sc, ev=None):
     ev = ev or {}
+    sc = 0 if sc is None else int(sc)
     proof_links = ev.get("proof_links") or []
     ext_reviews = ev.get("external_reviews") or []
     if key == "proof_cred":
