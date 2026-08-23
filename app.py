@@ -9,9 +9,11 @@ No extra installs, uses only Python's built-in web server. The AI diagnosis
 turns on automatically once ANTHROPIC_API_KEY is set in your environment.
 """
 
+import base64
 import html
 import json as _json
 import os
+import re
 import threading
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -24,9 +26,33 @@ except ImportError:
     pass
 
 from audit import audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count  # the engine we built
+from storage import save_audit, get_audit
 
 PORT = int(os.getenv("PORT", "8000"))
 MAILERLITE_API_KEY = os.getenv("MAILERLITE_API_KEY", "")
+# On Render, set APP_BASE_URL to your service URL (e.g. https://your-app.onrender.com).
+# Locally it falls back to localhost so email links still work during development.
+APP_BASE_URL = os.getenv("APP_BASE_URL", f"http://localhost:{PORT}").rstrip("/")
+
+SCREENSHOTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "screenshots")
+os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
+
+def _screenshot_filename(domain: str) -> str:
+    """Safe filename from a domain: strip protocol, keep alphanum/hyphen, collapse underscores."""
+    clean = re.sub(r"https?://", "", domain).strip("/")
+    return re.sub(r"[^a-zA-Z0-9\-]", "_", clean) + ".png"
+
+def _save_screenshot(domain: str, data_uri: str) -> str:
+    """Decode a data:image/png;base64,... URI and write it to the screenshots folder.
+    Returns the web-accessible path (/screenshots/<filename>) or '' on failure."""
+    try:
+        _, b64 = data_uri.split(",", 1)
+        path = os.path.join(SCREENSHOTS_DIR, _screenshot_filename(domain))
+        with open(path, "wb") as f:
+            f.write(base64.b64decode(b64))
+        return "/screenshots/" + _screenshot_filename(domain)
+    except Exception:
+        return ""
 
 # Angelo, David's mascot. Drop the image in as coach_audit_app/angelo.png and it appears automatically.
 MASCOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "angelo.png")
@@ -344,7 +370,7 @@ document.addEventListener('DOMContentLoaded',function(){
 """
 
 
-def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_found, global_score):
+def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_found, global_score, salespage_url=""):
     """Fire-and-forget MailerLite v3 subscriber upsert. Always runs in a daemon thread; never blocks the audit."""
     if not MAILERLITE_API_KEY or not email:
         return
@@ -359,6 +385,7 @@ def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_fo
                 "current_headline": hero_quote or "",
                 "failed_tokens": tokens_str,
                 "global_score": str(global_score or ""),
+                "salespage_url": salespage_url,
             },
         }).encode("utf-8")
         req = urllib.request.Request(
@@ -889,6 +916,645 @@ OFFER_PAGE = """<!doctype html><html lang="en"><head>
 </div></body></html>"""
 
 
+def _build_criteria_html(raw_json, hero_quote):
+    """Return the 3 lowest-scoring criteria blocks, or a plain fallback if no JSON is available."""
+    _fallback = (
+        '<div class="crit-fallback">'
+        "<p>Your homepage copy does not name a specific, daily problem your buyer is living through. "
+        "It describes what coaching does rather than what a stranger is already searching for. "
+        "That gap is why cold visitors leave without making contact.</p>"
+        "</div>"
+    )
+    if not raw_json:
+        return _fallback
+    try:
+        data   = _json.loads(raw_json)
+        scores = data.get("scores", {})
+        notes  = data.get("notes", {})
+        hero   = html.escape(hero_quote or "")
+        scored = [(k, scores[k]) for k in DISPLAY_CRIT if k in scores]
+        scored.sort(key=lambda x: x[1])
+        worst3 = scored[:3]
+        if not worst3:
+            return _fallback
+        blocks = []
+        for k, s in worst3:
+            label = html.escape(LABELS.get(k, k))
+            defn  = html.escape(DEFINITIONS.get(k, ""))
+            note_obj  = notes.get(k, {})
+            raw_note  = (note_obj.get("note", "") if isinstance(note_obj, dict) else "") or ""
+            # First sentence only — split on ". " so decimal numbers don't break it.
+            dot = raw_note.find(". ")
+            first_sent = html.escape((raw_note[:dot + 1] if dot != -1 else raw_note[:200]).strip())
+            # Verbatim headline quote for criteria where the headline IS the evidence.
+            quote_html = ""
+            if k in ("clarity_5sec", "symptom_resonance", "specificity") and hero:
+                quote_html = f'<blockquote class="crit-quote">&ldquo;{hero}&rdquo;</blockquote>'
+            blocks.append(
+                f'<div class="crit-block">'
+                f'<div class="crit-header">'
+                f'<span class="crit-name">{label}</span>'
+                f'<span class="crit-score">{s}/10</span>'
+                f'</div>'
+                f'<div class="crit-defn">{defn}</div>'
+                f'{quote_html}'
+                f'<p class="crit-obs">{first_sent}</p>'
+                f'</div>'
+            )
+        return "\n".join(blocks)
+    except Exception:
+        return _fallback
+
+
+def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_json=""):
+    fn     = html.escape(first_name)
+    fn_up  = html.escape(first_name.upper())
+    hl     = html.escape(headline)
+    tok    = html.escape(tokens)
+    sc     = html.escape(score)
+    shot   = html.escape(screenshot, quote=True)
+    criteria_html = _build_criteria_html(raw_json, headline)
+    return f"""<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your Market Intelligence File &mdash; {fn}</title>
+<style>
+  @font-face{{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}}
+  :root{{--paper:#FBFBFD;--surface:#fff;--ink:#12131A;--muted:#5c6a67;--line:#dde3e0;
+    --accent:#2A75D3;--accent-ink:#1a5fb8;--soft:#e8f0fb;--critical:#b3402a;--warn:#b47f26;}}
+  *{{box-sizing:border-box}}
+  body{{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}}
+  .wrap{{max-width:760px;margin:0 auto;padding:44px 22px 80px}}
+  .eyebrow{{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);font-weight:600;margin-bottom:18px}}
+  h1{{font-weight:600;font-size:clamp(26px,5vw,40px);letter-spacing:-.015em;margin:.2em 0 .5em;line-height:1.12}}
+  h2{{font-weight:600;font-size:clamp(17px,3vw,22px);margin:0 0 12px;line-height:1.25;color:var(--ink)}}
+  h3{{font-weight:600;font-size:16px;margin:0 0 8px;color:var(--ink)}}
+  p{{margin:0 0 14px;font-size:15px;line-height:1.65;color:var(--ink)}}
+  p:last-child{{margin-bottom:0}}
+  .card{{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 30px;
+    box-shadow:0 8px 30px rgba(20,40,36,.06);margin-bottom:22px}}
+  .label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:12px}}
+  .score-num{{font-size:72px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--critical)}}
+  .score-den{{font-size:22px;color:var(--muted);font-weight:600;vertical-align:super}}
+  .score-line{{margin:.15em 0 .5em;font-size:clamp(17px,2.8vw,21px);font-weight:600;line-height:1.25;color:var(--ink)}}
+  .cold-buyer-note{{font-size:15px;line-height:1.65;color:var(--muted);margin:.4em 0 0}}
+  .headline-quote{{font-style:italic;border-left:4px solid var(--accent);padding-left:16px;margin:14px 0;
+    font-size:17px;color:var(--ink);line-height:1.5}}
+  .tokens-block{{margin:14px 0 0;background:var(--soft);border:1px solid #cdddf3;border-radius:9px;padding:16px 20px}}
+  .tokens-block .tok-label{{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:700;margin-bottom:8px}}
+  .tokens-value{{font-size:15px;color:var(--ink);line-height:1.7;font-weight:500}}
+  .section-eyebrow{{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+    font-weight:600;margin-bottom:18px}}
+  .evidence-grid{{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:32px;align-items:start}}
+  @media(max-width:900px){{.evidence-grid{{grid-template-columns:1fr;gap:32px}}}}
+  .evidence-eyebrow{{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
+    color:var(--accent);margin-bottom:18px}}
+  .crit-block{{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;margin-bottom:14px}}
+  .crit-block:last-child{{margin-bottom:0}}
+  .crit-header{{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}}
+  .crit-name{{font-size:13px;font-weight:700;color:var(--ink)}}
+  .crit-score{{font-size:12px;font-weight:700;color:var(--critical);background:#fdf0ee;
+    padding:2px 8px;border-radius:6px}}
+  .crit-defn{{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    margin-bottom:10px;line-height:1.5}}
+  .crit-quote{{font-style:italic;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);
+    padding-left:12px;margin:10px 0;line-height:1.55}}
+  .crit-obs{{font-size:14px;color:var(--muted);line-height:1.65;margin:0}}
+  .crit-fallback{{background:var(--soft);border:1px solid #cdddf3;border-radius:12px;padding:20px 24px}}
+  .crit-fallback p{{font-size:14px;color:var(--ink);line-height:1.65;margin:0}}
+  .video-section-grid{{display:grid;grid-template-columns:1fr 2fr;gap:40px;
+    align-items:start;margin-bottom:22px}}
+  @media(max-width:768px){{.video-section-grid{{grid-template-columns:1fr;gap:28px}}}}
+  .video-section-copy{{padding-top:4px}}
+  .video-section-copy p{{font-size:15px;color:var(--muted);line-height:1.72;margin:0 0 16px}}
+  .video-section-copy p:last-child{{margin-bottom:0}}
+  .video-section-copy strong{{color:var(--ink)}}
+  .video-col{{display:flex;flex-direction:column;gap:18px}}
+  .video-block{{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;box-shadow:0 4px 18px rgba(20,40,36,.06);margin-bottom:0}}
+  .video-embed{{position:relative;width:100%;padding-top:56.25%}}
+  .video-embed iframe{{position:absolute;inset:0;width:100%;height:100%;border:0}}
+  .video-embed.shorts{{padding-top:177.78%}}
+  .video-copy{{padding:20px 24px}}
+  .video-copy h3{{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.35}}
+  .video-copy p{{font-size:14px;color:var(--muted);line-height:1.6;margin:0}}
+  .product-reveal{{border:2px solid var(--accent);border-radius:14px;padding:28px 30px;margin-bottom:22px;
+    background:var(--surface);box-shadow:0 8px 30px rgba(20,40,36,.06)}}
+  .product-reveal .pr-eyebrow{{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-bottom:10px}}
+  .product-reveal h2{{color:var(--accent-ink);margin-bottom:14px}}
+  .product-reveal .price-line{{margin:18px 0 0;font-size:20px;font-weight:700;color:var(--ink)}}
+  .product-reveal .price-line span{{color:var(--accent-ink)}}
+  .checkout-section{{background:var(--ink);border-radius:14px;padding:32px 30px;margin-bottom:22px}}
+  .checkout-section h2{{color:#fff;margin-bottom:6px;font-size:clamp(20px,4vw,26px)}}
+  .checkout-section .cs-sub{{color:#9ec6f0;font-size:15px;margin-bottom:24px}}
+  .checkout-form-placeholder{{background:#1e2e28;border:1px dashed rgba(255,255,255,.2);border-radius:11px;
+    padding:28px 24px;text-align:center}}
+  .checkout-form-placeholder .cf-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(255,255,255,.4);font-weight:600;margin-bottom:12px}}
+  .checkout-form-placeholder .cf-note{{font-size:14px;color:rgba(255,255,255,.5);line-height:1.55}}
+  .checkout-form-placeholder .lock-icon{{font-size:28px;margin-bottom:10px}}
+  .cta-btn{{display:inline-block;background:#e0691f;color:#fff;text-decoration:none;font-weight:700;
+    padding:16px 30px;border-radius:9px;font-size:16px;margin-top:18px;border:0;cursor:pointer;width:100%;
+    text-align:center}}
+  .cta-btn:hover{{background:#c65a15}}
+  .guarantee{{font-size:13px;color:rgba(255,255,255,.45);margin-top:14px;text-align:center;line-height:1.5}}
+  .xray-box{{margin:22px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+  @media(max-width:560px){{.xray-box{{grid-template-columns:1fr}}}}
+  .xray-panel{{border-radius:11px;overflow:hidden;border:1px solid var(--line)}}
+  .xray-panel.before{{border-color:#d4b8b3}}
+  .xray-panel.after{{border-color:#b8cfd4}}
+  .xray-screen{{height:120px;display:flex;align-items:center;justify-content:center;
+    font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}}
+  .xray-panel.before .xray-screen{{background:#f5eeec;color:#9a6055}}
+  .xray-panel.after .xray-screen{{background:#e8f0f2;color:#3a6e7a}}
+  .xray-meta{{padding:14px 16px;background:var(--surface)}}
+  .xray-meta .xm-label{{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:6px}}
+  .xray-panel.before .xm-label{{color:#9a6055}}
+  .xray-panel.after .xm-label{{color:#3a6e7a}}
+  .xray-meta .xm-body{{font-size:13px;color:var(--muted);line-height:1.55}}
+  .xray-meta .xm-body em{{color:var(--ink);font-style:normal;font-weight:600}}
+  .protocol-section{{margin-bottom:22px}}
+  .protocol-section .section-eyebrow{{margin-bottom:16px}}
+  .protocol-container{{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:24px 28px;margin-bottom:14px;box-shadow:0 4px 18px rgba(20,40,36,.04)}}
+  .protocol-container .pc-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-bottom:10px}}
+  .protocol-container h3{{font-size:17px;font-weight:700;color:var(--ink);margin:0 0 12px;line-height:1.3}}
+  .protocol-container p{{font-size:15px;color:var(--muted);line-height:1.65;margin:0 0 10px}}
+  .protocol-container p:last-child{{margin-bottom:0}}
+  .protocol-container p b{{color:var(--ink)}}
+  .protocol-container ul{{margin:8px 0 0;padding-left:20px}}
+  .protocol-container li{{font-size:15px;color:var(--muted);line-height:1.6;margin:6px 0}}
+  .protocol-container li b{{color:var(--ink)}}
+  .narrative-bridge{{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:28px 30px;box-shadow:0 8px 30px rgba(20,40,36,.06);margin-bottom:22px}}
+  .narrative-bridge .nb-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--critical);font-weight:700;margin-bottom:12px}}
+  .narrative-bridge h2{{margin-bottom:14px}}
+  .three-choices{{margin-bottom:22px}}
+  .three-choices .tc-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;margin-bottom:14px}}
+  .choice-block{{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;margin-bottom:12px;box-shadow:0 3px 12px rgba(20,40,36,.04)}}
+  .choice-block:last-child{{border-color:var(--accent);background:var(--soft)}}
+  .choice-block .cb-num{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;margin-bottom:8px}}
+  .choice-block:nth-child(1) .cb-num{{color:var(--critical)}}
+  .choice-block:nth-child(2) .cb-num{{color:var(--warn)}}
+  .choice-block:last-child .cb-num{{color:var(--accent-ink)}}
+  .choice-block h3{{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.3}}
+  .choice-block p{{font-size:15px;color:var(--muted);line-height:1.65;margin:0}}
+  .choice-block:last-child p{{color:var(--ink)}}
+  .payoffs-section{{margin-bottom:22px}}
+  .payoffs-grid{{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}}
+  @media(max-width:540px){{.payoffs-grid{{grid-template-columns:1fr}}}}
+  .payoff-tile{{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;box-shadow:0 3px 14px rgba(20,40,36,.05);display:flex;flex-direction:column}}
+  .payoff-tile .pt-icon{{font-size:24px;margin-bottom:10px}}
+  .payoff-tile .pt-title{{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}}
+  .payoff-tile .pt-body{{font-size:13px;color:var(--muted);line-height:1.6;flex:1}}
+  .assumptions-section{{margin-bottom:22px}}
+  .assumption{{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px 28px;
+    margin-bottom:14px;box-shadow:0 4px 18px rgba(20,40,36,.04)}}
+  .assumption .a-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--warn);
+    font-weight:700;margin-bottom:10px}}
+  .assumption h3{{font-size:17px;font-weight:700;color:var(--ink);margin:0 0 12px;line-height:1.3}}
+  .assumption p{{font-size:15px;color:var(--muted);line-height:1.65;margin:0 0 10px}}
+  .assumption p:last-child{{margin-bottom:0}}
+  .assumption p b{{color:var(--ink)}}
+  .price-anchor{{font-size:14px;color:var(--muted);margin:16px 0 6px;text-decoration:line-through}}
+  .price-main{{font-size:26px;font-weight:700;color:var(--accent-ink);margin:0 0 4px}}
+  .price-main span{{font-size:14px;font-weight:500;color:var(--muted)}}
+  .guarantee-block{{background:var(--soft);border:1px solid #cdddf3;border-left:4px solid var(--accent);
+    border-radius:11px;padding:20px 22px;margin-top:22px}}
+  .guarantee-block .g-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-bottom:10px}}
+  .guarantee-block p{{font-size:14px;color:var(--ink);line-height:1.65;margin:0 0 10px}}
+  .guarantee-block p:last-child{{margin-bottom:0}}
+  .guarantee-block p b{{color:var(--accent-ink)}}
+  .site-nav{{background:#fff;border-bottom:1px solid var(--line);padding:0 28px;
+    display:flex;align-items:center;gap:12px;height:58px;
+    position:sticky;top:0;z-index:100;box-shadow:0 1px 6px rgba(18,19,26,.05)}}
+  .site-nav img{{height:36px;width:auto;display:block}}
+  .site-nav .brand-name{{font-size:12px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink);line-height:1.2}}
+  .first-fold-section{{background:var(--paper);padding:60px 40px 56px}}
+  .ff-header{{max-width:1100px;margin:0 auto 36px}}
+  .ff-eyebrow{{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:18px}}
+  .ff-h1{{font-size:clamp(24px,3.4vw,42px);font-weight:700;color:#12131A;
+    letter-spacing:-.02em;line-height:1.14;margin:0}}
+  .first-fold-inner{{max-width:1100px;margin:0 auto;display:grid;
+    grid-template-columns:1fr 1fr;gap:48px;align-items:center}}
+  @media(max-width:800px){{.first-fold-inner{{grid-template-columns:1fr;gap:32px}}
+    .first-fold-section{{padding:44px 22px 48px}}
+    .ff-header{{margin-bottom:24px}}}}
+  .ff-body{{font-size:16px;font-weight:400;color:var(--muted);line-height:1.72;margin:0 0 16px}}
+  .ff-body:last-child{{margin-bottom:0}}
+  .ff-body strong{{color:var(--ink)}}
+  .ff-bridge{{max-width:1100px;margin:32px auto 0;padding:0 0 8px}}
+  .ff-bridge p{{font-size:18px;font-weight:600;color:var(--ink);line-height:1.5;margin:0;
+    border-top:1px solid var(--line);padding-top:28px}}
+  .ff-right{{display:flex;align-items:stretch}}
+  .screenshot-container{{width:100%;border-radius:16px;
+    background:#E8EEF7;
+    box-shadow:0 16px 56px rgba(42,117,211,.14),0 2px 8px rgba(42,117,211,.07);
+    overflow:hidden;min-height:340px;
+    display:flex;align-items:center;justify-content:center}}
+  .screenshot-container img{{width:100%;height:100%;object-fit:cover;object-position:top;
+    display:block;border-radius:16px}}
+  .sc-placeholder{{font-size:13px;color:#7a95c4;text-align:center;
+    padding:48px 24px;line-height:1.7}}
+  .sc-placeholder-icon{{font-size:36px;margin-bottom:12px}}
+</style></head><body>
+
+  <nav class="site-nav">
+    <img src="/angelo.png" alt="Going Beyond The Illusion">
+    <span class="brand-name">GOING BEYOND THE ILLUSION</span>
+  </nav>
+
+  <div class="first-fold-section">
+    <div class="ff-header">
+      <div class="ff-eyebrow">&#128309; PERSONAL EVALUATION CORE // DESIGNED FOR: {fn_up}</div>
+      <h1 class="ff-h1">You are about to see exactly how a Market Intelligence File builds your entire coaching business.</h1>
+    </div>
+    <div class="first-fold-inner">
+      <div class="ff-left">
+        <p class="ff-body">Hello {fn}. Your homepage text scored a brutal <strong style="color:#2A75D3">{sc}/10</strong>.</p>
+        <p class="ff-body"><strong>Your words do not match the thoughts already inside your client&rsquo;s head.</strong></p>
+        <p class="ff-body">Look closely at your screenshot on the right. When people get a low score, they usually try to change their website layout, fix their fonts, or rewrite their sentences. That is a mistake.</p>
+        <p class="ff-body">The real problem is not how your page looks. The problem is that your words talk about you and what you do, instead of talking about what your client is already thinking.</p>
+        <p class="ff-body">Someone landed on your page yesterday with a specific, painful problem. They gave it five seconds. Your words did not describe their problem. They left. You never knew they were there.</p>
+      </div>
+      <div class="ff-right">
+        <div class="screenshot-container">
+          {"" if not shot else f'<img src="{shot}" alt="Your coaching website homepage" loading="eager">'}
+          {"" if shot else '<div class="sc-placeholder"><div class="sc-placeholder-icon">&#128247;</div>Your homepage screenshot will appear here once the audit has run for your domain.</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="ff-bridge">
+      <p>That happens because of a data problem, not a design problem. This page is going to show you exactly what the data problem is&mdash;and what fixes it.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+  <!-- BODY LAYER 2: THE CLICHÉ HOOK -->
+  <div class="card">
+    <div class="label">Language parser report</div>
+    <h2>Our parser read your homepage and found these terms.</h2>
+    <p>Each one is abstract. Each one could sit on any coaching page on the internet.
+    When a stranger lands on your page and reads words that do not describe their specific problem,
+    they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
+    and they leave. The problem is not your design or your credentials. It is the words.</p>
+    <div class="tokens-block">
+      <div class="tok-label">Detected terms</div>
+      <div class="tokens-value">{tok}</div>
+    </div>
+    <p style="margin-top:14px">Each of those terms means something specific to you.
+    To a cold stranger who has never met you, they describe nobody&rsquo;s life in particular.
+    Replacing them with different abstract terms is not a fix. The fix is to find out what language
+    your specific buyer uses when they describe their own problem&mdash;and use those words instead.
+    That is a research question, not a writing question.</p>
+
+    <div style="margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--muted);font-weight:600;margin-bottom:10px">The Messaging X-Ray: From Intuition to Intelligence</div>
+    <div class="xray-box">
+      <div class="xray-panel before">
+        <div class="xray-screen" style="font-size:22px;letter-spacing:.04em;opacity:.55;font-style:italic">{tok}</div>
+        <div class="xray-meta">
+          <div class="xm-label">What your homepage says</div>
+          <div class="xm-body">These words describe what you offer. A cold buyer is not searching for what you offer.
+          They are searching for relief from a specific problem. These words do not name it.</div>
+        </div>
+      </div>
+      <div class="xray-panel after">
+        <div class="xray-screen" style="font-size:13px;line-height:1.6;padding:18px 22px;text-align:left;opacity:.8">&ldquo;I cannot stop thinking about&hellip;&rdquo;<br>&ldquo;I wake up every morning and&hellip;&rdquo;<br>&ldquo;I have tried everything and&hellip;&rdquo;</div>
+        <div class="xray-meta">
+          <div class="xm-label">What your buyer actually says</div>
+          <div class="xm-body">Real, unedited language from the forums, reviews, and complaint boards where
+          your specific market describes their own crisis. When your page uses words like these, strangers stop and read.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVIDENCE GRID: criteria analysis left, video proof right -->
+  <div class="evidence-grid">
+
+    <div class="evidence-left">
+      <div class="evidence-eyebrow">Where your page is losing buyers right now</div>
+      {criteria_html}
+    </div>
+
+    <div class="evidence-right">
+      <div class="evidence-eyebrow">Three coaches who fixed the same problem</div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin:0 0 22px">They had low scores. Their words described what they offered, not what their buyers were already searching for. Below is what happened when that changed.</p>
+
+      <div class="video-col">
+
+        <div class="video-block">
+          <div class="video-embed shorts">
+            <iframe src="https://www.youtube.com/embed/I2Q-BU3CQjo"
+              title="Chad Peterson case study"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <div class="video-copy">
+            <h3>A language fix that corrected a blind spot for a coach in South America.</h3>
+            <p>Chad explains how the Market Intelligence data forced him to stop guessing and change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
+          </div>
+        </div>
+
+        <div class="video-block">
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/bdnCbMnHaZo"
+              title="David Hyner case study"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <div class="video-copy">
+            <h3>Why ignoring standard advice gives you real authority.</h3>
+            <p>David breaks down what happens when you replace fill-in-the-blank templates with hard customer facts. The shift is structural, not cosmetic.</p>
+          </div>
+        </div>
+
+        <div class="video-block">
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/JJf6rFjWqds"
+              title="Brandon Croud deep-dive case study"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <div class="video-copy">
+            <h3>Long-term results after removing the guesswork completely.</h3>
+            <p>Brandon shows the financial difference between pages built on intuition and pages built on real buyer data. The gap is not subtle.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PROTOCOL BREAKDOWN -->
+  <div class="protocol-section">
+    <div class="section-eyebrow">What is inside your Market Intelligence Protocol</div>
+
+    <div class="protocol-container">
+      <div class="pc-label">Container A</div>
+      <h3>The Core Demographic Portrait</h3>
+      <p>A detailed picture of the real person buying in your niche, built from evidence, not assumptions.</p>
+      <ul>
+        <li><b>Calibrated Avatar &amp; Niche.</b> A precise profile of who is actually spending money in your market right now, built from real buying signals, not a generic age bracket.</li>
+        <li><b>3 AM Crisis Log.</b> A map of the specific real-life situations that keep your buyer awake. What they are staring at. What they are replaying in their head. What they typed into their phone at midnight.</li>
+        <li><b>The Deep Emotions.</b> The feelings driving those moments. What they are scared of. What they are ashamed of. What they are desperate to stop feeling.</li>
+        <li><b>What they want to feel, see, and touch.</b> The exact outcomes they are picturing when they imagine the problem being gone. In their words, not yours.</li>
+        <li><b>Their secret hangups.</b> The hidden reasons they talk themselves out of buying. The doubts they do not say out loud when they speak to a coach.</li>
+      </ul>
+    </div>
+
+    <div class="protocol-container">
+      <div class="pc-label">Container B</div>
+      <h3>The Language Filtering Matrix</h3>
+      <p>A practical guide to what to cut from your marketing and what to replace it with.</p>
+      <ul>
+        <li><b>Clich&eacute; Deletion Blueprint.</b> A line-by-line audit of the abstract terms already found on your page, including the ones our parser flagged: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a cold buyer.</li>
+        <li><b>AI Slop Deletion Guide.</b> A reference list of the predictable phrase styles that mark your writing as generated and generic. Things like &ldquo;unlock your potential&rdquo;, &ldquo;on your journey&rdquo;, and &ldquo;transform your life&rdquo;. Premium buyers have read these a hundred times and stopped trusting them.</li>
+        <li><b>High-status buyer vocabulary.</b> The specific words and phrases premium clients actually use when they are ready to spend money. The language that signals to them that you understand the problem they are living with, not just the solution you sell.</li>
+      </ul>
+    </div>
+
+    <div class="protocol-container">
+      <div class="pc-label">Container C</div>
+      <h3>The Universal Marketing Fuel Cell</h3>
+      <p>Everything above is formatted as a master prompt framework you can copy and paste straight into any AI writing tool, including ChatGPT and Claude, and get output that reads like a real human wrote it about a real problem.</p>
+      <p>Without this data sitting underneath it, any AI tool just repeats the same coaching clich&eacute;s it has seen a thousand times. <b>With this data loaded in, it writes from your buyer&rsquo;s actual reality.</b> The output stops sounding like every other coach on the internet and starts sounding like someone who understands the specific person reading it.</p>
+      <p>You are not locked into using AI. You can hand this file to a copywriter, a VA, or use it yourself. It works the same way in any of those hands because the facts it contains do not change.</p>
+    </div>
+  </div>
+
+  <!-- DECISION BRIDGE -->
+  <div class="narrative-bridge">
+    <div class="nb-label">Where this leaves you</div>
+    <h2>You cannot write your way out of a positioning problem.</h2>
+    <p>You can rewrite your homepage. You can hire a copywriter. You can ask an AI to help you.
+    None of those things change what your buyer is already thinking before they land on your page.
+    The only fix is to find out what they are thinking&mdash;in their own words, not yours.
+    That is a research problem. The Market Intelligence File solves it.</p>
+    <p>You now have three options.</p>
+  </div>
+
+  <!-- THREE REAL CHOICES -->
+  <div class="three-choices">
+    <div class="tc-label">Three options</div>
+
+    <div class="choice-block">
+      <div class="cb-num">Option 1</div>
+      <h3>Do nothing</h3>
+      <p>The strangers who left your page last month will leave it again next month.
+      A low score reflects a structural problem. Without new data, the words on your page stay where they are.</p>
+    </div>
+
+    <div class="choice-block">
+      <div class="cb-num">Option 2</div>
+      <h3>Guess again</h3>
+      <p>Rewrite your homepage using the same intuition that wrote the current version.
+      The words will change. The data behind them will not. You will be replacing one guess with another.</p>
+    </div>
+
+    <div class="choice-block">
+      <div class="cb-num">Option 3</div>
+      <h3>Get the data</h3>
+      <p>For &pound;75&mdash;one time&mdash;our research engine maps the exact vocabulary your specific buyers
+      use when they are ready to spend money. You stop guessing. Your page starts working.</p>
+    </div>
+  </div>
+
+  <!-- CAREER TRANSFORMATION MATRIX -->
+  <div class="payoffs-section">
+    <div class="section-eyebrow">What becomes possible when your words match your buyer&rsquo;s thoughts</div>
+    <div class="payoffs-grid">
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#127760;</div>
+        <div class="pt-title">Reclaiming Your Professional Dignity</div>
+        <div class="pt-body">
+          <p>Stop hiding behind vague, soft words that make you look identical to every low-tier provider in your niche.</p>
+          <p>When your homepage speaks the exact, unedited language your market whispers to themselves at 3 AM, you instantly shift from a desperate coach chasing clients to a sought-after authority.</p>
+          <p>You look high-paying buyers dead in the eye, stop defending your prices, and command the premium fees your talent actually deserves.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#128241;</div>
+        <div class="pt-title">Wiping Out Client Acquisition Fatigue</div>
+        <div class="pt-body">
+          <p>You did not start a coaching business to become a full-time social media content creator, dancing on videos or writing daily motivational essays that competitors copy and buyers ignore.</p>
+          <p>Because this single data protocol hands you your market&rsquo;s exact real-life situations, your content creation is entirely finished.</p>
+          <p>You write punchy, short posts that pull real buyers straight to your inbox, allowing you to stop shouting for attention online and start doing the deep work you love.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#127775;</div>
+        <div class="pt-title">Total Commercial Certainty Over Your Future</div>
+        <div class="pt-body">
+          <p>Staring at a blank screen wondering what offer to launch next is an exhausting way to live.</p>
+          <p>This protocol acts as your permanent business instrument panel. Whether you are launching a new lead resource, pivoting your entire target niche, or building a brand-new service framework, you operate with absolute commercial certainty.</p>
+          <p>You know exactly what commercial problems strangers will happily pull out their wallets to fix, removing the fear of failure from your business forever.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#128226;</div>
+        <div class="pt-title">The Freedom to Choose How You Grow</div>
+        <div class="pt-body">
+          <p>This single data core fuels every single marketing tactic you will ever use for the rest of your career.</p>
+          <p>It gives you total strategic freedom. If you want to speak on live stages, secure high-profile podcast gigs, write press releases, or build a private community, you use the exact same vocabulary framework. One asset, every single surface.</p>
+          <p>You scale your coaching income on your own terms, without ever sacrificing your values or doing marketing activities you completely despise.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#128176;</div>
+        <div class="pt-title">Closing High-Ticket Deals Without Selling</div>
+        <div class="pt-body">
+          <p>Stop sweating before you hop on a sales call, wondering if a prospect will fight you on your prices or throw an awkward objection at your face.</p>
+          <p>When you use the exact vocabulary blocks tracked inside your protocol, the entire sales process is already finished before they even speak to you.</p>
+          <p>Premium buyers arrive inside your ecosystem completely pre-sold, because your public words have already proven that you understand their inner thoughts better than anyone else alive.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#9203;</div>
+        <div class="pt-title">Moving Beyond Trading Hours for Dollars</div>
+        <div class="pt-body">
+          <p>You cannot scale a massive career asset if you are trapped inside a non-stop loop of manual 1-on-1 coaching calls every single day of the week.</p>
+          <p>Because this data core maps out the exact real-life situations and emotional goals of your market, it gives you the absolute power to build highly profitable group programs and digital assets.</p>
+          <p>You can design automated packages that solve their exact crises at scale, letting you buy back your calendar and enjoy total time freedom.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#129504;</div>
+        <div class="pt-title">Operating with Absolute Professional Conviction</div>
+        <div class="pt-body">
+          <p>Staring at your computer wondering if your coaching program is actually good enough to command thousand-pound fees is a miserable way to operate.</p>
+          <p>This protocol completely removes the fear of being a fraud. You no longer have to fake your confidence or copy guru scripts.</p>
+          <p>You possess hard, third-party consumer facts that prove you are building services based on exactly what real humans are struggling with right now, giving you ironclad confidence every time you speak.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#129309;</div>
+        <div class="pt-title">Attracting Elite Joint Ventures and Gigs</div>
+        <div class="pt-body">
+          <p>When you pitch yourself to high-end corporate platforms, joint venture partners, or masterminds using general coaching buzzwords, you get ignored instantly.</p>
+          <p>This data core elevates how you network. It hands you the precise macro-industry data and deep consumer insight vocabulary required to pitch high-status brands on their own terms.</p>
+          <p>You stand out instantly as a sophisticated research partner, allowing you to secure elite business collaborations that explode your reach for free.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FLAWED ASSUMPTIONS -->
+  <div class="assumptions-section">
+    <div class="section-eyebrow">Three things coaches believe that keep them invisible</div>
+
+    <div class="assumption">
+      <div class="a-label">Assumption 1</div>
+      <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
+      <p>When people look at that score, it is easy to assume you just need a prettier website, {fn}.
+      Swapping a few words on a page that is built on the wrong foundation does not fix the foundation.
+      It just gives the problem a fresh coat of paint. What you have is not a wording issue.
+      It is a <b>strategic positioning issue</b>: the page is written around what you offer, not around
+      what a stranger is already searching for.</p>
+      <p>And here is the part most coaches miss. Any new words you write without hard facts to back them up
+      are a blind guess. You are picking phrases that feel right to you, not phrases your buyers are
+      actually using. One guess replaces another. Nothing changes.</p>
+    </div>
+
+    <div class="assumption">
+      <div class="a-label">Assumption 2</div>
+      <h3>&ldquo;I already talk to my clients every day. I know exactly what they want.&rdquo;</h3>
+      <p>Relying on a few past clients is a dangerous trap, {fn}. It is too small of a sample size.
+      You know what your current clients say to you, in your sessions, after they have already decided
+      to hire you. That is a very small and very loyal group. It tells you almost nothing about
+      <b>the strangers who landed on your page last Tuesday and left without getting in touch.</b></p>
+      <p>The people who never contact you are the majority of your market. They had a problem.
+      They went online and searched for a solution in their own words, not yours.
+      They looked at your page for a few seconds. They did not see themselves in it. They left.
+      You never knew they were there. Your current clients cannot tell you why that happened,
+      because they are not those people.</p>
+    </div>
+
+    <div class="assumption">
+      <div class="a-label">Assumption 3</div>
+      <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
+      <p>AI writing tools do not do research. They predict which word is likely to follow the previous word,
+      based on patterns in text they have already read. The text they have already read is the internet.
+      The internet is full of coaching pages that say &ldquo;empower&rdquo;, &ldquo;mindset&rdquo;,
+      and &ldquo;clarity&rdquo;.</p>
+      <p>So when you ask an AI to research your market, it feeds those same words back to you&mdash;because
+      that is what coaching pages say. <b>You end up sounding identical to every other coach on the internet.</b>
+      That is exactly the problem you were trying to solve. The Market Intelligence File does not ask AI what
+      your market wants. It reads where your market actually speaks, and extracts the language they use when
+      they are not performing for an audience. That is a different process. The output is completely different.</p>
+    </div>
+  </div>
+
+  <!-- PRODUCT REVEAL (updated pricing & guarantee) -->
+  <div class="product-reveal">
+    <div class="pr-eyebrow">The Market Intelligence File</div>
+    <h2>The exact words your buyers use when they describe their own problem.</h2>
+    <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
+    uses when they are searching for a solution at two in the morning and nobody is watching.
+    The fears they do not say out loud. The specific outcomes that make them pick up the phone.
+    The words that, when they appear on your homepage, make a cold stranger stop scrolling and think:
+    <em>this person understands exactly what I am going through.</em></p>
+    <p>This is not a template. It is not a questionnaire you fill in yourself.
+    It is primary research drawn from thousands of real buyer sources, mapped to your specific niche,
+    delivered as a single structured file you hand to anyone writing your copy&mdash;or load straight
+    into any AI tool and watch it stop producing coaching clich&eacute;s.</p>
+    <p class="price-anchor">Traditional corporate research firms charge up to &pound;997 because they employ
+    human analysts to manually comb through data sources one by one. Our custom Python pipeline automates
+    this exact deep-linguistic parsing sweep in under 180 seconds, bypassing agency overhead entirely
+    and passing the infrastructure saving straight to you.</p>
+    <div class="price-main">&pound;75 <span>(One-Time Investment)</span></div>
+
+    <div class="guarantee-block">
+      <div class="g-label">7-Day Certainty Guarantee</div>
+      <p>If you read your file and feel it does not contain buyer language you could not have found yourself,
+      or market facts you did not already know, contact us within 7 days and we will give you a full refund.
+      No forms. No hoops. No awkward conversation.</p>
+      <p>We make this offer because we have done this research hundreds of times across dozens of coaching niches,
+      and we are certain of what we find. <b>The risk is entirely on our research metrics, not your wallet.</b></p>
+    </div>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div class="checkout-section">
+    <h2>Get My Market Intelligence File</h2>
+    <div class="cs-sub">Your niche. Your buyers&rsquo; actual language. &pound;75, one-time. No subscription.</div>
+    <div class="checkout-form-placeholder">
+      <div class="lock-icon">&#128274;</div>
+      <div class="cf-label">Secure checkout</div>
+      <div class="cf-note">Card payment integration goes here.<br>
+      Stripe / payment processor embed to be wired in.</div>
+      <button class="cta-btn" disabled>Get My Market Intelligence File &rarr;</button>
+    </div>
+    <p class="guarantee">Secure payment &middot; Instant confirmation &middot; Delivered within 5 working days &middot; 7-Day Certainty Guarantee</p>
+  </div>
+
+</div></body></html>"""
+
+
 class Handler(BaseHTTPRequestHandler):
     def _send(self, body):
         self.send_response(200)
@@ -920,6 +1586,39 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/offer":
             self._send(OFFER_PAGE)
             return
+        if path == "/salespage":
+            qs = parse_qs(parsed.query)
+            domain = (qs.get("domain", [""])[0]).strip()
+            if domain:
+                row = get_audit(domain)
+                if row:
+                    self._send(_render_salespage(
+                        first_name = row.get("first_name", "")      or "Coach",
+                        headline   = row.get("headline", "")         or "your website text",
+                        tokens     = row.get("tokens", "")           or "generic coaching terms",
+                        score      = row.get("score", "")            or "0.0",
+                        screenshot = row.get("screenshot_path", ""),
+                        raw_json   = row.get("raw_json", ""),
+                    ))
+                    return
+                # Domain recognised but no record yet — fall through to param fallback.
+            # Backward-compatibility: read individual URL parameters (immediate post-audit flow).
+            first_name = (qs.get("first_name", [""])[0]).strip() or "Coach"
+            headline   = (qs.get("headline",   [""])[0]).strip() or "your website text"
+            tokens     = (qs.get("tokens",     [""])[0]).strip() or "generic coaching terms"
+            score      = (qs.get("score",      [""])[0]).strip() or "0.0"
+            screenshot = (qs.get("screenshot", [""])[0]).strip()
+            self._send(_render_salespage(first_name, headline, tokens, score, screenshot))
+            return
+        if path.startswith("/screenshots/"):
+            fname = os.path.basename(path)
+            fpath = os.path.join(SCREENSHOTS_DIR, fname)
+            if os.path.isfile(fpath) and fname.endswith(".png"):
+                with open(fpath, "rb") as f:
+                    self._send_bytes(f.read(), "image/png")
+            else:
+                self.send_response(404); self.end_headers()
+            return
         if path == "/audit":   # JUST the report fragment, so the page can fetch it and show live progress
             qs = parse_qs(parsed.query)
             url = (qs.get("url", [""])[0]).strip()
@@ -929,13 +1628,33 @@ class Handler(BaseHTTPRequestHandler):
             res = audit_url(url) if url else {}
             frag = render_result(res) if url else ""
             if url and res.get("ok") and res.get("status") == "ok":
+                shot_path = ""
+                if res.get("thumbnail"):
+                    shot_path = _save_screenshot(res.get("domain", url), res["thumbnail"])
+                # Strip the raw base64 thumbnail before serialising — already on disk at shot_path.
+                storable = {k: v for k, v in res.items() if k != "thumbnail"}
+                tokens_raw = res.get("generic_tokens_found", [])
+                tokens_str = (", ".join(tokens_raw) if isinstance(tokens_raw, list)
+                              else str(tokens_raw or ""))
+                save_audit(
+                    domain=res.get("domain", url),
+                    first_name=first_name,
+                    email=email,
+                    headline=res.get("hero_quote", ""),
+                    score=str(res.get("score_10", "")),
+                    tokens=tokens_str,
+                    screenshot_path=shot_path,
+                    raw_json=_json.dumps(storable),
+                )
+                salespage_url = f"{APP_BASE_URL}/salespage?domain={res.get('domain', url)}"
                 threading.Thread(
                     target=_push_mailerlite,
                     args=(
                         email, first_name, last_name,
                         res.get("hero_quote", ""),
-                        res.get("generic_tokens_found", []),
+                        tokens_raw,
                         res.get("global_score", ""),
+                        salespage_url,
                     ),
                     daemon=True,
                 ).start()
