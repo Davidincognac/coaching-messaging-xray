@@ -51,18 +51,18 @@ MARKET_AVG_10 = 3.7
 TOP10_10 = 5.6
 BENCH = {
     "clarity_5sec": 4.5, "specificity": 4.4, "symptom_resonance": 3.2,
-    "proof_cred": 2.6, "offer_relevance": 3.0, "intent_flow": 3.8,
-    "perceived_friction": 4.5, "risk_reversal": 2.5,
+    "proof_cred": 2.6, "offer_clarity": 3.0, "next_step": 3.8,
+    "friction": 4.5, "shield": 2.5,
 }
 LABELS = {
     "clarity_5sec": "Fast Grab (5-Second Hook)",
     "specificity": "Laser Target (The Who)",
     "symptom_resonance": "Mind Reading (The Problem)",
     "proof_cred": "Hard Proof (The Trust)",
-    "offer_relevance": "The Perfect Cure (The Offer)",
-    "intent_flow": "One Clear Path (The Clarity)",
-    "perceived_friction": "Easy Start (The Effort)",
-    "risk_reversal": "Safety Net (The Shield)",
+    "offer_clarity": "The Perfect Cure (The Offer)",
+    "next_step": "One Clear Path (The Clarity)",
+    "friction": "Easy Start (The Effort)",
+    "shield": "Safety Net (The Shield)",
 }
 # A short 'what we check' line shown under each bar, so a coach knows EXACTLY what each score measures and never
 # confuses two that sound alike. Carries the scope David asked for.
@@ -71,10 +71,10 @@ DEFINITIONS = {
     "specificity": "Is the page focused on ONE clear audience and ONE clear problem?",
     "symptom_resonance": "Does the copy describe the buyer's daily pain in their own words — raw and situational — not generic coaching platitudes?",
     "proof_cred": "Does a cold buyer get real, costly-to-fake reasons to believe you can deliver?",
-    "offer_relevance": "Is there one clear, defined thing to buy or a vivid outcome the buyer can picture?",
-    "intent_flow": "Is the whole page aimed at ONE next step, or scattered across competing asks?",
-    "perceived_friction": "How much psychological effort does a cold visitor need to take the next step?",
-    "risk_reversal": "Does anything on the page lower the risk of saying yes — a guarantee, a safety net, or a clear trial option?",
+    "offer_clarity": "Is there one clear, defined thing to buy or a vivid outcome the buyer can picture?",
+    "next_step": "Is the whole page aimed at ONE next step, or scattered across competing asks?",
+    "friction": "How much psychological effort does a cold visitor need to take the next step?",
+    "shield": "Does anything on the page lower the risk of saying yes — a guarantee, a safety net, or a clear trial option?",
 }
 # The order the bars READ in (grouped by theme, not sorted by gap).
 DISPLAY_CRIT = [
@@ -82,10 +82,10 @@ DISPLAY_CRIT = [
     "specificity",
     "symptom_resonance",
     "proof_cred",
-    "offer_relevance",
-    "intent_flow",
-    "perceived_friction",
-    "risk_reversal",
+    "offer_clarity",
+    "next_step",
+    "friction",
+    "shield",
 ]
 
 # --- real percentile curve, loaded from the 10,954-site results (for "better than X%") ---
@@ -1327,7 +1327,7 @@ def judge_symptom_resonance(f):
         return 7
     return 4
 
-def judge_perceived_friction(f):
+def judge_friction(f):
     f = f if isinstance(f, dict) else {}
     if _flag(f.get("requires_immediate_live_call")):
         return 3
@@ -1335,7 +1335,7 @@ def judge_perceived_friction(f):
         return 8
     return 5
 
-def judge_risk_reversal(f):
+def judge_shield(f):
     f = f if isinstance(f, dict) else {}
     if _flag(f.get("guarantee_present")) and f.get("safety_net_quote"):
         return 8
@@ -1347,7 +1347,7 @@ def judge_proof_cred(f):
         return 8
     return 3
 
-def judge_offer_relevance(f):
+def judge_offer_clarity(f):
     f = f if isinstance(f, dict) else {}
     if _flag(f.get("offer_matches_stated_pain")) and f.get("core_offer_statement"):
         return 8
@@ -1355,7 +1355,7 @@ def judge_offer_relevance(f):
         return 5
     return 2
 
-def judge_intent_flow(f):
+def judge_next_step(f):
     f = f if isinstance(f, dict) else {}
     count = _as_int(f.get("competing_paths_count"), default=0)
     if _flag(f.get("action_overload_detected")) or count >= 3:
@@ -1371,10 +1371,10 @@ FLAG_CRIT = {
     "specificity": ("specificity_flags", judge_specificity),
     "symptom_resonance": ("symptom_resonance_flags", judge_symptom_resonance),
     "proof_cred": ("proof_cred_flags", judge_proof_cred),
-    "offer_relevance": ("offer_relevance_flags", judge_offer_relevance),
-    "intent_flow": ("intent_flow_flags", judge_intent_flow),
-    "perceived_friction": ("perceived_friction_flags", judge_perceived_friction),
-    "risk_reversal": ("risk_reversal_flags", judge_risk_reversal),
+    "offer_clarity": ("offer_clarity_flags", judge_offer_clarity),
+    "next_step": ("next_step_flags", judge_next_step),
+    "friction": ("friction_flags", judge_friction),
+    "shield": ("shield_flags", judge_shield),
 }
 # The AI EXTRACTS these flags (it does not score) for all 8 criteria. Pure Python judges turn the flags into scores.
 # Every boolean carries its grounding QUOTE so a 'true' is evidenced and auditable.
@@ -1441,10 +1441,10 @@ AI_ANALYSE_SCHEMA = {
         "clarity_flags": _CLARITY_FLAGS,                   # AI extracts, judge_clarity scores
         "symptom_resonance_flags": _SYMPTOM_RESONANCE_FLAGS,
         "proof_cred_flags": _PROOF_CRED_FLAGS,
-        "offer_relevance_flags": _OFFER_RELEVANCE_FLAGS,
-        "intent_flow_flags": _INTENT_FLOW_FLAGS,
-        "perceived_friction_flags": _PERCEIVED_FRICTION_FLAGS,
-        "risk_reversal_flags": _RISK_REVERSAL_FLAGS,
+        "offer_clarity_flags": _OFFER_RELEVANCE_FLAGS,
+        "next_step_flags": _INTENT_FLOW_FLAGS,
+        "friction_flags": _PERCEIVED_FRICTION_FLAGS,
+        "shield_flags": _RISK_REVERSAL_FLAGS,
         "headline_problem": {"type": "string"},
         "why_it_costs_clients": {"type": "string"},
         "top_fixes": {"type": "array", "items": {"type": "string"}},
@@ -1453,8 +1453,8 @@ AI_ANALYSE_SCHEMA = {
     "required": ["main_headline", "shop_reason", "has_visible_shop",
                  "specificity_flags", "clarity_flags",
                  "symptom_resonance_flags", "proof_cred_flags",
-                 "offer_relevance_flags", "intent_flow_flags",
-                 "perceived_friction_flags", "risk_reversal_flags",
+                 "offer_clarity_flags", "next_step_flags",
+                 "friction_flags", "shield_flags",
                  "headline_problem", "why_it_costs_clients", "top_fixes", "money_left_on_table"],
 }
 
@@ -1691,17 +1691,17 @@ def ai_analyse(row, scores, score_10, ev=None):
         "screenshot that testimonials are shown as screenshots of real Google/Facebook/Trustpilot review cards "
         "(identifiable by native platform UI: star icons, profile circles, local guide labels, or relative timestamps "
         "like '3 days ago'). A static star graphic or text claim alone = false.\n"
-        "offer_relevance_flags: core_offer_statement = the clearest offer description on the page (empty string if "
+        "offer_clarity_flags: core_offer_statement = the clearest offer description on the page (empty string if "
         "none); offer_matches_stated_pain = true if the core offer directly addresses the specific pain described in "
         "symptom_resonance_flags.\n"
-        "intent_flow_flags: action_overload_detected = true if there are 3+ genuinely different jobs a cold visitor "
+        "next_step_flags: action_overload_detected = true if there are 3+ genuinely different jobs a cold visitor "
         "is asked to do (book a call AND buy a product AND download something AND listen to podcast = 4 different "
         "jobs = overload); competing_paths_count = exact count of distinct next-step actions.\n"
-        "perceived_friction_flags: requires_immediate_live_call = true if the ONLY clear next step for a cold "
+        "friction_flags: requires_immediate_live_call = true if the ONLY clear next step for a cold "
         "visitor is a sales call or consultation (no free resource, no low-commitment option, no email capture); "
         "is_micro_commitment = true if there is a clearly visible low-friction first step (a free resource to "
         "download, a quiz, a checklist, a short video series they can start without booking a call).\n"
-        "risk_reversal_flags: guarantee_present = true if any money-back guarantee, refund policy, or explicit risk "
+        "shield_flags: guarantee_present = true if any money-back guarantee, refund policy, or explicit risk "
         "reversal is mentioned on the homepage; safety_net_quote = verbatim quote of the guarantee or risk-reversal "
         "language (empty string if none).\n\n"
         f"THE PAGE'S ON-PAGE TEXT LINES (biggest first, pick the headline from here):\n{cand_txt}\n\n"
@@ -1802,10 +1802,10 @@ HOMEPAGE_PROBLEMS = {
     "specificity": "on your homepage, it isn’t clear enough who you help or what problem you solve, a first-time visitor may not be able to tell whether you’re the right coach for them",
     "symptom_resonance": "the copy on your homepage describes coaching outcomes in abstract terms rather than the raw, daily pain your buyer actually feels",
     "proof_cred": "we didn’t spot the proof or credibility a cold buyer believes on your homepage, results, testimonials, and real reviews that show you deliver",
-    "offer_relevance": "on your homepage there’s no clearly defined offer that connects to the problem you’re solving, just a vague sense of what you do",
-    "intent_flow": "the page scatters a visitor across competing asks instead of pointing at one clear next step",
-    "perceived_friction": "the first step your homepage asks for is too big a commitment for a cold stranger who just found you",
-    "risk_reversal": "nothing on your homepage lowers the risk of saying yes, so sceptical visitors stay sceptical and leave",
+    "offer_clarity": "on your homepage there’s no clearly defined offer that connects to the problem you’re solving, just a vague sense of what you do",
+    "next_step": "the page scatters a visitor across competing asks instead of pointing at one clear next step",
+    "friction": "the first step your homepage asks for is too big a commitment for a cold stranger who just found you",
+    "shield": "nothing on your homepage lowers the risk of saying yes, so sceptical visitors stay sceptical and leave",
 }
 
 # Imperative ACTIONS, kept distinct from the problem descriptions so the diagnosis never repeats itself.
@@ -1814,10 +1814,10 @@ HOMEPAGE_FIXES = {
     "specificity": "Name the exact person you help and the exact problem, in their words. Not ‘ambitious people’, but the real situation they’re stuck in.",
     "symptom_resonance": "Replace the coaching platitudes with the buyer’s own words. Describe the physical, daily situation they’re stuck in, not the abstract outcome they’ll eventually get.",
     "proof_cred": "Add real proof: two or three client results with actual numbers, and a testimonial that names the problem you solved, ideally as a screenshot of a real review.",
-    "offer_relevance": "Spell out one clear thing you fix: what it is, who it’s for, and what changes for the buyer once you’ve done it.",
-    "intent_flow": "Pick one clear next step and make it the only strong action on the page. Cut or demote anything competing with it.",
-    "perceived_friction": "Add a low-commitment first step, a free resource, a quiz, or a short video series, so a curious visitor can start without booking a call.",
-    "risk_reversal": "Give a clear safety net: a guarantee, a refund window, or a free trial, so saying yes feels less like a gamble.",
+    "offer_clarity": "Spell out one clear thing you fix: what it is, who it’s for, and what changes for the buyer once you’ve done it.",
+    "next_step": "Pick one clear next step and make it the only strong action on the page. Cut or demote anything competing with it.",
+    "friction": "Add a low-commitment first step, a free resource, a quiz, or a short video series, so a curious visitor can start without booking a call.",
+    "shield": "Give a clear safety net: a guarantee, a refund window, or a free trial, so saying yes feels less like a gamble.",
 }
 
 def rule_critique(row, scores, score_10, ev):
@@ -1914,7 +1914,7 @@ def criterion_note(key, sc, ev=None):
         return ("The copy leans on generic coaching platitudes like ‘mindset’, ‘clarity’, or ‘overwhelm’. "
                 "These words don’t describe a real, felt pain — they describe a category. Replace them with "
                 "the raw, specific daily situation your buyer is actually stuck in.")
-    if key == "offer_relevance":
+    if key == "offer_clarity":
         if sc >= 7:
             return ("A cold buyer can see what you actually fix, and the offer connects directly to that pain. "
                     "That’s the clearest path from ‘I have this problem’ to ‘this person can fix it’.")
@@ -1923,7 +1923,7 @@ def criterion_note(key, sc, ev=None):
                     "A cold buyer needs to see the bridge: ‘I have THIS pain, you fix THAT pain, I’ll buy THIS.’")
         return ("We didn’t spot a clear offer that connects to a specific problem. A cold buyer needs to see "
                 "exactly what you fix and one clear thing to start with.")
-    if key == "intent_flow":
+    if key == "next_step":
         if sc >= 7:
             return ("The page points at one clear next step. A cold visitor knows exactly what to do without having "
                     "to decide between competing options.")
@@ -1932,7 +1932,7 @@ def criterion_note(key, sc, ev=None):
                     "the more the right action stands out.")
         return ("The page asks a cold visitor to do several different things at once. When someone has to choose "
                 "between competing options, they usually choose none of them. Pick one next step and make it obvious.")
-    if key == "perceived_friction":
+    if key == "friction":
         if sc >= 7:
             return ("The first step is low-commitment enough that a curious visitor will take it without needing "
                     "to be fully convinced yet. That’s how you catch people before they’re ready to buy.")
@@ -1942,7 +1942,7 @@ def criterion_note(key, sc, ev=None):
         return ("The only clear next step is a sales call or consultation. That requires massive trust. "
                 "Most new visitors are not ready to get on a phone call yet, so they leave. "
                 "You must build a smaller first step.")
-    if key == "risk_reversal":
+    if key == "shield":
         if sc >= 7:
             return ("You’ve given a cold buyer a reason to say yes without feeling like they’re taking a risk. "
                     "A guarantee or safety net removes the last objection.")
@@ -1953,20 +1953,20 @@ def criterion_note(key, sc, ev=None):
         "specificity": "You name who you help and their exact problem, which most coaches don't.",
         "symptom_resonance": "Your copy describes real, daily pain in the buyer's own words.",
         "proof_cred": "A cold buyer gets real reason to believe you: results and third-party trust.",
-        "offer_relevance": "A cold buyer can see what you fix and there's one clear thing to start.",
-        "intent_flow": "The page points at one clear next step, nothing competing with it.",
-        "perceived_friction": "The first step is low-commitment enough that a curious visitor will take it.",
-        "risk_reversal": "You lower the risk of saying yes, making it easier to commit.",
+        "offer_clarity": "A cold buyer can see what you fix and there's one clear thing to start.",
+        "next_step": "The page points at one clear next step, nothing competing with it.",
+        "friction": "The first step is low-commitment enough that a curious visitor will take it.",
+        "shield": "You lower the risk of saying yes, making it easier to commit.",
     }
     bad = {
         "clarity_5sec": "In five seconds, a stranger can't tell who this is for or what they'd get.",
         "specificity": "It could be for anyone. You don't name who you help or their exact problem.",
         "symptom_resonance": "The copy leans on generic coaching words that don't describe a real, felt pain.",
         "proof_cred": "We didn't spot the proof or credibility a cold buyer believes: results, testimonials, real reviews.",
-        "offer_relevance": "A cold buyer can't see what you actually fix, or there's no clear thing to buy.",
-        "intent_flow": "The page scatters a visitor across competing asks instead of one clear next step.",
-        "perceived_friction": "The first step asks for too much commitment from someone who just found you.",
-        "risk_reversal": "Nothing lowers the risk of saying yes, so sceptical visitors stay sceptical.",
+        "offer_clarity": "A cold buyer can't see what you actually fix, or there's no clear thing to buy.",
+        "next_step": "The page scatters a visitor across competing asks instead of one clear next step.",
+        "friction": "The first step asks for too much commitment from someone who just found you.",
+        "shield": "Nothing lowers the risk of saying yes, so sceptical visitors stay sceptical.",
     }
     thresh = 5 if key == "specificity" else 6
     return good.get(key, "") if sc >= thresh else bad.get(key, "")
@@ -2396,7 +2396,7 @@ def audit_url(url):
         "global_score": round(total_100 / 10, 1),
         "cliffhanger": {
             "symptom": CLIFFHANGER_SYMPTOM if scores.get("symptom_resonance", 10) <= 4 else None,
-            "friction": CLIFFHANGER_FRICTION if (scores.get("perceived_friction", 10) <= 4 or scores.get("risk_reversal", 10) <= 4) else None,
+            "friction": CLIFFHANGER_FRICTION if (scores.get("friction", 10) <= 4 or scores.get("shield", 10) <= 4) else None,
         },
     }
 
