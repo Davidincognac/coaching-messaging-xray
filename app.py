@@ -17,7 +17,7 @@ import re
 import threading
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs, quote as _url_quote
 
 try:
     from dotenv import load_dotenv
@@ -34,7 +34,11 @@ MAILERLITE_API_KEY = os.getenv("MAILERLITE_API_KEY", "")
 # Locally it falls back to localhost so email links still work during development.
 APP_BASE_URL = os.getenv("APP_BASE_URL", f"http://localhost:{PORT}").rstrip("/")
 
-SCREENSHOTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "screenshots")
+SCREENSHOTS_DIR = (
+    "/var/data/screenshots"
+    if os.getenv("RENDER")
+    else os.path.join(os.path.dirname(os.path.abspath(__file__)), "screenshots")
+)
 os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
 
 def _screenshot_filename(domain: str) -> str:
@@ -42,14 +46,20 @@ def _screenshot_filename(domain: str) -> str:
     clean = re.sub(r"https?://", "", domain).strip("/")
     return re.sub(r"[^a-zA-Z0-9\-]", "_", clean) + ".png"
 
-def _save_screenshot(domain: str, data_uri: str) -> str:
-    """Decode a data:image/png;base64,... URI and write it to the screenshots folder.
-    Returns the web-accessible path (/screenshots/<filename>) or '' on failure."""
+def _save_screenshot(domain: str) -> str:
+    """Fetch a screenshot from microlink.io and write it to the screenshots folder.
+    Returns the web-accessible path (/screenshots/<filename>) or '' on any failure."""
     try:
-        _, b64 = data_uri.split(",", 1)
+        encoded = _url_quote("https://" + domain, safe="")
+        api_url = f"https://api.microlink.io/?url={encoded}&screenshot=true&embed=screenshot.url"
+        req = urllib.request.Request(api_url, headers={"User-Agent": "CoachAudit/1.0"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            img_bytes = resp.read()
+        if not img_bytes or len(img_bytes) < 1000:
+            return ""
         path = os.path.join(SCREENSHOTS_DIR, _screenshot_filename(domain))
         with open(path, "wb") as f:
-            f.write(base64.b64decode(b64))
+            f.write(img_bytes)
         return "/screenshots/" + _screenshot_filename(domain)
     except Exception:
         return ""
@@ -1207,7 +1217,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <div class="ff-right">
         <div class="screenshot-container">
           {"" if not shot else f'<img src="{shot}" alt="Your coaching website homepage" loading="eager">'}
-          {"" if shot else '<div class="sc-placeholder"><div class="sc-placeholder-icon">&#128247;</div>Your homepage screenshot will appear here once the audit has run for your domain.</div>'}
+          {"" if shot else '<div class="sc-placeholder"><img src="/angelo.png" alt="Angelo" style="width:72px;height:auto;opacity:.55;margin-bottom:14px"><div>Screenshot loading&hellip;</div></div>'}
         </div>
       </div>
     </div>
@@ -1643,9 +1653,7 @@ class Handler(BaseHTTPRequestHandler):
             res = audit_url(url) if url else {}
             frag = render_result(res) if url else ""
             if url and res.get("ok") and res.get("status") == "ok":
-                shot_path = ""
-                if res.get("thumbnail"):
-                    shot_path = _save_screenshot(res.get("domain", url), res["thumbnail"])
+                shot_path = _save_screenshot(res.get("domain", url))
                 # Strip the raw base64 thumbnail before serialising — already on disk at shot_path.
                 storable = {k: v for k, v in res.items() if k != "thumbnail"}
                 tokens_raw = res.get("generic_tokens_found", [])
