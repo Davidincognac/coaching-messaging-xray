@@ -587,6 +587,7 @@ def render_result(res):
     _sc = res.get("scores", {})
     _weak = min(_HOLE, key=lambda k: _sc.get(k, 99))
     hole_phrase, hole_score = _HOLE[_weak], _sc.get(_weak, 0)
+    _mr_score = _sc.get("symptom_resonance", 0)
     niche_word = f'{_niche_clients} '   # "life coaching clients " / "clients " — used as "the real words your {…}use"
     steps_btn = (f'Show me how it works for {html.escape(_niche)} coaches &rarr;' if _niche
                  else 'Show me how it&rsquo;d work for me &rarr;')
@@ -800,9 +801,10 @@ def render_result(res):
       </div>
       <div class="cta">
         <div class="cta-h">So what do your buyers actually want?</div>
-        <div class="hook">Your homepage scored <span class="sc">{hole_score}/10</span> on {hole_phrase}, not because you
-        don't know your clients, but because it's written in your words, not the words a cold buyer uses in their own
-        head. Getting those exact words, the ones your {niche_word}really use, is the whole game.</div>
+        {"" if _mr_score >= 5 else f\'\'\'<div class="hook">Your homepage scored <span class="sc">{hole_score}/10</span> on {hole_phrase}, not because you
+        don&rsquo;t know your clients, but because it&rsquo;s written in your words, not the words a cold buyer uses in their own
+        head. Getting those exact words, the ones your {niche_word}really use, is the whole game.</div>\'\'\'}
+        {"" if _mr_score < 5 else f\'\'\'<div class="hook">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading. This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is exhausting. The Market Intelligence File scales what you are already doing right.</div>\'\'\'}
         <p>You've probably worked hard on this already. Rewritten the page, paid a designer, done the course, maybe
         hired a coach. And you know your clients, you've coached plenty of them.</p>
         <p>But your homepage has to win over the people who aren't your clients yet. Cold strangers, deciding in five
