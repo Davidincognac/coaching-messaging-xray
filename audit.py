@@ -994,7 +994,7 @@ def render_and_extract(domain):
         import base64
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
-            b = p.chromium.launch()
+            b = p.chromium.launch(args=["--no-sandbox"])
             pg = b.new_page(viewport={"width": 1200, "height": 750})
             try:
                 pg.goto("https://" + domain, timeout=30000, wait_until="load")

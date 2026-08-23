@@ -277,7 +277,8 @@ PROGRESS_UI = """
   #processing{display:none;margin:26px 0 0;padding:28px 30px;border-radius:14px;
     background:var(--surface);border:1px solid var(--line);box-shadow:0 8px 30px rgba(20,40,36,.06)}
   #processing.on{display:block}
-  #processing h3{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 20px;color:var(--ink)}
+  #processing .angelo-loader{display:block;width:80px;height:auto;margin:0 auto 20px}
+  #processing h3{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 20px;color:var(--ink);text-align:center}
   #processing ul{list-style:none;margin:0 0 18px;padding:0}
   #processing li{padding:11px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.5}
   #processing li:last-child{border-bottom:0}
@@ -288,12 +289,17 @@ PROGRESS_UI = """
   #processing .p-note{font-size:13px;color:var(--muted);line-height:1.5;margin:0;font-style:italic}
 </style>
 <div id="processing">
+  <img class="angelo-loader" src="/angelo.png" alt="Angelo">
   <h3>Angelo is actively analyzing your homepage copy&hellip;</h3>
   <ul>
-    <li><b>Step 1:</b> Logging your email data into our secure MailerLite server path&hellip; <span class="ps-status ps-done" id="ps1">[DONE]</span></li>
-    <li><b>Step 2:</b> Capturing an authentic browser screenshot of your hero section&hellip; <span class="ps-status ps-waiting" id="ps2">[WAITING]</span></li>
-    <li><b>Step 3:</b> Running our 8-bar semantic parser to strip away generic coaching clich&eacute;s&hellip; <span class="ps-status ps-waiting" id="ps3">[WAITING]</span></li>
-    <li><b>Step 4:</b> Cross-referencing your messaging against our database of 2,000 commercial book buying triggers&hellip; <span class="ps-status ps-waiting" id="ps4">[WAITING]</span></li>
+    <li><b>Step 1:</b> Calibrating secure pipeline data and initializing target network links&hellip; <span class="ps-status ps-done" id="ps1">[DONE]</span></li>
+    <li><b>Step 2:</b> Launching Angelo&rsquo;s headless browser engine to lock down your above-the-fold hero matrix&hellip; <span class="ps-status ps-waiting" id="ps2">[WAITING]</span></li>
+    <li><b>Step 3:</b> Activating semantic text extraction algorithms to isolate core phrasing&hellip; <span class="ps-status ps-waiting" id="ps3">[WAITING]</span></li>
+    <li><b>Step 4:</b> Executing deep linguistic parsing arrays across target audience pain points&hellip; <span class="ps-status ps-waiting" id="ps4">[WAITING]</span></li>
+    <li><b>Step 5:</b> Angelo is compiling toxic token and clich&eacute; density data profiles&hellip; <span class="ps-status ps-waiting" id="ps5">[WAITING]</span></li>
+    <li><b>Step 6:</b> Formatting tactical copy adjustments and strategic alternative recommendations&hellip; <span class="ps-status ps-waiting" id="ps6">[WAITING]</span></li>
+    <li><b>Step 7:</b> Binding persistent database files and generating secure endpoint parameters&hellip; <span class="ps-status ps-waiting" id="ps7">[WAITING]</span></li>
+    <li><b>Step 8:</b> Angelo is finalizing your custom Market Intelligence File dashboard layout&hellip; <span class="ps-status ps-waiting" id="ps8">[WAITING]</span></li>
   </ul>
   <p class="p-note">This takes exactly 30 to 40 seconds. Do not close this window or hit refresh. Your personalized diagnostic dashboard will load automatically the moment processing concludes.</p>
 </div>
@@ -312,6 +318,10 @@ document.addEventListener('DOMContentLoaded',function(){
     el.className='ps-status '+(status==='DONE'?'ps-done':status==='IN PROGRESS'?'ps-progress':'ps-waiting');
   }
 
+  function markAllDone(){
+    for(var i=1;i<=8;i++) setStep('ps'+i,'DONE');
+  }
+
   form.addEventListener('submit',function(e){
     var url=document.getElementById('urlinput').value.trim();
     var fn=document.getElementById('firstnameinput').value.trim();
@@ -324,16 +334,19 @@ document.addEventListener('DOMContentLoaded',function(){
 
     setStep('ps1','DONE');
     setStep('ps2','IN PROGRESS');
-    setStep('ps3','WAITING');
-    setStep('ps4','WAITING');
+    for(var i=3;i<=8;i++) setStep('ps'+i,'WAITING');
 
     form.style.display='none';
     result.innerHTML='';
     proc.className='on';
     proc.scrollIntoView({behavior:'smooth',block:'center'});
 
-    var t2=setTimeout(function(){setStep('ps2','DONE');setStep('ps3','IN PROGRESS');},9000);
-    var t3=setTimeout(function(){setStep('ps3','DONE');setStep('ps4','IN PROGRESS');},20000);
+    var t2=setTimeout(function(){setStep('ps2','DONE');setStep('ps3','IN PROGRESS');},6000);
+    var t3=setTimeout(function(){setStep('ps3','DONE');setStep('ps4','IN PROGRESS');},13000);
+    var t4=setTimeout(function(){setStep('ps4','DONE');setStep('ps5','IN PROGRESS');},20000);
+    var t5=setTimeout(function(){setStep('ps5','DONE');setStep('ps6','IN PROGRESS');},25000);
+    var t6=setTimeout(function(){setStep('ps6','DONE');setStep('ps7','IN PROGRESS');},29000);
+    var t7=setTimeout(function(){setStep('ps7','DONE');setStep('ps8','IN PROGRESS');},33000);
 
     var qs='url='+encodeURIComponent(url);
     if(fn) qs+='&first_name='+encodeURIComponent(fn);
@@ -342,8 +355,9 @@ document.addEventListener('DOMContentLoaded',function(){
 
     var t0=Date.now();
     fetch('/audit?'+qs+'&_t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
-      clearTimeout(t2); clearTimeout(t3);
-      setStep('ps2','DONE'); setStep('ps3','DONE'); setStep('ps4','DONE');
+      clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
+      clearTimeout(t5); clearTimeout(t6); clearTimeout(t7);
+      markAllDone();
       setTimeout(function(){
         proc.className='';
         form.style.display='';
@@ -360,7 +374,8 @@ document.addEventListener('DOMContentLoaded',function(){
         result.scrollIntoView({behavior:'smooth',block:'start'});
       }, Math.max(0,500-(Date.now()-t0)));
     }).catch(function(){
-      clearTimeout(t2); clearTimeout(t3);
+      clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
+      clearTimeout(t5); clearTimeout(t6); clearTimeout(t7);
       proc.className=''; form.style.display=''; busy=false;
       window.location.href='/?'+qs;
     });
