@@ -1778,6 +1778,7 @@ def ai_analyse(row, scores, score_10, ev=None):
             client = anthropic.Anthropic()
             _kw = dict(
                 model=AUDIT_MODEL, max_tokens=1800,
+                top_p=0.001,   # near-greedy decoding — minimises flag-flip variance on first-run audits
                 system=[{"type": "text", "text": VOICE, "cache_control": {"type": "ephemeral"}}],
                 messages=[{"role": "user", "content": content}],
                 output_config={"format": {"type": "json_schema", "schema": AI_ANALYSE_SCHEMA}},
@@ -2161,6 +2162,18 @@ def audit_url(url):
     domain = sm.norm_domain(url)
     if not domain:
         return {"ok": False, "error": "That doesn't look like a valid website address."}
+    # CACHE LOOKUP: same domain → same score, every run. Bypasses Playwright + AI entirely on repeat visits.
+    # Uses a local import so audit.py stays usable in standalone corpus-scoring contexts where storage.py
+    # may not be present. Any failure (missing module, corrupt JSON, unexpected schema) falls through silently.
+    try:
+        from storage import get_audit as _get_cached
+        _row = _get_cached(domain)
+        if _row and _row.get("raw_json"):
+            _cached = json.loads(_row["raw_json"])
+            if _cached.get("ok") and _cached.get("status") == "ok":
+                return _cached
+    except Exception:
+        pass  # storage unavailable or row corrupt — proceed to live audit
     # KEEP THE FULL PATH for rendering: if the user gives a specific page (…/dating-coaching), audit THAT page, not
     # the homepage. norm_domain strips the path (right for corpus de-dup), so we build a path-preserving target here.
     target = re.sub(r"^https?://", "", str(url).strip(), flags=re.I)
