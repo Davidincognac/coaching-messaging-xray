@@ -574,18 +574,18 @@ def para_split(text, max_chars=260):
         chunks.append(cur)
     return "".join(f"<p>{html.escape(c)}</p>" for c in chunks)
 
-# What we check, plain, buyer-focused, so they know it's quick and what's coming
+# What we check, plain, buyer-focused, so they know it's quick and what's coming.
+# HARD RULE (David): this list must match the criteria the report actually details below —
+# one item per DISPLAY_CRIT entry, in the same order. If the taxonomy changes, change this too.
 CHECKLIST = [
-    "Whether it's instantly clear <b>who you help</b>",
-    "Whether a visitor sees <b>their own problem</b> on the page",
-    "Whether your <b>offer</b> is clear",
-    "Whether there's <b>proof</b> you can deliver",
-    "Whether there's <b>one obvious next step</b>",
-    "Whether you capture people who aren't ready <b>yet</b>",
-    "Whether you look <b>credible and trustworthy</b>",
-    "Whether there's a <b>human</b> to connect with",
-    "How you handle <b>pricing</b>",
-    "The <b>technical basics</b>, secure, fast, works on a phone",
+    "Whether a stranger gets it <b>in five seconds</b>",          # clarity_5sec
+    "Whether it's instantly clear <b>who you help</b>",           # specificity
+    "Whether a visitor sees <b>their own problem</b> on the page",# symptom_resonance
+    "Whether there's <b>proof</b> you can deliver",               # proof_cred
+    "Whether your <b>offer</b> is clear",                         # offer_clarity
+    "Whether there's <b>one obvious next step</b>",               # next_step
+    "How easy it is to <b>take the first step</b>",               # friction
+    "Whether saying yes feels <b>safe</b>",                       # shield
 ]
 
 # Constructive verdicts, no harsh one-word labels
@@ -703,6 +703,9 @@ def render_result(res, first_name=""):
     g = sev_class(res["score_10"])
     ev = res["evidence"]
     cnt = f'{res.get("corpus_count", 10954):,}'   # the living count of coaching websites read
+    # RULEBOOK §0: never claim "homepage" when a subpage was audited. Every personal claim below
+    # that names their page uses this word, so it's right for both cases.
+    _page_word = "homepage" if res.get("is_home", True) else "page"
     # The "who's really buying" step needs a vague-avatar example to push against. Pin it to THEIR OWN niche so a
     # leadership coach never reads a divorce-coach example and thinks "that's not me". Neutral fallback if unknown.
     _niche = ev.get("niche")
@@ -784,7 +787,7 @@ def render_result(res, first_name=""):
                    'but not to them.</div>')
 
     evidence_html = (
-        f'<div class="ev"><div class="h"><span class="secnum">1 / 5</span>What we read on your homepage: {html.escape(ev["domain"])}</div>'
+        f'<div class="ev"><div class="h"><span class="secnum">1 / 5</span>What we read on your {_page_word}: {html.escape(ev.get("page_display") or ev["domain"])}</div>'
         f'{thumb}{quotes}</div>'
     )
 
@@ -795,7 +798,7 @@ def render_result(res, first_name=""):
     if v.get("leaning") == "expert":
         voice_html = (
             '<div class="voice"><h4><span class="secnum">4 / 5</span>Whose words are these? Yours, or your buyer\'s?</h4>'
-            f'<p>On your homepage you reach for coach words like {coach_terms}. They\'re good words. But they\'re '
+            f'<p>On your {_page_word} you reach for coach words like {coach_terms}. They\'re good words. But they\'re '
             '<b>your</b> words, not your customer\'s.</p>'
             '<p>Right now you\'re talking expert to expert. Another coach would read this and understand you easily. '
             'But your buyer isn\'t another expert. <b>They still have the problem.</b> They need you to talk '
@@ -825,7 +828,7 @@ def render_result(res, first_name=""):
     elif v.get("leaning") == "customer":
         voice_html = (
             '<div class="voice good"><h4><span class="secnum">4 / 5</span>You\'re speaking your buyer\'s language</h4>'
-            '<p>Here\'s something you\'re doing well. Your homepage talks about the problem in words your customer '
+            f'<p>Here\'s something you\'re doing well. Your {_page_word} talks about the problem in words your customer '
             'would actually use, not just coach words.</p>'
             f'<p>That\'s rarer than you\'d think. Of the {cnt} coaching sites we scored, only about 1 in 8 do this. The '
             'other 88% talk like the expert. You sound more like the person with the problem, and <b>that\'s a real edge</b>. '
@@ -833,7 +836,7 @@ def render_result(res, first_name=""):
     else:
         voice_html = (
             '<div class="voice"><h4><span class="secnum">4 / 5</span>Whose words are these? Yours, or your buyer\'s?</h4>'
-            '<p>Your homepage mixes your words with your customer\'s words.</p>'
+            f'<p>Your {_page_word} mixes your words with your customer\'s words.</p>'
             '<p>The closer you get to how your customer really talks, the words they\'d use for their own problem, the '
             'more of them will get in touch instead of just nodding and leaving.</p>'
             '<p>And that\'s harder than it sounds. You know your work so well that you\'ve forgotten how your customer '
@@ -918,7 +921,7 @@ def render_result(res, first_name=""):
 
     if hole_score > 5:
         hook_html = (
-            f'<div class="hook good"><span class="hl">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading.</span> '
+            f'<div class="hook good"><span class="hl">Your {_page_word} scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading.</span> '
             f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
             f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
             f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
@@ -926,7 +929,7 @@ def render_result(res, first_name=""):
         )
     else:
         hook_html = (
-            f'<div class="hook"><span class="hl">Your homepage scored <span class="sc">{hole_score}/10</span> on {hole_phrase},</span> not '
+            f'<div class="hook"><span class="hl">Your {_page_word} scored <span class="sc">{hole_score}/10</span> on {hole_phrase},</span> not '
             f'because you don&rsquo;t know your clients, but because it&rsquo;s written in your words, not the words '
             f'a cold buyer uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
             f'is the whole game.</div>'
@@ -977,7 +980,7 @@ def render_result(res, first_name=""):
         {hook_html}
         <p>You've probably worked hard on this already. Rewritten the page, paid a designer, done the course, maybe
         hired a coach. And you know your clients, you've coached plenty of them.</p>
-        <p>But your homepage has to win over the people who aren't your clients yet. Cold strangers, deciding in five
+        <p>But your {_page_word} has to win over the people who aren't your clients yet. Cold strangers, deciding in five
         seconds, who've never heard of you. What's in their head before they meet you is the hard part, and no one
         sees the whole market from inside their own business.</p>
         <p>So here's what we make you: a <b>Marketing Intelligence File</b>. In plain English, it's everything we can

@@ -702,7 +702,7 @@ def build_evidence(row):
 
 # --- pricing is often a deliberate choice, never scold; give a balanced note instead ---
 PRICING_NOTE = (
-    "We noticed your homepage doesn't show pricing. Plenty of coaching businesses choose this on purpose, and it "
+    "We noticed the page we read doesn't show pricing. Plenty of coaching businesses choose this on purpose, and it "
     "can be the right call, pricing is a personal, strategic decision. Just be aware it cuts both ways: some "
     "visitors hesitate when they can't tell what they're getting into, a few assume it's out of their "
     "range, and others won't reach out because the uncertainty feels risky. Worth testing either way."
