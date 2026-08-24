@@ -317,7 +317,7 @@ PROGRESS_UI = """
     <li><b>Step 5:</b> Angelo is compiling toxic token and clich&eacute; density data profiles&hellip; <span class="ps-status ps-waiting" id="ps5">[WAITING]</span></li>
     <li><b>Step 6:</b> Formatting tactical copy adjustments and strategic alternative recommendations&hellip; <span class="ps-status ps-waiting" id="ps6">[WAITING]</span></li>
     <li><b>Step 7:</b> Binding persistent database files and generating secure endpoint parameters&hellip; <span class="ps-status ps-waiting" id="ps7">[WAITING]</span></li>
-    <li><b>Step 8:</b> Angelo is finalizing your custom Market Intelligence File dashboard layout&hellip; <span class="ps-status ps-waiting" id="ps8">[WAITING]</span></li>
+    <li><b>Step 8:</b> Angelo is finalizing your custom Marketing Intelligence File dashboard layout&hellip; <span class="ps-status ps-waiting" id="ps8">[WAITING]</span></li>
   </ul>
   <p class="p-note">This takes exactly 30 to 40 seconds. Do not close this window or hit refresh. Your personalized diagnostic dashboard will load automatically the moment processing concludes.</p>
 </div>
@@ -548,7 +548,7 @@ FIXES_CAVEAT = (
 )
 
 
-def render_result(res):
+def render_result(res, first_name=""):
     if not res.get("ok"):
         return f'<div class="card"><p class="err">{html.escape(res.get("error",""))}</p></div>'
     if res.get("status") == "dead":
@@ -668,8 +668,9 @@ def render_result(res):
             'But your buyer isn\'t another expert. They still have the problem. They need you to talk '
             '<b>expert to buyer</b>.</p>'
             f'<p>Picture the person you help, lying awake at night, worried. What do they type into Google? Probably '
-            f'not &lsquo;{first_coach}&rsquo;. More likely something real, like &ldquo;I dread Monday mornings&rdquo;, '
-            'or &ldquo;I keep getting passed over at work&rdquo;.</p>'
+            f'not &lsquo;{first_coach}&rsquo;. More likely something real. A career coach\'s buyer might type '
+            '&ldquo;I keep getting passed over at work&rdquo;. A health coach\'s buyer might type &ldquo;why am I '
+            'tired all the time&rdquo;. Your buyer has their own version, in their own words.</p>'
             '<p>You talk like the expert who fixed the problem. They talk like someone who still has it. Those are two '
             'different languages.</p>'
             f'<p>And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
@@ -744,7 +745,9 @@ def render_result(res):
     fixes = "".join(f"<li>{html.escape(f)}</li>" for f in cr["top_fixes"])
     ai = ('<span class="badge">AI diagnosis</span>' if res["ai_powered"]
           else '<span class="badge">add API key for AI</span>')
-    opener = (f'<div class="analysed">We can tell in a few seconds what a cold buyer thinks when they arrive on your '
+    # Greet the coach by name when the form gave us one. Falls back cleanly to the old opener.
+    _greet = f'{html.escape(first_name.strip())}, we' if first_name.strip() else 'We'
+    opener = (f'<div class="analysed">{_greet} can tell in a few seconds what a cold buyer thinks when they arrive on your '
               f'page. We\'ve watched it go right and wrong on thousands of coaching sites. We looked at '
               f'<b>{html.escape(ev.get("page_display") or ev["domain"])}</b>, scored it against all <b>{cnt}</b> of '
               f'them, and the screenshot below is your real page, not a template. Here\'s what we found.</div>')
@@ -782,7 +785,8 @@ def render_result(res):
             f'<div class="hook">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading. '
             f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
             f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
-            f'exhausting. The Market Intelligence File scales what you are already doing right.</div>'
+            f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
+            f'{niche_word}you want more of.</div>'
         )
     else:
         hook_html = (
@@ -840,7 +844,7 @@ def render_result(res):
         find out about the person you're really selling to, pulled from thousands of real buyers, not just the handful
         you've worked with:</p>
         <ul>
-          <li>the exact words they use for their problem</li>
+          <li>the exact words your {niche_word}use for their problem</li>
           <li>the fears that hold them back</li>
           <li>the desires that make them pick up the phone</li>
           <li>what they'll pay to fix, and what they won't</li>
@@ -858,8 +862,7 @@ def render_result(res):
         <div class="steps-h">So how do you fix it?</div>
         <p>You have seen the problem. Here is the way out, step by step.</p>
         <ol class="steplist">
-          <li><b>We find out who is actually buying.</b> Not the vague, fake avatar most coaches use, like
-          &ldquo;leadership clients, aged 35 to 55.&rdquo; We find the real person and the exact burning problem
+          <li><b>We find out who is actually buying.</b> Not {avatar_eg}. We find the real person and the exact burning problem
           they will pull out their wallet to fix. We pull this data by deep-diving into 11,384 real professional
           profiles and tracking over 2,000 specific books people are actively purchasing right now to solve their pain.
           <span class="ben">So you are talking to the people who actually buy, not a vague avatar.</span></li>
@@ -1029,7 +1032,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     criteria_html = _build_criteria_html(raw_json, headline)
     return f"""<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Your Market Intelligence File &mdash; {fn}</title>
+<title>Your Marketing Intelligence File &mdash; {fn}</title>
 <style>
   @font-face{{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}}
   :root{{--paper:#FBFBFD;--surface:#fff;--ink:#12131A;--muted:#5c6a67;--line:#dde3e0;
@@ -1232,7 +1235,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <div class="first-fold-section">
     <div class="ff-header">
       <div class="ff-eyebrow">&#128309; PERSONAL EVALUATION CORE // DESIGNED FOR: {fn_up}</div>
-      <h1 class="ff-h1">You are about to see exactly how a Market Intelligence File builds your entire coaching business.</h1>
+      <h1 class="ff-h1">You are about to see exactly how a Marketing Intelligence File builds your entire coaching business.</h1>
     </div>
     <div class="first-fold-inner">
       <div class="ff-left">
@@ -1319,7 +1322,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           </div>
           <div class="video-copy">
             <h3>A language fix that corrected a blind spot for a coach in South America.</h3>
-            <p>Chad explains how the Market Intelligence data forced him to stop guessing and change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
+            <p>Chad explains how the Marketing Intelligence data forced him to stop guessing and change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
           </div>
         </div>
 
@@ -1356,7 +1359,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <!-- PROTOCOL BREAKDOWN -->
   <div class="protocol-section">
-    <div class="section-eyebrow">What is inside your Market Intelligence Protocol</div>
+    <div class="section-eyebrow">What is inside your Marketing Intelligence Protocol</div>
 
     <div class="protocol-container">
       <div class="pc-label">Container A</div>
@@ -1398,7 +1401,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <p>You can rewrite your homepage. You can hire a copywriter. You can ask an AI to help you.
     None of those things change what your buyer is already thinking before they land on your page.
     The only fix is to find out what they are thinking&mdash;in their own words, not yours.
-    That is a research problem. The Market Intelligence File solves it.</p>
+    That is a research problem. The Marketing Intelligence File solves it.</p>
     <p>You now have three options.</p>
   </div>
 
@@ -1556,7 +1559,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       and &ldquo;clarity&rdquo;.</p>
       <p>So when you ask an AI to research your market, it feeds those same words back to you&mdash;because
       that is what coaching pages say. <b>You end up sounding identical to every other coach on the internet.</b>
-      That is exactly the problem you were trying to solve. The Market Intelligence File does not ask AI what
+      That is exactly the problem you were trying to solve. The Marketing Intelligence File does not ask AI what
       your market wants. It reads where your market actually speaks, and extracts the language they use when
       they are not performing for an audience. That is a different process. The output is completely different.</p>
     </div>
@@ -1564,7 +1567,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <!-- PRODUCT REVEAL (updated pricing & guarantee) -->
   <div class="product-reveal">
-    <div class="pr-eyebrow">The Market Intelligence File</div>
+    <div class="pr-eyebrow">The Marketing Intelligence File</div>
     <h2>The exact words your buyers use when they describe their own problem.</h2>
     <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
     uses when they are searching for a solution at two in the morning and nobody is watching.
@@ -1593,14 +1596,14 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <!-- CHECKOUT -->
   <div class="checkout-section">
-    <h2>Get My Market Intelligence File</h2>
+    <h2>Get My Marketing Intelligence File</h2>
     <div class="cs-sub">Your niche. Your buyers&rsquo; actual language. &pound;75, one-time. No subscription.</div>
     <div class="checkout-form-placeholder">
       <div class="lock-icon">&#128274;</div>
       <div class="cf-label">Secure checkout</div>
       <div class="cf-note">Card payment integration goes here.<br>
       Stripe / payment processor embed to be wired in.</div>
-      <button class="cta-btn" disabled>Get My Market Intelligence File &rarr;</button>
+      <button class="cta-btn" disabled>Get My Marketing Intelligence File &rarr;</button>
     </div>
     <p class="guarantee">Secure payment &middot; Instant confirmation &middot; Delivered within 5 working days &middot; 7-Day Certainty Guarantee</p>
   </div>
@@ -1707,7 +1710,7 @@ class Handler(BaseHTTPRequestHandler):
                 shot_path = _save_screenshot(res.get("domain", url))
                 if not res.get("thumbnail") and shot_path:
                     res["thumbnail"] = shot_path
-            frag = render_result(res) if url else ""
+            frag = render_result(res, first_name=first_name) if url else ""
             if url and res.get("ok") and res.get("status") == "ok":
                 # Strip the thumbnail before serialising — a base64 blob is huge, and a /screenshots/ path
                 # is re-injected fresh on every request anyway, so the stored JSON never needs it.

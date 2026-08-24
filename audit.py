@@ -1983,13 +1983,13 @@ def _mi_close(note, key, score):
             f"A score of {score} here means your instincts are ahead of most coaches. "
             "The question is whether that intuition matches thousands of real buyers out there, "
             "or just the small group of clients you have already met. "
-            "The Market Intelligence (MI) File tells you which."
+            "The Marketing Intelligence (MI) File tells you which."
         )
     else:
         tail = (
             "Your words aren't working because you lack real-world facts. "
             "You cannot guess what a stressed buyer wants. "
-            "The Market Intelligence (MI) File gives you the exact phrases they use "
+            "The Marketing Intelligence (MI) File gives you the exact phrases they use "
             "when they are ready to buy."
         )
     return f"{note} {tail}" if note else tail
@@ -2140,9 +2140,9 @@ CLIFFHANGER_SYMPTOM = (
     'In direct-response conversion psychology, consumers do not buy intellectual states. They buy solutions to raw, '
     'physical, burning symptoms. If you cannot describe their exact daily pain better than they can describe it '
     'themselves, they will click away instantly.</p>'
-    '<h4>The Market Intelligence Gap:</h4>'
+    '<h4>The Marketing Intelligence Gap:</h4>'
     '<p>You are currently estimating how your audience feels. To fix your conversion rate, you need real-world data, '
-    'not an estimate. Our <b>Market Intelligence (MI) File</b> maps the exact raw, internal dialogue your market '
+    'not an estimate. Our <b>Marketing Intelligence (MI) File</b> maps the exact raw, internal dialogue your market '
     'whispers to themselves at 3 AM so you can deploy copy that hooks their soul.</p>'
 )
 
@@ -2152,8 +2152,8 @@ CLIFFHANGER_FRICTION = (
     'who just discovered your name to immediately commit to a ‘45-minute sales consultation’ without any '
     'psychological safety nets or risk reversals, your friction is too high. You are asking for marriage on the '
     'first date. The psychological resistance is too high.</p>'
-    '<h4>The Market Intelligence Gap:</h4>'
-    '<p>You cannot lower consumer resistance unless you know their exact skepticism. Our <b>Market Intelligence (MI) File</b> '
+    '<h4>The Marketing Intelligence Gap:</h4>'
+    '<p>You cannot lower consumer resistance unless you know their exact skepticism. Our <b>Marketing Intelligence (MI) File</b> '
     'tracks your audience’s deepest hidden buying objections and fears, showing you exactly what low-friction '
     'value slopes and safety shields you need to build to capture cold traffic seamlessly.</p>'
 )
