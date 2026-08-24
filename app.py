@@ -252,9 +252,11 @@ PAGE = """<!doctype html><html lang="en"><head>
   .tag.neutral{{background:#EEF0F4;color:var(--muted)}}
   .analysed{{font-family:var(--serif);font-size:clamp(19px,2.8vw,23px);line-height:1.5;
     margin:0 0 22px;padding-bottom:20px;border-bottom:1px solid var(--line)}}
+  .analysed p{{margin:0 0 14px}} .analysed p:last-child{{margin:0}}
   .analysed b{{color:var(--accent-ink)}}
   .reframe{{background:var(--soft);color:var(--ink);border-left:4px solid var(--accent);
     border-radius:0 10px 10px 0;padding:22px 24px;margin:0 0 24px;line-height:1.6;font-size:15px}}
+  .reframe p{{margin:0 0 12px}} .reframe p:last-child{{margin:0}}
   .reframe b{{color:var(--accent-ink)}}
   .checklist{{background:#F7F8FA;border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:0 0 24px}}
   .checklist .h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
@@ -874,19 +876,21 @@ def render_result(res, first_name=""):
           else '<span class="badge">add API key for AI</span>')
     # Greet the coach by name when the form gave us one. Falls back cleanly to the old opener.
     _greet = f'{html.escape(first_name.strip())}, we' if first_name.strip() else 'We'
-    opener = (f'<div class="analysed">{_greet} can tell in a few seconds what a cold buyer thinks when they arrive on your '
-              f'page. We\'ve watched it go right and wrong on thousands of coaching sites. We looked at '
+    opener = (f'<div class="analysed"><p>{_greet} can tell in a few seconds what a cold buyer thinks when they arrive on your '
+              f'page. We\'ve watched it go right and wrong on thousands of coaching sites.</p>'
+              f'<p>We looked at '
               f'<b>{html.escape(ev.get("page_display") or ev["domain"])}</b>, scored it against all <b>{cnt}</b> of '
-              f'them, and the screenshot below is your real page, not a template. Here\'s what we found.</div>')
+              f'them, and the screenshot below is your real page, not a template. Here\'s what we found.</p></div>')
     media = (f'<div class="media">🎬 {html.escape(res["media_note"])}</div>' if res.get("media_note") else "")
     popup = (f'<div class="media">🚫 {html.escape(res["popup_note"])}</div>' if res.get("popup_note") else "")
-    reframe = ('<div class="reframe">You\'ve probably had a website audit before. This isn\'t that. '
-               'This isn\'t about how good your website <i>looks</i>. Forget the design for a minute. '
-               'A stranger arrives on your page. In a few seconds they decide one thing about you: '
+    reframe = ('<div class="reframe"><p>You\'ve probably had a website audit before. This isn\'t that. '
+               'This isn\'t about how good your website <i>looks</i>. Forget the design for a minute.</p>'
+               '<p>A stranger arrives on your page. In a few seconds they decide one thing about you: '
                '<b>&ldquo;can this person fix my problem?&rdquo;</b> If the answer isn\'t a clear yes, they leave. '
-               f'And you never even knew they were there. We read {cnt} coaching homepages, and <b>86% fail that '
+               'And you never even knew they were there.</p>'
+               f'<p>We read {cnt} coaching homepages, and <b>86% fail that '
                'test.</b> The checks below show what\'s going wrong. The real reason is simpler: '
-               '<b>the words on your page aren\'t the words your buyer uses in their own head.</b></div>')
+               '<b>the words on your page aren\'t the words your buyer uses in their own head.</b></p></div>')
     checklist_html = (
         '<div class="checklist"><div class="h">What we have looked at (detailed below)</div><ul>'
         + "".join(f"<li>{c}</li>" for c in CHECKLIST)
