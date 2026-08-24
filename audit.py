@@ -2162,16 +2162,26 @@ def audit_url(url):
     domain = sm.norm_domain(url)
     if not domain:
         return {"ok": False, "error": "That doesn't look like a valid website address."}
-    # CACHE LOOKUP: same domain → same score, every run. Bypasses Playwright + AI entirely on repeat visits.
+    # CACHE LOOKUP: same domain → same score on repeat visits, but only for 24 HOURS. Bypasses Playwright + AI
+    # inside the window (consistency), then expires so a coach who reworks their site gets a genuinely fresh
+    # audit — new text, new screenshot, new score — instead of last month's verdict locked in forever.
     # Uses a local import so audit.py stays usable in standalone corpus-scoring contexts where storage.py
     # may not be present. Any failure (missing module, corrupt JSON, unexpected schema) falls through silently.
     try:
         from storage import get_audit as _get_cached
         _row = _get_cached(domain)
         if _row and _row.get("raw_json"):
-            _cached = json.loads(_row["raw_json"])
-            if _cached.get("ok") and _cached.get("status") == "ok":
-                return _cached
+            # updated_at is stored as datetime.utcnow().isoformat(); an unparseable/missing stamp = treat as stale.
+            _fresh = False
+            try:
+                _age = _dt.datetime.utcnow() - _dt.datetime.fromisoformat(_row["updated_at"])
+                _fresh = _age < _dt.timedelta(hours=24)
+            except Exception:
+                pass
+            if _fresh:
+                _cached = json.loads(_row["raw_json"])
+                if _cached.get("ok") and _cached.get("status") == "ok":
+                    return _cached
     except Exception:
         pass  # storage unavailable or row corrupt — proceed to live audit
     # KEEP THE FULL PATH for rendering: if the user gives a specific page (…/dating-coaching), audit THAT page, not

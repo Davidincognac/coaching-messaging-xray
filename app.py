@@ -48,21 +48,29 @@ def _screenshot_filename(domain: str) -> str:
 
 def _save_screenshot(domain: str) -> str:
     """Fetch a screenshot from microlink.io and write it to the screenshots folder.
-    Returns the web-accessible path (/screenshots/<filename>) or '' on any failure."""
+    Returns the web-accessible path (/screenshots/<filename>) or, when the fetch fails but a
+    previously saved PNG for this domain is still on disk, the path to that old image, so a
+    rate-limit blip never blanks a screenshot we already had. '' only when we have nothing."""
+    fname = _screenshot_filename(domain)
+    web_path = "/screenshots/" + fname
+    disk_path = os.path.join(SCREENSHOTS_DIR, fname)
     try:
         encoded = _url_quote("https://" + domain, safe="")
         api_url = f"https://api.microlink.io/?url={encoded}&screenshot=true&embed=screenshot.url"
         req = urllib.request.Request(api_url, headers={"User-Agent": "CoachAudit/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             img_bytes = resp.read()
         if not img_bytes or len(img_bytes) < 1000:
-            return ""
-        path = os.path.join(SCREENSHOTS_DIR, _screenshot_filename(domain))
-        with open(path, "wb") as f:
+            # A tiny body is a microlink error payload (rate limit JSON etc.), not an image.
+            print(f"[screenshot] {domain}: response too small ({len(img_bytes)} bytes), not an image", flush=True)
+            return web_path if os.path.isfile(disk_path) else ""
+        with open(disk_path, "wb") as f:
             f.write(img_bytes)
-        return "/screenshots/" + _screenshot_filename(domain)
-    except Exception:
-        return ""
+        return web_path
+    except Exception as e:
+        print(f"[screenshot] {domain}: {e}", flush=True)
+        # Rate limit / timeout / network blip: fall back to the last good PNG if we have one.
+        return web_path if os.path.isfile(disk_path) else ""
 
 # Angelo, David's mascot. Drop the image in as coach_audit_app/angelo.png and it appears automatically.
 MASCOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "angelo.png")
@@ -1631,12 +1639,30 @@ class Handler(BaseHTTPRequestHandler):
             if domain:
                 row = get_audit(domain)
                 if row:
+                    # LAZY RETRY: if the audit-time screenshot fetch failed (rate limit, timeout), try once
+                    # more now — the salespage is usually visited hours later, so the window has reset.
+                    # A success is persisted so every later visit is instant; a failure just shows the
+                    # placeholder again, same as before.
+                    shot = row.get("screenshot_path", "")
+                    if not shot:
+                        shot = _save_screenshot(domain)
+                        if shot:
+                            save_audit(
+                                domain=domain,
+                                first_name=row.get("first_name", ""),
+                                email=row.get("email", ""),
+                                headline=row.get("headline", ""),
+                                score=row.get("score", ""),
+                                tokens=row.get("tokens", ""),
+                                screenshot_path=shot,
+                                raw_json=row.get("raw_json", ""),
+                            )
                     self._send(_render_salespage(
                         first_name = row.get("first_name", "")      or "Coach",
                         headline   = row.get("headline", "")         or "your website text",
                         tokens     = row.get("tokens", "")           or "generic coaching terms",
                         score      = row.get("score", "")            or "0.0",
-                        screenshot = row.get("screenshot_path", ""),
+                        screenshot = shot,
                         raw_json   = row.get("raw_json", ""),
                     ))
                     return
