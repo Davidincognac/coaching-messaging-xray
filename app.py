@@ -85,37 +85,49 @@ PAGE = """<!doctype html><html lang="en"><head>
 <title>The Coaching Website Report Card</title>
 <style>
   @font-face{{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}}
-  :root{{--paper:#eef1f5;--surface:#fff;--ink:#17222e;--muted:#5c6a67;--line:#dde3e0;
-    --accent:#3a76bd;--accent-ink:#234e83;--soft:#e6edf8;--good:#2f8f6b;--warn:#b47f26;--critical:#b3402a;}}
+  :root{{
+    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
+    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
+    --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
+    --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
+    --gold:#D4AF37;--gold-h:#C2A02F;
+    --good:#2A7B56;--good-glow:#5CB88C;--warn:#A87B23;--critical:#A62626;}}
   *{{box-sizing:border-box}}
-  body{{margin:0;background:var(--paper);color:var(--ink);
+  html{{background:var(--navy)}}
+  body{{margin:0;background:var(--navy);color:var(--ink);
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}}
-  .wrap{{max-width:760px;margin:0 auto;padding:44px 22px 80px}}
+  .wrap{{max-width:760px;margin:0 auto;padding:64px 24px 72px}}
+  .hero-band{{background:var(--navy);color:var(--ivory)}}
   .serif{{font-family:"Inter",sans-serif}}
-  .eyebrow{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--accent-ink);font-weight:600}}
-  h1{{font-family:"Inter",sans-serif;font-weight:600;font-size:clamp(28px,6vw,44px);
-    letter-spacing:-.015em;margin:.3em 0 .15em}}
-  .sub{{color:var(--muted);font-size:16px;margin:0 0 28px;max-width:56ch}}
-  .sub b{{color:var(--ink)}}
-  .hero{{display:flex;align-items:center;gap:24px;margin-bottom:26px}}
+  .eyebrow{{font-family:"Inter",sans-serif;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--ivory-dim);font-weight:600}}
+  h1{{font-family:"Inter",sans-serif;font-weight:700;font-size:clamp(30px,6.5vw,52px);
+    letter-spacing:-.025em;line-height:1.08;margin:.35em 0 .3em;color:#fff}}
+  .sub{{color:var(--ivory);font-weight:300;font-size:17px;line-height:1.7;margin:0 0 32px;max-width:58ch}}
+  .sub b{{color:var(--glow);font-weight:600}}
+  .hero{{display:flex;align-items:center;gap:32px;margin-bottom:32px}}
   .hero-copy{{flex:1;min-width:0}}
   .hero-copy h1{{margin-top:.1em}} .hero-copy .sub{{margin-bottom:0}}
   .mascot{{width:160px;height:auto;flex-shrink:0}}
   @media(max-width:560px){{.hero{{flex-direction:column;align-items:flex-start;gap:10px}}
     .mascot{{width:120px}}}}
-  form{{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);
-    border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(20,40,36,.06)}}
-  input[type=text],input[type=email]{{border:1px solid var(--line);border-radius:9px;
-    padding:14px 16px;font-size:16px;color:var(--ink);background:var(--surface);width:100%}}
+  form{{display:flex;flex-direction:column;gap:12px;background:var(--navy-card);border:1px solid var(--navy-line);
+    border-radius:10px;padding:24px}}
+  input[type=text],input[type=email]{{border:1px solid var(--navy-line);border-radius:6px;
+    padding:14px 16px;font-size:16px;color:var(--ivory);background:var(--navy-deep);width:100%}}
+  input[type=text]::placeholder,input[type=email]::placeholder{{color:var(--ivory-dim)}}
   input[type=text]:focus,input[type=email]:focus{{outline:2px solid var(--accent);border-color:var(--accent)}}
-  button{{background:#e0691f;color:#fff;border:0;border-radius:9px;padding:14px 22px;
-    font-size:16px;font-weight:600;cursor:pointer}}
-  button:hover{{background:#c65a15}}
-  .hint{{font-size:13px;color:var(--muted);margin-top:12px}}
-  .hint b{{color:var(--accent-ink)}}
-  .card{{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px;
-    box-shadow:0 8px 30px rgba(20,40,36,.06);margin-top:28px}}
+  button{{background:var(--gold);color:var(--navy);border:0;border-radius:6px;padding:16px 24px;
+    font-size:16px;font-weight:700;letter-spacing:.01em;cursor:pointer;margin-top:4px}}
+  button:hover{{background:var(--gold-h)}}
+  .hint{{font-size:13px;color:var(--ivory-dim);margin-top:16px;line-height:1.6}}
+  .hint b{{color:var(--glow)}}
+  #result:not(:empty){{background:var(--paper);padding:56px 24px 88px}}
+  #result>*{{max-width:760px;margin-left:auto;margin-right:auto}}
+  #result>.card:first-child{{margin-top:0}}
+  .card{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:32px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08);margin-top:28px}}
+  @media(max-width:560px){{.card{{padding:24px 18px}}}}
   .grade{{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);
     padding-bottom:18px;margin-bottom:20px}}
   .num{{font-family:"Inter",sans-serif;font-size:56px;font-weight:600;letter-spacing:-.03em;line-height:1}}
@@ -131,7 +143,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .mark.ok::before{{content:"✓";color:var(--good);font-weight:700}}
   .mark.no::before{{content:"✗";color:var(--critical);font-weight:700}}
   .mark.na::before{{content:"–";color:#9aa0a6;font-weight:700}}
-  .track{{height:8px;background:var(--soft);border-radius:6px;overflow:hidden;margin:12px 0 0}}
+  .track{{height:8px;background:#ECEFF4;border-radius:6px;overflow:hidden;margin:12px 0 0}}
   .fill{{height:100%;border-radius:6px}}
   .fill.crit{{background:var(--critical)}} .fill.warn{{background:var(--warn)}} .fill.good{{background:var(--good)}}
   .fill.na{{background:transparent}}
@@ -149,8 +161,8 @@ PAGE = """<!doctype html><html lang="en"><head>
   .diag .k{{font-family:"Inter",sans-serif;font-size:11px;letter-spacing:.1em;
     text-transform:uppercase;color:var(--accent-ink);font-weight:600}}
   .diag ul{{margin:6px 0 0;padding-left:20px}} .diag li{{margin:4px 0}}
-  .caveat{{margin-top:12px;padding:12px 14px;background:var(--soft);border-left:3px solid var(--accent);
-    border-radius:8px;font-size:15px;line-height:1.55}}
+  .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
+    border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
   .caveat p{{margin:0 0 10px}} .caveat p:last-child{{margin:0}}
   .badge{{display:inline-block;font-family:"Inter",sans-serif;font-size:11px;
@@ -158,57 +170,57 @@ PAGE = """<!doctype html><html lang="en"><head>
   .dead{{color:var(--critical);font-size:17px}}
   .err{{color:var(--critical)}}
   .pctl{{font-family:"Inter",sans-serif;font-size:13px;color:var(--accent-ink);font-weight:600}}
-  .ev{{background:#f6f8f7;border:1px solid var(--line);border-radius:11px;padding:18px 20px;margin:20px 0}}
+  .ev{{background:#F7F8FA;border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:20px 0}}
   .ev .h{{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:14px}}
   .ev .q{{font-family:"Inter",sans-serif;font-style:italic;font-size:16px;color:var(--ink);
     border-left:3px solid var(--accent);padding-left:12px;margin:8px 0}}
   .ev .meta{{font-size:13px;color:var(--muted);margin-top:6px}}
   .ev .tag{{display:inline-block;font-family:"Inter",sans-serif;font-size:11px;padding:2px 8px;
     border-radius:20px;margin:4px 6px 0 0}}
-  .tag.no{{background:#f6e6e3;color:var(--critical)}} .tag.yes{{background:var(--soft);color:var(--accent-ink)}}
-  .tag.neutral{{background:#eef1f5;color:var(--muted)}}
+  .tag.no{{background:#F5E9E9;color:var(--critical)}} .tag.yes{{background:var(--soft);color:var(--accent-ink)}}
+  .tag.neutral{{background:#EEF0F4;color:var(--muted)}}
   .analysed{{font-family:"Inter",sans-serif;font-size:clamp(17px,2.6vw,21px);line-height:1.42;
     margin:0 0 22px;padding-bottom:20px;border-bottom:1px solid var(--line)}}
   .analysed b{{color:var(--accent-ink)}}
-  .reframe{{background:var(--accent);color:#eafaf6;border-radius:12px;padding:18px 22px;margin:0 0 22px;
-    line-height:1.55;font-size:15px}}
-  .reframe b{{color:#fff}}
-  .checklist{{background:#f6f8f7;border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:0 0 22px}}
+  .reframe{{background:var(--soft);color:var(--ink);border-left:4px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:22px 24px;margin:0 0 24px;line-height:1.6;font-size:15px}}
+  .reframe b{{color:var(--accent-ink)}}
+  .checklist{{background:#F7F8FA;border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:0 0 24px}}
   .checklist .h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
     color:var(--muted);margin-bottom:10px}}
   .checklist ul{{margin:0;padding-left:20px;columns:2;column-gap:26px}}
   .checklist li{{margin:5px 0;font-size:14px;break-inside:avoid}}
   .checklist .foot{{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:14px}}
   @media(max-width:560px){{.checklist ul{{columns:1}}}}
-  .reveal{{margin-top:28px;padding:24px;background:#f0f4f3;border:1px solid var(--line);border-radius:14px}}
+  .reveal{{margin-top:32px;padding:24px;background:#F6F7F9;border:1px solid var(--line);border-radius:12px}}
   .reveal .h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
     color:var(--muted);margin-bottom:10px}}
   .verdict{{font-family:"Inter",sans-serif;font-size:17px;line-height:1.4}}
-  .strength{{background:#eaf1fb;border:1px solid #cfe8dd;border-radius:11px;padding:14px 18px;margin:18px 0;
+  .strength{{background:#EDF5F0;border:1px solid #CBE2D6;border-radius:10px;padding:14px 18px;margin:18px 0;
     font-size:14px}}
   .strength b{{color:var(--good)}}
-  .scope{{font-size:13px;color:var(--muted);margin:0 0 18px;padding:9px 13px;background:#f6f8f7;border-radius:8px}}
+  .scope{{font-size:13px;color:var(--muted);margin:0 0 18px;padding:9px 13px;background:#F7F8FA;border-radius:8px}}
   .scope .date{{color:var(--accent-ink);font-weight:600}}
   .gap{{font-family:"Inter",sans-serif;font-size:13px;color:var(--accent-ink);font-weight:600;max-width:52ch}}
   .gap p{{margin:0 0 10px}} .gap p:last-child{{margin:0}}
-  .secnum{{display:block;width:fit-content;font-family:"Inter",sans-serif;font-size:14px;
-    letter-spacing:.12em;color:#fff;background:var(--accent);font-weight:700;margin:0 0 12px;
-    padding:6px 14px;border-radius:20px}}
+  .secnum{{display:block;width:fit-content;font-family:"Inter",sans-serif;font-size:12px;
+    letter-spacing:.14em;color:var(--accent-ink);background:transparent;border:1px solid var(--accent);
+    font-weight:700;margin:0 0 12px;padding:5px 14px;border-radius:20px}}
   .thumb{{width:100%;border-radius:8px;border:1px solid var(--line);margin-bottom:14px;display:block}}
   .q.sm{{font-size:14px}}
-  .fault{{margin-top:14px;padding:14px 16px;background:#fbf0ee;border:1px solid #edd4cd;border-radius:9px;
+  .fault{{margin-top:14px;padding:14px 16px;background:#F8EEEE;border:1px solid #E3CACA;border-radius:8px;
     font-size:14px;line-height:1.55}}
   .fault b{{color:var(--critical)}}
-  .pricing{{background:#fbf7ee;border:1px solid #ece0c8;border-radius:11px;padding:14px 18px;margin:18px 0;
+  .pricing{{background:#F8F3E7;border:1px solid #E6DAB9;border-radius:10px;padding:14px 18px;margin:18px 0;
     font-size:14px;line-height:1.5}}
-  .pricing b{{color:#8a6d1f}}
-  .media{{background:#eef2fb;border:1px solid #d5def0;border-radius:11px;padding:14px 18px;margin:0 0 20px;
+  .pricing b{{color:#7A5A16}}
+  .media{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:14px 18px;margin:0 0 20px;
     font-size:14px;line-height:1.5}}
-  .voice{{background:var(--soft);border:1px solid #cdddf3;border-left:4px solid var(--accent);border-radius:12px;
-    padding:20px 22px;margin:22px 0;line-height:1.6;font-size:15px}}
+  .voice{{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:22px 24px;margin:24px 0;line-height:1.6;font-size:15px}}
   .voice h4{{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 10px;color:var(--accent-ink)}}
   .voice b{{color:var(--accent-ink)}}
-  .voice.good{{background:#eaf1fb;border-left-color:var(--good)}}
+  .voice.good{{background:#EDF5F0;border-color:#CBE2D6;border-left-color:var(--good)}}
   .voice.good h4{{color:var(--good)}}
   .voice p{{margin:0 0 12px}} .voice p:last-child{{margin:0}}
   .checks{{margin-top:14px;display:flex;flex-direction:column;gap:2px}}
@@ -220,23 +232,25 @@ PAGE = """<!doctype html><html lang="en"><head>
   .check.no{{color:var(--critical)}} .check.no::before{{content:"✗";color:var(--critical)}}
   .checks-foot{{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:14px;
     line-height:1.55;color:var(--ink)}}
-  .cta{{margin-top:26px;padding:28px 26px;background:var(--ink);color:#eef1f5;border-radius:14px;text-align:left}}
-  .cta-h{{font-family:"Inter",sans-serif;font-size:23px;color:#fff;margin-bottom:16px;text-align:center}}
-  .cta p{{max-width:60ch;margin:0 auto 15px;line-height:1.65;font-size:16px;color:#eaeff2}}
-  .cta ul{{max-width:60ch;margin:0 auto 15px;padding-left:24px;line-height:1.55;font-size:16px;color:#eaeff2}}
+  .cta{{margin-top:32px;padding:40px 32px;background:var(--navy);color:var(--ivory);border-radius:16px;text-align:left}}
+  @media(max-width:560px){{.cta{{padding:28px 20px}}}}
+  .cta-h{{font-family:"Inter",sans-serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:16px;text-align:center}}
+  .cta p{{max-width:60ch;margin:0 auto 16px;line-height:1.65;font-size:16px;color:#DEE3EE}}
+  .cta ul{{max-width:60ch;margin:0 auto 16px;padding-left:24px;line-height:1.55;font-size:16px;color:#DEE3EE}}
   .cta li{{margin:5px 0}}
-  .cta .hook{{max-width:60ch;margin:0 auto 20px;padding:16px 18px;border-radius:11px;
-    background:rgba(224,105,31,.12);border:1px solid rgba(224,105,31,.5);
+  .cta .hook{{max-width:60ch;margin:0 auto 24px;padding:18px 20px;border-radius:8px;
+    background:rgba(166,38,38,.16);border:1px solid rgba(198,90,90,.55);
     font-size:17px;line-height:1.55;font-weight:600;color:#fff}}
-  .cta .hook .sc{{color:#f6a869;font-size:19px}}
+  .cta .hook.good{{background:rgba(58,118,189,.16);border-color:rgba(127,169,221,.5)}}
+  .cta .hook .sc{{color:#fff;font-size:19px;font-weight:700}}
   .cta .curi{{font-weight:600;color:#fff;font-size:16.5px}}
-  .cta .btnwrap{{text-align:center;margin-top:6px}}
-  .cta-btn{{display:inline-block;background:#e0691f;color:#fff;text-decoration:none;font-weight:600;
-    padding:15px 28px;border-radius:9px;font-size:16px}}
-  .cta-btn:hover{{background:#c65a15}}
-  .positioning{{margin-top:26px;padding:22px 24px;background:var(--ink);color:#dfe7e4;border-radius:14px;line-height:1.6;font-size:15px}}
+  .cta .btnwrap{{text-align:center;margin-top:8px}}
+  .cta-btn{{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
+    padding:16px 32px;border-radius:6px;font-size:16px}}
+  .cta-btn:hover{{background:var(--gold-h)}}
+  .positioning{{margin-top:32px;padding:24px;background:var(--navy);color:#DEE3EE;border-radius:16px;line-height:1.6;font-size:15px}}
   .positioning h4{{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 10px;color:#fff}}
-  .positioning b{{color:#9ec6f0}}
+  .positioning b{{color:var(--glow)}}
   .steps{{margin-top:26px;padding:26px 26px;background:var(--surface);border:1px solid var(--line);
     border-radius:14px}}
   .steps-h{{font-family:"Inter",sans-serif;font-size:23px;margin-bottom:6px;color:var(--ink)}}
@@ -251,20 +265,21 @@ PAGE = """<!doctype html><html lang="en"><head>
   .ben:before{{content:"\\2192  ";font-weight:700}}
   .steps-foot{{margin:8px 0 20px;font-weight:600;color:var(--ink);font-size:15px}}
   .steps .cta-btn{{margin-top:0}}
-  .taste{{background:var(--soft);border:1px solid #d4deec;border-left:5px solid var(--accent);
-    border-radius:12px;padding:22px 24px;margin:24px 0}}
+  .taste{{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:24px;margin:24px 0}}
   .taste .th{{font-family:"Inter",sans-serif;font-weight:700;font-size:18px;color:var(--ink);margin-bottom:16px}}
   .taste .grid{{display:grid;grid-template-columns:118px 1fr;gap:12px 16px;align-items:center}}
-  .taste .lbl{{font-size:12px;font-weight:700;color:#4a5560;line-height:1.3}}
-  .taste .lbl.b{{color:#e0691f}}
+  .taste .lbl{{font-size:12px;font-weight:700;color:#4A5560;line-height:1.3}}
+  .taste .lbl.b{{color:var(--accent-ink)}}
   .taste .cw{{font-style:italic;color:var(--ink);font-size:15.5px}}
-  .taste .bw{{background:#fff;border:1px solid #ecdfd2;border-left:4px solid #e0691f;border-radius:8px;
+  .taste .bw{{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
     padding:9px 13px;font-weight:600;color:var(--ink);font-size:16px}}
-  .taste .dvd{{grid-column:1/-1;height:1px;background:#cdd7e5;margin:2px 0}}
+  .taste .dvd{{grid-column:1/-1;height:1px;background:#C9D4E4;margin:2px 0}}
   .taste .kick{{margin-top:16px;font-weight:700;color:var(--accent-ink);font-size:16px}}
   .curi{{font-weight:600;color:var(--ink)}}
   .freegift{{margin-top:12px;font-size:14px;color:var(--muted)}}
-</style></head><body><div class="wrap">
+</style></head><body>
+<div class="hero-band"><div class="wrap">
   <div class="hero">
     {mascot}
     <div class="hero-copy">
@@ -285,26 +300,28 @@ PAGE = """<!doctype html><html lang="en"><head>
   </form>
   <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
   <!--PROGRESS-->
-  <div id="result">{result}</div>
-</div></body></html>"""
+</div></div>
+<div id="result">{result}</div>
+</body></html>"""
 
 # The live-progress overlay. Kept as a PLAIN string (real braces) and injected into PAGE after .format(), so its
 # CSS/JS braces don't collide with the template's format fields.
 PROGRESS_UI = """
 <style>
-  #processing{display:none;margin:26px 0 0;padding:28px 30px;border-radius:14px;
-    background:var(--surface);border:1px solid var(--line);box-shadow:0 8px 30px rgba(20,40,36,.06)}
+  #processing{display:none;margin:32px 0 0;padding:32px;border-radius:10px;
+    background:var(--navy-card);border:1px solid var(--navy-line)}
   #processing.on{display:block}
   #processing .angelo-loader{display:block;width:80px;height:auto;margin:0 auto 20px}
-  #processing h3{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 20px;color:var(--ink);text-align:center}
+  #processing h3{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 20px;color:var(--ivory);text-align:center}
   #processing ul{list-style:none;margin:0 0 18px;padding:0}
-  #processing li{padding:11px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.5}
+  #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.5;color:#D7DCE8}
+  #processing li b{color:#fff}
   #processing li:last-child{border-bottom:0}
   .ps-status{font-weight:700}
-  .ps-done{color:var(--good)}
-  .ps-progress{color:var(--accent-ink)}
-  .ps-waiting{color:var(--muted)}
-  #processing .p-note{font-size:13px;color:var(--muted);line-height:1.5;margin:0;font-style:italic}
+  .ps-done{color:var(--good-glow)}
+  .ps-progress{color:var(--glow)}
+  .ps-waiting{color:var(--ivory-dim)}
+  #processing .p-note{font-size:13px;color:var(--ivory-dim);line-height:1.5;margin:0;font-style:italic}
 </style>
 <div id="processing">
   <img class="angelo-loader" src="/angelo.png" alt="Angelo">
@@ -787,7 +804,7 @@ def render_result(res, first_name=""):
 
     if _mr_score >= 5:
         hook_html = (
-            f'<div class="hook">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading. '
+            f'<div class="hook good">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading. '
             f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
             f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
             f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
