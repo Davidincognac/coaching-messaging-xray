@@ -1002,7 +1002,7 @@ def render_result(res, first_name=""):
         <div class="steps-h">So how do you fix it?</div>
         <p>You have seen the problem. Here is the way out, step by step.</p>
         <ol class="steplist">
-          <li><b>We find out who is actually buying.</b> Not {avatar_eg}. We find the real person and the exact burning problem
+          <li><b>We find out what makes people want to invest in you.</b> Not {avatar_eg}. We find the real person and the exact burning problem
           they will pull out their wallet to fix. We go deep into your market: how they talk about the problem,
           how they buy, when they buy, and what finally makes them pay.
           <span class="ben">So you are talking to the people who actually buy, not a vague avatar.</span></li>
