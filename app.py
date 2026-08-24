@@ -14,7 +14,9 @@ import html
 import json as _json
 import os
 import re
+import ssl
 import threading
+import time
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs, quote as _url_quote
@@ -41,6 +43,15 @@ SCREENSHOTS_DIR = (
 )
 os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
 
+# urllib needs an explicit CA bundle on python.org macOS builds (their Python ships without system certs
+# wired in, so every https urlopen dies with CERTIFICATE_VERIFY_FAILED). certifi ships with requests,
+# which the audit engine already depends on, so it's always installed.
+try:
+    import certifi
+    _SSL_CTX = ssl.create_default_context(cafile=certifi.where())
+except Exception:
+    _SSL_CTX = ssl.create_default_context()
+
 def _screenshot_filename(domain: str) -> str:
     """Safe filename from a domain: strip protocol, keep alphanum/hyphen, collapse underscores."""
     clean = re.sub(r"https?://", "", domain).strip("/")
@@ -50,15 +61,23 @@ def _save_screenshot(domain: str) -> str:
     """Fetch a screenshot from microlink.io and write it to the screenshots folder.
     Returns the web-accessible path (/screenshots/<filename>) or, when the fetch fails but a
     previously saved PNG for this domain is still on disk, the path to that old image, so a
-    rate-limit blip never blanks a screenshot we already had. '' only when we have nothing."""
+    rate-limit blip never blanks a screenshot we already had. '' only when we have nothing.
+    A PNG younger than 24h (the audit-cache window) is reused WITHOUT calling microlink — the
+    anonymous tier is ~50 requests/day per IP, and refetching on every report view was burning
+    that quota, which is why screenshots 'randomly' went missing later in the day."""
     fname = _screenshot_filename(domain)
     web_path = "/screenshots/" + fname
     disk_path = os.path.join(SCREENSHOTS_DIR, fname)
     try:
+        if os.path.isfile(disk_path) and (time.time() - os.path.getmtime(disk_path)) < 24 * 3600:
+            return web_path
+    except Exception:
+        pass
+    try:
         encoded = _url_quote("https://" + domain, safe="")
         api_url = f"https://api.microlink.io/?url={encoded}&screenshot=true&embed=screenshot.url"
         req = urllib.request.Request(api_url, headers={"User-Agent": "CoachAudit/1.0"})
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=55, context=_SSL_CTX) as resp:
             img_bytes = resp.read()
         if not img_bytes or len(img_bytes) < 1000:
             # A tiny body is a microlink error payload (rate limit JSON etc.), not an image.
@@ -448,7 +467,7 @@ def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_fo
             },
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=10):
+        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX):
             pass
     except Exception:
         pass   # never let a MailerLite failure touch the audit result
@@ -1725,6 +1744,22 @@ class Handler(BaseHTTPRequestHandler):
             first_name = (qs.get("first_name", [""])[0]).strip()
             last_name = (qs.get("last_name", [""])[0]).strip()
             email = (qs.get("email", [""])[0]).strip()
+            # Start the microlink fetch IN PARALLEL with the audit: the audit takes 30-40s anyway, so the
+            # screenshot gets that whole window for free instead of bolting 30-55s onto the end. The
+            # prefetch needs the normalised domain before audit_url returns it, so it derives the same
+            # value via sm.norm_domain — same function, same result, same disk filename.
+            _shot_box = {}
+            _shot_thread = None
+            if url:
+                try:
+                    from audit import sm as _sm
+                    _predom = _sm.norm_domain(url) or ""
+                except Exception:
+                    _predom = ""
+                if _predom:
+                    _shot_thread = threading.Thread(
+                        target=lambda d=_predom: _shot_box.update(path=_save_screenshot(d)), daemon=True)
+                    _shot_thread.start()
             res = audit_url(url) if url else {}
             shot_path = ""
             if url and res.get("ok") and res.get("status") == "ok":
@@ -1733,7 +1768,12 @@ class Handler(BaseHTTPRequestHandler):
                 # before the DB). The microlink disk path slots straight into the same key, so ONE reliable
                 # image source feeds the report card AND the salespage. Playwright's base64 stays preferred
                 # when it exists; microlink is the fallback that stops the blank canvas.
-                shot_path = _save_screenshot(res.get("domain", url))
+                if _shot_thread is not None:
+                    _shot_thread.join(timeout=30)
+                shot_path = _shot_box.get("path") or ""
+                if not shot_path:
+                    # Prefetch failed or never ran — one serial retry before we render a placeholder.
+                    shot_path = _save_screenshot(res.get("domain", url))
                 if not res.get("thumbnail") and shot_path:
                     res["thumbnail"] = shot_path
             frag = render_result(res, first_name=first_name) if url else ""
@@ -1772,7 +1812,16 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(404); self.end_headers(); return
         qs = parse_qs(parsed.query)
         url = (qs.get("url", [""])[0]).strip()
-        result_html = render_result(audit_url(url)) if url else ""
+        result_html = ""
+        if url:
+            res = audit_url(url)
+            if res.get("ok") and res.get("status") == "ok" and not res.get("thumbnail"):
+                # Same microlink fallback as /audit — a refresh or shared link must never lock in the
+                # placeholder. Cheap on repeat views: _save_screenshot reuses a same-day PNG from disk.
+                _sp = _save_screenshot(res.get("domain", url))
+                if _sp:
+                    res["thumbnail"] = _sp
+            result_html = render_result(res, first_name=(qs.get("first_name", [""])[0]).strip())
         page = PAGE.format(url_value=html.escape(url, quote=True), result=result_html,
                            count=f"{websites_read_count():,}", mascot=mascot_img())
         self._send(page.replace("<!--PROGRESS-->", PROGRESS_UI))
