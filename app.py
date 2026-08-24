@@ -138,7 +138,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .wrap{{max-width:760px;margin:0 auto;padding:64px 24px 72px}}
   .hero-band{{background:var(--navy);color:var(--ivory)}}
   .serif{{font-family:"Inter",sans-serif}}
-  .eyebrow{{font-family:"Inter",sans-serif;font-size:11px;letter-spacing:.24em;
+  .eyebrow{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.24em;
     text-transform:uppercase;color:var(--ivory-dim);font-weight:600}}
   h1{{font-family:"Inter",sans-serif;font-weight:700;font-size:clamp(30px,6.5vw,52px);
     letter-spacing:-.025em;line-height:1.08;margin:.35em 0 .3em;color:#fff}}
@@ -157,7 +157,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   input[type=text]::placeholder,input[type=email]::placeholder{{color:var(--ivory-dim)}}
   input[type=text]:focus,input[type=email]:focus{{outline:2px solid var(--accent);border-color:var(--accent)}}
   button{{background:var(--gold);color:var(--navy);border:0;border-radius:6px;padding:16px 24px;
-    font-size:16px;font-weight:700;letter-spacing:.01em;cursor:pointer;margin-top:4px}}
+    font-family:inherit;font-size:16px;font-weight:700;letter-spacing:.01em;cursor:pointer;margin-top:4px}}
   button:hover{{background:var(--gold-h)}}
   .hint{{font-size:13px;color:var(--ivory-dim);margin-top:16px;line-height:1.6}}
   .hint b{{color:var(--glow)}}
@@ -174,14 +174,14 @@ PAGE = """<!doctype html><html lang="en"><head>
   .grade{{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);
     padding-bottom:18px;margin-bottom:20px}}
   .num{{font-family:var(--serif);font-size:72px;font-weight:650;letter-spacing:-.02em;line-height:1}}
-  .num.crit{{color:var(--critical)}} .num.warn{{color:var(--warn)}} .num.good{{color:var(--good)}}
+  .num.crit{{color:var(--critical)}} .num.warn{{color:#7A5A16}} .num.good{{color:var(--good)}}
   .den{{font-family:"Inter",sans-serif;color:var(--muted);font-size:15px}}
   .tier{{margin-left:auto;font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--muted)}}
   .barwrap{{padding:16px 0;border-top:1px solid var(--line)}}
   .barwrap:first-child{{border-top:0;padding-top:2px}}
   .barhead{{display:flex;align-items:baseline;justify-content:space-between;gap:16px}}
-  .lbl{{font-size:16.5px;font-weight:600;color:var(--ink);line-height:1.3}}
+  .lbl{{font-size:16px;font-weight:600;color:var(--ink);line-height:1.3}}
   .chip{{display:inline-block;font-weight:700;font-size:16px;padding:4px 12px;border-radius:8px;line-height:1.3}}
   .chip .den{{color:inherit;opacity:.65;font-weight:600;font-size:12px}}
   .chip.good{{background:#EDF5F0;color:var(--good)}}
@@ -190,7 +190,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .mark{{display:inline-block;width:22px}}
   .mark.ok::before{{content:"✓";color:var(--good);font-weight:700}}
   .mark.no::before{{content:"✗";color:var(--critical);font-weight:700}}
-  .mark.na::before{{content:"–";color:#9aa0a6;font-weight:700}}
+  .mark.na::before{{content:"–";color:var(--muted);font-weight:700}}
   .track{{height:8px;background:#ECEFF4;border-radius:6px;overflow:hidden;margin:12px 0 0}}
   .fill{{height:100%;border-radius:6px}}
   .fill.crit{{background:var(--critical)}} .fill.warn{{background:var(--warn)}} .fill.good{{background:var(--good)}}
@@ -223,7 +223,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;
     display:flex;align-items:center;justify-content:center;font-size:14px}}
   .verdict-note{{background:var(--soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
-    padding:16px 20px;font-family:var(--serif);font-style:italic;font-size:16.5px;line-height:1.6}}
+    padding:16px 20px;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.6}}
   .verdict-note p{{margin:0 0 10px}} .verdict-note p:last-child{{margin:0}}
   .diag h3+.row p:first-of-type::first-letter,.voice h4+p::first-letter{{font-family:var(--serif);
     float:left;font-size:52px;line-height:.85;padding:4px 8px 0 0;font-weight:600;color:var(--accent-ink)}}
@@ -234,7 +234,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
   .caveat p{{margin:0 0 10px}} .caveat p:last-child{{margin:0}}
-  .badge{{display:inline-block;font-family:"Inter",sans-serif;font-size:11px;
+  .badge{{display:inline-block;font-family:"Inter",sans-serif;font-size:12px;
     padding:3px 8px;border-radius:20px;background:var(--soft);color:var(--accent-ink);margin-left:8px}}
   .dead{{color:var(--critical);font-size:17px}}
   .err{{color:var(--critical)}}
@@ -246,11 +246,11 @@ PAGE = """<!doctype html><html lang="en"><head>
   .ev .q{{font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.5;color:var(--ink);
     border-left:3px solid var(--accent);padding-left:16px;margin:10px 0}}
   .ev .meta{{font-size:13px;color:var(--muted);margin-top:6px}}
-  .ev .tag{{display:inline-block;font-family:"Inter",sans-serif;font-size:11px;padding:2px 8px;
+  .ev .tag{{display:inline-block;font-family:"Inter",sans-serif;font-size:12px;padding:2px 8px;
     border-radius:20px;margin:4px 6px 0 0}}
   .tag.no{{background:#F5E9E9;color:var(--critical)}} .tag.yes{{background:var(--soft);color:var(--accent-ink)}}
   .tag.neutral{{background:#EEF0F4;color:var(--muted)}}
-  .analysed{{font-family:var(--serif);font-size:clamp(19px,2.8vw,23px);line-height:1.5;
+  .analysed{{font-family:var(--serif);font-size:clamp(19px,2.8vw,21px);line-height:1.5;
     margin:0 0 22px;padding-bottom:20px;border-bottom:1px solid var(--line)}}
   .analysed p{{margin:0 0 14px}} .analysed p:last-child{{margin:0}}
   .analysed b{{color:var(--accent-ink)}}
@@ -273,7 +273,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .reveal.crit{{border-top-color:var(--critical)}}
   .reveal .h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
     color:var(--muted);margin-bottom:10px}}
-  .verdict{{font-family:var(--serif);font-size:20px;line-height:1.45}}
+  .verdict{{font-family:var(--serif);font-size:19px;line-height:1.45}}
   .strength{{background:#EDF5F0;border:1px solid #CBE2D6;border-radius:10px;padding:14px 18px;margin:18px 0;
     font-size:14px}}
   .strength b{{color:var(--good)}}
@@ -285,7 +285,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     letter-spacing:.14em;color:var(--accent-ink);background:transparent;border:1px solid var(--accent);
     font-weight:700;margin:0 0 12px;padding:5px 14px;border-radius:20px}}
   .thumb{{width:100%;border-radius:8px;border:1px solid var(--line);margin-bottom:14px;display:block}}
-  .q.sm{{font-size:15.5px}}
+  .q.sm{{font-size:16px}}
   .fault{{margin-top:14px;padding:14px 16px;background:#F8EEEE;border:1px solid #E3CACA;border-radius:8px;
     font-size:14px;line-height:1.55}}
   .fault b{{color:var(--critical)}}
@@ -298,13 +298,13 @@ PAGE = """<!doctype html><html lang="en"><head>
     border-radius:0 12px 12px 0;padding:36px 32px;margin:0;line-height:1.65;font-size:16px;
     box-shadow:0 1px 3px rgba(11,19,43,.08)}}
   @media(max-width:560px){{.voice{{padding:26px 18px}}}}
-  .voice h4{{font-family:var(--serif);font-size:23px;font-weight:600;margin:0 0 14px;color:var(--accent-ink)}}
+  .voice h4{{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 14px;color:var(--accent-ink)}}
   .voice b{{color:var(--accent-ink)}}
   .voice.good{{border-left-color:var(--good)}}
   .voice.good h4{{color:var(--good)}}
   .voice p{{margin:0 0 12px}} .voice p:last-child{{margin:0}}
   .checks{{margin-top:14px;display:flex;flex-direction:column;gap:2px}}
-  .checks .h{{font-family:"Inter",sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  .checks .h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
     color:var(--muted);margin-bottom:8px}}
   .check{{font-size:14px;padding:6px 0;padding-left:26px;position:relative}}
   .check::before{{position:absolute;left:0;font-weight:700}}
@@ -314,9 +314,9 @@ PAGE = """<!doctype html><html lang="en"><head>
     line-height:1.55;color:var(--ink)}}
   .cta{{margin-top:32px;padding:40px 32px;background:var(--navy);color:var(--ivory);border-radius:16px;text-align:left}}
   @media(max-width:560px){{.cta{{padding:28px 20px}}}}
-  .cta-h{{font-family:var(--serif);font-size:27px;font-weight:600;color:#fff;margin-bottom:16px;text-align:center}}
-  .cta p{{max-width:60ch;margin:0 auto 16px;line-height:1.65;font-size:16px;color:#DEE3EE}}
-  .cta ul{{max-width:60ch;margin:0 auto 16px;padding-left:24px;line-height:1.55;font-size:16px;color:#DEE3EE}}
+  .cta-h{{font-family:var(--serif);font-size:25px;font-weight:600;color:#fff;margin-bottom:16px;text-align:center}}
+  .cta p{{max-width:60ch;margin:0 auto 16px;line-height:1.65;font-size:16px;color:var(--ivory)}}
+  .cta ul{{max-width:60ch;margin:0 auto 16px;padding-left:24px;line-height:1.55;font-size:16px;color:var(--ivory)}}
   .cta li{{margin:5px 0}}
   .cta .hook{{max-width:60ch;margin:0 auto 24px;padding:18px 20px;border-radius:8px;
     background:rgba(166,38,38,.16);border:1px solid rgba(198,90,90,.55);
@@ -326,12 +326,12 @@ PAGE = """<!doctype html><html lang="en"><head>
   .cta .hook .hl{{color:#F0B9B4}}
   .cta .hook.good .hl{{color:var(--glow)}}
   .cta .hook .hl .sc{{color:inherit}}
-  .cta .curi{{font-weight:600;color:#fff;font-size:16.5px}}
+  .cta .curi{{font-weight:600;color:#fff;font-size:17px}}
   .cta .btnwrap{{text-align:center;margin-top:8px}}
   .cta-btn{{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
     padding:16px 32px;border-radius:6px;font-size:16px}}
   .cta-btn:hover{{background:var(--gold-h)}}
-  .positioning{{margin-top:32px;padding:24px;background:var(--navy);color:#DEE3EE;border-radius:16px;line-height:1.6;font-size:15px}}
+  .positioning{{margin-top:32px;padding:24px;background:var(--navy);color:var(--ivory);border-radius:16px;line-height:1.6;font-size:15px}}
   .positioning h4{{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 10px;color:#fff}}
   .positioning b{{color:var(--glow)}}
   .steps{{margin-top:26px;padding:26px 26px;background:var(--surface);border:1px solid var(--line);
@@ -339,23 +339,23 @@ PAGE = """<!doctype html><html lang="en"><head>
   .steps-h{{font-family:var(--serif);font-size:25px;font-weight:600;margin-bottom:6px;color:var(--ink)}}
   .steps>p{{color:var(--muted);font-size:15px;margin:0 0 16px}}
   .steplist{{margin:0;padding:0;list-style:none;counter-reset:step}}
-  .steplist li{{position:relative;padding:0 0 16px 46px;margin:0;line-height:1.55;font-size:15.5px}}
+  .steplist li{{position:relative;padding:0 0 16px 46px;margin:0;line-height:1.55;font-size:16px}}
   .steplist li:before{{counter-increment:step;content:counter(step);position:absolute;left:0;top:0;
     width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;
     display:flex;align-items:center;justify-content:center;font-size:15px}}
   .steplist li b{{color:var(--accent-ink)}}
-  .ben{{display:block;margin-top:6px;color:var(--accent-ink);font-weight:600;font-size:14.5px}}
+  .ben{{display:block;margin-top:6px;color:var(--accent-ink);font-weight:600;font-size:15px}}
   .ben:before{{content:"\\2192  ";font-weight:700}}
   .steps-foot{{margin:8px 0 20px;font-weight:600;color:var(--ink);font-size:15px}}
   .steps .cta-btn{{margin-top:0}}
   .taste{{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
     border-radius:0 10px 10px 0;padding:24px;margin:24px 0}}
   .taste{{margin:0}}
-  .taste .th{{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--ink);margin-bottom:16px}}
+  .taste .th{{font-family:var(--serif);font-weight:600;font-size:21px;color:var(--ink);margin-bottom:16px}}
   .taste .grid{{display:grid;grid-template-columns:118px 1fr;gap:12px 16px;align-items:center}}
-  .taste .lbl{{font-size:12px;font-weight:700;color:#4A5560;line-height:1.3}}
+  .taste .lbl{{font-size:12px;font-weight:700;color:var(--muted);line-height:1.3}}
   .taste .lbl.b{{color:var(--accent-ink)}}
-  .taste .cw{{font-style:italic;color:var(--ink);font-size:15.5px}}
+  .taste .cw{{font-style:italic;color:var(--ink);font-size:16px}}
   .taste .bw{{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
     padding:9px 13px;font-weight:600;color:var(--ink);font-size:16px}}
   .taste .dvd{{grid-column:1/-1;height:1px;background:#C9D4E4;margin:2px 0}}
@@ -399,9 +399,9 @@ PROGRESS_UI = """
     background:var(--navy-card);border:1px solid var(--navy-line)}
   #processing.on{display:block}
   #processing .angelo-loader{display:block;width:80px;height:auto;margin:0 auto 20px}
-  #processing h3{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 20px;color:var(--ivory);text-align:center}
+  #processing h3{font-family:"Inter",sans-serif;font-size:21px;margin:0 0 20px;color:var(--ivory);text-align:center}
   #processing ul{list-style:none;margin:0 0 18px;padding:0}
-  #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.5;color:#D7DCE8}
+  #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.5;color:var(--ivory)}
   #processing li b{color:#fff}
   #processing li:last-child{border-bottom:0}
   .ps-status{font-weight:700}
