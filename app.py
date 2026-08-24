@@ -122,7 +122,9 @@ PAGE = """<!doctype html><html lang="en"><head>
 <title>The Coaching Website Report Card</title>
 <style>
   @font-face{{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}}
+  @font-face{{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}}
   :root{{
+    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
     --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
     --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
     --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
@@ -165,9 +167,13 @@ PAGE = """<!doctype html><html lang="en"><head>
   .card{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:32px;
     box-shadow:0 1px 3px rgba(11,19,43,.08);margin-top:28px}}
   @media(max-width:560px){{.card{{padding:24px 18px}}}}
+  .report>*+*{{margin-top:28px}}
+  .sec{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08)}}
+  @media(max-width:560px){{.sec{{padding:26px 18px}}}}
   .grade{{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);
     padding-bottom:18px;margin-bottom:20px}}
-  .num{{font-family:"Inter",sans-serif;font-size:56px;font-weight:600;letter-spacing:-.03em;line-height:1}}
+  .num{{font-family:var(--serif);font-size:72px;font-weight:650;letter-spacing:-.02em;line-height:1}}
   .num.crit{{color:var(--critical)}} .num.warn{{color:var(--warn)}} .num.good{{color:var(--good)}}
   .den{{font-family:"Inter",sans-serif;color:var(--muted);font-size:15px}}
   .tier{{margin-left:auto;font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.12em;
@@ -175,7 +181,12 @@ PAGE = """<!doctype html><html lang="en"><head>
   .barwrap{{padding:16px 0;border-top:1px solid var(--line)}}
   .barwrap:first-child{{border-top:0;padding-top:2px}}
   .barhead{{display:flex;align-items:baseline;justify-content:space-between;gap:16px}}
-  .lbl{{font-size:15.5px;font-weight:600;color:var(--ink);line-height:1.3}}
+  .lbl{{font-size:16.5px;font-weight:600;color:var(--ink);line-height:1.3}}
+  .chip{{display:inline-block;font-weight:700;font-size:16px;padding:4px 12px;border-radius:8px;line-height:1.3}}
+  .chip .den{{color:inherit;opacity:.65;font-weight:600;font-size:12px}}
+  .chip.good{{background:#EDF5F0;color:var(--good)}}
+  .chip.warn{{background:#F8F3E7;color:#7A5A16}}
+  .chip.crit{{background:#F8EEEE;color:var(--critical)}}
   .mark{{display:inline-block;width:22px}}
   .mark.ok::before{{content:"✓";color:var(--good);font-weight:700}}
   .mark.no::before{{content:"✗";color:var(--critical);font-weight:700}}
@@ -188,13 +199,15 @@ PAGE = """<!doctype html><html lang="en"><head>
   .vs .den{{font-weight:600;color:var(--muted);font-size:13px}}
   .vs .mkt{{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:3px}}
   .def{{font-size:13px;color:var(--muted);margin:12px 0 0;line-height:1.5;max-width:64ch}}
-  .barnote{{font-size:14px;color:var(--ink);margin:7px 0 0;line-height:1.55;max-width:62ch}}
-  .scores-h{{font-size:15px;color:var(--muted);line-height:1.55;margin:30px 0 18px;max-width:62ch}}
+  .barnote{{font-size:15px;color:var(--ink);margin:8px 0 0;line-height:1.6;max-width:62ch}}
+  .scores-h{{font-family:var(--serif);font-size:19px;color:var(--ink);line-height:1.55;margin:0 0 8px;max-width:58ch}}
   .honest{{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);
     padding-top:14px}}
-  .diag{{margin-top:24px;border-top:1px solid var(--line);padding-top:20px}}
-  .diag h3{{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 12px}}
-  .diag .row{{margin:10px 0}}
+  .diag{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08);margin:0;line-height:1.65}}
+  @media(max-width:560px){{.diag{{padding:26px 18px}}}}
+  .diag h3{{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 16px}}
+  .diag .row{{margin:18px 0}}
   .diag .k{{font-family:"Inter",sans-serif;font-size:11px;letter-spacing:.1em;
     text-transform:uppercase;color:var(--accent-ink);font-weight:600}}
   .diag ul{{margin:6px 0 0;padding-left:20px}} .diag li{{margin:4px 0}}
@@ -207,16 +220,18 @@ PAGE = """<!doctype html><html lang="en"><head>
   .dead{{color:var(--critical);font-size:17px}}
   .err{{color:var(--critical)}}
   .pctl{{font-family:"Inter",sans-serif;font-size:13px;color:var(--accent-ink);font-weight:600}}
-  .ev{{background:#F7F8FA;border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:20px 0}}
-  .ev .h{{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:14px}}
-  .ev .q{{font-family:"Inter",sans-serif;font-style:italic;font-size:16px;color:var(--ink);
-    border-left:3px solid var(--accent);padding-left:12px;margin:8px 0}}
+  .ev{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08);margin:0}}
+  @media(max-width:560px){{.ev{{padding:26px 18px}}}}
+  .ev .h{{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);line-height:1.4;margin-bottom:18px}}
+  .ev .q{{font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.5;color:var(--ink);
+    border-left:3px solid var(--accent);padding-left:16px;margin:10px 0}}
   .ev .meta{{font-size:13px;color:var(--muted);margin-top:6px}}
   .ev .tag{{display:inline-block;font-family:"Inter",sans-serif;font-size:11px;padding:2px 8px;
     border-radius:20px;margin:4px 6px 0 0}}
   .tag.no{{background:#F5E9E9;color:var(--critical)}} .tag.yes{{background:var(--soft);color:var(--accent-ink)}}
   .tag.neutral{{background:#EEF0F4;color:var(--muted)}}
-  .analysed{{font-family:"Inter",sans-serif;font-size:clamp(17px,2.6vw,21px);line-height:1.42;
+  .analysed{{font-family:var(--serif);font-size:clamp(19px,2.8vw,23px);line-height:1.5;
     margin:0 0 22px;padding-bottom:20px;border-bottom:1px solid var(--line)}}
   .analysed b{{color:var(--accent-ink)}}
   .reframe{{background:var(--soft);color:var(--ink);border-left:4px solid var(--accent);
@@ -229,10 +244,15 @@ PAGE = """<!doctype html><html lang="en"><head>
   .checklist li{{margin:5px 0;font-size:14px;break-inside:avoid}}
   .checklist .foot{{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:14px}}
   @media(max-width:560px){{.checklist ul{{columns:1}}}}
-  .reveal{{margin-top:32px;padding:24px;background:#F6F7F9;border:1px solid var(--line);border-radius:12px}}
+  .reveal{{margin:0;padding:36px 32px;background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08);border-top:4px solid var(--line)}}
+  @media(max-width:560px){{.reveal{{padding:26px 18px}}}}
+  .reveal.good{{border-top-color:var(--good)}}
+  .reveal.warn{{border-top-color:var(--warn)}}
+  .reveal.crit{{border-top-color:var(--critical)}}
   .reveal .h{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
     color:var(--muted);margin-bottom:10px}}
-  .verdict{{font-family:"Inter",sans-serif;font-size:17px;line-height:1.4}}
+  .verdict{{font-family:var(--serif);font-size:20px;line-height:1.45}}
   .strength{{background:#EDF5F0;border:1px solid #CBE2D6;border-radius:10px;padding:14px 18px;margin:18px 0;
     font-size:14px}}
   .strength b{{color:var(--good)}}
@@ -244,7 +264,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     letter-spacing:.14em;color:var(--accent-ink);background:transparent;border:1px solid var(--accent);
     font-weight:700;margin:0 0 12px;padding:5px 14px;border-radius:20px}}
   .thumb{{width:100%;border-radius:8px;border:1px solid var(--line);margin-bottom:14px;display:block}}
-  .q.sm{{font-size:14px}}
+  .q.sm{{font-size:15.5px}}
   .fault{{margin-top:14px;padding:14px 16px;background:#F8EEEE;border:1px solid #E3CACA;border-radius:8px;
     font-size:14px;line-height:1.55}}
   .fault b{{color:var(--critical)}}
@@ -253,11 +273,13 @@ PAGE = """<!doctype html><html lang="en"><head>
   .pricing b{{color:#7A5A16}}
   .media{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:14px 18px;margin:0 0 20px;
     font-size:14px;line-height:1.5}}
-  .voice{{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
-    border-radius:0 10px 10px 0;padding:22px 24px;margin:24px 0;line-height:1.6;font-size:15px}}
-  .voice h4{{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 10px;color:var(--accent-ink)}}
+  .voice{{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:0 12px 12px 0;padding:36px 32px;margin:0;line-height:1.65;font-size:16px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08)}}
+  @media(max-width:560px){{.voice{{padding:26px 18px}}}}
+  .voice h4{{font-family:var(--serif);font-size:23px;font-weight:600;margin:0 0 14px;color:var(--accent-ink)}}
   .voice b{{color:var(--accent-ink)}}
-  .voice.good{{background:#EDF5F0;border-color:#CBE2D6;border-left-color:var(--good)}}
+  .voice.good{{border-left-color:var(--good)}}
   .voice.good h4{{color:var(--good)}}
   .voice p{{margin:0 0 12px}} .voice p:last-child{{margin:0}}
   .checks{{margin-top:14px;display:flex;flex-direction:column;gap:2px}}
@@ -271,7 +293,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     line-height:1.55;color:var(--ink)}}
   .cta{{margin-top:32px;padding:40px 32px;background:var(--navy);color:var(--ivory);border-radius:16px;text-align:left}}
   @media(max-width:560px){{.cta{{padding:28px 20px}}}}
-  .cta-h{{font-family:"Inter",sans-serif;font-size:24px;font-weight:700;color:#fff;margin-bottom:16px;text-align:center}}
+  .cta-h{{font-family:var(--serif);font-size:27px;font-weight:600;color:#fff;margin-bottom:16px;text-align:center}}
   .cta p{{max-width:60ch;margin:0 auto 16px;line-height:1.65;font-size:16px;color:#DEE3EE}}
   .cta ul{{max-width:60ch;margin:0 auto 16px;padding-left:24px;line-height:1.55;font-size:16px;color:#DEE3EE}}
   .cta li{{margin:5px 0}}
@@ -290,7 +312,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .positioning b{{color:var(--glow)}}
   .steps{{margin-top:26px;padding:26px 26px;background:var(--surface);border:1px solid var(--line);
     border-radius:14px}}
-  .steps-h{{font-family:"Inter",sans-serif;font-size:23px;margin-bottom:6px;color:var(--ink)}}
+  .steps-h{{font-family:var(--serif);font-size:25px;font-weight:600;margin-bottom:6px;color:var(--ink)}}
   .steps>p{{color:var(--muted);font-size:15px;margin:0 0 16px}}
   .steplist{{margin:0;padding:0;list-style:none;counter-reset:step}}
   .steplist li{{position:relative;padding:0 0 16px 46px;margin:0;line-height:1.55;font-size:15.5px}}
@@ -304,7 +326,8 @@ PAGE = """<!doctype html><html lang="en"><head>
   .steps .cta-btn{{margin-top:0}}
   .taste{{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
     border-radius:0 10px 10px 0;padding:24px;margin:24px 0}}
-  .taste .th{{font-family:"Inter",sans-serif;font-weight:700;font-size:18px;color:var(--ink);margin-bottom:16px}}
+  .taste{{margin:0}}
+  .taste .th{{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--ink);margin-bottom:16px}}
   .taste .grid{{display:grid;grid-template-columns:118px 1fr;gap:12px 16px;align-items:center}}
   .taste .lbl{{font-size:12px;font-weight:700;color:#4A5560;line-height:1.3}}
   .taste .lbl.b{{color:var(--accent-ink)}}
@@ -315,6 +338,9 @@ PAGE = """<!doctype html><html lang="en"><head>
   .taste .kick{{margin-top:16px;font-weight:700;color:var(--accent-ink);font-size:16px}}
   .curi{{font-weight:600;color:var(--ink)}}
   .freegift{{margin-top:12px;font-size:14px;color:var(--muted)}}
+  .report>.cta,.report>.steps,.report>.strength,.report>.pricing,.report>.media,.report>.scope,
+  .report>.checklist{{margin-top:28px;margin-bottom:0}}
+  .report>*:first-child{{margin-top:0}}
 </style></head><body>
 <div class="hero-band"><div class="wrap">
   <div class="hero">
@@ -794,7 +820,7 @@ def render_result(res, first_name=""):
         rows.append(
             f'<div class="barwrap"><div class="barhead">'
             f'<div class="lbl"><span class="mark {mark}"></span>{html.escape(LABELS[k])}</div>'
-            f'<div class="vs"><b>{c["you"]}</b><span class="den">/10</span>'
+            f'<div class="vs"><span class="chip {sev_class(c["you"])}">{c["you"]}<span class="den">/10</span></span>'
             f'<span class="mkt">{_mkt}</span></div></div>'
             f'<div class="track"><div class="fill {sev_class(c["you"])}" style="width:{pct}%"></div></div>'
             f'<div class="def">{_def}</div>'
@@ -826,7 +852,7 @@ def render_result(res, first_name=""):
     )
 
     score_reveal = (
-        '<div class="reveal"><div class="h"><span class="secnum">5 / 5</span>Your overall score</div>'
+        f'<div class="reveal {g}"><div class="h"><span class="secnum">5 / 5</span>Your overall score</div>'
         '<div class="grade">'
         f'<div class="num {g}">{res.get("score_10_display", res["score_10"])}<span class="den">/10</span></div>'
         f'<div><div class="verdict">{verdict}</div>'
@@ -855,16 +881,20 @@ def render_result(res, first_name=""):
             f'is the whole game.</div>'
         )
 
-    return f"""<div class="card" data-sites="{cnt}">
+    return f"""<div class="report" data-sites="{cnt}">
+      <div class="sec">
       {opener}
       {reframe}
       {checklist_html}
+      </div>
       {scope}
       {media}
       {popup}
       {evidence_html}
+      <div class="sec">
       <div class="scores-h"><span class="secnum">2 / 5</span>Here are your scores, with the reason behind each one. A green tick means it's working for you. A red cross means it's costing you clients.</div>
       <div>{''.join(rows)}</div>
+      </div>
       <div class="diag">
         <h3><span class="secnum">3 / 5</span>What a visitor sees{ai}</h3>
         <div class="row"><div class="k">The biggest thing in the way</div>{emph(html.escape(cr['headline_problem']))}</div>
@@ -1689,7 +1719,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
-        if path in ("/angelo.png", "/inter.woff2"):
+        if path in ("/angelo.png", "/inter.woff2", "/serif.woff2"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
