@@ -117,8 +117,10 @@ _DOMAINS_FILE = os.path.join(HERE, "analysed_domains.txt")   # only stores domai
 _domain_lock = threading.Lock()
 _domain_set = None
 
+_corpus_seeded = False   # True when the benchmark CSV was on disk and seeded the set
+
 def _load_domains():
-    global _domain_set
+    global _domain_set, _corpus_seeded
     if _domain_set is not None:
         return _domain_set
     s = set()
@@ -128,6 +130,7 @@ def _load_domains():
                 d = str(row.get("domain", "")).strip().lower()
                 if d:
                     s.add(d)
+        _corpus_seeded = len(s) > 0
     except Exception:
         pass
     # Read the live-audit domains file; deduplicate it in place if it has accumulated duplicate lines
@@ -166,8 +169,13 @@ def record_domain(domain):
                 pass
 
 def websites_read_count():
+    """The living 'X coaching websites read' number. When the benchmark CSV is on disk (local dev),
+    the domain set already holds the whole corpus, so its size IS the count. On deploys without the
+    CSV (Render), the set holds only the domains audited since, so add the corpus size as a constant.
+    Never both — adding 11008 on top of a corpus-seeded set double-counted to ~22,000."""
     with _domain_lock:
-        return 11008 + len(_load_domains())
+        s = _load_domains()
+        return len(s) if _corpus_seeded else 11008 + len(s)
 
 # ---------------------------------------------------------------- evidence ("we actually read your site")
 def _clean(x):

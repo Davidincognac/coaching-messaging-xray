@@ -1680,6 +1680,27 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         strength_html = (f'<div class="strength">&#10003; <b>What you&rsquo;re doing right:</b> '
                          f'{html.escape(data["strength"])}</div>')
 
+    # Softer opener for low scorers (David's rule + his copy): under 5 there is no "brutal",
+    # the average is framed as within reach, and the low score as easier to improve. 5 and up
+    # keeps the original opener. An unparseable score gets the soft version — it is safe for
+    # everyone, the harsh one is only right for a page that can take it.
+    try:
+        _sc_num = float((data or {}).get("score_10_display") or score)
+    except (TypeError, ValueError):
+        _sc_num = 0.0
+    if _sc_num <= 4.9:
+        opener_html = (
+            f'<p class="ff-body">Hi {fn}. It&rsquo;s never nice having a low score, we remember what '
+            f'that was like at school. Your {page_word} text scored <strong class="ff-score">{sc}/10</strong>.</p>'
+            f'<p class="ff-body">To give you the bigger picture, the average is {MARKET_AVG_10} out of ten, '
+            f'so you are only a few steps away from improving yours. Remember this, it&rsquo;s easier to '
+            f'improve when the score is lower, and we are here to help you do that today.</p>')
+    else:
+        opener_html = (
+            f'<p class="ff-body">Hello {fn}. Your {page_word} text scored <strong class="ff-score">{sc}/10</strong>. '
+            f'For context: across the {cnt} coaching homepages we have read, the average score is {MARKET_AVG_10} '
+            f'out of 10, and the top 10% score {TOP10_10} or higher.</p>')
+
     # Beckoning Angelo: the bubble in the artwork is blank; the words are HTML overlaid on it
     # (same pattern as the report's _angelo_speaks), so the line is personalised per coach.
     # fn is never empty here — the handler falls back to "Coach" — but guard anyway.
@@ -1704,9 +1725,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
     <div class="first-fold-inner">
       <div class="ff-left">
-        <p class="ff-body">Hello {fn}. Your {page_word} text scored a brutal <strong class="ff-score">{sc}/10</strong>.
-        For context: across the {cnt} coaching homepages we have read, the average score is {MARKET_AVG_10} out of 10,
-        and the top 10% score {TOP10_10} or higher.</p>
+        {opener_html}
         <p class="ff-body"><strong>Your words do not match the thoughts already inside your client&rsquo;s head.</strong></p>
         <p class="ff-body">Look closely at your screenshot on the right. When people get a low score, they usually try to change their website layout, fix their fonts, or rewrite their sentences. That is a mistake.</p>
         <p class="ff-body">The real problem is not how your page looks. The problem is that your words talk about you and what you do, instead of talking about what your client is already thinking.</p>
@@ -1721,7 +1740,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
     {hook_html}
     <div class="ff-bridge">
-      <p>That happens because of a data problem, not a design problem. This page is going to show you exactly what the data problem is, and what fixes it.</p>
+      <p>That is not a design problem. The words on the page are yours, not your buyer&rsquo;s. The rest of this page shows you where their words come from, and what changes when you use them.</p>
     </div>
   </div>
 
