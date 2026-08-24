@@ -215,6 +215,21 @@ PAGE = """<!doctype html><html lang="en"><head>
   .diag .k::before{{content:"";width:18px;height:4px;background:var(--accent);border-radius:2px;flex-shrink:0}}
   .diag ul{{margin:6px 0 0;padding-left:20px}} .diag li{{margin:0 0 14px}}
   .diag li p{{margin:0 0 8px}} .diag li p:last-child{{margin-bottom:0}}
+  .diag .row+.row{{border-top:1px solid var(--line);padding-top:26px}}
+  .fixlist{{margin:6px 0 0;padding:0;list-style:none;counter-reset:fix}}
+  .fixlist li{{position:relative;padding:0 0 18px 44px;margin:0}}
+  .fixlist li:last-child{{padding-bottom:0}}
+  .fixlist li::before{{counter-increment:fix;content:counter(fix);position:absolute;left:0;top:0;
+    width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:14px}}
+  .verdict-note{{background:var(--soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
+    padding:16px 20px;font-family:var(--serif);font-style:italic;font-size:16.5px;line-height:1.6}}
+  .verdict-note p{{margin:0 0 10px}} .verdict-note p:last-child{{margin:0}}
+  .diag h3+.row p:first-of-type::first-letter,.voice h4+p::first-letter{{font-family:var(--serif);
+    float:left;font-size:52px;line-height:.85;padding:4px 8px 0 0;font-weight:600;color:var(--accent-ink)}}
+  .qchip{{display:inline-block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600}}
+  .voice .statpane{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}}
   .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
     border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
@@ -780,11 +795,12 @@ def render_result(res, first_name=""):
             '<b>expert to buyer</b>.</p>'
             f'<p>Picture the person you help, lying awake at night, worried. <b>What do they type into Google?</b> Probably '
             f'not &lsquo;{first_coach}&rsquo;. More likely something real. A career coach\'s buyer might type '
-            '&ldquo;I keep getting passed over at work&rdquo;. A health coach\'s buyer might type &ldquo;why am I '
-            'tired all the time&rdquo;. Your buyer has their own version, in their own words.</p>'
+            '<span class="qchip">&ldquo;I keep getting passed over at work&rdquo;</span>. A health coach\'s buyer might type '
+            '<span class="qchip">&ldquo;why am I tired all the time&rdquo;</span>. '
+            'Your buyer has their own version, in their own words.</p>'
             '<p>You talk like the expert who fixed the problem. They talk like someone who still has it. Those are two '
             'different languages.</p>'
-            f'<p>And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
+            f'<p class="statpane">And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
             '<b>1 in 8</b> use their customer\'s words. The other <b>88%</b> sound just like this page does.</p>'
             '<p>That\'s good news for you. Nearly every coach sounds the same, so people can\'t tell them apart. Use '
             'the words your customers actually use, and <b>you stand out straight away</b>. You become <b>the coach who '
@@ -925,8 +941,8 @@ def render_result(res, first_name=""):
         <h3><span class="secnum">3 / 5</span>What a visitor sees{ai}</h3>
         <div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr['headline_problem']))}</div>
         <div class="row"><div class="k">What it's costing you</div>{para_split(cr['why_it_costs_clients'])}</div>
-        <div class="row"><div class="k">The obvious fixes</div><ul>{fixes}</ul>{FIXES_CAVEAT}</div>
-        <div class="row"><div class="k">Bottom line</div>{para_split(cr['money_left_on_table'])}</div>
+        <div class="row"><div class="k">The obvious fixes</div><ol class="fixlist">{fixes}</ol>{FIXES_CAVEAT}</div>
+        <div class="row"><div class="k">Bottom line</div><div class="verdict-note">{para_split(cr['money_left_on_table'])}</div></div>
       </div>
       {strength_html}
       {pricing_html}
