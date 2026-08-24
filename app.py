@@ -243,7 +243,12 @@ PAGE = """<!doctype html><html lang="en"><head>
   @media(max-width:560px){{.sec-angelo{{width:76px}}}}
   .mi-img{{display:block;width:min(300px,72%);height:auto;margin:0 auto 18px;
     filter:drop-shadow(0 8px 20px rgba(0,0,0,.4))}}
-  .cta-angelo{{display:block;width:min(380px,88%);height:auto;margin:28px auto 0}}
+  .cta-angelo-wrap{{position:relative;display:block;width:min(400px,90%);margin:28px auto 0;
+    container-type:inline-size}}
+  .cta-angelo{{display:block;width:100%;height:auto}}
+  .bubble-txt{{position:absolute;left:8%;top:14%;width:33%;height:23%;display:flex;
+    align-items:center;justify-content:center;text-align:center;font-weight:700;color:#141414;
+    font-size:13px;font-size:3.7cqw;line-height:1.25}}
   .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
     border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
@@ -906,6 +911,17 @@ def render_result(res, first_name=""):
           else '<span class="badge">add API key for AI</span>')
     # Greet the coach by name when the form gave us one. Falls back cleanly to the old opener.
     _greet = f'{html.escape(first_name.strip())}, we' if first_name.strip() else 'We'
+    # Beckoning Angelo: the bubble in the artwork is blank; the words are HTML overlaid on it, so
+    # each placement speaks its own personalised line (clean fallback when we have no name).
+    _fn = html.escape(first_name.strip()) if first_name.strip() else ""
+    # Personalised gold button in the pitch block (David): Angelo-voice, coach's name in the label.
+    _mid_btn = (f'{_fn}, let me show you what a buyer actually wants &rarr;' if _fn
+                else 'Let me show you what a buyer actually wants &rarr;')
+    _bub_end = (f'Come on, {_fn}. Let me show you.' if _fn else 'Come on. Let me show you.')
+    def _angelo_speaks(text, href):
+        return (f'<a class="cta-angelo-wrap" href="{href}">'
+                f'<img class="cta-angelo" src="/angelo_cta.png" alt="Angelo: {text}">'
+                f'<span class="bubble-txt">{text}</span></a>')
     opener = (f'<div class="analysed"><p>{_greet} can tell in a few seconds what a cold buyer thinks when they arrive on your '
               f'page. We\'ve watched it go right and wrong on thousands of coaching sites.</p>'
               f'<p>We looked at '
@@ -1025,7 +1041,7 @@ def render_result(res, first_name=""):
         need it. If you want that edge, this is where it comes from.</p>
         <p class="curi">There's one thing your buyer wants that you've never put into words. It's the reason they pick
         one coach over another.</p>
-        <div class="btnwrap"><a class="cta-btn" href="{_offer_href}">Show me what my buyer actually wants &rarr;</a></div>
+        <div class="btnwrap"><a class="cta-btn" href="{_offer_href}">{_mid_btn}</a></div>
       </div>
       <div class="steps">
         <div class="steps-h">So how do you fix it?</div>
@@ -1046,8 +1062,7 @@ def render_result(res, first_name=""):
         </ol>
         <p class="steps-foot">When your marketing sounds like your buyer, more of the right people get in touch, and more of them buy. More clients, the right ones, and the growth to reach your next level.</p>
         <a class="cta-btn" href="{_offer_href}">{steps_btn}</a>
-        <a href="{_offer_href}"><img class="cta-angelo" src="/angelo_cta.png"
-          alt="Angelo: Come on. Let me show you."></a>
+        {_angelo_speaks(_bub_end, _offer_href)}
       </div>
     </div>"""
 
