@@ -47,8 +47,12 @@ import score_all as S           # CRITERIA + helpers
 AUDIT_MODEL = os.getenv("AUDIT_MODEL", "claude-sonnet-4-6")
 
 # --- market benchmarks, from our full run of 10,954 live sites (strict scoring) ---
+# SINGLE SOURCE OF TRUTH for every market stat quoted anywhere (prompts, fallback copy, report).
+# When the corpus is re-benchmarked, update HERE and the display copy in app.py together.
 MARKET_AVG_10 = 3.7
 TOP10_10 = 5.6
+PCT_FAIL_5SEC = 86          # % of corpus failing the five-second test
+BUYER_VOICE_1_IN = 8        # "only about 1 in N speak their buyer's language"
 BENCH = {
     "clarity_5sec": 4.5, "specificity": 4.4, "symptom_resonance": 3.2,
     "proof_cred": 2.6, "offer_clarity": 3.0, "next_step": 3.8,
@@ -1567,6 +1571,9 @@ def ai_analyse(row, scores, score_10, ev=None):
     except ImportError:
         return None
     ev = ev or {}
+    # RULEBOOK §0: never claim "homepage" when a subpage was audited. audit_url stamps the right word
+    # into ev["page_word"]; every scoping instruction below uses it so the AI's own wording stays honest.
+    pw = ev.get("page_word", "homepage")
     # Only the AI-SCORED criteria go in the rubric-to-score list. specificity + clarity are extracted as FLAGS instead.
     rubric_txt = "\n".join(f"- {LABELS[k]} ({k}): {_AI_RUBRIC[k]}" for k in AI_SCORE_CRIT)
     # Copy the AI reads. clean_text strips nav/menu noise, but on some markup it over-strips and leaves almost
@@ -1597,7 +1604,7 @@ def ai_analyse(row, scores, score_10, ev=None):
         f"H1 tag (what Google reads): {row.get('h1_tag') or row.get('h1') or '(none found)'}\n"
         f"Sub-headings: {str(row.get('h2_headings'))[:400]}\n"
         f"Main CTA text: {row.get('cta_text') or '(none)'}\n"
-        f"Testimonials ON the homepage: {'yes' if row.get('testimonial_text') else 'no'}\n"
+        f"Testimonials ON the page: {'yes' if row.get('testimonial_text') else 'no'}\n"
         f"Proof linked off-page (spotted, not visited): {row.get('proof_link_labels') or 'none'}\n"
         f"Client/'worked with' logo strip detected on the page: {'yes' if has_logos else 'no'}\n"
         f"The logo strip is headed: {row.get('logo_heading') or '(no heading captured)'} "
@@ -1618,11 +1625,11 @@ def ai_analyse(row, scores, score_10, ev=None):
         f"and the top 10% score {TOP10_10}+. Score THIS page on its own merits, not relative to that."
     )
     prompt = (
-        "You are diagnosing ONE coach's HOMEPAGE (homepage only, so scope everything to 'your "
-        "homepage', never 'your site'). Your job: extract structured flags for all 8 criteria by reading the ACTUAL "
+        f"You are diagnosing ONE PAGE of a coach's website, their {pw} (that one page only, so scope everything "
+        f"to 'your {pw}', never 'your site'). Your job: extract structured flags for all 8 criteria by reading the ACTUAL "
         "page copy below, then write the diagnosis. Judge exactly what a cold buyer would perceive, be strict and "
         "honest, no benefit of the doubt for things that aren't there.\n"
-        "You are given a FULL-PAGE SCREENSHOT of the homepage as well as the text. USE THE SCREENSHOT to judge "
+        "You are given a FULL-PAGE SCREENSHOT of the page as well as the text. USE THE SCREENSHOT to judge "
         "anything visual, a client logo strip, an 'as seen on' media row (TV networks, big publications), named "
         "client logos (companies, universities), video testimonials, headshots, design and hierarchy. Read the "
         "logos and media names you can see and weigh them: recognised TV networks / national media / well-known "
@@ -1702,7 +1709,7 @@ def ai_analyse(row, scores, score_10, ev=None):
         "is_micro_commitment = true if there is a clearly visible low-friction first step (a free resource to "
         "download, a quiz, a checklist, a short video series they can start without booking a call).\n"
         "shield_flags: guarantee_present = true if any money-back guarantee, refund policy, or explicit risk "
-        "reversal is mentioned on the homepage; safety_net_quote = verbatim quote of the guarantee or risk-reversal "
+        "reversal is mentioned on the page; safety_net_quote = verbatim quote of the guarantee or risk-reversal "
         "language (empty string if none).\n\n"
         f"THE PAGE'S ON-PAGE TEXT LINES (biggest first, pick the headline from here):\n{cand_txt}\n\n"
         f"FACTS:\n{facts}\n\n"
@@ -1714,7 +1721,7 @@ def ai_analyse(row, scores, score_10, ev=None):
         "(4) a sharp bottom line. Frame everything as how a cold BUYER perceives them in the first few seconds, "
         "this is marketing and buyer psychology, not a website-quality checklist. The deeper problem is almost "
         "always the same: they don't understand their buyer well enough. Only claim what the copy supports; if a "
-        "signal is missing say 'we didn't spot X on your homepage', never a flat 'you have no X'.\n"
+        f"signal is missing say 'we didn't spot X on your {pw}', never a flat 'you have no X'.\n"
         "DO NOT INVENT DETAILS YOU CAN'T VERIFY (two specific traps): (1) TESTIMONIAL ATTRIBUTION, describe only what "
         "is actually there. If a testimonial shows NO name, say 'anonymous, no name attached', do NOT claim 'first "
         "names only' or 'full names' or 'with photos' unless you can actually see them; getting this wrong is a "
@@ -1845,6 +1852,10 @@ def rule_critique(row, scores, score_10, ev):
                    f'not estimation. But that’s the shape to aim for.')
     else:
         problem = HOMEPAGE_PROBLEMS.get(worst_key, "").capitalize() + "."
+    # RULEBOOK §0: the templates say "your homepage"; swap the word when a subpage was audited.
+    _pw = ev.get("page_word", "homepage")
+    if _pw != "homepage":
+        problem = problem.replace("your homepage", f"your {_pw}")
 
     # Build fixes as actions; collapse the clarity/specificity pair (same root) into one.
     fix_keys, seen_who = [], False
@@ -1857,14 +1868,16 @@ def rule_critique(row, scores, score_10, ev):
         if len(fix_keys) >= 3:
             break
     fixes = [HOMEPAGE_FIXES.get(k, f"Strengthen your {LABELS.get(k, k).lower()}.") for k in fix_keys]
+    if _pw != "homepage":
+        fixes = [f.replace("your homepage", f"your {_pw}") for f in fixes]
 
     return {
         "headline_problem": problem,
         "why_it_costs_clients": (
             "A visitor makes up their mind in seconds. If your page doesn't quickly show you can fix their problem, "
-            "they click away and try another coach. The average coaching homepage we scored is just 3.7 out of 10, and "
-            "86% fail this basic five-second test. That's where you lose clients, before a single enquiry ever "
-            "comes in."
+            f"they click away and try another coach. The average coaching homepage we scored is just {MARKET_AVG_10} "
+            f"out of 10, and {PCT_FAIL_5SEC}% fail this basic five-second test. That's where you lose clients, "
+            "before a single enquiry ever comes in."
         ),
         "top_fixes": fixes,
         "money_left_on_table": (
@@ -2167,9 +2180,15 @@ def audit_url(url):
     # audit — new text, new screenshot, new score — instead of last month's verdict locked in forever.
     # Uses a local import so audit.py stays usable in standalone corpus-scoring contexts where storage.py
     # may not be present. Any failure (missing module, corrupt JSON, unexpected schema) falls through silently.
+    # CACHE COLLISION GUARD: the cache is keyed by DOMAIN, and a domain's stored record is its HOMEPAGE
+    # audit. A subpage request (…/about) must NOT be served the homepage's cached result — bypass the
+    # cache entirely for subpage audits (they're rare, always fresh, and never saved over the homepage).
+    _req_path = re.sub(r"^https?://", "", str(url).strip(), flags=re.I)
+    _req_path = re.sub(r"^www\.", "", _req_path, flags=re.I).rstrip("/")
+    _req_is_home = ("/" not in _req_path)
     try:
         from storage import get_audit as _get_cached
-        _row = _get_cached(domain)
+        _row = _get_cached(domain) if _req_is_home else None
         if _row and _row.get("raw_json"):
             # updated_at is stored as datetime.utcnow().isoformat(); an unparseable/missing stamp = treat as stale.
             _fresh = False
@@ -2237,6 +2256,8 @@ def audit_url(url):
 
     scores, total_100, score_10 = score_site(row)
     ev = build_evidence(row)
+    # RULEBOOK §0: stamp the honest scope word once; ai_analyse and rule_critique both read it.
+    ev["page_word"] = "homepage" if is_home else "page"
     _caps = ev.get("captures") or {}
     total_100 = S.weighted_total(scores); score_10 = round(total_100 / 10)
 

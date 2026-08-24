@@ -230,6 +230,14 @@ PAGE = """<!doctype html><html lang="en"><head>
   .qchip{{display:inline-block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600}}
   .voice .statpane{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}}
+  .verdict-img{{float:right;width:132px;height:auto;border-radius:10px;border:1px solid var(--line);
+    margin:0 0 12px 16px}}
+  @media(max-width:560px){{.verdict-img{{width:100px;margin-left:12px}}}}
+  .sec-angelo{{float:right;width:120px;height:auto;border-radius:10px;border:1px solid var(--line);
+    margin:0 0 10px 16px}}
+  @media(max-width:560px){{.sec-angelo{{width:90px;margin-left:12px}}}}
+  .mi-img{{display:block;width:min(280px,70%);height:auto;margin:0 auto 18px;border-radius:12px;
+    border:1px solid var(--navy-line)}}
   .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
     border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
@@ -398,7 +406,8 @@ PROGRESS_UI = """
   #processing{display:none;margin:32px 0 0;padding:32px;border-radius:10px;
     background:var(--navy-card);border:1px solid var(--navy-line)}
   #processing.on{display:block}
-  #processing .angelo-loader{display:block;width:80px;height:auto;margin:0 auto 20px}
+  #processing .angelo-loader{display:block;width:170px;height:auto;margin:0 auto 20px;border-radius:10px;
+    border:1px solid var(--navy-line)}
   #processing h3{font-family:"Inter",sans-serif;font-size:21px;margin:0 0 20px;color:var(--ivory);text-align:center}
   #processing ul{list-style:none;margin:0 0 18px;padding:0}
   #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.5;color:var(--ivory)}
@@ -411,7 +420,7 @@ PROGRESS_UI = """
   #processing .p-note{font-size:13px;color:var(--ivory-dim);line-height:1.5;margin:0;font-style:italic}
 </style>
 <div id="processing">
-  <img class="angelo-loader" src="/angelo.png" alt="Angelo">
+  <img class="angelo-loader" src="/angelo_typing.png" alt="Angelo at work">
   <h3>Angelo is actively analyzing your homepage copy&hellip;</h3>
   <ul>
     <li><b>Step 1:</b> Calibrating secure pipeline data and initializing target network links&hellip; <span class="ps-status ps-done" id="ps1">[DONE]</span></li>
@@ -788,6 +797,7 @@ def render_result(res, first_name=""):
 
     evidence_html = (
         f'<div class="ev"><div class="h"><span class="secnum">1 / 5</span>What we read on your {_page_word}: {html.escape(ev.get("page_display") or ev["domain"])}</div>'
+        f'<img class="sec-angelo" src="/angelo_reading.png" alt="Angelo reading your page">'
         f'{thumb}{quotes}</div>'
     )
 
@@ -905,8 +915,15 @@ def render_result(res, first_name=""):
         + '</ul><div class="foot">Read on for what we found, your <b>overall score is at the very bottom.</b></div></div>'
     )
 
+    # Angelo's verdict image (David's rule): under 5 = thumbs down, 5-6 = unsure, 7+ = thumbs up.
+    try:
+        _sd = float(res.get("score_10_display", res["score_10"]) or 0)
+    except (TypeError, ValueError):
+        _sd = float(res["score_10"])
+    _verdict_img = ("angelo_down.png" if _sd < 5 else "angelo_unsure.png" if _sd < 7 else "angelo_up.png")
     score_reveal = (
         f'<div class="reveal {g}"><div class="h"><span class="secnum">5 / 5</span>Your overall score</div>'
+        f'<img class="verdict-img" src="/{_verdict_img}" alt="Angelo&rsquo;s verdict">'
         '<div class="grade">'
         f'<div class="num {g}">{res.get("score_10_display", res["score_10"])}<span class="den">/10</span></div>'
         f'<div><div class="verdict">{verdict}</div>'
@@ -986,6 +1003,7 @@ def render_result(res, first_name=""):
         <p>So here's what we make you: a <b>Marketing Intelligence File</b>. In plain English, it's everything we can
         find out about the person you're really selling to, pulled from thousands of real buyers, not just the handful
         you've worked with:</p>
+        <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
         <ul>
           <li>the exact words your {niche_word}use for their problem</li>
           <li>the fears that hold them back</li>
@@ -1773,7 +1791,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
-        if path in ("/angelo.png", "/inter.woff2", "/serif.woff2"):
+        if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
+                    "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
@@ -1854,13 +1873,16 @@ class Handler(BaseHTTPRequestHandler):
                 # every refresh reuse it for free, no third-party call, no quota. Microlink is only
                 # the fallback for runs where Playwright produced no image (heavy sites, low-RAM
                 # containers) — and _save_screenshot itself reuses a same-day PNG before refetching.
-                shot_path = _save_playwright_shot(res.get("domain", url), res.get("thumbnail", ""))
+                _shot_key = res.get("page_display") or res.get("domain", url)   # subpages get their own PNG
+                shot_path = _save_playwright_shot(_shot_key, res.get("thumbnail", ""))
                 if not shot_path:
-                    shot_path = _save_screenshot(res.get("domain", url))
+                    shot_path = _save_screenshot(_shot_key)
                 if not res.get("thumbnail") and shot_path:
                     res["thumbnail"] = shot_path
             frag = render_result(res, first_name=first_name) if url else ""
-            if url and res.get("ok") and res.get("status") == "ok":
+            # Subpage audits are never SAVED: the DB record for a domain is its homepage audit (the
+            # salespage and email funnel key off it), and a subpage result must not overwrite that.
+            if url and res.get("ok") and res.get("status") == "ok" and res.get("is_home", True):
                 # Strip the thumbnail before serialising — a base64 blob is huge, and a /screenshots/ path
                 # is re-injected fresh on every request anyway, so the stored JSON never needs it.
                 storable = {k: v for k, v in res.items() if k != "thumbnail"}
@@ -1901,7 +1923,7 @@ class Handler(BaseHTTPRequestHandler):
             if res.get("ok") and res.get("status") == "ok" and not res.get("thumbnail"):
                 # Same microlink fallback as /audit — a refresh or shared link must never lock in the
                 # placeholder. Cheap on repeat views: _save_screenshot reuses a same-day PNG from disk.
-                _sp = _save_screenshot(res.get("domain", url))
+                _sp = _save_screenshot(res.get("page_display") or res.get("domain", url))
                 if _sp:
                     res["thumbnail"] = _sp
             result_html = render_result(res, first_name=(qs.get("first_name", [""])[0]).strip())
