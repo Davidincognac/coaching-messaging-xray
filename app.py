@@ -599,6 +599,11 @@ def render_result(res, first_name=""):
     niche_word = f'{_niche_clients} '   # "life coaching clients " / "clients " — used as "the real words your {…}use"
     steps_btn = (f'Show me how it works for {html.escape(_niche)} coaches &rarr;' if _niche
                  else 'Show me how it&rsquo;d work for me &rarr;')
+    # Carry the coach's identity into the offer page. The domain is the DB key to everything we saved
+    # (name, score, tokens, screenshot), so as long as it rides in the URL, every page downstream can
+    # look the full record up — no other parameters needed.
+    _offer_href = ("/offer?domain=" + _url_quote(res.get("domain", ""), safe="")
+                   if res.get("domain") else "/offer")
 
     # scope: make it unmistakable we looked at the homepage only, + date
     scope = (f'<div class="scope">{html.escape(res["scope_note"])} '
@@ -856,7 +861,7 @@ def render_result(res, first_name=""):
         need it. If you want that edge, this is where it comes from.</p>
         <p class="curi">There's one thing your buyer wants that you've never put into words. It's the reason they pick
         one coach over another.</p>
-        <div class="btnwrap"><a class="cta-btn" href="/offer">Show me what my buyer actually wants &rarr;</a></div>
+        <div class="btnwrap"><a class="cta-btn" href="{_offer_href}">Show me what my buyer actually wants &rarr;</a></div>
       </div>
       <div class="steps">
         <div class="steps-h">So how do you fix it?</div>
@@ -876,7 +881,7 @@ def render_result(res, first_name=""):
           <span class="ben">So everything you put out pulls the same way, not a different message in every place.</span></li>
         </ol>
         <p class="steps-foot">When your marketing sounds like your buyer, more of the right people get in touch, and more of them buy. More clients, the right ones, and the growth to reach your next level.</p>
-        <a class="cta-btn" href="/offer">{steps_btn}</a>
+        <a class="cta-btn" href="{_offer_href}">{steps_btn}</a>
       </div>
     </div>"""
 
@@ -922,7 +927,7 @@ OFFER_PAGE = """<!doctype html><html lang="en"><head>
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
     --paper:#0e1614;--surface:#16211e;--ink:#e9efec;--muted:#93a29d;--line:#243430;--soft:#16302b;
     --accent:#6ba6e0;--accent-ink:#9ec6f0;}}
-</style></head><body><div class="wrap">
+</style></head><body data-domain="__DOMAIN__"><div class="wrap">
   <a class="back" href="/">&larr; Back to your free audit</a>
   <div class="eyebrow">The Marketing Intelligence File</div>
   <h1>Your buyers are already telling you exactly what to say. You just can't hear it yet.</h1>
@@ -1640,7 +1645,11 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(404); self.end_headers()
             return
         if path == "/offer":
-            self._send(OFFER_PAGE)
+            # The report card links here as /offer?domain=… — the DB key to everything we saved about
+            # this coach. Stamp it into <body data-domain> so the checkout wiring (and any onward link
+            # to the salespage) can pick it up without a second lookup. No domain = plain generic page.
+            _dom = (parse_qs(parsed.query).get("domain", [""])[0]).strip()
+            self._send(OFFER_PAGE.replace("__DOMAIN__", html.escape(_dom, quote=True)))
             return
         if path == "/salespage":
             qs = parse_qs(parsed.query)
