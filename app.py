@@ -713,8 +713,13 @@ def render_result(res, first_name=""):
                  f'who want to grow&rdquo;' if _niche else 'the vague avatar every coach gets handed')
     # Tie the file to the EXACT hole this page has: their weakest message score + their niche. Turns the CTA from
     # a generic upsell into "here's the fix for the specific wound we just showed you".
+    # DAVID'S HOOK RULE: praise is earned, not defaulted. The candidates below are the criteria a Marketing
+    # Intelligence File genuinely fixes. If ANY of them sits at 5/10 or under, the hook must name the weakest
+    # one — never compliment Mind Reading while the page has a real message hole. The positive Mind-Reading
+    # hook only shows when every candidate is 6+, i.e. there is truly nothing weak to point at.
     _HOLE = {"specificity": "who it's for", "clarity_5sec": "a stranger getting it in five seconds",
-             "offer_clarity": "showing what you actually fix", "story": "connecting with the reader"}
+             "offer_clarity": "showing what you actually fix",
+             "symptom_resonance": "describing the problem in your buyer's own words"}
     _sc = res.get("scores", {})
     _weak = min(_HOLE, key=lambda k: _sc.get(k, 99))
     hole_phrase, hole_score = _HOLE[_weak], _sc.get(_weak, 0)
@@ -911,7 +916,7 @@ def render_result(res, first_name=""):
         'What you do about it is up to you.</div></div>'
     )
 
-    if _mr_score >= 5:
+    if hole_score > 5:
         hook_html = (
             f'<div class="hook good"><span class="hl">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading.</span> '
             f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
@@ -998,8 +1003,8 @@ def render_result(res, first_name=""):
         <p>You have seen the problem. Here is the way out, step by step.</p>
         <ol class="steplist">
           <li><b>We find out who is actually buying.</b> Not {avatar_eg}. We find the real person and the exact burning problem
-          they will pull out their wallet to fix. We pull this data by deep-diving into 11,384 real professional
-          profiles and tracking over 2,000 specific books people are actively purchasing right now to solve their pain.
+          they will pull out their wallet to fix. We go deep into your market: how they talk about the problem,
+          how they buy, when they buy, and what finally makes them pay.
           <span class="ben">So you are talking to the people who actually buy, not a vague avatar.</span></li>
           <li><b>We uncover how your market lives and buys.</b> We do not estimate. Our research maps out exactly
           how your target audience describes their day, what empty promises they are tired of hearing, and the exact
