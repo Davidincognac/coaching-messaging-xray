@@ -46,17 +46,19 @@ import score_all as S           # CRITERIA + helpers
 #     Intelligence File. Override via env AUDIT_MODEL. ---
 AUDIT_MODEL = os.getenv("AUDIT_MODEL", "claude-sonnet-4-6")
 
-# --- market benchmarks, from our full run of 10,954 live sites (strict scoring) ---
+# --- market benchmarks ---
 # SINGLE SOURCE OF TRUTH for every market stat quoted anywhere (prompts, fallback copy, report).
-# When the corpus is re-benchmarked, update HERE and the display copy in app.py together.
-MARKET_AVG_10 = 3.7
-TOP10_10 = 5.6
-PCT_FAIL_5SEC = 86          # % of corpus failing the five-second test
-BUYER_VOICE_1_IN = 8        # "only about 1 in N speak their buyer's language"
+# Re-benchmarked 2026-08-24 under the CURRENT flag-judge scoring model: 150-site random sample
+# of the corpus scored through the exact live pipeline (text-only), voice stats from a
+# 2,000-site rule-based sweep. The old numbers came from the retired keyword scorer.
+MARKET_AVG_10 = 4.5
+TOP10_10 = 5.7
+PCT_FAIL_5SEC = 83          # % of corpus failing the five-second test (clarity < 6)
+BUYER_VOICE_1_IN = 14       # "only about 1 in N speak their buyer's language" (93% don't)
 BENCH = {
-    "clarity_5sec": 4.5, "specificity": 4.4, "symptom_resonance": 3.2,
-    "proof_cred": 2.6, "offer_clarity": 3.0, "next_step": 3.8,
-    "friction": 4.5, "shield": 2.5,
+    "clarity_5sec": 3.9, "specificity": 5.2, "symptom_resonance": 4.7,
+    "proof_cred": 3.0, "offer_clarity": 6.3, "next_step": 3.8,
+    "friction": 5.8, "shield": 3.2,
 }
 LABELS = {
     "clarity_5sec": "Fast Grab (5-Second Hook)",
@@ -1531,8 +1533,9 @@ def ai_critique(row, scores, score_10):
         "checklist. Make clear the surface issue is a symptom of a deeper problem: they don't understand their buyer "
         "well enough. Write plainly, like a 12-year-old could follow it. Plain everyday words, natural length (NOT "
         "chopped into tiny sentences). No jargon, no buzzwords, no em dashes. We are built on accuracy, not guesswork. "
-        "You may cite our data: of 10,955 coaching sites, the average homepage scores just 3.7/10, 86% fail the "
-        "five-second test, and only about 1 in 8 speak their buyer's language (the rest talk expert-to-expert). "
+        f"You may cite our data: of {websites_read_count():,} coaching sites, the average homepage scores just "
+        f"{MARKET_AVG_10}/10, {PCT_FAIL_5SEC}% fail the five-second test, and only about 1 in {BUYER_VOICE_1_IN} "
+        "speak their buyer's language (the rest talk expert-to-expert). "
         "Rules: Quote their actual headline or wording back at least once so they know you really read their page. "
         "Only claim what the analysis supports, if a signal is 'none found', say 'we didn't spot X on your homepage', "
         "never a flat 'you have no X' (it might be elsewhere on the site). Do NOT treat hidden pricing as a mistake, "

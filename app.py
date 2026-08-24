@@ -27,7 +27,10 @@ try:
 except ImportError:
     pass
 
-from audit import audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count  # the engine we built
+from audit import (audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count,   # the engine we built
+                   PCT_FAIL_5SEC, BUYER_VOICE_1_IN)   # market stats: single source of truth in audit.py
+# "1 in 14 speak their buyer's language" => the other 93%. Derived, so the pair can never disagree.
+PCT_NOT_BUYER_VOICE = 100 - round(100 / BUYER_VOICE_1_IN)
 from storage import save_audit, get_audit
 
 PORT = int(os.getenv("PORT", "8000"))
@@ -230,14 +233,14 @@ PAGE = """<!doctype html><html lang="en"><head>
   .qchip{{display:inline-block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600}}
   .voice .statpane{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}}
-  .verdict-img{{float:right;width:132px;height:auto;border-radius:10px;border:1px solid var(--line);
-    margin:0 0 12px 16px}}
+  .verdict-img{{float:right;width:136px;aspect-ratio:1;object-fit:cover;border-radius:50%;
+    border:2px solid var(--accent);box-shadow:0 0 0 5px var(--soft);margin:4px 6px 12px 16px}}
   @media(max-width:560px){{.verdict-img{{width:100px;margin-left:12px}}}}
-  .sec-angelo{{float:right;width:120px;height:auto;border-radius:10px;border:1px solid var(--line);
-    margin:0 0 10px 16px}}
-  @media(max-width:560px){{.sec-angelo{{width:90px;margin-left:12px}}}}
-  .mi-img{{display:block;width:min(280px,70%);height:auto;margin:0 auto 18px;border-radius:12px;
-    border:1px solid var(--navy-line)}}
+  .sec-angelo{{float:right;width:116px;aspect-ratio:1;object-fit:cover;border-radius:50%;
+    border:2px solid var(--accent);box-shadow:0 0 0 5px var(--soft);margin:4px 6px 10px 16px}}
+  @media(max-width:560px){{.sec-angelo{{width:88px;margin-left:12px}}}}
+  .mi-img{{display:block;width:min(300px,72%);height:auto;margin:0 auto 18px;
+    filter:drop-shadow(0 8px 20px rgba(0,0,0,.4))}}
   .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
     border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
@@ -382,8 +385,8 @@ PAGE = """<!doctype html><html lang="en"><head>
       <h1 class="serif">Coaches: in five seconds, does your website say &ldquo;I can fix your problem&rdquo;?</h1>
       <p class="sub"><b>That's all the time a cold buyer gives you.</b> If they don't see it, they leave, and you
       never even know they came. Paste your coaching website in and in about half a minute Angelo shows you what that
-      cold buyer sees, why they stay or go, and how you score against <b>{count}</b> other coaching sites. Almost 9 in 10
-      get it wrong. (86.4%, for those who like it exact.)</p>
+      cold buyer sees, why they stay or go, and how you score against <b>{count}</b> other coaching sites. More than 8 in 10
+      get it wrong. (83%, for those who like it exact.)</p>
     </div>
   </div>
   <form method="get" action="/" id="auditform">
@@ -406,8 +409,8 @@ PROGRESS_UI = """
   #processing{display:none;margin:32px 0 0;padding:32px;border-radius:10px;
     background:var(--navy-card);border:1px solid var(--navy-line)}
   #processing.on{display:block}
-  #processing .angelo-loader{display:block;width:170px;height:auto;margin:0 auto 20px;border-radius:10px;
-    border:1px solid var(--navy-line)}
+  #processing .angelo-loader{display:block;width:150px;aspect-ratio:1;object-fit:cover;margin:0 auto 20px;
+    border-radius:50%;border:2px solid var(--accent);box-shadow:0 0 0 5px rgba(58,118,189,.18)}
   #processing h3{font-family:"Inter",sans-serif;font-size:21px;margin:0 0 20px;color:var(--ivory);text-align:center}
   #processing ul{list-style:none;margin:0 0 18px;padding:0}
   #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.5;color:var(--ivory)}
@@ -827,7 +830,7 @@ def render_result(res, first_name=""):
             '<p>You talk like the expert who fixed the problem. They talk like someone who still has it. Those are two '
             'different languages.</p>'
             f'<p class="statpane">And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
-            '<b>1 in 8</b> use their customer\'s words. The other <b>88%</b> sound just like this page does.</p>'
+            f'<b>1 in {BUYER_VOICE_1_IN}</b> use their customer\'s words. The other <b>{PCT_NOT_BUYER_VOICE}%</b> sound just like this page does.</p>'
             '<p>That\'s good news for you. Nearly every coach sounds the same, so people can\'t tell them apart. Use '
             'the words your customers actually use, and <b>you stand out straight away</b>. You become <b>the coach who '
             'understands them</b>.</p>'
@@ -846,8 +849,8 @@ def render_result(res, first_name=""):
             '<div class="voice good"><h4><span class="secnum">4 / 5</span>You\'re speaking your buyer\'s language</h4>'
             f'<p>Here\'s something you\'re doing well. Your {_page_word} talks about the problem in words your customer '
             'would actually use, not just coach words.</p>'
-            f'<p>That\'s rarer than you\'d think. Of the {cnt} coaching sites we scored, only about 1 in 8 do this. The '
-            'other 88% talk like the expert. You sound more like the person with the problem, and <b>that\'s a real edge</b>. '
+            f'<p>That\'s rarer than you\'d think. Of the {cnt} coaching sites we scored, only about 1 in {BUYER_VOICE_1_IN} do this. The '
+            f'other {PCT_NOT_BUYER_VOICE}% talk like the expert. You sound more like the person with the problem, and <b>that\'s a real edge</b>. '
             'Keep using the real words your clients say.</p></div>')
     else:
         voice_html = (
@@ -912,7 +915,7 @@ def render_result(res, first_name=""):
                '<p>A stranger arrives on your page. In a few seconds they decide one thing about you: '
                '<b>&ldquo;can this person fix my problem?&rdquo;</b> If the answer isn\'t a clear yes, they leave. '
                'And you never even knew they were there.</p>'
-               f'<p>We read {cnt} coaching homepages, and <b>86% fail that '
+               f'<p>We read {cnt} coaching homepages, and <b>{PCT_FAIL_5SEC}% fail that '
                'test.</b> The checks below show what\'s going wrong. The real reason is simpler: '
                '<b>the words on your page aren\'t the words your buyer uses in their own head.</b></p></div>')
     checklist_html = (
