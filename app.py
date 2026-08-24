@@ -200,6 +200,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .vs .mkt{{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:3px}}
   .def{{font-size:13px;color:var(--muted);margin:12px 0 0;line-height:1.5;max-width:64ch}}
   .barnote{{font-size:15px;color:var(--ink);margin:8px 0 0;line-height:1.6;max-width:62ch}}
+  .barnote p{{margin:0 0 10px}} .barnote p:last-child{{margin:0}}
   .scores-h{{font-family:var(--serif);font-size:19px;color:var(--ink);line-height:1.55;margin:0 0 8px;max-width:58ch}}
   .honest{{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.55;border-top:1px solid var(--line);
     padding-top:14px}}
@@ -207,10 +208,13 @@ PAGE = """<!doctype html><html lang="en"><head>
     box-shadow:0 1px 3px rgba(11,19,43,.08);margin:0;line-height:1.65}}
   @media(max-width:560px){{.diag{{padding:26px 18px}}}}
   .diag h3{{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 16px}}
-  .diag .row{{margin:18px 0}}
-  .diag .k{{font-family:"Inter",sans-serif;font-size:11px;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--accent-ink);font-weight:600}}
-  .diag ul{{margin:6px 0 0;padding-left:20px}} .diag li{{margin:4px 0}}
+  .diag .row{{margin:26px 0}}
+  .diag .row p{{margin:0 0 10px}} .diag .row p:last-child{{margin-bottom:0}}
+  .diag .k{{display:flex;align-items:center;gap:9px;font-family:"Inter",sans-serif;font-size:13px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin:0 0 10px}}
+  .diag .k::before{{content:"";width:18px;height:4px;background:var(--accent);border-radius:2px;flex-shrink:0}}
+  .diag ul{{margin:6px 0 0;padding-left:20px}} .diag li{{margin:0 0 14px}}
+  .diag li p{{margin:0 0 8px}} .diag li p:last-child{{margin-bottom:0}}
   .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
     border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
@@ -220,8 +224,8 @@ PAGE = """<!doctype html><html lang="en"><head>
   .dead{{color:var(--critical);font-size:17px}}
   .err{{color:var(--critical)}}
   .pctl{{font-family:"Inter",sans-serif;font-size:13px;color:var(--accent-ink);font-weight:600}}
-  .ev{{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;
-    box-shadow:0 1px 3px rgba(11,19,43,.08);margin:0}}
+  .ev{{background:var(--surface);border:1.5px solid var(--accent);border-radius:12px;padding:36px 32px;
+    box-shadow:0 0 0 5px var(--soft),0 1px 3px rgba(11,19,43,.08);margin:0}}
   @media(max-width:560px){{.ev{{padding:26px 18px}}}}
   .ev .h{{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);line-height:1.4;margin-bottom:18px}}
   .ev .q{{font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.5;color:var(--ink);
@@ -302,6 +306,9 @@ PAGE = """<!doctype html><html lang="en"><head>
     font-size:17px;line-height:1.55;font-weight:600;color:#fff}}
   .cta .hook.good{{background:rgba(58,118,189,.16);border-color:rgba(127,169,221,.5)}}
   .cta .hook .sc{{color:#fff;font-size:19px;font-weight:700}}
+  .cta .hook .hl{{color:#F0B9B4}}
+  .cta .hook.good .hl{{color:var(--glow)}}
+  .cta .hook .hl .sc{{color:inherit}}
   .cta .curi{{font-weight:600;color:#fff;font-size:16.5px}}
   .cta .btnwrap{{text-align:center;margin-top:8px}}
   .cta-btn{{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
@@ -531,6 +538,25 @@ def emph(escaped_html):
             escaped_html = escaped_html.replace(p, "<b>" + p + "</b>")
     return escaped_html
 
+# Long AI-written blocks can run 7+ lines deep as one wall of text. David's readability rule: after
+# ~4 lines there must be a gap. At our ~62ch measure, 4 lines ≈ 260 characters, so regroup whole
+# sentences into <p> chunks under that budget. Words are untouched — only paragraph breaks added.
+_SENT_RE = re.compile(r"(?<=[.!?])\s+")
+def para_split(text, max_chars=260):
+    text = (text or "").strip()
+    if not text:
+        return ""
+    chunks, cur = [], ""
+    for s in _SENT_RE.split(text):
+        if cur and len(cur) + len(s) + 1 > max_chars:
+            chunks.append(cur)
+            cur = s
+        else:
+            cur = (cur + " " + s).strip()
+    if cur:
+        chunks.append(cur)
+    return "".join(f"<p>{html.escape(c)}</p>" for c in chunks)
+
 # What we check, plain, buyer-focused, so they know it's quick and what's coming
 CHECKLIST = [
     "Whether it's instantly clear <b>who you help</b>",
@@ -750,9 +776,9 @@ def render_result(res, first_name=""):
             f'<p>On your homepage you reach for coach words like {coach_terms}. They\'re good words. But they\'re '
             '<b>your</b> words, not your customer\'s.</p>'
             '<p>Right now you\'re talking expert to expert. Another coach would read this and understand you easily. '
-            'But your buyer isn\'t another expert. They still have the problem. They need you to talk '
+            'But your buyer isn\'t another expert. <b>They still have the problem.</b> They need you to talk '
             '<b>expert to buyer</b>.</p>'
-            f'<p>Picture the person you help, lying awake at night, worried. What do they type into Google? Probably '
+            f'<p>Picture the person you help, lying awake at night, worried. <b>What do they type into Google?</b> Probably '
             f'not &lsquo;{first_coach}&rsquo;. More likely something real. A career coach\'s buyer might type '
             '&ldquo;I keep getting passed over at work&rdquo;. A health coach\'s buyer might type &ldquo;why am I '
             'tired all the time&rdquo;. Your buyer has their own version, in their own words.</p>'
@@ -761,25 +787,25 @@ def render_result(res, first_name=""):
             f'<p>And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
             '<b>1 in 8</b> use their customer\'s words. The other <b>88%</b> sound just like this page does.</p>'
             '<p>That\'s good news for you. Nearly every coach sounds the same, so people can\'t tell them apart. Use '
-            'the words your customers actually use, and you stand out straight away. You become the coach who '
-            'understands them.</p>'
+            'the words your customers actually use, and <b>you stand out straight away</b>. You become <b>the coach who '
+            'understands them</b>.</p>'
             '<p>And there\'s a bigger catch. Maybe you had this problem yourself once, and got through it. Maybe '
             'you\'ve helped a few people do the same. That feels like proof. But it\'s just a handful of people. It '
-            'doesn\'t tell you there are enough others out there who\'ll pay for exactly this, said in exactly these '
+            'doesn\'t tell you there are <b>enough others out there who\'ll pay for exactly this</b>, said in exactly these '
             'words.</p>'
             '<p>And when your whole page is built on your own story and your own view, the people you want to reach '
             'don\'t feel understood. They don\'t feel you get them, so they move on to another coach, one who feels '
             'like they understand them better.</p>'
             '<p>You can\'t see your own blind spot, and you can\'t guess what your customers are really thinking. '
             'Finding it takes real digging into who is buying, and why. It isn\'t a five-minute rewrite. It isn\'t a '
-            'weekend job either. The words you need aren\'t in your own head to find.</p></div>')
+            'weekend job either. <b>The words you need aren\'t in your own head to find.</b></p></div>')
     elif v.get("leaning") == "customer":
         voice_html = (
             '<div class="voice good"><h4><span class="secnum">4 / 5</span>You\'re speaking your buyer\'s language</h4>'
             '<p>Here\'s something you\'re doing well. Your homepage talks about the problem in words your customer '
             'would actually use, not just coach words.</p>'
             f'<p>That\'s rarer than you\'d think. Of the {cnt} coaching sites we scored, only about 1 in 8 do this. The '
-            'other 88% talk like the expert. You sound more like the person with the problem, and that\'s a real edge. '
+            'other 88% talk like the expert. You sound more like the person with the problem, and <b>that\'s a real edge</b>. '
             'Keep using the real words your clients say.</p></div>')
     else:
         voice_html = (
@@ -788,7 +814,7 @@ def render_result(res, first_name=""):
             '<p>The closer you get to how your customer really talks, the words they\'d use for their own problem, the '
             'more of them will get in touch instead of just nodding and leaving.</p>'
             '<p>And that\'s harder than it sounds. You know your work so well that you\'ve forgotten how your customer '
-            'talks about it. Finding their real words takes proper digging, not a quick rewrite.</p></div>')
+            'talks about it. <b>Finding their real words takes proper digging, not a quick rewrite.</b></p></div>')
 
     strength_html = (f'<div class="strength">✓ <b>What you\'re doing right:</b> {html.escape(res["strength"])}</div>'
                      if res.get("strength") else "")
@@ -810,7 +836,7 @@ def render_result(res, first_name=""):
                 f'<div class="lbl"><span class="mark na"></span>{html.escape(LABELS[k])}</div>'
                 f'<div class="vs" style="color:var(--muted);font-size:14px">N/A</div></div>'
                 f'<div class="def">{_def}</div>'
-                f'<div class="barnote">{html.escape(info["note"])}</div></div>'
+                f'<div class="barnote">{para_split(info["note"])}</div></div>'
             )
             continue
         pct = c["you"] * 10
@@ -824,10 +850,10 @@ def render_result(res, first_name=""):
             f'<span class="mkt">{_mkt}</span></div></div>'
             f'<div class="track"><div class="fill {sev_class(c["you"])}" style="width:{pct}%"></div></div>'
             f'<div class="def">{_def}</div>'
-            f'<div class="barnote">{html.escape(info["note"])}</div></div>'
+            f'<div class="barnote">{para_split(info["note"])}</div></div>'
         )
     cr = res["critique"]
-    fixes = "".join(f"<li>{html.escape(f)}</li>" for f in cr["top_fixes"])
+    fixes = "".join(f"<li>{para_split(f)}</li>" for f in cr["top_fixes"])
     ai = ('<span class="badge">AI diagnosis</span>' if res["ai_powered"]
           else '<span class="badge">add API key for AI</span>')
     # Greet the coach by name when the form gave us one. Falls back cleanly to the old opener.
@@ -867,7 +893,7 @@ def render_result(res, first_name=""):
 
     if _mr_score >= 5:
         hook_html = (
-            f'<div class="hook good">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading. '
+            f'<div class="hook good"><span class="hl">Your homepage scored a strong <span class="sc">{_mr_score}/10</span> on Mind Reading.</span> '
             f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
             f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
             f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
@@ -875,7 +901,7 @@ def render_result(res, first_name=""):
         )
     else:
         hook_html = (
-            f'<div class="hook">Your homepage scored <span class="sc">{hole_score}/10</span> on {hole_phrase}, not '
+            f'<div class="hook"><span class="hl">Your homepage scored <span class="sc">{hole_score}/10</span> on {hole_phrase},</span> not '
             f'because you don&rsquo;t know your clients, but because it&rsquo;s written in your words, not the words '
             f'a cold buyer uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
             f'is the whole game.</div>'
@@ -897,10 +923,10 @@ def render_result(res, first_name=""):
       </div>
       <div class="diag">
         <h3><span class="secnum">3 / 5</span>What a visitor sees{ai}</h3>
-        <div class="row"><div class="k">The biggest thing in the way</div>{emph(html.escape(cr['headline_problem']))}</div>
-        <div class="row"><div class="k">What it's costing you</div>{html.escape(cr['why_it_costs_clients'])}</div>
+        <div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr['headline_problem']))}</div>
+        <div class="row"><div class="k">What it's costing you</div>{para_split(cr['why_it_costs_clients'])}</div>
         <div class="row"><div class="k">The obvious fixes</div><ul>{fixes}</ul>{FIXES_CAVEAT}</div>
-        <div class="row"><div class="k">Bottom line</div>{html.escape(cr['money_left_on_table'])}</div>
+        <div class="row"><div class="k">Bottom line</div>{para_split(cr['money_left_on_table'])}</div>
       </div>
       {strength_html}
       {pricing_html}
