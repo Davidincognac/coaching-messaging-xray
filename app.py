@@ -1280,6 +1280,9 @@ _SALES_CSS = """
   .voice .statpane{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}
 
   /* ---------- criteria + capture + strength ---------- */
+  .evidence-section{margin-bottom:28px}
+  .video-section{margin-bottom:28px}
+  .video-section>p{font-size:14px;color:var(--muted);line-height:1.7;margin:0 0 22px}
   .evidence-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:28px;align-items:start}
   @media(max-width:800px){.evidence-grid{grid-template-columns:1fr;gap:32px}}
   .evidence-eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
@@ -1701,6 +1704,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             f'For context: across the {cnt} coaching homepages we have read, the average score is {MARKET_AVG_10} '
             f'out of 10, and the top 10% score {TOP10_10} or higher.</p>')
 
+    # Benefit-first headline (David + Ogilvy panel): name the prize, never the product the
+    # reader hasn't met yet. The coach's name leads when we have it.
+    h1_line = (f'{fn}, here&rsquo;s what your buyers actually want, and the exact words that bring them to you.'
+               if fn else
+               'Here&rsquo;s what your buyers actually want, and the exact words that bring them to you.')
+
     # Beckoning Angelo: the bubble in the artwork is blank; the words are HTML overlaid on it
     # (same pattern as the report's _angelo_speaks), so the line is personalised per coach.
     # fn is never empty here — the handler falls back to "Coach" — but guard anyway.
@@ -1720,8 +1729,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <div class="first-fold-section">
     <div class="ff-header">
-      <div class="ff-eyebrow">&#128309; PERSONAL EVALUATION CORE // DESIGNED FOR: {fn_up}</div>
-      <h1 class="ff-h1">You are about to see exactly how a Marketing Intelligence File builds your entire coaching business.</h1>
+      <div class="ff-eyebrow">&#128309; YOUR PRIVATE RESULTS PAGE // PREPARED FOR: {fn_up}</div>
+      <h1 class="ff-h1">{h1_line}</h1>
     </div>
     <div class="first-fold-inner">
       <div class="ff-left">
@@ -1746,16 +1755,26 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <div class="wrap">
 
-  <!-- BODY LAYER 2: THE CLICHÉ HOOK -->
+  <!-- CHAPTER 1: THEIR OWN EVIDENCE — the one thing no other page can say. Personal before generic. -->
+  <div class="evidence-section">
+    <div class="evidence-eyebrow">Where your page is losing buyers right now</div>
+    {criteria_html}
+    {capture_html}
+    {strength_html}
+  </div>
+
+  {diag_html}
+
+  <!-- CHAPTER 2: YOUR WORDS vs THEIR WORDS -->
   <div class="card">
-    <div class="label">Language parser report</div>
-    <h2>Our parser read your {page_word} and found these terms.</h2>
+    <div class="label">The words on your page</div>
+    <h2>We read your {page_word} and found these terms.</h2>
     <p>Each one is abstract. Each one could sit on any coaching page on the internet.
     When a stranger arrives on your page and reads words that do not describe their specific problem,
     they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
     and they leave. The problem is not your design or your credentials. It is the words.</p>
     <div class="tokens-block">
-      <div class="tok-label">Detected terms</div>
+      <div class="tok-label">Found on your page</div>
       <div class="tokens-value">{tok}</div>
     </div>
     <p style="margin-top:14px">Each of those terms means something specific to you.
@@ -1779,8 +1798,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="xray-screen" style="font-size:13px;line-height:1.6;padding:18px 22px;text-align:left">&ldquo;I cannot stop thinking about&hellip;&rdquo;<br>&ldquo;I wake up every morning and&hellip;&rdquo;<br>&ldquo;I have tried everything and&hellip;&rdquo;</div>
         <div class="xray-meta">
           <div class="xm-label">What your buyer actually says</div>
-          <div class="xm-body">Real, unedited language from the forums, reviews, and complaint boards where
-          your specific market describes their own crisis. When your page uses words like these, strangers stop and read.</div>
+          <div class="xm-body">The sort of thing your market really types when they go looking for help and
+          nobody is watching. When your page uses words like these, strangers stop and read.</div>
         </div>
       </div>
     </div>
@@ -1788,22 +1807,13 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   {voice_html}
 
-  <!-- EVIDENCE GRID: criteria analysis left, video proof right -->
-  <div class="evidence-grid">
-
-    <div class="evidence-left">
-      <div class="evidence-eyebrow">Where your page is losing buyers right now</div>
-      {criteria_html}
-      {capture_html}
-      {strength_html}
-    </div>
-
-    <div class="evidence-right">
-      <div class="evidence-eyebrow">Three coaches who fixed the same problem</div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin:0 0 22px">They had low scores. Their words described what they offered, not what their buyers were already searching for. Below is what happened when that changed.</p>
+  <!-- CHAPTER 3: PROOF — three coaches on video -->
+  <div class="video-section">
+    <div class="evidence-eyebrow">Three coaches who fixed the same problem</div>
+    <p>They had low scores. Their words described what they offered, not what their buyers were already searching for. Below is what happened when that changed.</p>
+    <div class="evidence-grid">
 
       <div class="video-col">
-
         <div class="video-block">
           <div class="video-embed shorts">
             <iframe src="https://www.youtube.com/embed/I2Q-BU3CQjo"
@@ -1816,7 +1826,9 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             <p>Chad explains how the Marketing Intelligence data forced him to change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
           </div>
         </div>
+      </div>
 
+      <div class="video-col">
         <div class="video-block">
           <div class="video-embed">
             <iframe src="https://www.youtube.com/embed/bdnCbMnHaZo"
@@ -1829,7 +1841,6 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             <p>David breaks down what happens when you replace fill-in-the-blank templates with hard customer facts. The shift is structural, not cosmetic.</p>
           </div>
         </div>
-
         <div class="video-block">
           <div class="video-embed">
             <iframe src="https://www.youtube.com/embed/JJf6rFjWqds"
@@ -1838,19 +1849,116 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
               allowfullscreen></iframe>
           </div>
           <div class="video-copy">
-            <h3>Long-term results after removing the guesswork completely.</h3>
+            <h3>Long-term results after switching from instinct to evidence.</h3>
             <p>Brandon shows the financial difference between pages built on intuition and pages built on real buyer data. The difference is not subtle.</p>
           </div>
         </div>
-
       </div>
-    </div>
 
+    </div>
   </div>
 
-  {diag_html}
+  <!-- WHAT CHANGES — four payoffs, in the audit's plain voice -->
+  <div class="payoffs-section">
+    <div class="section-eyebrow">What becomes possible when your words match your buyer&rsquo;s thoughts</div>
+    <div class="payoffs-grid">
 
-  <!-- PROTOCOL BREAKDOWN -->
+      <div class="payoff-tile">
+        <div class="pt-icon">&#127919;</div>
+        <div class="pt-title">The right people get in touch</div>
+        <div class="pt-body">
+          <p>When your page says what your buyer is already thinking, the right people recognise themselves and reach out.</p>
+          <p>More clients, the right ones, and the growth to reach your next level.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#9997;&#65039;</div>
+        <div class="pt-title">Writing stops being the hard part</div>
+        <div class="pt-body">
+          <p>The file gives you the words for everything you write, from your homepage to your emails. No more staring at a blank page wondering what to say.</p>
+          <p>You read what your buyer says, and you answer it.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#128222;</div>
+        <div class="pt-title">Sales calls get easier</div>
+        <div class="pt-body">
+          <p>When your public words show you understand the problem, people arrive at the call already half-decided.</p>
+          <p>You spend less time convincing and more time coaching.</p>
+        </div>
+      </div>
+
+      <div class="payoff-tile">
+        <div class="pt-icon">&#129517;</div>
+        <div class="pt-title">You stop wondering and start knowing</div>
+        <div class="pt-body">
+          <p>Every decision, from your next offer to your next post, rests on real facts about what your market pays to fix.</p>
+          <p>Feeling sure and being right finally point the same way.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FLAWED ASSUMPTIONS -->
+  <div class="assumptions-section">
+    <div class="section-eyebrow">Four things coaches believe that keep them invisible</div>
+
+    <div class="assumption">
+      <div class="a-label">Assumption 1</div>
+      <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
+      <p>When people look at that score, it is easy to assume you just need a prettier website, {fn}.
+      Swapping a few words on a page that is built on the wrong foundation does not fix the foundation.
+      It just gives the problem a fresh coat of paint. What you have is not a wording issue.
+      It is a <b>strategic positioning issue</b>: the page is written around what you offer, not around
+      what a stranger is already searching for.</p>
+      <p>And here is the part most coaches miss. Any new words you write without hard facts behind them
+      come from instinct, and feeling sure and being right are not the same thing. You end up picking
+      phrases that feel right to you, not phrases your buyers actually use. Nothing changes.</p>
+    </div>
+
+    <div class="assumption">
+      <div class="a-label">Assumption 2</div>
+      <h3>&ldquo;I already talk to my clients every day. I know exactly what they want.&rdquo;</h3>
+      <p>Relying on a few past clients is a dangerous trap, {fn}. That is a small sample.
+      You know what your current clients say to you, in your sessions, after they have already decided
+      to hire you. That is a very small and very loyal group. It tells you almost nothing about
+      <b>the strangers who arrived on your page last Tuesday and left without getting in touch.</b></p>
+      <p>The people who never contact you are the majority of your market. They had a problem.
+      They went online and searched for a solution in their own words, not yours.
+      They looked at your page for a few seconds. They did not see themselves in it. They left.
+      You never knew they were there. Your current clients cannot tell you why that happened,
+      because they are not those people.</p>
+    </div>
+
+    <div class="assumption">
+      <div class="a-label">Assumption 3</div>
+      <h3>&ldquo;My words are fine. I just need more people to see the page.&rdquo;</h3>
+      <p>More visitors to a page that is not working just means more people leaving.
+      If ten people arrive and nobody gets in touch, a hundred will give you ten times the silence,
+      and you will have paid for the ads.</p>
+      <p>Traffic multiplies what a page already does. Fix the words first, so the traffic has
+      something to work with.</p>
+    </div>
+
+    <div class="assumption">
+      <div class="a-label">Assumption 4</div>
+      <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
+      <p>AI writing tools do not do research. They predict which word is likely to follow the previous word,
+      based on patterns in text they have already read. The text they have already read is the internet.
+      The internet is full of coaching pages that say &ldquo;empower&rdquo;, &ldquo;mindset&rdquo;,
+      and &ldquo;clarity&rdquo;.</p>
+      <p>So when you ask an AI to research your market, it feeds those same words back to you, because
+      that is what coaching pages say. <b>You end up sounding identical to every other coach on the internet.</b>
+      That is exactly the problem you were trying to solve. The Marketing Intelligence File does not ask AI what
+      your market wants. It reads where your market actually speaks, and extracts the language they use when
+      they are not performing for an audience. That is a different process. The output is completely different.</p>
+    </div>
+  </div>
+
+  <!-- WHAT'S INSIDE -->
   <div class="protocol-section" id="inside">
     <div class="section-eyebrow">What is inside your Marketing Intelligence File</div>
 
@@ -1872,8 +1980,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <h3>The Language Filtering Matrix</h3>
       <p>A practical guide to what to cut from your marketing and what to replace it with.</p>
       <ul>
-        <li><b>Clich&eacute; Deletion Blueprint.</b> A line-by-line audit of the abstract terms already found on your page, including the ones our parser flagged: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a cold buyer.</li>
-        <li><b>AI Slop Deletion Guide.</b> A reference list of the predictable phrase styles that mark your writing as generated and generic. Things like &ldquo;unlock your potential&rdquo;, &ldquo;on your journey&rdquo;, and &ldquo;transform your life&rdquo;. Premium buyers have read these a hundred times and stopped trusting them.</li>
+        <li><b>Clich&eacute; Deletion Blueprint.</b> A line-by-line audit of the abstract terms already found on your page, including the ones we found ourselves: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a cold buyer.</li>
+        <li><b>AI Slop Deletion Guide.</b> A reference list of the predictable phrase styles that mark your writing as generated and generic. Things like &ldquo;unlock your potential&rdquo;, &ldquo;on your journey&rdquo;, and &ldquo;transform your life&rdquo;. Buyers have seen these lines everywhere, so they slide right past them.</li>
         <li><b>High-status buyer vocabulary.</b> The specific words and phrases premium clients actually use when they are ready to spend money. The language that signals to them that you understand the problem they are living with, not just the solution you sell.</li>
       </ul>
     </div>
@@ -1887,7 +1995,42 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- DECISION BRIDGE -->
+  <!-- PRODUCT REVEAL -->
+  <div class="product-reveal" id="file">
+    <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
+    <div class="pr-eyebrow">The Marketing Intelligence File</div>
+    <h2>The exact words your buyers use when they describe their own problem.</h2>
+    <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
+    uses when they are searching for a solution at two in the morning and nobody is watching.
+    The fears they do not say out loud. The specific outcomes that make them pick up the phone.
+    The words that, when they appear on your homepage, make a cold stranger stop scrolling and think:
+    <em>this person understands exactly what I am going through.</em></p>
+    <p>This is not a template. It is not a questionnaire you fill in yourself. It is real research into your
+    specific market, built on the evidence we have already read: {cnt} coaching websites, and 2,000 books
+    your market bought to fix their own problems. Every book that sells is a vote, real proof of what people
+    struggle with and what they will pay to fix. It all arrives as a single structured file you hand to anyone
+    writing your copy, or load straight into any AI tool and watch it stop producing coaching clich&eacute;s.</p>
+    <p class="price-anchor">Real market research is a corporate purchase. Agencies charge thousands of pounds
+    for even a small study, because a human analyst combs through the sources one by one. Our research engine
+    has already done years of that reading, and a person still checks every file before it goes out. That is
+    how the corporate tool reaches you at a coach&rsquo;s price.</p>
+    <div class="price-main">&pound;75 <span>(One-Time Investment)</span></div>
+
+    <div class="guarantee-block">
+      <div class="g-copy">
+        <div class="g-label">7-Day Certainty Guarantee</div>
+        <p>If you read your file and feel it does not contain buyer language you could not have found yourself,
+        or market facts you did not already know, contact us within 7 days and we will give you a full refund.
+        No forms. No hoops. No awkward conversation.</p>
+        <p>We can make this offer because the evidence is already in: {cnt} coaching websites read, and 2,000
+        books analysed, the books your market bought to fix their own problems. We know what your market keeps
+        paying for. <b>The risk is on us, not your wallet.</b></p>
+      </div>
+      <img class="angelo-relax" src="/angelo_relaxed.png" alt="Angelo, relaxed. The risk is on us.">
+    </div>
+  </div>
+
+  <!-- DECISION BRIDGE + THE CLOSE -->
   <div class="narrative-bridge">
     <div class="nb-label">Where this leaves you</div>
     <h2>You cannot write your way out of a positioning problem.</h2>
@@ -1898,7 +2041,6 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <p>You now have three options.</p>
   </div>
 
-  <!-- THREE REAL CHOICES -->
   <div class="three-choices">
     <div class="tc-label">Three options</div>
 
@@ -1911,183 +2053,16 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     <div class="choice-block">
       <div class="cb-num">Option 2</div>
-      <h3>Guess again</h3>
-      <p>Rewrite your homepage using the same intuition that wrote the current version.
-      The words will change. The data behind them will not. You will be replacing one guess with another.</p>
+      <h3>Rewrite it yourself</h3>
+      <p>Rewrite your homepage using the same instinct that wrote the current version.
+      The words will change. The facts behind them will not.</p>
     </div>
 
     <div class="choice-block">
       <div class="cb-num">Option 3</div>
-      <h3>Get the data</h3>
+      <h3>Get the facts</h3>
       <p>For &pound;75, one time, our research engine maps the exact vocabulary your specific buyers
       use when they are ready to spend money. Your page starts working.</p>
-    </div>
-  </div>
-
-  <!-- CAREER TRANSFORMATION MATRIX -->
-  <div class="payoffs-section">
-    <div class="section-eyebrow">What becomes possible when your words match your buyer&rsquo;s thoughts</div>
-    <div class="payoffs-grid">
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#127760;</div>
-        <div class="pt-title">Reclaiming Your Professional Dignity</div>
-        <div class="pt-body">
-          <p>Stop hiding behind vague, soft words that make you look identical to every low-tier provider in your niche.</p>
-          <p>When your homepage speaks the exact, unedited language your market whispers to themselves at 3 AM, you instantly shift from a desperate coach chasing clients to a sought-after authority.</p>
-          <p>You look high-paying buyers dead in the eye, stop defending your prices, and command the premium fees your talent actually deserves.</p>
-        </div>
-      </div>
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#128241;</div>
-        <div class="pt-title">Wiping Out Client Acquisition Fatigue</div>
-        <div class="pt-body">
-          <p>You did not start a coaching business to become a full-time social media content creator, dancing on videos or writing daily motivational essays that competitors copy and buyers ignore.</p>
-          <p>Because this single data file hands you your market&rsquo;s exact real-life situations, your content creation is entirely finished.</p>
-          <p>You write punchy, short posts that pull real buyers straight to your inbox, allowing you to stop shouting for attention online and start doing the deep work you love.</p>
-        </div>
-      </div>
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#127775;</div>
-        <div class="pt-title">Total Commercial Certainty Over Your Future</div>
-        <div class="pt-body">
-          <p>Staring at a blank screen wondering what offer to launch next is an exhausting way to live.</p>
-          <p>This file acts as your permanent business instrument panel. Whether you are launching a new lead freebie, pivoting your entire target niche, or building a brand-new service framework, you operate with absolute commercial certainty.</p>
-          <p>You know exactly what commercial problems strangers will happily pull out their wallets to fix, removing the fear of failure from your business forever.</p>
-        </div>
-      </div>
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#128226;</div>
-        <div class="pt-title">The Freedom to Choose How You Grow</div>
-        <div class="pt-body">
-          <p>This single data core fuels every single marketing tactic you will ever use for the rest of your career.</p>
-          <p>It gives you total strategic freedom. If you want to speak on live stages, secure high-profile podcast gigs, write press releases, or build a private community, you use the exact same vocabulary framework. One asset, every single surface.</p>
-          <p>You scale your coaching income on your own terms, without ever sacrificing your values or doing marketing activities you completely despise.</p>
-        </div>
-      </div>
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#128176;</div>
-        <div class="pt-title">Closing High-Ticket Deals Without Selling</div>
-        <div class="pt-body">
-          <p>Stop sweating before you hop on a sales call, wondering if a prospect will fight you on your prices or throw an awkward objection at your face.</p>
-          <p>When you use the exact vocabulary blocks tracked inside your file, the entire sales process is already finished before they even speak to you.</p>
-          <p>Premium buyers arrive inside your ecosystem completely pre-sold, because your public words have already proven that you understand their inner thoughts better than anyone else alive.</p>
-        </div>
-      </div>
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#9203;</div>
-        <div class="pt-title">Moving Beyond Trading Hours for Dollars</div>
-        <div class="pt-body">
-          <p>You cannot scale a massive career asset if you are trapped inside a non-stop loop of manual 1-on-1 coaching calls every single day of the week.</p>
-          <p>Because this data core maps out the exact real-life situations and emotional goals of your market, it gives you the absolute power to build highly profitable group programs and digital assets.</p>
-          <p>You can design automated packages that solve their exact crises at scale, letting you buy back your calendar and enjoy total time freedom.</p>
-        </div>
-      </div>
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#129504;</div>
-        <div class="pt-title">Operating with Absolute Professional Conviction</div>
-        <div class="pt-body">
-          <p>Staring at your computer wondering if your coaching program is actually good enough to command thousand-pound fees is a miserable way to operate.</p>
-          <p>This file completely removes the fear of being a fraud. You no longer have to fake your confidence or copy guru scripts.</p>
-          <p>You possess hard, third-party consumer facts that prove you are building services based on exactly what real humans are struggling with right now, giving you ironclad confidence every time you speak.</p>
-        </div>
-      </div>
-
-      <div class="payoff-tile">
-        <div class="pt-icon">&#129309;</div>
-        <div class="pt-title">Attracting Elite Joint Ventures and Gigs</div>
-        <div class="pt-body">
-          <p>When you pitch yourself to high-end corporate platforms, joint venture partners, or masterminds using general coaching buzzwords, you get ignored instantly.</p>
-          <p>This data core changes how you network. It hands you the precise macro-industry data and deep consumer insight vocabulary required to pitch high-status brands on their own terms.</p>
-          <p>You stand out instantly as a sophisticated research partner, allowing you to secure elite business collaborations that explode your reach for free.</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- FLAWED ASSUMPTIONS -->
-  <div class="assumptions-section">
-    <div class="section-eyebrow">Three things coaches believe that keep them invisible</div>
-
-    <div class="assumption">
-      <div class="a-label">Assumption 1</div>
-      <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
-      <p>When people look at that score, it is easy to assume you just need a prettier website, {fn}.
-      Swapping a few words on a page that is built on the wrong foundation does not fix the foundation.
-      It just gives the problem a fresh coat of paint. What you have is not a wording issue.
-      It is a <b>strategic positioning issue</b>: the page is written around what you offer, not around
-      what a stranger is already searching for.</p>
-      <p>And here is the part most coaches miss. Any new words you write without hard facts to back them up
-      are a blind guess. You are picking phrases that feel right to you, not phrases your buyers are
-      actually using. One guess replaces another. Nothing changes.</p>
-    </div>
-
-    <div class="assumption">
-      <div class="a-label">Assumption 2</div>
-      <h3>&ldquo;I already talk to my clients every day. I know exactly what they want.&rdquo;</h3>
-      <p>Relying on a few past clients is a dangerous trap, {fn}. It is too small of a sample size.
-      You know what your current clients say to you, in your sessions, after they have already decided
-      to hire you. That is a very small and very loyal group. It tells you almost nothing about
-      <b>the strangers who arrived on your page last Tuesday and left without getting in touch.</b></p>
-      <p>The people who never contact you are the majority of your market. They had a problem.
-      They went online and searched for a solution in their own words, not yours.
-      They looked at your page for a few seconds. They did not see themselves in it. They left.
-      You never knew they were there. Your current clients cannot tell you why that happened,
-      because they are not those people.</p>
-    </div>
-
-    <div class="assumption">
-      <div class="a-label">Assumption 3</div>
-      <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
-      <p>AI writing tools do not do research. They predict which word is likely to follow the previous word,
-      based on patterns in text they have already read. The text they have already read is the internet.
-      The internet is full of coaching pages that say &ldquo;empower&rdquo;, &ldquo;mindset&rdquo;,
-      and &ldquo;clarity&rdquo;.</p>
-      <p>So when you ask an AI to research your market, it feeds those same words back to you, because
-      that is what coaching pages say. <b>You end up sounding identical to every other coach on the internet.</b>
-      That is exactly the problem you were trying to solve. The Marketing Intelligence File does not ask AI what
-      your market wants. It reads where your market actually speaks, and extracts the language they use when
-      they are not performing for an audience. That is a different process. The output is completely different.</p>
-    </div>
-  </div>
-
-  <!-- PRODUCT REVEAL -->
-  <div class="product-reveal" id="file">
-    <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
-    <div class="pr-eyebrow">The Marketing Intelligence File</div>
-    <h2>The exact words your buyers use when they describe their own problem.</h2>
-    <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
-    uses when they are searching for a solution at two in the morning and nobody is watching.
-    The fears they do not say out loud. The specific outcomes that make them pick up the phone.
-    The words that, when they appear on your homepage, make a cold stranger stop scrolling and think:
-    <em>this person understands exactly what I am going through.</em></p>
-    <p>This is not a template. It is not a questionnaire you fill in yourself.
-    It is primary research drawn from thousands of real buyer sources, mapped to your specific niche,
-    delivered as a single structured file you hand to anyone writing your copy, or load straight
-    into any AI tool and watch it stop producing coaching clich&eacute;s.</p>
-    <p class="price-anchor">Traditional corporate research firms charge up to &pound;997 because they employ
-    human analysts to manually comb through data sources one by one. Our custom Python pipeline automates
-    this exact deep-linguistic parsing sweep in under 180 seconds, bypassing agency overhead entirely
-    and passing the infrastructure saving straight to you.</p>
-    <div class="price-main">&pound;75 <span>(One-Time Investment)</span></div>
-
-    <div class="guarantee-block">
-      <div class="g-copy">
-        <div class="g-label">7-Day Certainty Guarantee</div>
-        <p>If you read your file and feel it does not contain buyer language you could not have found yourself,
-        or market facts you did not already know, contact us within 7 days and we will give you a full refund.
-        No forms. No hoops. No awkward conversation.</p>
-        <p>We make this offer because we have done this research hundreds of times across dozens of coaching niches,
-        and we are certain of what we find. <b>The risk is entirely on our research metrics, not your wallet.</b></p>
-      </div>
-      <img class="angelo-relax" src="/angelo_relaxed.png" alt="Angelo, relaxed. The risk is on us.">
     </div>
   </div>
 
