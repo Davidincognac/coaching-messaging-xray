@@ -1419,7 +1419,12 @@ _SALES_CSS = """
   .guarantee-block p b{color:var(--accent-ink)}
   .angelo-relax{width:120px;aspect-ratio:1;object-fit:cover;border-radius:50%;flex-shrink:0;
     border:2px solid var(--accent);box-shadow:0 0 0 5px #fff}
-  .cta-angelo{display:block;width:min(380px,88%);height:auto;margin:0 auto 20px}
+  .cta-angelo-wrap{position:relative;display:block;width:min(400px,90%);margin:0 auto 20px;
+    container-type:inline-size}
+  .cta-angelo{display:block;width:100%;height:auto}
+  .bubble-txt{position:absolute;left:8%;top:14%;width:33%;height:23%;display:flex;
+    align-items:center;justify-content:center;text-align:center;font-weight:700;color:#141414;
+    font-size:13px;font-size:3.7cqw;line-height:1.25}
   .checkout-section{background:var(--navy);border-radius:16px;padding:40px 32px;margin-bottom:28px}
   @media(max-width:560px){.checkout-section{padding:28px 20px}}
   .checkout-section h2{font-family:var(--serif);color:#fff;margin-bottom:6px;font-size:clamp(20px,4vw,26px)}
@@ -1674,6 +1679,13 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     if (data or {}).get("strength"):
         strength_html = (f'<div class="strength">&#10003; <b>What you&rsquo;re doing right:</b> '
                          f'{html.escape(data["strength"])}</div>')
+
+    # Beckoning Angelo: the bubble in the artwork is blank; the words are HTML overlaid on it
+    # (same pattern as the report's _angelo_speaks), so the line is personalised per coach.
+    # fn is never empty here — the handler falls back to "Coach" — but guard anyway.
+    bub = f'Come on, {fn}. Let me show you.' if fn else 'Come on. Let me show you.'
+    buy_btn = (f'{fn}, get your Marketing Intelligence File &rarr;' if fn
+               else 'Get My Marketing Intelligence File &rarr;')
 
     return f"""<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -2062,7 +2074,10 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <!-- CHECKOUT -->
   <div class="checkout-section" id="checkout">
-    <img class="cta-angelo" src="/angelo_cta.png" alt="Angelo: Come on. Let me show you.">
+    <div class="cta-angelo-wrap">
+      <img class="cta-angelo" src="/angelo_cta.png" alt="Angelo: {bub}">
+      <span class="bubble-txt">{bub}</span>
+    </div>
     <h2>Get My Marketing Intelligence File</h2>
     <div class="cs-sub">Your niche. Your buyers&rsquo; actual language. &pound;75, one-time. No subscription.</div>
     <div class="checkout-form-placeholder">
@@ -2070,7 +2085,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <div class="cf-label">Secure checkout</div>
       <div class="cf-note">Card payment integration goes here.<br>
       Stripe / payment processor embed to be wired in.</div>
-      <button class="cta-btn" disabled>Get My Marketing Intelligence File &rarr;</button>
+      <button class="cta-btn" disabled>{buy_btn}</button>
     </div>
     <p class="guarantee">Secure payment &middot; Instant confirmation &middot; Delivered within 5 working days &middot; 7-Day Certainty Guarantee</p>
   </div>
