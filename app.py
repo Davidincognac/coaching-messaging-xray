@@ -1306,9 +1306,6 @@ _SALES_CSS = """
     font-weight:700;margin-bottom:8px}
   .capbox p{font-size:14px;line-height:1.65;margin:0 0 10px}
   .capbox p:last-child{margin:0}
-  .strength{background:#EDF5F0;border:1px solid #CBE2D6;border-radius:10px;padding:14px 18px;margin-bottom:14px;
-    font-size:14px;line-height:1.6}
-  .strength b{color:var(--good)}
 
   /* ---------- videos ---------- */
   .video-col{display:flex;flex-direction:column;gap:18px}
@@ -1678,10 +1675,6 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     capture_html = _sales_capture(ev, page_word)
     diag_html = _sales_diag(critique)
     criteria_html = _build_criteria_html(data, headline)
-    strength_html = ""
-    if (data or {}).get("strength"):
-        strength_html = (f'<div class="strength">&#10003; <b>What you&rsquo;re doing right:</b> '
-                         f'{html.escape(data["strength"])}</div>')
 
     # Softer opener for low scorers (David's rule + his copy): under 5 there is no "brutal",
     # the average is framed as within reach, and the low score as easier to improve. 5 and up
@@ -1760,7 +1753,6 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="evidence-eyebrow">Where your page is losing buyers right now</div>
     {criteria_html}
     {capture_html}
-    {strength_html}
   </div>
 
   {diag_html}
