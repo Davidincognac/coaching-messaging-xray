@@ -2353,6 +2353,14 @@ def audit_url(url):
         critique = rule_critique(row, scores, score_10, ev)
     ai_powered = bool(ai)   # AI informed the scores, even where a note or two fell back to the rule wording
 
+    # Defensive guardrail: DISPLAY_CRIT criteria that are only produced by the FLAG_CRIT judges
+    # (symptom_resonance, proof_cred, next_step, friction, shield) have no value when ai_analyse()
+    # returned None (e.g. missing API key). Default them to 5 so the report card always shows a
+    # number rather than an N/A card — an honest mid-range proxy, never a zero or a crash.
+    for _dk in DISPLAY_CRIT:
+        if scores.get(_dk) is None:
+            scores[_dk] = 5
+
     # The bars a coach sees, in the module-level DISPLAY_CRIT order (grouped by theme). Proof and credibility are
     # MERGED into proof_cred; the separate proof/credibility keys stay in `scores` only for the total math.
     # booking can be None (N/A). Keep it None all the way through so the display shows 'N/A', never a 0 or a crash.
