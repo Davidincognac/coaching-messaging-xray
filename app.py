@@ -609,8 +609,14 @@ def render_result(res):
     _clar = (res["comparison"].get("clarity_5sec") or {}).get("you")
     verdict, den_line, gap_line = overall_copy(_clar, res.get("tier"), res.get("in_top_tier"))
 
-    # optional thumbnail, only if we actually captured one (never a broken image)
-    thumb = f'<img class="thumb" src="{res["thumbnail"]}" alt="Your homepage">' if res.get("thumbnail") else ""
+    # Thumbnail: Playwright base64 or the /screenshots/ microlink path — whichever the /audit handler filled.
+    # When BOTH failed, show Angelo instead of dead white space, so the layout never has an unexplained hole.
+    thumb = (f'<img class="thumb" src="{res["thumbnail"]}" alt="Your homepage">' if res.get("thumbnail")
+             else '<div class="thumb" style="display:flex;flex-direction:column;align-items:center;'
+                  'justify-content:center;padding:26px 0;background:var(--surface);border:1px solid var(--line);'
+                  'border-radius:10px"><img src="/angelo.png" alt="Angelo" '
+                  'style="width:64px;height:auto;opacity:.55;margin-bottom:10px">'
+                  '<div style="font-size:13px;color:var(--muted)">Screenshot unavailable — the words below are what count.</div></div>')
 
     # Headline block. Two things matter here, for different reasons: the biggest words a visitor reads
     # first (what we analyse), and the <h1> tag Google reads first (an SEO finding when they're not the same).
@@ -1691,10 +1697,20 @@ class Handler(BaseHTTPRequestHandler):
             last_name = (qs.get("last_name", [""])[0]).strip()
             email = (qs.get("email", [""])[0]).strip()
             res = audit_url(url) if url else {}
+            shot_path = ""
+            if url and res.get("ok") and res.get("status") == "ok":
+                # SCREENSHOT FIRST, RENDER SECOND: the report card's canvas reads res["thumbnail"], which
+                # Playwright doesn't always fill on Render (and cached results never carry — it's stripped
+                # before the DB). The microlink disk path slots straight into the same key, so ONE reliable
+                # image source feeds the report card AND the salespage. Playwright's base64 stays preferred
+                # when it exists; microlink is the fallback that stops the blank canvas.
+                shot_path = _save_screenshot(res.get("domain", url))
+                if not res.get("thumbnail") and shot_path:
+                    res["thumbnail"] = shot_path
             frag = render_result(res) if url else ""
             if url and res.get("ok") and res.get("status") == "ok":
-                shot_path = _save_screenshot(res.get("domain", url))
-                # Strip the raw base64 thumbnail before serialising — already on disk at shot_path.
+                # Strip the thumbnail before serialising — a base64 blob is huge, and a /screenshots/ path
+                # is re-injected fresh on every request anyway, so the stored JSON never needs it.
                 storable = {k: v for k, v in res.items() if k != "thumbnail"}
                 tokens_raw = res.get("generic_tokens_found", [])
                 tokens_str = (", ".join(tokens_raw) if isinstance(tokens_raw, list)
