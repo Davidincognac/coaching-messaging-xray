@@ -233,12 +233,14 @@ PAGE = """<!doctype html><html lang="en"><head>
   .qchip{{display:inline-block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600}}
   .voice .statpane{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}}
-  .verdict-img{{float:right;width:136px;aspect-ratio:1;object-fit:cover;border-radius:50%;
-    border:2px solid var(--accent);box-shadow:0 0 0 5px var(--soft);margin:4px 6px 12px 16px}}
-  @media(max-width:560px){{.verdict-img{{width:100px;margin-left:12px}}}}
-  .sec-angelo{{float:right;width:116px;aspect-ratio:1;object-fit:cover;border-radius:50%;
-    border:2px solid var(--accent);box-shadow:0 0 0 5px var(--soft);margin:4px 6px 10px 16px}}
-  @media(max-width:560px){{.sec-angelo{{width:88px;margin-left:12px}}}}
+  .verdict-img{{width:112px;aspect-ratio:1;object-fit:cover;border-radius:50%;flex-shrink:0;
+    border:2px solid var(--accent);box-shadow:0 0 0 5px var(--soft);margin-left:auto;align-self:center}}
+  @media(max-width:560px){{.verdict-img{{width:88px}}}}
+  .ev-head{{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}}
+  .ev-head .h{{margin-bottom:0}}
+  .sec-angelo{{width:96px;aspect-ratio:1;object-fit:cover;border-radius:50%;flex-shrink:0;
+    border:2px solid var(--accent);box-shadow:0 0 0 5px var(--soft)}}
+  @media(max-width:560px){{.sec-angelo{{width:76px}}}}
   .mi-img{{display:block;width:min(300px,72%);height:auto;margin:0 auto 18px;
     filter:drop-shadow(0 8px 20px rgba(0,0,0,.4))}}
   .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
@@ -805,8 +807,8 @@ def render_result(res, first_name=""):
                    'but not to them.</div>')
 
     evidence_html = (
-        f'<div class="ev"><div class="h"><span class="secnum">1 / 5</span>What we read on your {_page_word}: {html.escape(ev.get("page_display") or ev["domain"])}</div>'
-        f'<img class="sec-angelo" src="/angelo_reading.png" alt="Angelo reading your page">'
+        f'<div class="ev"><div class="ev-head"><div class="h"><span class="secnum">1 / 5</span>What we read on your {_page_word}: {html.escape(ev.get("page_display") or ev["domain"])}</div>'
+        f'<img class="sec-angelo" src="/angelo_reading.png" alt="Angelo reading your page"></div>'
         f'{thumb}{quotes}</div>'
     )
 
@@ -928,11 +930,11 @@ def render_result(res, first_name=""):
     _verdict_img = ("angelo_down.png" if _sd < 5 else "angelo_unsure.png" if _sd < 7 else "angelo_up.png")
     score_reveal = (
         f'<div class="reveal {g}"><div class="h"><span class="secnum">5 / 5</span>Your overall score</div>'
-        f'<img class="verdict-img" src="/{_verdict_img}" alt="Angelo&rsquo;s verdict">'
         '<div class="grade">'
         f'<div class="num {g}">{res.get("score_10_display", res["score_10"])}<span class="den">/10</span></div>'
         f'<div><div class="verdict">{verdict}</div>'
         f'<div class="den">{den_line}</div></div>'
+        f'<img class="verdict-img" src="/{_verdict_img}" alt="Angelo&rsquo;s verdict">'
         '</div>'
         f'<div class="gap" style="margin-top:14px">{gap_line}</div>'
         f'<div class="honest">A word on your {res.get("score_10_display", res["score_10"])}/10. We\'re not marking you down to make a sale. Every '
