@@ -243,6 +243,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   @media(max-width:560px){{.sec-angelo{{width:76px}}}}
   .mi-img{{display:block;width:min(300px,72%);height:auto;margin:0 auto 18px;
     filter:drop-shadow(0 8px 20px rgba(0,0,0,.4))}}
+  .cta-angelo{{display:block;width:min(380px,88%);height:auto;margin:28px auto 0}}
   .caveat{{margin-top:12px;padding:16px 18px;background:var(--soft);border-left:4px solid var(--accent);
     border-radius:0 8px 8px 0;font-size:15px;line-height:1.55}}
   .caveat b{{color:var(--accent-ink)}}
@@ -1045,6 +1046,8 @@ def render_result(res, first_name=""):
         </ol>
         <p class="steps-foot">When your marketing sounds like your buyer, more of the right people get in touch, and more of them buy. More clients, the right ones, and the growth to reach your next level.</p>
         <a class="cta-btn" href="{_offer_href}">{steps_btn}</a>
+        <a href="{_offer_href}"><img class="cta-angelo" src="/angelo_cta.png"
+          alt="Angelo: Come on. Let me show you."></a>
       </div>
     </div>"""
 
@@ -1799,7 +1802,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path
         if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
-                    "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png"):
+                    "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
+                    "/angelo_cta.png"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
