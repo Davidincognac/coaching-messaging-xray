@@ -28,7 +28,7 @@ except ImportError:
     pass
 
 from audit import (audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count,   # the engine we built
-                   PCT_FAIL_5SEC, BUYER_VOICE_1_IN)   # market stats: single source of truth in audit.py
+                   PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH)   # market stats: single source of truth in audit.py
 # "1 in 14 speak their buyer's language" => the other 93%. Derived, so the pair can never disagree.
 PCT_NOT_BUYER_VOICE = 100 - round(100 / BUYER_VOICE_1_IN)
 from storage import save_audit, get_audit
@@ -1158,22 +1158,446 @@ OFFER_PAGE = """<!doctype html><html lang="en"><head>
 </div></body></html>"""
 
 
-def _build_criteria_html(raw_json, hero_quote):
-    """Return the 3 lowest-scoring criteria blocks, or a plain fallback if no JSON is available."""
+# ============================================================================
+#  THE SALES PAGE  (/salespage) — the personalised Marketing Intelligence File
+#  pitch. Keyed off everything the audit stored in pipeline.db (raw_json), and
+#  wearing the same design system as the report: navy/ivory/gold, Angelo blue,
+#  Inter + Source Serif, chapter cards. Static, no animations.
+#  Every personalised block degrades to "" (or a generic fallback) when the
+#  page is opened with URL params only and there is no stored record.
+# ============================================================================
+
+# Plain string (not a template), so the CSS braces need no doubling.
+_SALES_CSS = """
+  @font-face{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}
+  @font-face{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}
+  :root{
+    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
+    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
+    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
+    --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
+    --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
+    --gold:#D4AF37;--gold-h:#C2A02F;
+    --good:#2A7B56;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;}
+  *{box-sizing:border-box}
+  html{background:var(--navy)}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:760px;margin:0 auto;padding:44px 22px 80px}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(19px,3.4vw,25px);margin:0 0 14px;line-height:1.3;color:var(--ink)}
+  h3{font-weight:600;font-size:16px;margin:0 0 8px;color:var(--ink)}
+  p{margin:0 0 14px;font-size:15px;line-height:1.65;color:var(--ink)}
+  p:last-child{margin-bottom:0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:28px}
+  @media(max-width:560px){.card{padding:26px 18px}}
+  .label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin-bottom:12px}
+  .section-eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:700;margin-bottom:16px}
+  .chip{display:inline-block;font-weight:700;font-size:15px;padding:3px 11px;border-radius:8px;line-height:1.3}
+  .chip .den{opacity:.65;font-weight:600;font-size:12px}
+  .chip.good{background:#EDF5F0;color:var(--good)}
+  .chip.warn{background:#F8F3E7;color:var(--warn-ink)}
+  .chip.crit{background:#F8EEEE;color:var(--critical)}
+
+  /* ---------- sticky nav ---------- */
+  .site-nav{background:var(--navy-deep);border-bottom:1px solid var(--navy-line);padding:0 28px;
+    display:flex;align-items:center;gap:12px;height:58px;
+    position:sticky;top:0;z-index:100}
+  .site-nav img{height:36px;width:auto;display:block}
+  .site-nav .brand-name{font-size:12px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ivory);line-height:1.2}
+
+  /* ---------- first fold (navy hero band) ---------- */
+  .first-fold-section{background:var(--navy);color:var(--ivory);padding:60px 40px 56px}
+  .ff-header{max-width:1100px;margin:0 auto 36px}
+  .ff-eyebrow{font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ivory-dim);font-weight:600;margin-bottom:18px}
+  .ff-h1{font-size:clamp(26px,3.6vw,44px);font-weight:700;color:#fff;
+    letter-spacing:-.02em;line-height:1.14;margin:0}
+  .first-fold-inner{max-width:1100px;margin:0 auto;display:grid;
+    grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+  @media(max-width:800px){.first-fold-inner{grid-template-columns:1fr;gap:32px}
+    .first-fold-section{padding:44px 22px 48px}
+    .ff-header{margin-bottom:24px}}
+  .ff-body{font-size:16px;font-weight:300;color:var(--ivory);line-height:1.72;margin:0 0 16px}
+  .ff-body:last-child{margin-bottom:0}
+  .ff-body strong{color:var(--glow);font-weight:600}
+  .ff-score{color:#fff;font-weight:700}
+  .hook{max-width:1100px;margin:28px auto 0;padding:18px 20px;border-radius:8px;
+    background:rgba(166,38,38,.16);border:1px solid rgba(198,90,90,.55);
+    font-size:17px;line-height:1.55;font-weight:600;color:#fff}
+  .hook.good{background:rgba(58,118,189,.16);border-color:rgba(127,169,221,.5)}
+  .hook .sc{color:#fff;font-size:19px;font-weight:700}
+  .hook .hl{color:#F0B9B4}
+  .hook.good .hl{color:var(--glow)}
+  .hook .hl .sc{color:inherit}
+  .ff-bridge{max-width:1100px;margin:32px auto 0;padding:0 0 8px}
+  .ff-bridge p{font-family:var(--serif);font-size:19px;font-weight:500;color:var(--ivory);line-height:1.55;margin:0;
+    border-top:1px solid var(--navy-line);padding-top:28px}
+  .ff-right{display:flex;align-items:stretch}
+  .screenshot-container{width:100%;border-radius:12px;
+    background:var(--navy-card);border:1px solid var(--navy-line);
+    box-shadow:0 16px 56px rgba(0,0,0,.35);
+    overflow:hidden;min-height:340px;
+    display:flex;align-items:center;justify-content:center}
+  .screenshot-container img{width:100%;height:100%;object-fit:cover;object-position:top;
+    display:block}
+  .sc-placeholder{font-size:13px;color:var(--ivory-dim);text-align:center;
+    padding:48px 24px;line-height:1.7}
+
+  /* ---------- parser / tokens ---------- */
+  .tokens-block{margin:14px 0 0;background:var(--soft);border:1px solid #CBD9EC;border-radius:9px;padding:16px 20px}
+  .tokens-block .tok-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:700;margin-bottom:8px}
+  .tokens-value{font-size:15px;color:var(--ink);line-height:1.7;font-weight:500}
+  .xray-box{margin:22px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.xray-box{grid-template-columns:1fr}}
+  .xray-panel{border-radius:11px;overflow:hidden;border:1px solid var(--line)}
+  .xray-panel.before{border-color:#E3CACA}
+  .xray-panel.after{border-color:#CBD9EC}
+  .xray-screen{min-height:120px;display:flex;align-items:center;justify-content:center;
+    font-weight:600}
+  .xray-panel.before .xray-screen{background:#F8EEEE;color:var(--critical)}
+  .xray-panel.after .xray-screen{background:var(--soft);color:var(--accent-ink)}
+  .xray-meta{padding:14px 16px;background:var(--surface)}
+  .xray-meta .xm-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+  .xray-panel.before .xm-label{color:var(--critical)}
+  .xray-panel.after .xm-label{color:var(--accent-ink)}
+  .xray-meta .xm-body{font-size:13px;color:var(--muted);line-height:1.55}
+  .xray-meta .xm-body em{color:var(--ink);font-style:normal;font-weight:600}
+
+  /* ---------- voice (whose words) ---------- */
+  .voice{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:0 12px 12px 0;padding:36px 32px;margin-bottom:28px;line-height:1.65;font-size:16px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08)}
+  @media(max-width:560px){.voice{padding:26px 18px}}
+  .voice h4{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 14px;color:var(--accent-ink)}
+  .voice b{color:var(--accent-ink)}
+  .voice.good{border-left-color:var(--good)}
+  .voice.good h4{color:var(--good)}
+  .voice p{margin:0 0 12px}.voice p:last-child{margin:0}
+  .voice .statpane{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}
+
+  /* ---------- criteria + capture + strength ---------- */
+  .evidence-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:28px;align-items:start}
+  @media(max-width:800px){.evidence-grid{grid-template-columns:1fr;gap:32px}}
+  .evidence-eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
+    color:var(--accent-ink);margin-bottom:18px}
+  .crit-block{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
+  .crit-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .crit-name{font-size:14px;font-weight:700;color:var(--ink)}
+  .crit-vs{text-align:right;white-space:nowrap}
+  .crit-mkt{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+  .crit-defn{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+    margin-bottom:10px;line-height:1.5}
+  .crit-quote{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink);border-left:3px solid var(--accent);
+    padding-left:12px;margin:10px 0;line-height:1.55}
+  .crit-obs{font-size:14px;color:var(--ink);line-height:1.65;margin:0}
+  .crit-fallback{background:var(--soft);border:1px solid #CBD9EC;border-radius:12px;padding:20px 24px}
+  .crit-fallback p{font-size:14px;color:var(--ink);line-height:1.65;margin:0}
+  .capbox{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:18px 20px;margin-bottom:14px}
+  .capbox .cb-h{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:700;margin-bottom:8px}
+  .capbox p{font-size:14px;line-height:1.65;margin:0 0 10px}
+  .capbox p:last-child{margin:0}
+  .strength{background:#EDF5F0;border:1px solid #CBE2D6;border-radius:10px;padding:14px 18px;margin-bottom:14px;
+    font-size:14px;line-height:1.6}
+  .strength b{color:var(--good)}
+
+  /* ---------- videos ---------- */
+  .video-col{display:flex;flex-direction:column;gap:18px}
+  .video-block{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    overflow:hidden;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:0}
+  .video-embed{position:relative;width:100%;padding-top:56.25%}
+  .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .video-embed.shorts{padding-top:177.78%}
+  .video-copy{padding:20px 24px}
+  .video-copy h3{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.35}
+  .video-copy p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
+
+  /* ---------- diagnosis ---------- */
+  .diag{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;
+    box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:28px;line-height:1.65}
+  @media(max-width:560px){.diag{padding:26px 18px}}
+  .diag h2{margin-bottom:16px}
+  .diag .row{margin:26px 0}
+  .diag .row:first-of-type{margin-top:0}
+  .diag .row p{margin:0 0 10px}.diag .row p:last-child{margin-bottom:0}
+  .diag .k{display:flex;align-items:center;gap:9px;font-size:13px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin:0 0 10px}
+  .diag .k::before{content:"";width:18px;height:4px;background:var(--accent);border-radius:2px;flex-shrink:0}
+  .diag .row+.row{border-top:1px solid var(--line);padding-top:26px}
+  .fixlist{margin:6px 0 0;padding:0;list-style:none;counter-reset:fix}
+  .fixlist li{position:relative;padding:0 0 18px 44px;margin:0}
+  .fixlist li:last-child{padding-bottom:0}
+  .fixlist li::before{counter-increment:fix;content:counter(fix);position:absolute;left:0;top:0;
+    width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .verdict-note{background:var(--soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
+    padding:16px 20px;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.6}
+  .verdict-note p{margin:0 0 10px}.verdict-note p:last-child{margin:0}
+
+  /* ---------- protocol / bridge / choices ---------- */
+  .protocol-section{margin-bottom:28px}
+  .protocol-section .section-eyebrow{margin-bottom:16px}
+  .protocol-container{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:24px 28px;margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
+  .protocol-container .pc-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-bottom:10px}
+  .protocol-container h3{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);margin:0 0 12px;line-height:1.3}
+  .protocol-container p{font-size:15px;color:var(--muted);line-height:1.65;margin:0 0 10px}
+  .protocol-container p:last-child{margin-bottom:0}
+  .protocol-container p b{color:var(--ink)}
+  .protocol-container ul{margin:8px 0 0;padding-left:20px}
+  .protocol-container li{font-size:15px;color:var(--muted);line-height:1.6;margin:6px 0}
+  .protocol-container li b{color:var(--ink)}
+  .narrative-bridge{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:36px 32px;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:28px}
+  @media(max-width:560px){.narrative-bridge{padding:26px 18px}}
+  .narrative-bridge .nb-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--critical);font-weight:700;margin-bottom:12px}
+  .narrative-bridge h2{margin-bottom:14px}
+  .three-choices{margin-bottom:28px}
+  .three-choices .tc-label{font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-bottom:14px}
+  .choice-block{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;margin-bottom:12px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
+  .choice-block:last-child{border:1.5px solid var(--accent);background:var(--surface);
+    box-shadow:0 0 0 5px var(--soft),0 1px 3px rgba(11,19,43,.08)}
+  .choice-block .cb-num{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;margin-bottom:8px}
+  .choice-block:nth-child(2) .cb-num{color:var(--critical)}
+  .choice-block:nth-child(3) .cb-num{color:var(--warn-ink)}
+  .choice-block:last-child .cb-num{color:var(--accent-ink)}
+  .choice-block h3{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);margin:0 0 10px;line-height:1.3}
+  .choice-block p{font-size:15px;color:var(--muted);line-height:1.65;margin:0}
+  .choice-block:last-child p{color:var(--ink)}
+
+  /* ---------- payoffs / assumptions ---------- */
+  .payoffs-section{margin-bottom:28px}
+  .payoffs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
+  @media(max-width:540px){.payoffs-grid{grid-template-columns:1fr}}
+  .payoff-tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;box-shadow:0 1px 3px rgba(11,19,43,.08);display:flex;flex-direction:column}
+  .payoff-tile .pt-icon{font-size:24px;margin-bottom:10px}
+  .payoff-tile .pt-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
+  .payoff-tile .pt-body{font-size:13px;color:var(--muted);line-height:1.6;flex:1}
+  .assumptions-section{margin-bottom:28px}
+  .assumption{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px 28px;
+    margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
+  .assumption .a-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--warn-ink);
+    font-weight:700;margin-bottom:10px}
+  .assumption h3{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--ink);margin:0 0 12px;line-height:1.3}
+  .assumption p{font-size:15px;color:var(--muted);line-height:1.65;margin:0 0 10px}
+  .assumption p:last-child{margin-bottom:0}
+  .assumption p b{color:var(--ink)}
+
+  /* ---------- product reveal / guarantee / checkout ---------- */
+  .product-reveal{border:1.5px solid var(--accent);border-radius:12px;padding:36px 32px;margin-bottom:28px;
+    background:var(--surface);box-shadow:0 0 0 5px var(--soft),0 1px 3px rgba(11,19,43,.08)}
+  @media(max-width:560px){.product-reveal{padding:26px 18px}}
+  .product-reveal .pr-eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-bottom:10px}
+  .product-reveal h2{color:var(--accent-ink);margin-bottom:14px}
+  .mi-img{display:block;width:min(280px,72%);height:auto;margin:0 auto 20px;
+    filter:drop-shadow(0 10px 22px rgba(11,19,43,.25))}
+  .price-anchor{font-size:14px;color:var(--muted);margin:16px 0 6px}
+  .price-main{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--accent-ink);margin:0 0 4px}
+  .price-main span{font-family:"Inter",sans-serif;font-size:14px;font-weight:500;color:var(--muted)}
+  .guarantee-block{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
+    border-radius:0 11px 11px 0;padding:20px 22px;margin-top:22px;
+    display:flex;gap:20px;align-items:center}
+  @media(max-width:560px){.guarantee-block{flex-direction:column}}
+  .guarantee-block .g-copy{flex:1;min-width:0}
+  .guarantee-block .g-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-bottom:10px}
+  .guarantee-block p{font-size:14px;color:var(--ink);line-height:1.65;margin:0 0 10px}
+  .guarantee-block p:last-child{margin-bottom:0}
+  .guarantee-block p b{color:var(--accent-ink)}
+  .angelo-relax{width:120px;aspect-ratio:1;object-fit:cover;border-radius:50%;flex-shrink:0;
+    border:2px solid var(--accent);box-shadow:0 0 0 5px #fff}
+  .cta-angelo{display:block;width:min(380px,88%);height:auto;margin:0 auto 20px}
+  .checkout-section{background:var(--navy);border-radius:16px;padding:40px 32px;margin-bottom:28px}
+  @media(max-width:560px){.checkout-section{padding:28px 20px}}
+  .checkout-section h2{font-family:var(--serif);color:#fff;margin-bottom:6px;font-size:clamp(20px,4vw,26px)}
+  .checkout-section .cs-sub{color:var(--ivory-dim);font-size:15px;margin-bottom:24px}
+  .checkout-form-placeholder{background:var(--navy-card);border:1px dashed var(--navy-line);border-radius:11px;
+    padding:28px 24px;text-align:center}
+  .checkout-form-placeholder .cf-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ivory-dim);font-weight:600;margin-bottom:12px}
+  .checkout-form-placeholder .cf-note{font-size:14px;color:var(--ivory-dim);line-height:1.55}
+  .checkout-form-placeholder .lock-icon{font-size:28px;margin-bottom:10px}
+  .cta-btn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
+    padding:16px 30px;border-radius:6px;font-size:16px;margin-top:18px;border:0;cursor:pointer;width:100%;
+    text-align:center}
+  .cta-btn:hover{background:var(--gold-h)}
+  .cta-btn:disabled{opacity:.55;cursor:default}
+  .guarantee{font-size:13px;color:var(--ivory-dim);margin-top:14px;text-align:center;line-height:1.5}
+"""
+
+# The criteria a Marketing Intelligence File genuinely fixes, and the plain phrase the hook uses
+# for each. Mirrors render_result's hook: never praise while one of these sits at 5/10 or under.
+_SALES_HOLE = {
+    "specificity": "who it's for",
+    "clarity_5sec": "a stranger getting it in five seconds",
+    "offer_clarity": "showing what you actually fix",
+    "symptom_resonance": "describing the problem in your buyer's own words",
+}
+
+
+def _sales_hook(data, page_word, niche_word):
+    """The personalised hook box for the hero. Same rule as the report: if any MI-fixable
+    criterion is 5/10 or under, name the weakest one; praise only when nothing is weak."""
+    scores = (data or {}).get("scores") or {}
+    if not scores:
+        return ""
+    weak = min(_SALES_HOLE, key=lambda k: scores.get(k, 99))
+    hole_score = scores.get(weak, 0)
+    mr_score = scores.get("symptom_resonance", 0)
+    if hole_score > 5:
+        return (
+            f'<div class="hook good"><span class="hl">Your {page_word} scored a strong <span class="sc">{mr_score}/10</span> on Mind Reading.</span> '
+            f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
+            f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
+            f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
+            f'{niche_word}you want more of.</div>'
+        )
+    return (
+        f'<div class="hook"><span class="hl">Your {page_word} scored <span class="sc">{hole_score}/10</span> on {_SALES_HOLE[weak]},</span> not '
+        f'because you don&rsquo;t know your clients, but because it&rsquo;s written in your words, not the words '
+        f'a cold buyer uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
+        f'is the whole game.</div>'
+    )
+
+
+def _sales_voice(voice, page_word, cnt):
+    """The 'whose words are these' block, built from the coach's actual words. Same copy as the
+    report's section 4 (approved), trimmed to salespage length. Empty when we have no voice data."""
+    leaning = (voice or {}).get("leaning")
+    if not leaning:
+        return ""
+    coach_terms = ", ".join(f"&lsquo;{html.escape(t)}&rsquo;" for t in voice.get("coach_terms", []) if t) or "coach language"
+    if leaning == "expert":
+        return (
+            '<div class="voice"><h4>Whose words are these? Yours, or your buyer&rsquo;s?</h4>'
+            f'<p>On your {page_word} you reach for coach words like {coach_terms}. They&rsquo;re good words. But they&rsquo;re '
+            '<b>your</b> words, not your customer&rsquo;s.</p>'
+            '<p>Right now you&rsquo;re talking expert to expert. Another coach would read this and understand you easily. '
+            'But your buyer isn&rsquo;t another expert. <b>They still have the problem.</b> They need you to talk '
+            '<b>expert to buyer</b>.</p>'
+            '<p>You talk like the expert who fixed the problem. They talk like someone who still has it. Those are two '
+            'different languages.</p>'
+            f'<p class="statpane">And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
+            f'<b>1 in {BUYER_VOICE_1_IN}</b> use their customer&rsquo;s words. The other <b>{PCT_NOT_BUYER_VOICE}%</b> sound just like this page does.</p>'
+            '<p>That&rsquo;s good news for you. Nearly every coach sounds the same, so people can&rsquo;t tell them apart. Use '
+            'the words your customers actually use, and <b>you stand out straight away</b>. You become <b>the coach who '
+            'understands them</b>. The rest of this page shows you where those words come from.</p></div>')
+    if leaning == "customer":
+        return (
+            '<div class="voice good"><h4>You&rsquo;re speaking your buyer&rsquo;s language</h4>'
+            f'<p>Here&rsquo;s something you&rsquo;re doing well. Your {page_word} talks about the problem in words your customer '
+            'would actually use, not just coach words.</p>'
+            f'<p>That&rsquo;s rarer than you&rsquo;d think. Of the {cnt} coaching sites we scored, only about 1 in {BUYER_VOICE_1_IN} do this. The '
+            f'other {PCT_NOT_BUYER_VOICE}% talk like the expert. You sound more like the person with the problem, and <b>that&rsquo;s a real edge</b>. '
+            'Keep using the real words your clients say.</p></div>')
+    return (
+        '<div class="voice"><h4>Whose words are these? Yours, or your buyer&rsquo;s?</h4>'
+        f'<p>Your {page_word} mixes your words with your customer&rsquo;s words.</p>'
+        '<p>The closer you get to how your customer really talks, the words they&rsquo;d use for their own problem, the '
+        'more of them will get in touch instead of just nodding and leaving.</p>'
+        '<p>And that&rsquo;s harder than it sounds. You know your work so well that you&rsquo;ve forgotten how your customer '
+        'talks about it. <b>Finding their real words takes proper digging, not a quick rewrite.</b></p></div>')
+
+
+def _sales_capture(ev, page_word):
+    """Their opt-in and booking situation, named exactly (deterministic detector output, so every
+    personal claim here is the detector's own words). Empty when the record has no capture data."""
+    caps = (ev or {}).get("captures") or {}
+    if not caps:
+        return ""
+    opt = caps.get("opt_in") or {}
+    bk = caps.get("booking") or {}
+    parts = []
+    okind, odesc, buried = opt.get("kind", "none"), opt.get("desc", ""), opt.get("buried")
+    if okind == "none" or not odesc:
+        parts.append(f"We couldn&rsquo;t see any way on your {page_word} for a visitor who isn&rsquo;t ready to "
+                     "book to leave their email and hear from you again. They read, they leave, and you have no "
+                     "way to reach them after that.")
+    elif okind == "magnet":
+        s = (f"You&rsquo;ve got {html.escape(odesc)} on the page, something a visitor can take without booking "
+             "anything. That&rsquo;s the right move.")
+        if buried:
+            s += " But it sits low on the page, so a cold visitor may never reach it."
+        parts.append(s)
+    else:
+        s = f"The only sign-up we could see for a visitor who isn&rsquo;t ready to book is {html.escape(odesc)}."
+        if buried:
+            s += " And it sits low on the page, so a cold visitor may never even see it."
+        s += (" That visitor has no reason to hand over their email, so they leave with nothing, and you have "
+              "no way to reach them again.")
+        parts.append(s)
+    bkind, bdesc = bk.get("kind", "none"), bk.get("desc", "")
+    if bkind in ("booking", "booking_live") and bdesc:
+        parts.append(f"For the visitor who is ready, you have {html.escape(bdesc)}. That part works.")
+    elif bkind == "contact_form" and bdesc:
+        parts.append(f"For the visitor who is ready, the page offers {html.escape(bdesc)}. A form is passive. "
+                     "Some will fill it in. The rest close the tab.")
+    elif bkind == "application" and bdesc:
+        parts.append(f"For the visitor who is ready, the page offers {html.escape(bdesc)}. That is a lot to ask "
+                     "of someone who found you five minutes ago.")
+    elif bkind == "none":
+        parts.append("And we couldn&rsquo;t see a clear way for a ready visitor to book you, or reach you, "
+                     "straight from the page.")
+    parts.append("Both jobs run on the same thing: words. A sign-up only works when it offers something your "
+                 "buyer already knows they want, named in their words. Finding those words is research, and that "
+                 "research is exactly what the Marketing Intelligence File is.")
+    body = "".join(f"<p>{p}</p>" for p in parts)
+    return f'<div class="capbox"><div class="cb-h">How your page treats the not-ready visitor</div>{body}</div>'
+
+
+def _sales_diag(critique):
+    """The full 4-part diagnosis the audit already wrote for this exact page. Rows render only for
+    the fields the record actually has. Empty when there is no stored critique."""
+    cr = critique or {}
+    rows = []
+    if cr.get("headline_problem"):
+        rows.append(f'<div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr["headline_problem"]))}</div>')
+    if cr.get("why_it_costs_clients"):
+        rows.append(f'<div class="row"><div class="k">What it&rsquo;s costing you</div>{para_split(cr["why_it_costs_clients"])}</div>')
+    if cr.get("top_fixes"):
+        fixes = "".join(f"<li>{para_split(f)}</li>" for f in cr["top_fixes"])
+        rows.append(f'<div class="row"><div class="k">The obvious fixes</div><ol class="fixlist">{fixes}</ol></div>')
+    if cr.get("money_left_on_table"):
+        rows.append(f'<div class="row"><div class="k">Bottom line</div><div class="verdict-note">{para_split(cr["money_left_on_table"])}</div></div>')
+    if not rows:
+        return ""
+    return (
+        '<div class="diag">'
+        '<h2>The diagnosis, from your own audit</h2>'
+        '<p style="color:var(--muted);font-size:14px;margin-bottom:6px">This is not a template. It was written about your page, from what we read on it.</p>'
+        + "".join(rows) +
+        '</div>')
+
+
+def _build_criteria_html(data, hero_quote):
+    """Return the 3 lowest-scoring criteria blocks (with the you-vs-market number for each),
+    or a plain fallback if no stored record is available."""
     _fallback = (
         '<div class="crit-fallback">'
         "<p>Your homepage copy does not name a specific, daily problem your buyer is living through. "
         "It describes what coaching does rather than what a stranger is already searching for. "
-        "That gap is why cold visitors leave without making contact.</p>"
+        "That is why cold visitors leave without making contact.</p>"
         "</div>"
     )
-    if not raw_json:
+    if not data:
         return _fallback
     try:
-        data   = _json.loads(raw_json)
         scores = data.get("scores", {})
-        notes  = data.get("notes", {})
-        hero   = html.escape(hero_quote or "")
+        notes = data.get("notes", {})
+        hero = html.escape(hero_quote or "")
         scored = [(k, scores[k]) for k in DISPLAY_CRIT if k in scores]
         scored.sort(key=lambda x: x[1])
         worst3 = scored[:3]
@@ -1182,9 +1606,9 @@ def _build_criteria_html(raw_json, hero_quote):
         blocks = []
         for k, s in worst3:
             label = html.escape(LABELS.get(k, k))
-            defn  = html.escape(DEFINITIONS.get(k, ""))
-            note_obj  = notes.get(k, {})
-            raw_note  = (note_obj.get("note", "") if isinstance(note_obj, dict) else "") or ""
+            defn = html.escape(DEFINITIONS.get(k, ""))
+            note_obj = notes.get(k, {})
+            raw_note = (note_obj.get("note", "") if isinstance(note_obj, dict) else "") or ""
             # First sentence only — split on ". " so decimal numbers don't break it.
             dot = raw_note.find(". ")
             first_sent = html.escape((raw_note[:dot + 1] if dot != -1 else raw_note[:200]).strip())
@@ -1192,11 +1616,15 @@ def _build_criteria_html(raw_json, hero_quote):
             quote_html = ""
             if k in ("clarity_5sec", "symptom_resonance", "specificity") and hero:
                 quote_html = f'<blockquote class="crit-quote">&ldquo;{hero}&rdquo;</blockquote>'
+            # The market number for the same criterion — read live from audit.py's BENCH (the single
+            # source of truth), never from the stored record, so a re-benchmark updates old pages too.
+            mkt = BENCH.get(k)
+            mkt_html = f'<span class="crit-mkt">market {mkt}</span>' if mkt is not None else ""
             blocks.append(
                 f'<div class="crit-block">'
                 f'<div class="crit-header">'
                 f'<span class="crit-name">{label}</span>'
-                f'<span class="crit-score">{s}/10</span>'
+                f'<span class="crit-vs"><span class="chip {sev_class(s)}">{s}<span class="den">/10</span></span>{mkt_html}</span>'
                 f'</div>'
                 f'<div class="crit-defn">{defn}</div>'
                 f'{quote_html}'
@@ -1209,209 +1637,48 @@ def _build_criteria_html(raw_json, hero_quote):
 
 
 def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_json=""):
-    fn     = html.escape(first_name)
-    fn_up  = html.escape(first_name.upper())
-    hl     = html.escape(headline)
-    tok    = html.escape(tokens)
-    sc     = html.escape(score)
-    shot   = html.escape(screenshot, quote=True)
-    criteria_html = _build_criteria_html(raw_json, headline)
+    fn = html.escape(first_name)
+    fn_up = html.escape(first_name.upper())
+    shot = html.escape(screenshot, quote=True)
+    cnt = f"{websites_read_count():,}"
+
+    # Parse the stored audit once. Every personalised block below degrades cleanly without it,
+    # so the param-only fallback URL still renders a complete page.
+    data = None
+    if raw_json:
+        try:
+            data = _json.loads(raw_json)
+        except Exception:
+            data = None
+    ev = (data or {}).get("evidence") or {}
+    voice = (data or {}).get("voice") or {}
+    critique = (data or {}).get("critique") or {}
+
+    # RULEBOOK §0: never claim "homepage" when a subpage was audited.
+    page_word = "homepage" if (data or {}).get("is_home", True) else "page"
+    # Prefer the stored 1-decimal score over the coarse URL param.
+    sc = html.escape(str((data or {}).get("score_10_display") or score))
+    # The coach's actual words from the voice sweep beat the old generic-tokens param.
+    _terms = [t for t in voice.get("coach_terms", []) if t]
+    tok = html.escape(tokens or ", ".join(_terms) or "generic coaching terms")
+    # Niche → "life coaching clients" (raw niche words don't work as an adjective on their own).
+    _niche = ev.get("niche")
+    niche_word = f"{html.escape(_niche)} coaching clients " if _niche else "clients "
+
+    hook_html = _sales_hook(data, page_word, niche_word)
+    voice_html = _sales_voice(voice, page_word, cnt)
+    capture_html = _sales_capture(ev, page_word)
+    diag_html = _sales_diag(critique)
+    criteria_html = _build_criteria_html(data, headline)
+    strength_html = ""
+    if (data or {}).get("strength"):
+        strength_html = (f'<div class="strength">&#10003; <b>What you&rsquo;re doing right:</b> '
+                         f'{html.escape(data["strength"])}</div>')
+
     return f"""<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Your Marketing Intelligence File &mdash; {fn}</title>
-<style>
-  @font-face{{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}}
-  :root{{--paper:#FBFBFD;--surface:#fff;--ink:#12131A;--muted:#5c6a67;--line:#dde3e0;
-    --accent:#2A75D3;--accent-ink:#1a5fb8;--soft:#e8f0fb;--critical:#b3402a;--warn:#b47f26;}}
-  *{{box-sizing:border-box}}
-  body{{margin:0;background:var(--paper);color:var(--ink);
-    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}}
-  .wrap{{max-width:760px;margin:0 auto;padding:44px 22px 80px}}
-  .eyebrow{{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);font-weight:600;margin-bottom:18px}}
-  h1{{font-weight:600;font-size:clamp(26px,5vw,40px);letter-spacing:-.015em;margin:.2em 0 .5em;line-height:1.12}}
-  h2{{font-weight:600;font-size:clamp(17px,3vw,22px);margin:0 0 12px;line-height:1.25;color:var(--ink)}}
-  h3{{font-weight:600;font-size:16px;margin:0 0 8px;color:var(--ink)}}
-  p{{margin:0 0 14px;font-size:15px;line-height:1.65;color:var(--ink)}}
-  p:last-child{{margin-bottom:0}}
-  .card{{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 30px;
-    box-shadow:0 8px 30px rgba(20,40,36,.06);margin-bottom:22px}}
-  .label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:12px}}
-  .score-num{{font-size:72px;font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--critical)}}
-  .score-den{{font-size:22px;color:var(--muted);font-weight:600;vertical-align:super}}
-  .score-line{{margin:.15em 0 .5em;font-size:clamp(17px,2.8vw,21px);font-weight:600;line-height:1.25;color:var(--ink)}}
-  .cold-buyer-note{{font-size:15px;line-height:1.65;color:var(--muted);margin:.4em 0 0}}
-  .headline-quote{{font-style:italic;border-left:4px solid var(--accent);padding-left:16px;margin:14px 0;
-    font-size:17px;color:var(--ink);line-height:1.5}}
-  .tokens-block{{margin:14px 0 0;background:var(--soft);border:1px solid #cdddf3;border-radius:9px;padding:16px 20px}}
-  .tokens-block .tok-label{{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
-    font-weight:700;margin-bottom:8px}}
-  .tokens-value{{font-size:15px;color:var(--ink);line-height:1.7;font-weight:500}}
-  .section-eyebrow{{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
-    font-weight:600;margin-bottom:18px}}
-  .evidence-grid{{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:32px;align-items:start}}
-  @media(max-width:900px){{.evidence-grid{{grid-template-columns:1fr;gap:32px}}}}
-  .evidence-eyebrow{{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
-    color:var(--accent);margin-bottom:18px}}
-  .crit-block{{background:var(--surface);border:1px solid var(--line);border-radius:12px;
-    padding:20px 24px;margin-bottom:14px}}
-  .crit-block:last-child{{margin-bottom:0}}
-  .crit-header{{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}}
-  .crit-name{{font-size:13px;font-weight:700;color:var(--ink)}}
-  .crit-score{{font-size:12px;font-weight:700;color:var(--critical);background:#fdf0ee;
-    padding:2px 8px;border-radius:6px}}
-  .crit-defn{{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
-    margin-bottom:10px;line-height:1.5}}
-  .crit-quote{{font-style:italic;font-size:14px;color:var(--ink);border-left:3px solid var(--accent);
-    padding-left:12px;margin:10px 0;line-height:1.55}}
-  .crit-obs{{font-size:14px;color:var(--muted);line-height:1.65;margin:0}}
-  .crit-fallback{{background:var(--soft);border:1px solid #cdddf3;border-radius:12px;padding:20px 24px}}
-  .crit-fallback p{{font-size:14px;color:var(--ink);line-height:1.65;margin:0}}
-  .video-section-grid{{display:grid;grid-template-columns:1fr 2fr;gap:40px;
-    align-items:start;margin-bottom:22px}}
-  @media(max-width:768px){{.video-section-grid{{grid-template-columns:1fr;gap:28px}}}}
-  .video-section-copy{{padding-top:4px}}
-  .video-section-copy p{{font-size:15px;color:var(--muted);line-height:1.72;margin:0 0 16px}}
-  .video-section-copy p:last-child{{margin-bottom:0}}
-  .video-section-copy strong{{color:var(--ink)}}
-  .video-col{{display:flex;flex-direction:column;gap:18px}}
-  .video-block{{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-    overflow:hidden;box-shadow:0 4px 18px rgba(20,40,36,.06);margin-bottom:0}}
-  .video-embed{{position:relative;width:100%;padding-top:56.25%}}
-  .video-embed iframe{{position:absolute;inset:0;width:100%;height:100%;border:0}}
-  .video-embed.shorts{{padding-top:177.78%}}
-  .video-copy{{padding:20px 24px}}
-  .video-copy h3{{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.35}}
-  .video-copy p{{font-size:14px;color:var(--muted);line-height:1.6;margin:0}}
-  .product-reveal{{border:2px solid var(--accent);border-radius:14px;padding:28px 30px;margin-bottom:22px;
-    background:var(--surface);box-shadow:0 8px 30px rgba(20,40,36,.06)}}
-  .product-reveal .pr-eyebrow{{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--accent-ink);font-weight:700;margin-bottom:10px}}
-  .product-reveal h2{{color:var(--accent-ink);margin-bottom:14px}}
-  .product-reveal .price-line{{margin:18px 0 0;font-size:20px;font-weight:700;color:var(--ink)}}
-  .product-reveal .price-line span{{color:var(--accent-ink)}}
-  .checkout-section{{background:var(--ink);border-radius:14px;padding:32px 30px;margin-bottom:22px}}
-  .checkout-section h2{{color:#fff;margin-bottom:6px;font-size:clamp(20px,4vw,26px)}}
-  .checkout-section .cs-sub{{color:#9ec6f0;font-size:15px;margin-bottom:24px}}
-  .checkout-form-placeholder{{background:#1e2e28;border:1px dashed rgba(255,255,255,.2);border-radius:11px;
-    padding:28px 24px;text-align:center}}
-  .checkout-form-placeholder .cf-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:rgba(255,255,255,.4);font-weight:600;margin-bottom:12px}}
-  .checkout-form-placeholder .cf-note{{font-size:14px;color:rgba(255,255,255,.5);line-height:1.55}}
-  .checkout-form-placeholder .lock-icon{{font-size:28px;margin-bottom:10px}}
-  .cta-btn{{display:inline-block;background:#e0691f;color:#fff;text-decoration:none;font-weight:700;
-    padding:16px 30px;border-radius:9px;font-size:16px;margin-top:18px;border:0;cursor:pointer;width:100%;
-    text-align:center}}
-  .cta-btn:hover{{background:#c65a15}}
-  .guarantee{{font-size:13px;color:rgba(255,255,255,.45);margin-top:14px;text-align:center;line-height:1.5}}
-  .xray-box{{margin:22px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}}
-  @media(max-width:560px){{.xray-box{{grid-template-columns:1fr}}}}
-  .xray-panel{{border-radius:11px;overflow:hidden;border:1px solid var(--line)}}
-  .xray-panel.before{{border-color:#d4b8b3}}
-  .xray-panel.after{{border-color:#b8cfd4}}
-  .xray-screen{{height:120px;display:flex;align-items:center;justify-content:center;
-    font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}}
-  .xray-panel.before .xray-screen{{background:#f5eeec;color:#9a6055}}
-  .xray-panel.after .xray-screen{{background:#e8f0f2;color:#3a6e7a}}
-  .xray-meta{{padding:14px 16px;background:var(--surface)}}
-  .xray-meta .xm-label{{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:6px}}
-  .xray-panel.before .xm-label{{color:#9a6055}}
-  .xray-panel.after .xm-label{{color:#3a6e7a}}
-  .xray-meta .xm-body{{font-size:13px;color:var(--muted);line-height:1.55}}
-  .xray-meta .xm-body em{{color:var(--ink);font-style:normal;font-weight:600}}
-  .protocol-section{{margin-bottom:22px}}
-  .protocol-section .section-eyebrow{{margin-bottom:16px}}
-  .protocol-container{{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-    padding:24px 28px;margin-bottom:14px;box-shadow:0 4px 18px rgba(20,40,36,.04)}}
-  .protocol-container .pc-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--accent-ink);font-weight:700;margin-bottom:10px}}
-  .protocol-container h3{{font-size:17px;font-weight:700;color:var(--ink);margin:0 0 12px;line-height:1.3}}
-  .protocol-container p{{font-size:15px;color:var(--muted);line-height:1.65;margin:0 0 10px}}
-  .protocol-container p:last-child{{margin-bottom:0}}
-  .protocol-container p b{{color:var(--ink)}}
-  .protocol-container ul{{margin:8px 0 0;padding-left:20px}}
-  .protocol-container li{{font-size:15px;color:var(--muted);line-height:1.6;margin:6px 0}}
-  .protocol-container li b{{color:var(--ink)}}
-  .narrative-bridge{{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-    padding:28px 30px;box-shadow:0 8px 30px rgba(20,40,36,.06);margin-bottom:22px}}
-  .narrative-bridge .nb-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--critical);font-weight:700;margin-bottom:12px}}
-  .narrative-bridge h2{{margin-bottom:14px}}
-  .three-choices{{margin-bottom:22px}}
-  .three-choices .tc-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--muted);font-weight:600;margin-bottom:14px}}
-  .choice-block{{background:var(--surface);border:1px solid var(--line);border-radius:12px;
-    padding:20px 24px;margin-bottom:12px;box-shadow:0 3px 12px rgba(20,40,36,.04)}}
-  .choice-block:last-child{{border-color:var(--accent);background:var(--soft)}}
-  .choice-block .cb-num{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    font-weight:700;margin-bottom:8px}}
-  .choice-block:nth-child(1) .cb-num{{color:var(--critical)}}
-  .choice-block:nth-child(2) .cb-num{{color:var(--warn)}}
-  .choice-block:last-child .cb-num{{color:var(--accent-ink)}}
-  .choice-block h3{{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.3}}
-  .choice-block p{{font-size:15px;color:var(--muted);line-height:1.65;margin:0}}
-  .choice-block:last-child p{{color:var(--ink)}}
-  .payoffs-section{{margin-bottom:22px}}
-  .payoffs-grid{{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}}
-  @media(max-width:540px){{.payoffs-grid{{grid-template-columns:1fr}}}}
-  .payoff-tile{{background:var(--surface);border:1px solid var(--line);border-radius:12px;
-    padding:20px 22px;box-shadow:0 3px 14px rgba(20,40,36,.05);display:flex;flex-direction:column}}
-  .payoff-tile .pt-icon{{font-size:24px;margin-bottom:10px}}
-  .payoff-tile .pt-title{{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}}
-  .payoff-tile .pt-body{{font-size:13px;color:var(--muted);line-height:1.6;flex:1}}
-  .assumptions-section{{margin-bottom:22px}}
-  .assumption{{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px 28px;
-    margin-bottom:14px;box-shadow:0 4px 18px rgba(20,40,36,.04)}}
-  .assumption .a-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--warn);
-    font-weight:700;margin-bottom:10px}}
-  .assumption h3{{font-size:17px;font-weight:700;color:var(--ink);margin:0 0 12px;line-height:1.3}}
-  .assumption p{{font-size:15px;color:var(--muted);line-height:1.65;margin:0 0 10px}}
-  .assumption p:last-child{{margin-bottom:0}}
-  .assumption p b{{color:var(--ink)}}
-  .price-anchor{{font-size:14px;color:var(--muted);margin:16px 0 6px;text-decoration:line-through}}
-  .price-main{{font-size:26px;font-weight:700;color:var(--accent-ink);margin:0 0 4px}}
-  .price-main span{{font-size:14px;font-weight:500;color:var(--muted)}}
-  .guarantee-block{{background:var(--soft);border:1px solid #cdddf3;border-left:4px solid var(--accent);
-    border-radius:11px;padding:20px 22px;margin-top:22px}}
-  .guarantee-block .g-label{{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--accent-ink);font-weight:700;margin-bottom:10px}}
-  .guarantee-block p{{font-size:14px;color:var(--ink);line-height:1.65;margin:0 0 10px}}
-  .guarantee-block p:last-child{{margin-bottom:0}}
-  .guarantee-block p b{{color:var(--accent-ink)}}
-  .site-nav{{background:#fff;border-bottom:1px solid var(--line);padding:0 28px;
-    display:flex;align-items:center;gap:12px;height:58px;
-    position:sticky;top:0;z-index:100;box-shadow:0 1px 6px rgba(18,19,26,.05)}}
-  .site-nav img{{height:36px;width:auto;display:block}}
-  .site-nav .brand-name{{font-size:12px;font-weight:700;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--ink);line-height:1.2}}
-  .first-fold-section{{background:var(--paper);padding:60px 40px 56px}}
-  .ff-header{{max-width:1100px;margin:0 auto 36px}}
-  .ff-eyebrow{{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-    color:var(--accent);font-weight:700;margin-bottom:18px}}
-  .ff-h1{{font-size:clamp(24px,3.4vw,42px);font-weight:700;color:#12131A;
-    letter-spacing:-.02em;line-height:1.14;margin:0}}
-  .first-fold-inner{{max-width:1100px;margin:0 auto;display:grid;
-    grid-template-columns:1fr 1fr;gap:48px;align-items:center}}
-  @media(max-width:800px){{.first-fold-inner{{grid-template-columns:1fr;gap:32px}}
-    .first-fold-section{{padding:44px 22px 48px}}
-    .ff-header{{margin-bottom:24px}}}}
-  .ff-body{{font-size:16px;font-weight:400;color:var(--muted);line-height:1.72;margin:0 0 16px}}
-  .ff-body:last-child{{margin-bottom:0}}
-  .ff-body strong{{color:var(--ink)}}
-  .ff-bridge{{max-width:1100px;margin:32px auto 0;padding:0 0 8px}}
-  .ff-bridge p{{font-size:18px;font-weight:600;color:var(--ink);line-height:1.5;margin:0;
-    border-top:1px solid var(--line);padding-top:28px}}
-  .ff-right{{display:flex;align-items:stretch}}
-  .screenshot-container{{width:100%;border-radius:16px;
-    background:#E8EEF7;
-    box-shadow:0 16px 56px rgba(42,117,211,.14),0 2px 8px rgba(42,117,211,.07);
-    overflow:hidden;min-height:340px;
-    display:flex;align-items:center;justify-content:center}}
-  .screenshot-container img{{width:100%;height:100%;object-fit:cover;object-position:top;
-    display:block;border-radius:16px}}
-  .sc-placeholder{{font-size:13px;color:#7a95c4;text-align:center;
-    padding:48px 24px;line-height:1.7}}
-  .sc-placeholder-icon{{font-size:36px;margin-bottom:12px}}
-</style></head><body>
+<title>Your Marketing Intelligence File | {fn}</title>
+<style>{_SALES_CSS}</style></head><body>
 
   <nav class="site-nav">
     <img src="/angelo.png" alt="Going Beyond The Illusion">
@@ -1425,11 +1692,13 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
     <div class="first-fold-inner">
       <div class="ff-left">
-        <p class="ff-body">Hello {fn}. Your homepage text scored a brutal <strong style="color:#2A75D3">{sc}/10</strong>.</p>
+        <p class="ff-body">Hello {fn}. Your {page_word} text scored a brutal <strong class="ff-score">{sc}/10</strong>.
+        For context: across the {cnt} coaching homepages we have read, the average score is {MARKET_AVG_10} out of 10,
+        and the top 10% score {TOP10_10} or higher.</p>
         <p class="ff-body"><strong>Your words do not match the thoughts already inside your client&rsquo;s head.</strong></p>
         <p class="ff-body">Look closely at your screenshot on the right. When people get a low score, they usually try to change their website layout, fix their fonts, or rewrite their sentences. That is a mistake.</p>
         <p class="ff-body">The real problem is not how your page looks. The problem is that your words talk about you and what you do, instead of talking about what your client is already thinking.</p>
-        <p class="ff-body">Someone landed on your page yesterday with a specific, painful problem. They gave it five seconds. Your words did not describe their problem. They left. You never knew they were there.</p>
+        <p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. They gave it five seconds. Your words did not describe their problem. They left. You never knew they were there.</p>
       </div>
       <div class="ff-right">
         <div class="screenshot-container">
@@ -1438,8 +1707,9 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         </div>
       </div>
     </div>
+    {hook_html}
     <div class="ff-bridge">
-      <p>That happens because of a data problem, not a design problem. This page is going to show you exactly what the data problem is&mdash;and what fixes it.</p>
+      <p>That happens because of a data problem, not a design problem. This page is going to show you exactly what the data problem is, and what fixes it.</p>
     </div>
   </div>
 
@@ -1448,9 +1718,9 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <!-- BODY LAYER 2: THE CLICHÉ HOOK -->
   <div class="card">
     <div class="label">Language parser report</div>
-    <h2>Our parser read your homepage and found these terms.</h2>
+    <h2>Our parser read your {page_word} and found these terms.</h2>
     <p>Each one is abstract. Each one could sit on any coaching page on the internet.
-    When a stranger lands on your page and reads words that do not describe their specific problem,
+    When a stranger arrives on your page and reads words that do not describe their specific problem,
     they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
     and they leave. The problem is not your design or your credentials. It is the words.</p>
     <div class="tokens-block">
@@ -1460,22 +1730,22 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <p style="margin-top:14px">Each of those terms means something specific to you.
     To a cold stranger who has never met you, they describe nobody&rsquo;s life in particular.
     Replacing them with different abstract terms is not a fix. The fix is to find out what language
-    your specific buyer uses when they describe their own problem&mdash;and use those words instead.
+    your specific buyer uses when they describe their own problem, and use those words instead.
     That is a research question, not a writing question.</p>
 
     <div style="margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
-      color:var(--muted);font-weight:600;margin-bottom:10px">The Messaging X-Ray: From Intuition to Intelligence</div>
+      color:var(--accent-ink);font-weight:700;margin-bottom:10px">The Messaging X-Ray: From Intuition to Intelligence</div>
     <div class="xray-box">
       <div class="xray-panel before">
-        <div class="xray-screen" style="font-size:22px;letter-spacing:.04em;opacity:.55;font-style:italic">{tok}</div>
+        <div class="xray-screen" style="font-size:16px;letter-spacing:.02em;font-style:italic;padding:18px 22px;text-align:center">{tok}</div>
         <div class="xray-meta">
-          <div class="xm-label">What your homepage says</div>
+          <div class="xm-label">What your {page_word} says</div>
           <div class="xm-body">These words describe what you offer. A cold buyer is not searching for what you offer.
           They are searching for relief from a specific problem. These words do not name it.</div>
         </div>
       </div>
       <div class="xray-panel after">
-        <div class="xray-screen" style="font-size:13px;line-height:1.6;padding:18px 22px;text-align:left;opacity:.8">&ldquo;I cannot stop thinking about&hellip;&rdquo;<br>&ldquo;I wake up every morning and&hellip;&rdquo;<br>&ldquo;I have tried everything and&hellip;&rdquo;</div>
+        <div class="xray-screen" style="font-size:13px;line-height:1.6;padding:18px 22px;text-align:left">&ldquo;I cannot stop thinking about&hellip;&rdquo;<br>&ldquo;I wake up every morning and&hellip;&rdquo;<br>&ldquo;I have tried everything and&hellip;&rdquo;</div>
         <div class="xray-meta">
           <div class="xm-label">What your buyer actually says</div>
           <div class="xm-body">Real, unedited language from the forums, reviews, and complaint boards where
@@ -1485,12 +1755,16 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
+  {voice_html}
+
   <!-- EVIDENCE GRID: criteria analysis left, video proof right -->
   <div class="evidence-grid">
 
     <div class="evidence-left">
       <div class="evidence-eyebrow">Where your page is losing buyers right now</div>
       {criteria_html}
+      {capture_html}
+      {strength_html}
     </div>
 
     <div class="evidence-right">
@@ -1508,7 +1782,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           </div>
           <div class="video-copy">
             <h3>A language fix that corrected a blind spot for a coach in South America.</h3>
-            <p>Chad explains how the Marketing Intelligence data forced him to stop guessing and change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
+            <p>Chad explains how the Marketing Intelligence data forced him to change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
           </div>
         </div>
 
@@ -1534,7 +1808,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           </div>
           <div class="video-copy">
             <h3>Long-term results after removing the guesswork completely.</h3>
-            <p>Brandon shows the financial difference between pages built on intuition and pages built on real buyer data. The gap is not subtle.</p>
+            <p>Brandon shows the financial difference between pages built on intuition and pages built on real buyer data. The difference is not subtle.</p>
           </div>
         </div>
 
@@ -1543,9 +1817,11 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   </div>
 
+  {diag_html}
+
   <!-- PROTOCOL BREAKDOWN -->
-  <div class="protocol-section">
-    <div class="section-eyebrow">What is inside your Marketing Intelligence Protocol</div>
+  <div class="protocol-section" id="inside">
+    <div class="section-eyebrow">What is inside your Marketing Intelligence File</div>
 
     <div class="protocol-container">
       <div class="pc-label">Container A</div>
@@ -1585,8 +1861,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="nb-label">Where this leaves you</div>
     <h2>You cannot write your way out of a positioning problem.</h2>
     <p>You can rewrite your homepage. You can hire a copywriter. You can ask an AI to help you.
-    None of those things change what your buyer is already thinking before they land on your page.
-    The only fix is to find out what they are thinking&mdash;in their own words, not yours.
+    None of those things change what your buyer is already thinking before they arrive on your page.
+    The only fix is to find out what they are thinking, in their own words, not yours.
     That is a research problem. The Marketing Intelligence File solves it.</p>
     <p>You now have three options.</p>
   </div>
@@ -1612,8 +1888,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="choice-block">
       <div class="cb-num">Option 3</div>
       <h3>Get the data</h3>
-      <p>For &pound;75&mdash;one time&mdash;our research engine maps the exact vocabulary your specific buyers
-      use when they are ready to spend money. You stop guessing. Your page starts working.</p>
+      <p>For &pound;75, one time, our research engine maps the exact vocabulary your specific buyers
+      use when they are ready to spend money. Your page starts working.</p>
     </div>
   </div>
 
@@ -1637,7 +1913,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="pt-title">Wiping Out Client Acquisition Fatigue</div>
         <div class="pt-body">
           <p>You did not start a coaching business to become a full-time social media content creator, dancing on videos or writing daily motivational essays that competitors copy and buyers ignore.</p>
-          <p>Because this single data protocol hands you your market&rsquo;s exact real-life situations, your content creation is entirely finished.</p>
+          <p>Because this single data file hands you your market&rsquo;s exact real-life situations, your content creation is entirely finished.</p>
           <p>You write punchy, short posts that pull real buyers straight to your inbox, allowing you to stop shouting for attention online and start doing the deep work you love.</p>
         </div>
       </div>
@@ -1647,7 +1923,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="pt-title">Total Commercial Certainty Over Your Future</div>
         <div class="pt-body">
           <p>Staring at a blank screen wondering what offer to launch next is an exhausting way to live.</p>
-          <p>This protocol acts as your permanent business instrument panel. Whether you are launching a new lead resource, pivoting your entire target niche, or building a brand-new service framework, you operate with absolute commercial certainty.</p>
+          <p>This file acts as your permanent business instrument panel. Whether you are launching a new lead freebie, pivoting your entire target niche, or building a brand-new service framework, you operate with absolute commercial certainty.</p>
           <p>You know exactly what commercial problems strangers will happily pull out their wallets to fix, removing the fear of failure from your business forever.</p>
         </div>
       </div>
@@ -1667,7 +1943,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="pt-title">Closing High-Ticket Deals Without Selling</div>
         <div class="pt-body">
           <p>Stop sweating before you hop on a sales call, wondering if a prospect will fight you on your prices or throw an awkward objection at your face.</p>
-          <p>When you use the exact vocabulary blocks tracked inside your protocol, the entire sales process is already finished before they even speak to you.</p>
+          <p>When you use the exact vocabulary blocks tracked inside your file, the entire sales process is already finished before they even speak to you.</p>
           <p>Premium buyers arrive inside your ecosystem completely pre-sold, because your public words have already proven that you understand their inner thoughts better than anyone else alive.</p>
         </div>
       </div>
@@ -1687,7 +1963,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="pt-title">Operating with Absolute Professional Conviction</div>
         <div class="pt-body">
           <p>Staring at your computer wondering if your coaching program is actually good enough to command thousand-pound fees is a miserable way to operate.</p>
-          <p>This protocol completely removes the fear of being a fraud. You no longer have to fake your confidence or copy guru scripts.</p>
+          <p>This file completely removes the fear of being a fraud. You no longer have to fake your confidence or copy guru scripts.</p>
           <p>You possess hard, third-party consumer facts that prove you are building services based on exactly what real humans are struggling with right now, giving you ironclad confidence every time you speak.</p>
         </div>
       </div>
@@ -1697,7 +1973,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="pt-title">Attracting Elite Joint Ventures and Gigs</div>
         <div class="pt-body">
           <p>When you pitch yourself to high-end corporate platforms, joint venture partners, or masterminds using general coaching buzzwords, you get ignored instantly.</p>
-          <p>This data core elevates how you network. It hands you the precise macro-industry data and deep consumer insight vocabulary required to pitch high-status brands on their own terms.</p>
+          <p>This data core changes how you network. It hands you the precise macro-industry data and deep consumer insight vocabulary required to pitch high-status brands on their own terms.</p>
           <p>You stand out instantly as a sophisticated research partner, allowing you to secure elite business collaborations that explode your reach for free.</p>
         </div>
       </div>
@@ -1728,7 +2004,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <p>Relying on a few past clients is a dangerous trap, {fn}. It is too small of a sample size.
       You know what your current clients say to you, in your sessions, after they have already decided
       to hire you. That is a very small and very loyal group. It tells you almost nothing about
-      <b>the strangers who landed on your page last Tuesday and left without getting in touch.</b></p>
+      <b>the strangers who arrived on your page last Tuesday and left without getting in touch.</b></p>
       <p>The people who never contact you are the majority of your market. They had a problem.
       They went online and searched for a solution in their own words, not yours.
       They looked at your page for a few seconds. They did not see themselves in it. They left.
@@ -1743,7 +2019,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       based on patterns in text they have already read. The text they have already read is the internet.
       The internet is full of coaching pages that say &ldquo;empower&rdquo;, &ldquo;mindset&rdquo;,
       and &ldquo;clarity&rdquo;.</p>
-      <p>So when you ask an AI to research your market, it feeds those same words back to you&mdash;because
+      <p>So when you ask an AI to research your market, it feeds those same words back to you, because
       that is what coaching pages say. <b>You end up sounding identical to every other coach on the internet.</b>
       That is exactly the problem you were trying to solve. The Marketing Intelligence File does not ask AI what
       your market wants. It reads where your market actually speaks, and extracts the language they use when
@@ -1751,8 +2027,9 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- PRODUCT REVEAL (updated pricing & guarantee) -->
-  <div class="product-reveal">
+  <!-- PRODUCT REVEAL -->
+  <div class="product-reveal" id="file">
+    <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
     <div class="pr-eyebrow">The Marketing Intelligence File</div>
     <h2>The exact words your buyers use when they describe their own problem.</h2>
     <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
@@ -1762,7 +2039,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <em>this person understands exactly what I am going through.</em></p>
     <p>This is not a template. It is not a questionnaire you fill in yourself.
     It is primary research drawn from thousands of real buyer sources, mapped to your specific niche,
-    delivered as a single structured file you hand to anyone writing your copy&mdash;or load straight
+    delivered as a single structured file you hand to anyone writing your copy, or load straight
     into any AI tool and watch it stop producing coaching clich&eacute;s.</p>
     <p class="price-anchor">Traditional corporate research firms charge up to &pound;997 because they employ
     human analysts to manually comb through data sources one by one. Our custom Python pipeline automates
@@ -1771,17 +2048,21 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="price-main">&pound;75 <span>(One-Time Investment)</span></div>
 
     <div class="guarantee-block">
-      <div class="g-label">7-Day Certainty Guarantee</div>
-      <p>If you read your file and feel it does not contain buyer language you could not have found yourself,
-      or market facts you did not already know, contact us within 7 days and we will give you a full refund.
-      No forms. No hoops. No awkward conversation.</p>
-      <p>We make this offer because we have done this research hundreds of times across dozens of coaching niches,
-      and we are certain of what we find. <b>The risk is entirely on our research metrics, not your wallet.</b></p>
+      <div class="g-copy">
+        <div class="g-label">7-Day Certainty Guarantee</div>
+        <p>If you read your file and feel it does not contain buyer language you could not have found yourself,
+        or market facts you did not already know, contact us within 7 days and we will give you a full refund.
+        No forms. No hoops. No awkward conversation.</p>
+        <p>We make this offer because we have done this research hundreds of times across dozens of coaching niches,
+        and we are certain of what we find. <b>The risk is entirely on our research metrics, not your wallet.</b></p>
+      </div>
+      <img class="angelo-relax" src="/angelo_relaxed.png" alt="Angelo, relaxed. The risk is on us.">
     </div>
   </div>
 
   <!-- CHECKOUT -->
-  <div class="checkout-section">
+  <div class="checkout-section" id="checkout">
+    <img class="cta-angelo" src="/angelo_cta.png" alt="Angelo: Come on. Let me show you.">
     <h2>Get My Marketing Intelligence File</h2>
     <div class="cs-sub">Your niche. Your buyers&rsquo; actual language. &pound;75, one-time. No subscription.</div>
     <div class="checkout-form-placeholder">
@@ -1818,7 +2099,7 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path
         if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
-                    "/angelo_cta.png"):
+                    "/angelo_cta.png", "/angelo_relaxed.png"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
@@ -1861,7 +2142,9 @@ class Handler(BaseHTTPRequestHandler):
                     self._send(_render_salespage(
                         first_name = row.get("first_name", "")      or "Coach",
                         headline   = row.get("headline", "")         or "your website text",
-                        tokens     = row.get("tokens", "")           or "generic coaching terms",
+                        # No fallback here: when the stored tokens are empty, _render_salespage
+                        # falls back to the coach's actual words from the voice sweep instead.
+                        tokens     = row.get("tokens", ""),
                         score      = row.get("score", "")            or "0.0",
                         screenshot = shot,
                         raw_json   = row.get("raw_json", ""),
@@ -1871,7 +2154,7 @@ class Handler(BaseHTTPRequestHandler):
             # Backward-compatibility: read individual URL parameters (immediate post-audit flow).
             first_name = (qs.get("first_name", [""])[0]).strip() or "Coach"
             headline   = (qs.get("headline",   [""])[0]).strip() or "your website text"
-            tokens     = (qs.get("tokens",     [""])[0]).strip() or "generic coaching terms"
+            tokens     = (qs.get("tokens",     [""])[0]).strip()   # _render_salespage supplies the generic fallback
             score      = (qs.get("score",      [""])[0]).strip() or "0.0"
             screenshot = (qs.get("screenshot", [""])[0]).strip()
             self._send(_render_salespage(first_name, headline, tokens, score, screenshot))
