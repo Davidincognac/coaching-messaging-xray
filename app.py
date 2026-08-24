@@ -57,6 +57,24 @@ def _screenshot_filename(domain: str) -> str:
     clean = re.sub(r"https?://", "", domain).strip("/")
     return re.sub(r"[^a-zA-Z0-9\-]", "_", clean) + ".png"
 
+def _save_playwright_shot(domain: str, thumbnail: str) -> str:
+    """Persist the audit's own Playwright screenshot (a base64 data URI) to the screenshots folder.
+    We already rendered the page during the audit, so saving it costs nothing and keeps microlink
+    as a rare fallback instead of a per-audit dependency. Returns the web path, or '' if the
+    thumbnail isn't a usable data URI (then the caller falls back to microlink)."""
+    if not (thumbnail or "").startswith("data:image/png;base64,"):
+        return ""
+    try:
+        raw = base64.b64decode(thumbnail.split(",", 1)[1])
+        if len(raw) < 1000:
+            return ""
+        fname = _screenshot_filename(domain)
+        with open(os.path.join(SCREENSHOTS_DIR, fname), "wb") as f:
+            f.write(raw)
+        return "/screenshots/" + fname
+    except Exception:
+        return ""
+
 def _save_screenshot(domain: str) -> str:
     """Fetch a screenshot from microlink.io and write it to the screenshots folder.
     Returns the web-accessible path (/screenshots/<filename>) or, when the fetch fails but a
@@ -1744,35 +1762,16 @@ class Handler(BaseHTTPRequestHandler):
             first_name = (qs.get("first_name", [""])[0]).strip()
             last_name = (qs.get("last_name", [""])[0]).strip()
             email = (qs.get("email", [""])[0]).strip()
-            # Start the microlink fetch IN PARALLEL with the audit: the audit takes 30-40s anyway, so the
-            # screenshot gets that whole window for free instead of bolting 30-55s onto the end. The
-            # prefetch needs the normalised domain before audit_url returns it, so it derives the same
-            # value via sm.norm_domain — same function, same result, same disk filename.
-            _shot_box = {}
-            _shot_thread = None
-            if url:
-                try:
-                    from audit import sm as _sm
-                    _predom = _sm.norm_domain(url) or ""
-                except Exception:
-                    _predom = ""
-                if _predom:
-                    _shot_thread = threading.Thread(
-                        target=lambda d=_predom: _shot_box.update(path=_save_screenshot(d)), daemon=True)
-                    _shot_thread.start()
             res = audit_url(url) if url else {}
             shot_path = ""
             if url and res.get("ok") and res.get("status") == "ok":
-                # SCREENSHOT FIRST, RENDER SECOND: the report card's canvas reads res["thumbnail"], which
-                # Playwright doesn't always fill on Render (and cached results never carry — it's stripped
-                # before the DB). The microlink disk path slots straight into the same key, so ONE reliable
-                # image source feeds the report card AND the salespage. Playwright's base64 stays preferred
-                # when it exists; microlink is the fallback that stops the blank canvas.
-                if _shot_thread is not None:
-                    _shot_thread.join(timeout=30)
-                shot_path = _shot_box.get("path") or ""
+                # OUR OWN RENDER FIRST: the audit's Playwright pass already screenshotted the page
+                # (res["thumbnail"], a base64 data URI), so persist THAT to disk — the salespage and
+                # every refresh reuse it for free, no third-party call, no quota. Microlink is only
+                # the fallback for runs where Playwright produced no image (heavy sites, low-RAM
+                # containers) — and _save_screenshot itself reuses a same-day PNG before refetching.
+                shot_path = _save_playwright_shot(res.get("domain", url), res.get("thumbnail", ""))
                 if not shot_path:
-                    # Prefetch failed or never ran — one serial retry before we render a placeholder.
                     shot_path = _save_screenshot(res.get("domain", url))
                 if not res.get("thumbnail") and shot_path:
                     res["thumbnail"] = shot_path
