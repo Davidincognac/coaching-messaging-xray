@@ -709,7 +709,13 @@ def render_result(res, first_name=""):
                 f'<b>{html.escape(res.get("page_display") or res["domain"])}</b>, not the real homepage.</p>'
                 f'<p>{html.escape(res["message"])}</p>{shot}</div>')
 
-    g = sev_class(res["score_10"])
+    # Overall verdict colour aligned with Angelo's thumbs (David): green only at 7+, so a 6.5 never
+    # shows a green number next to an unsure Angelo. Per-criterion chips/bars keep sev_class bands.
+    try:
+        _sd = float(res.get("score_10_display", res["score_10"]) or 0)
+    except (TypeError, ValueError):
+        _sd = float(res["score_10"])
+    g = "crit" if _sd < 3.5 else "warn" if _sd < 7 else "good"
     ev = res["evidence"]
     cnt = f'{res.get("corpus_count", 10954):,}'   # the living count of coaching websites read
     # RULEBOOK §0: never claim "homepage" when a subpage was audited. Every personal claim below
@@ -916,10 +922,6 @@ def render_result(res, first_name=""):
     )
 
     # Angelo's verdict image (David's rule): under 5 = thumbs down, 5-6 = unsure, 7+ = thumbs up.
-    try:
-        _sd = float(res.get("score_10_display", res["score_10"]) or 0)
-    except (TypeError, ValueError):
-        _sd = float(res["score_10"])
     _verdict_img = ("angelo_down.png" if _sd < 5 else "angelo_unsure.png" if _sd < 7 else "angelo_up.png")
     score_reveal = (
         f'<div class="reveal {g}"><div class="h"><span class="secnum">5 / 5</span>Your overall score</div>'
