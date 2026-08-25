@@ -1462,17 +1462,21 @@ def _sales_hook(data, page_word, niche_word):
     weak = min(_SALES_HOLE, key=lambda k: scores.get(k, 99))
     hole_score = scores.get(weak, 0)
     mr_score = scores.get("symptom_resonance", 0)
+    # The hook must explain its own number (David): the overall score is one figure, this is one
+    # of the eight checks INSIDE it — say so, or a 4.6 followed by a bare 3/10 reads like a typo.
     if hole_score > 5:
         return (
-            f'<div class="hook good"><span class="hl">Your {page_word} scored a strong <span class="sc">{mr_score}/10</span> on Mind Reading.</span> '
+            f'<div class="hook good"><span class="hl">Your overall score is built from eight separate checks, '
+            f'and your strongest is Mind Reading: <span class="sc">{mr_score}/10</span>.</span> '
             f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
             f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
             f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
             f'{niche_word}you want more of.</div>'
         )
     return (
-        f'<div class="hook"><span class="hl">Your {page_word} scored <span class="sc">{hole_score}/10</span> on {_SALES_HOLE[weak]},</span> not '
-        f'because you don&rsquo;t know your clients, but because it&rsquo;s written in your words, not the words '
+        f'<div class="hook"><span class="hl">Your overall score is built from eight separate checks. The one '
+        f'holding yours down is {_SALES_HOLE[weak]}: <span class="sc">{hole_score}/10</span>.</span> Not '
+        f'because you don&rsquo;t know your clients, but because the page is written in your words, not the words '
         f'a cold buyer uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
         f'is the whole game.</div>'
     )
@@ -1687,12 +1691,25 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     except (TypeError, ValueError):
         _sc_num = 0.0
     if _sc_num <= 4.9:
+        # The "bigger picture" line has to be true against the market average, not just under 5:
+        # a 4.6 is ABOVE the 4.5 average, so "a few steps away from improving yours" read wrong
+        # (David caught it). Below average -> David's original line; at/above it -> honest version:
+        # ahead of the average, but the average page doesn't bring in clients, the top level does.
+        if _sc_num > MARKET_AVG_10:
+            _bigger = (
+                f'<p class="ff-body">To give you the bigger picture, the average is {MARKET_AVG_10} out of ten, '
+                f'so you are already above the average. But the average coaching homepage is not bringing in '
+                f'clients, so that is a low bar. The top pages score {TOP10_10} or higher, and that is where a '
+                f'page starts working. You are close to that level, and we are here to help you get there today.</p>')
+        else:
+            _bigger = (
+                f'<p class="ff-body">To give you the bigger picture, the average is {MARKET_AVG_10} out of ten, '
+                f'so you are only a few steps away from improving yours. Remember this, it&rsquo;s easier to '
+                f'improve when the score is lower, and we are here to help you do that today.</p>')
         opener_html = (
             f'<p class="ff-body">Hi {fn}. It&rsquo;s never nice having a low score, we remember what '
             f'that was like at school. Your {page_word} text scored <strong class="ff-score">{sc}/10</strong>.</p>'
-            f'<p class="ff-body">To give you the bigger picture, the average is {MARKET_AVG_10} out of ten, '
-            f'so you are only a few steps away from improving yours. Remember this, it&rsquo;s easier to '
-            f'improve when the score is lower, and we are here to help you do that today.</p>'
+            + _bigger +
             f'<p class="ff-body">But please see this score for what it is: <strong>an area of easy growth</strong>. '
             f'This is not about a 1% shift in your business. It is about taking one big stride forward.</p>')
     else:
