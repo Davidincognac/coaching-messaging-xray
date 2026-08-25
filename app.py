@@ -1232,6 +1232,14 @@ _SALES_CSS = """
   .hook .hl{color:#F0B9B4}
   .hook.good .hl{color:var(--glow)}
   .hook .hl .sc{color:inherit}
+  .steps-wrap{position:relative;display:block;width:min(860px,96%);margin:36px auto 0;
+    container-type:inline-size}
+  .steps-img{display:block;width:100%;height:auto}
+  .step-lbl{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;
+    font-weight:700;color:#141414;font-size:13px;font-size:2.1cqw;line-height:1.15}
+  .step-lbl.s1{left:34%;top:46.5%;width:17%;height:22%;transform:rotate(-4deg)}
+  .step-lbl.s2{left:55%;top:26.5%;width:18%;height:21%;transform:rotate(-2deg)}
+  .step-lbl.s3{left:76.5%;top:6.5%;width:18%;height:22%}
   .ff-bridge{max-width:1100px;margin:32px auto 0;padding:0 0 8px}
   .ff-bridge p{font-family:var(--serif);font-size:19px;font-weight:500;color:var(--ivory);line-height:1.55;margin:0;
     border-top:1px solid var(--navy-line);padding-top:28px}
@@ -1712,6 +1720,15 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             + _bigger +
             f'<p class="ff-body">But please see this score for what it is: <strong>an area of easy growth</strong>. '
             f'This is not about a 1% shift in your business. It is about taking one big stride forward.</p>')
+    elif _sc_num >= TOP10_10:
+        # Top-tier (David's catch): at 5.7+ they ARE the top 10% — say so, then sell the last
+        # edge, not a rescue job. The hook below still names a weak criterion if one exists.
+        opener_html = (
+            f'<p class="ff-body">Hello {fn}. Your {page_word} text scored <strong class="ff-score">{sc}/10</strong>. '
+            f'Across the {cnt} coaching homepages we have read, the average is {MARKET_AVG_10} out of 10, and only '
+            f'the top 10% score {TOP10_10} or higher. <strong>You are one of them.</strong></p>'
+            f'<p class="ff-body">So this page is not about fixing a broken page. It is about the last edge: the '
+            f'distance between a page that reads well and a page built on your buyer&rsquo;s actual words.</p>')
     else:
         opener_html = (
             f'<p class="ff-body">Hello {fn}. Your {page_word} text scored <strong class="ff-score">{sc}/10</strong>. '
@@ -1762,7 +1779,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="ff-bridge">
       <p>So here is what this page will do. First we will show you the areas that will grow your business fastest, the ones we found when we read your page. Then we will explain why this happens to almost every coach, because it is not carelessness and it is not a lack of talent. Once you can see why, you can make a sound decision about what to do next.</p>
     </div>
-    <!-- ANGELO-STEPS IMAGE SLOT: David's "Angelo shows the plan" art lands here (blank signs, HTML labels overlaid) -->
+    <div class="steps-wrap">
+      <img class="steps-img" src="/angelo_steps.png" alt="Angelo pointing up the three steps of this page">
+      <span class="step-lbl s1">The areas</span>
+      <span class="step-lbl s2">The why</span>
+      <span class="step-lbl s3">Your decision</span>
+    </div>
   </div>
 
   <div class="wrap">
@@ -2181,7 +2203,7 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path
         if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
-                    "/angelo_cta.png", "/angelo_relaxed.png"):
+                    "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
