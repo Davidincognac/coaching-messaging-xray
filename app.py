@@ -166,15 +166,18 @@ PAGE = """<!doctype html><html lang="en"><head>
   .hint b{{color:var(--glow)}}
   .plan2{{margin-top:14px;background:var(--navy-card);border:1px solid var(--navy-line);
     border-radius:10px;padding:20px 22px}}
-  .plan2 .p2-mirror{{color:var(--ivory);font-size:15px;line-height:1.6;margin:0 0 14px}}
-  .plan2 .p2-mirror b{{color:var(--glow)}}
-  .plan2 ol{{margin:0;padding:0;list-style:none;counter-reset:p2}}
-  .plan2 li{{position:relative;padding:0 0 10px 40px;color:var(--ivory);font-size:15px;line-height:1.5}}
-  .plan2 li:last-child{{padding-bottom:0}}
-  .plan2 li::before{{counter-increment:p2;content:counter(p2);position:absolute;left:0;top:0;
-    width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;
-    display:flex;align-items:center;justify-content:center;font-size:14px}}
-  .plan2 li b{{color:#fff}}
+  .plan-wrap{{position:relative;display:block;width:min(560px,100%);margin:0 auto;container-type:inline-size}}
+  .plan-img{{display:block;width:100%;height:auto}}
+  .plan-lbl{{position:absolute;left:63%;top:15%;width:23.5%;height:44%;display:flex;flex-direction:column;
+    justify-content:center;gap:7%;transform:rotate(-1deg)}}
+  .pl-h{{font-weight:700;color:#141414;font-size:13px;font-size:2.8cqw;line-height:1.2}}
+  .pl-step{{position:relative;padding-left:14%;color:#141414;font-size:11px;font-size:2.1cqw;
+    line-height:1.3;font-weight:600}}
+  .pl-step span{{position:absolute;left:0;top:.1em;width:10%;aspect-ratio:1;border-radius:50%;
+    background:var(--gold);color:var(--navy);font-weight:700;display:flex;align-items:center;
+    justify-content:center;font-size:1.7cqw}}
+  .p2-cap{{color:var(--ivory);font-size:14px;line-height:1.6;margin:12px 0 0;text-align:center}}
+  .p2-cap b{{color:var(--glow)}}
   #result:not(:empty){{background:var(--paper);padding:56px 24px 88px}}
   #result>*{{max-width:760px;margin-left:auto;margin-right:auto}}
   #result>.card:first-child{{margin-top:0}}
@@ -415,15 +418,18 @@ PAGE = """<!doctype html><html lang="en"><head>
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a cold buyer sees</button>
   </form>
-  <!-- FLIPCHART SLOT: David's "Angelo explains the plan" art replaces the text block below when
-       it lands (blank flipchart, the mirror line + two steps overlaid as HTML). -->
+  <!-- Angelo explains the plan: blank flipchart in the artwork, the words are real HTML
+       overlaid on the pad (same pattern as the bubble and the signposts). -->
   <div class="plan2">
-    <p class="p2-mirror">Your homepage is a <b>mirror</b>. It shows how you think about your marketing, and
-    Angelo reads it the way a cold buyer does. Two steps:</p>
-    <ol>
-      <li><b>Your report.</b> Free, about half a minute.</li>
-      <li><b>What to do about it.</b></li>
-    </ol>
+    <div class="plan-wrap">
+      <img class="plan-img" src="/angelo_plan.png" alt="Angelo at his flipchart, explaining the two steps">
+      <div class="plan-lbl">
+        <div class="pl-h">Your homepage is a mirror.</div>
+        <div class="pl-step"><span>1</span>Your report. Free, about half a minute.</div>
+        <div class="pl-step"><span>2</span>What to do about it.</div>
+      </div>
+    </div>
+    <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a cold buyer does.</p>
   </div>
   <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
   <!--PROGRESS-->
@@ -2224,7 +2230,7 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path
         if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
-                    "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png"):
+                    "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
