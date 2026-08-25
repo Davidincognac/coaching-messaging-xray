@@ -1527,10 +1527,14 @@ def _sales_capture(ev, page_word):
     bk = caps.get("booking") or {}
     parts = []
     okind, odesc, buried = opt.get("kind", "none"), opt.get("desc", ""), opt.get("buried")
+    # Detector FACTS first (hedged with "we could see"), then the explanation clearly framed as
+    # an explanation — never a claim about their site we can't defend (David: true to their website).
+    explain = ("Here is why that matters. A visitor who is not ready to book today has nothing to take "
+               "away and no reason to leave their email. They leave, and there is no way to follow up.")
     if okind == "none" or not odesc:
         parts.append(f"We couldn&rsquo;t see any way on your {page_word} for a visitor who isn&rsquo;t ready to "
-                     "book to leave their email and hear from you again. They read, they leave, and you have no "
-                     "way to reach them after that.")
+                     "book to leave their email and hear from you again.")
+        parts.append(explain)
     elif okind == "magnet":
         s = (f"You&rsquo;ve got {html.escape(odesc)} on the page, something a visitor can take without booking "
              "anything. That&rsquo;s the right move.")
@@ -1538,12 +1542,10 @@ def _sales_capture(ev, page_word):
             s += " But it sits low on the page, so a cold visitor may never reach it."
         parts.append(s)
     else:
-        s = f"The only sign-up we could see for a visitor who isn&rsquo;t ready to book is {html.escape(odesc)}."
-        if buried:
-            s += " And it sits low on the page, so a cold visitor may never even see it."
-        s += (" That visitor has no reason to hand over their email, so they leave with nothing, and you have "
-              "no way to reach them again.")
+        s = f"The only sign-up we could see for a visitor who isn&rsquo;t ready to book is {html.escape(odesc)}"
+        s += ", and it sits low on the page." if buried else "."
         parts.append(s)
+        parts.append(explain)
     bkind, bdesc = bk.get("kind", "none"), bk.get("desc", "")
     if bkind in ("booking", "booking_live") and bdesc:
         parts.append(f"For the visitor who is ready, you have {html.escape(bdesc)}. That part works.")
@@ -1572,9 +1574,9 @@ def _sales_diag(critique):
         rows.append(f'<div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr["headline_problem"]))}</div>')
     if cr.get("why_it_costs_clients"):
         rows.append(f'<div class="row"><div class="k">What it&rsquo;s costing you</div>{para_split(cr["why_it_costs_clients"])}</div>')
-    if cr.get("top_fixes"):
-        fixes = "".join(f"<li>{para_split(f)}</li>" for f in cr["top_fixes"])
-        rows.append(f'<div class="row"><div class="k">The obvious fixes</div><ol class="fixlist">{fixes}</ol></div>')
+    # NO fixes list on the salespage (David's rule): a to-do list two scrolls before the offer does
+    # the product's job for free. The fixes live on the report, behind its caveat. Everything here
+    # opens a loop only the Marketing Intelligence File closes.
     if cr.get("money_left_on_table"):
         rows.append(f'<div class="row"><div class="k">Bottom line</div><div class="verdict-note">{para_split(cr["money_left_on_table"])}</div></div>')
     if not rows:
@@ -1690,7 +1692,9 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             f'that was like at school. Your {page_word} text scored <strong class="ff-score">{sc}/10</strong>.</p>'
             f'<p class="ff-body">To give you the bigger picture, the average is {MARKET_AVG_10} out of ten, '
             f'so you are only a few steps away from improving yours. Remember this, it&rsquo;s easier to '
-            f'improve when the score is lower, and we are here to help you do that today.</p>')
+            f'improve when the score is lower, and we are here to help you do that today.</p>'
+            f'<p class="ff-body">But please see this score for what it is: <strong>an area of easy growth</strong>. '
+            f'This is not about a 1% shift in your business. It is about taking one big stride forward.</p>')
     else:
         opener_html = (
             f'<p class="ff-body">Hello {fn}. Your {page_word} text scored <strong class="ff-score">{sc}/10</strong>. '
@@ -1728,9 +1732,6 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="first-fold-inner">
       <div class="ff-left">
         {opener_html}
-        <p class="ff-body"><strong>Your words do not match the thoughts already inside your client&rsquo;s head.</strong></p>
-        <p class="ff-body">Look closely at your screenshot on the right. When people get a low score, they usually try to change their website layout, fix their fonts, or rewrite their sentences. That is a mistake.</p>
-        <p class="ff-body">The real problem is not how your page looks. The problem is that your words talk about you and what you do, instead of talking about what your client is already thinking.</p>
         <p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. They gave it five seconds. Your words did not describe their problem. They left. You never knew they were there.</p>
       </div>
       <div class="ff-right">
@@ -1742,115 +1743,139 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
     {hook_html}
     <div class="ff-bridge">
-      <p>That is not a design problem. The words on the page are yours, not your buyer&rsquo;s. The rest of this page shows you where their words come from, and what changes when you use them.</p>
+      <p>So here is what this page will do. First we will show you the areas that will grow your business fastest, the ones we found when we read your page. Then we will explain why this happens to almost every coach, because it is not carelessness and it is not a lack of talent. Once you can see why, you can make a sound decision about what to do next.</p>
     </div>
+    <!-- ANGELO-STEPS IMAGE SLOT: David's "Angelo shows the plan" art lands here (blank signs, HTML labels overlaid) -->
   </div>
 
   <div class="wrap">
 
-  <!-- CHAPTER 1: THEIR OWN EVIDENCE — the one thing no other page can say. Personal before generic. -->
+  <!-- SECTION 2: THE AREAS — their own evidence, growth-framed heading (David's pick) -->
   <div class="evidence-section">
-    <div class="evidence-eyebrow">Where your page is losing buyers right now</div>
+    <div class="evidence-eyebrow">The areas that will grow your business fastest</div>
     {criteria_html}
     {capture_html}
   </div>
 
   {diag_html}
 
-  <!-- CHAPTER 2: YOUR WORDS vs THEIR WORDS -->
-  <div class="card">
-    <div class="label">The words on your page</div>
-    <h2>We read your {page_word} and found these terms.</h2>
-    <p>Each one is abstract. Each one could sit on any coaching page on the internet.
-    When a stranger arrives on your page and reads words that do not describe their specific problem,
-    they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
-    and they leave. The problem is not your design or your credentials. It is the words.</p>
-    <div class="tokens-block">
-      <div class="tok-label">Found on your page</div>
-      <div class="tokens-value">{tok}</div>
+  <!-- SECTION 3: THE WHY — the report said WHAT is wrong; this chapter explains WHY it happens.
+       Thesis + their own words as live evidence, then the four roots. -->
+  <div class="why-section">
+    <div class="section-eyebrow">Why this happens to almost every coach</div>
+
+    <div class="card">
+      <h2>Your words do not match the thoughts already inside your client&rsquo;s head.</h2>
+      <p>That is not a design problem, and it is not a writing problem. To see what it actually is,
+      look at the words we found on your {page_word}.</p>
+      <p>Each one is abstract. Each one could sit on any coaching page on the internet.
+      When a stranger arrives on your page and reads words that do not describe their specific problem,
+      they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
+      and they leave. The problem is not your design or your credentials. It is the words.</p>
+      <div class="tokens-block">
+        <div class="tok-label">Found on your page</div>
+        <div class="tokens-value">{tok}</div>
+      </div>
+      <p style="margin-top:14px">Each of those terms means something specific to you.
+      To a cold stranger who has never met you, they describe nobody&rsquo;s life in particular.
+      Replacing them with different abstract terms is not a fix. The fix is to find out what language
+      your specific buyer uses when they describe their own problem, and use those words instead.
+      That is a research question, not a writing question.</p>
+
+      <div style="margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+        color:var(--accent-ink);font-weight:700;margin-bottom:10px">The Messaging X-Ray: From Intuition to Intelligence</div>
+      <div class="xray-box">
+        <div class="xray-panel before">
+          <div class="xray-screen" style="font-size:16px;letter-spacing:.02em;font-style:italic;padding:18px 22px;text-align:center">{tok}</div>
+          <div class="xray-meta">
+            <div class="xm-label">What your {page_word} says</div>
+            <div class="xm-body">These words describe what you offer. A cold buyer is not searching for what you offer.
+            They are searching for relief from a specific problem. These words do not name it.</div>
+          </div>
+        </div>
+        <div class="xray-panel after">
+          <div class="xray-screen" style="font-size:13px;line-height:1.6;padding:18px 22px;text-align:left">&ldquo;I cannot stop thinking about&hellip;&rdquo;<br>&ldquo;I wake up every morning and&hellip;&rdquo;<br>&ldquo;I have tried everything and&hellip;&rdquo;</div>
+          <div class="xray-meta">
+            <div class="xm-label">What your buyer actually says</div>
+            <div class="xm-body">The sort of thing your market really types when they go looking for help and
+            nobody is watching. When your page uses words like these, strangers stop and read.</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <p style="margin-top:14px">Each of those terms means something specific to you.
-    To a cold stranger who has never met you, they describe nobody&rsquo;s life in particular.
-    Replacing them with different abstract terms is not a fix. The fix is to find out what language
-    your specific buyer uses when they describe their own problem, and use those words instead.
-    That is a research question, not a writing question.</p>
 
-    <div style="margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
-      color:var(--accent-ink);font-weight:700;margin-bottom:10px">The Messaging X-Ray: From Intuition to Intelligence</div>
-    <div class="xray-box">
-      <div class="xray-panel before">
-        <div class="xray-screen" style="font-size:16px;letter-spacing:.02em;font-style:italic;padding:18px 22px;text-align:center">{tok}</div>
-        <div class="xray-meta">
-          <div class="xm-label">What your {page_word} says</div>
-          <div class="xm-body">These words describe what you offer. A cold buyer is not searching for what you offer.
-          They are searching for relief from a specific problem. These words do not name it.</div>
-        </div>
-      </div>
-      <div class="xray-panel after">
-        <div class="xray-screen" style="font-size:13px;line-height:1.6;padding:18px 22px;text-align:left">&ldquo;I cannot stop thinking about&hellip;&rdquo;<br>&ldquo;I wake up every morning and&hellip;&rdquo;<br>&ldquo;I have tried everything and&hellip;&rdquo;</div>
-        <div class="xray-meta">
-          <div class="xm-label">What your buyer actually says</div>
-          <div class="xm-body">The sort of thing your market really types when they go looking for help and
-          nobody is watching. When your page uses words like these, strangers stop and read.</div>
-        </div>
-      </div>
+    {voice_html}
+
+    <div class="protocol-container">
+      <div class="pc-label">Root 1</div>
+      <h3>Nobody can see their own business from the outside.</h3>
+      <p>You built this business from the inside, so you describe it from the inside. You know what your
+      coaching does, so that is what the page says. But your buyer has never been inside. They only know
+      what their problem feels like.</p>
+      <p>Nobody sees their own business the way a stranger sees it. Not you, not us, nobody.</p>
     </div>
-  </div>
 
-  {voice_html}
+    <div class="protocol-container">
+      <div class="pc-label">Root 2</div>
+      <h3>The trends are coaches copying coaches.</h3>
+      <p>When you look around for how to write your page, you look at other coaches. The sites that look
+      professional. The phrases everyone uses. But we have read {cnt} coaching homepages, and
+      {PCT_FAIL_5SEC}% fail the five-second test.</p>
+      <p>That is who the trends come from. Follow them, and you inherit their results.</p>
+    </div>
 
-  <!-- CHAPTER 3: PROOF — three coaches on video -->
-  <div class="video-section">
-    <div class="evidence-eyebrow">Three coaches who fixed the same problem</div>
-    <p>They had low scores. Their words described what they offered, not what their buyers were already searching for. Below is what happened when that changed.</p>
-    <div class="evidence-grid">
+    <div class="protocol-container">
+      <div class="pc-label">Root 3</div>
+      <h3>The people you hired could only give you opinions.</h3>
+      <p>Maybe you paid for help. A designer, a brand expert, a business coach, a course. Here is the
+      problem: they gave you their opinion. It may have been a good opinion.</p>
+      <p>But an opinion is not evidence, and nobody you hired was holding your buyer&rsquo;s actual words.</p>
+    </div>
 
-      <div class="video-col">
-        <div class="video-block">
-          <div class="video-embed shorts">
-            <iframe src="https://www.youtube.com/embed/I2Q-BU3CQjo"
-              title="Chad Peterson case study"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen></iframe>
-          </div>
-          <div class="video-copy">
-            <h3>A language fix that corrected a blind spot for a coach in South America.</h3>
-            <p>Chad explains how the Marketing Intelligence data forced him to change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
-          </div>
-        </div>
-      </div>
+    <div class="protocol-container">
+      <div class="pc-label">Root 4</div>
+      <h3>You got through the problem you now fix.</h3>
+      <p>That is exactly why you are good at fixing it. But it also means you talk like someone on the
+      other side of it, while your buyer is still in it.</p>
+      <p>You talk like the expert who fixed the problem. They talk like someone who still has it.
+      Those are two different languages.</p>
+    </div>
 
-      <div class="video-col">
-        <div class="video-block">
-          <div class="video-embed">
-            <iframe src="https://www.youtube.com/embed/bdnCbMnHaZo"
-              title="David Hyner case study"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen></iframe>
-          </div>
-          <div class="video-copy">
-            <h3>Why ignoring standard advice gives you real authority.</h3>
-            <p>David breaks down what happens when you replace fill-in-the-blank templates with hard customer facts. The shift is structural, not cosmetic.</p>
-          </div>
-        </div>
-        <div class="video-block">
-          <div class="video-embed">
-            <iframe src="https://www.youtube.com/embed/JJf6rFjWqds"
-              title="Brandon Croud deep-dive case study"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen></iframe>
-          </div>
-          <div class="video-copy">
-            <h3>Long-term results after switching from instinct to evidence.</h3>
-            <p>Brandon shows the financial difference between pages built on intuition and pages built on real buyer data. The difference is not subtle.</p>
-          </div>
-        </div>
-      </div>
-
+    <div class="card">
+      <p><strong>Put those together and the mystery disappears.</strong> Nothing in your world contains
+      your buyer&rsquo;s actual words. Not your own head, and not anyone you hired. So the page sounds
+      like you, because your view is all anyone ever had to work with.</p>
+      <p>That is why the score is what it is. And it is why rewriting the page with the same ingredients
+      gets the same result.</p>
     </div>
   </div>
 
-  <!-- WHAT CHANGES — four payoffs, in the audit's plain voice -->
+  <!-- SECTION 4: PERMISSION, THEN THE CURE -->
+  <div class="narrative-bridge">
+    <div class="nb-label">Before we go on</div>
+    <h2>May we show you what the fix looks like?</h2>
+    <p>The fix is not more opinions, and it is not trying harder with the same ingredients. It is the
+    missing ingredient itself: your buyer&rsquo;s actual words, as evidence. Here it is.</p>
+  </div>
+
+  <!-- What the File is -->
+  <div class="product-reveal" id="file">
+    <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
+    <div class="pr-eyebrow">The Marketing Intelligence File</div>
+    <h2>The exact words your buyers use when they describe their own problem.</h2>
+    <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
+    uses when they are searching for a solution at two in the morning and nobody is watching.
+    The fears they do not say out loud. The specific outcomes that make them pick up the phone.
+    The words that, when they appear on your homepage, make a cold stranger stop scrolling and think:
+    <em>this person understands exactly what I am going through.</em></p>
+    <p>This is not a template. It is not a questionnaire you fill in yourself. It is real research into your
+    specific market, built on the evidence we have already read: {cnt} coaching websites, and 2,000 books
+    your market bought to fix their own problems. Every book that sells is a vote, real proof of what people
+    struggle with and what they will pay to fix. It all arrives as a single structured file you hand to anyone
+    writing your copy, or load straight into any AI tool and watch it stop producing coaching clich&eacute;s.</p>
+  </div>
+
+  <!-- The benefits -->
   <div class="payoffs-section">
     <div class="section-eyebrow">What becomes possible when your words match your buyer&rsquo;s thoughts</div>
     <div class="payoffs-grid">
@@ -1894,7 +1919,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- FLAWED ASSUMPTIONS -->
+  <!-- The false beliefs -->
   <div class="assumptions-section">
     <div class="section-eyebrow">Four things coaches believe that keep them invisible</div>
 
@@ -1950,7 +1975,58 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- WHAT'S INSIDE -->
+  <!-- Proof of the cure: three coaches on video -->
+  <div class="video-section">
+    <div class="evidence-eyebrow">Three coaches who fixed the same problem</div>
+    <p>They had low scores. Their words described what they offered, not what their buyers were already searching for. Below is what happened when that changed.</p>
+    <div class="evidence-grid">
+
+      <div class="video-col">
+        <div class="video-block">
+          <div class="video-embed shorts">
+            <iframe src="https://www.youtube.com/embed/I2Q-BU3CQjo"
+              title="Chad Peterson case study"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <div class="video-copy">
+            <h3>A language fix that corrected a blind spot for a coach in South America.</h3>
+            <p>Chad explains how the Marketing Intelligence data forced him to change who he was speaking to. He discovered the exact questions his audience asks online at two in the morning.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="video-col">
+        <div class="video-block">
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/bdnCbMnHaZo"
+              title="David Hyner case study"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <div class="video-copy">
+            <h3>Why ignoring standard advice gives you real authority.</h3>
+            <p>David breaks down what happens when you replace fill-in-the-blank templates with hard customer facts. The shift is structural, not cosmetic.</p>
+          </div>
+        </div>
+        <div class="video-block">
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/JJf6rFjWqds"
+              title="Brandon Croud deep-dive case study"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+          <div class="video-copy">
+            <h3>Long-term results after switching from instinct to evidence.</h3>
+            <p>Brandon shows the financial difference between pages built on intuition and pages built on real buyer data. The difference is not subtle.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- What you get -->
   <div class="protocol-section" id="inside">
     <div class="section-eyebrow">What is inside your Marketing Intelligence File</div>
 
@@ -1987,21 +2063,9 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- PRODUCT REVEAL -->
-  <div class="product-reveal" id="file">
-    <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
-    <div class="pr-eyebrow">The Marketing Intelligence File</div>
-    <h2>The exact words your buyers use when they describe their own problem.</h2>
-    <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
-    uses when they are searching for a solution at two in the morning and nobody is watching.
-    The fears they do not say out loud. The specific outcomes that make them pick up the phone.
-    The words that, when they appear on your homepage, make a cold stranger stop scrolling and think:
-    <em>this person understands exactly what I am going through.</em></p>
-    <p>This is not a template. It is not a questionnaire you fill in yourself. It is real research into your
-    specific market, built on the evidence we have already read: {cnt} coaching websites, and 2,000 books
-    your market bought to fix their own problems. Every book that sells is a vote, real proof of what people
-    struggle with and what they will pay to fix. It all arrives as a single structured file you hand to anyone
-    writing your copy, or load straight into any AI tool and watch it stop producing coaching clich&eacute;s.</p>
+  <!-- Price and guarantee -->
+  <div class="product-reveal">
+    <div class="pr-eyebrow">The price, and the guarantee</div>
     <p class="price-anchor">Real market research is a corporate purchase. Agencies charge thousands of pounds
     for even a small study, because a human analyst combs through the sources one by one. Our research engine
     has already done years of that reading, and a person still checks every file before it goes out. That is
@@ -2022,7 +2086,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- DECISION BRIDGE + THE CLOSE -->
+  <!-- The close -->
   <div class="narrative-bridge">
     <div class="nb-label">Where this leaves you</div>
     <h2>You cannot write your way out of a positioning problem.</h2>
