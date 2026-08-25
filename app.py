@@ -164,6 +164,17 @@ PAGE = """<!doctype html><html lang="en"><head>
   button:hover{{background:var(--gold-h)}}
   .hint{{font-size:13px;color:var(--ivory-dim);margin-top:16px;line-height:1.6}}
   .hint b{{color:var(--glow)}}
+  .plan2{{margin-top:14px;background:var(--navy-card);border:1px solid var(--navy-line);
+    border-radius:10px;padding:20px 22px}}
+  .plan2 .p2-mirror{{color:var(--ivory);font-size:15px;line-height:1.6;margin:0 0 14px}}
+  .plan2 .p2-mirror b{{color:var(--glow)}}
+  .plan2 ol{{margin:0;padding:0;list-style:none;counter-reset:p2}}
+  .plan2 li{{position:relative;padding:0 0 10px 40px;color:var(--ivory);font-size:15px;line-height:1.5}}
+  .plan2 li:last-child{{padding-bottom:0}}
+  .plan2 li::before{{counter-increment:p2;content:counter(p2);position:absolute;left:0;top:0;
+    width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:14px}}
+  .plan2 li b{{color:#fff}}
   #result:not(:empty){{background:var(--paper);padding:56px 24px 88px}}
   #result>*{{max-width:760px;margin-left:auto;margin-right:auto}}
   #result>.card:first-child{{margin-top:0}}
@@ -404,6 +415,16 @@ PAGE = """<!doctype html><html lang="en"><head>
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a cold buyer sees</button>
   </form>
+  <!-- FLIPCHART SLOT: David's "Angelo explains the plan" art replaces the text block below when
+       it lands (blank flipchart, the mirror line + two steps overlaid as HTML). -->
+  <div class="plan2">
+    <p class="p2-mirror">Your homepage is a <b>mirror</b>. It shows how you think about your marketing, and
+    Angelo reads it the way a cold buyer does. Two steps:</p>
+    <ol>
+      <li><b>Your report.</b> Free, about half a minute.</li>
+      <li><b>What to do about it.</b></li>
+    </ol>
+  </div>
   <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
   <!--PROGRESS-->
 </div></div>
