@@ -1388,9 +1388,12 @@ _SALES_CSS = """
   .rm-albl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
   .rm-arrow.ok .rm-albl{color:var(--accent-ink)}
   .rm-arrow.no .rm-albl{color:var(--critical)}
-  .rm-page{border:1.5px solid var(--accent);border-radius:8px;padding:16px 14px;text-align:center;
-    font-weight:700;font-size:14px;color:var(--ink);line-height:1.3;background:#fff;
-    box-shadow:0 0 0 4px var(--soft)}
+  .rm-page{position:relative;border:1.5px solid var(--accent);border-radius:8px;padding:28px 14px 16px;
+    text-align:center;font-weight:700;font-size:14px;color:var(--ink);line-height:1.3;background:#fff;
+    box-shadow:0 0 0 4px var(--soft);overflow:hidden}
+  .rm-page::before{content:"";position:absolute;top:0;left:0;right:0;height:14px;background:var(--accent)}
+  .rm-page::after{content:"";position:absolute;top:4px;left:8px;width:6px;height:6px;border-radius:50%;
+    background:#fff;box-shadow:10px 0 0 rgba(255,255,255,.7),20px 0 0 rgba(255,255,255,.45)}
   .rm-buyer{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);
     border-radius:0 8px 8px 0;padding:12px 14px;font-family:var(--serif);font-style:italic;
     font-size:14px;color:var(--ink);line-height:1.5}
