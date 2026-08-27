@@ -1915,39 +1915,34 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- The false beliefs -->
+  <!-- The four myths (false beliefs). "Myth" not "Assumption": a myth belongs to the industry,
+       not the reader, which keeps the blame where the roots section put it. Each card holds to
+       the Myth-3 standard: two short paragraphs, one idea each. -->
   <div class="assumptions-section">
-    <div class="section-eyebrow">Four things coaches believe that keep them invisible</div>
+    <div class="section-eyebrow">Four myths that keep coaches invisible</div>
 
     <div class="assumption">
-      <div class="a-label">Assumption 1</div>
+      <div class="a-label">Myth 1</div>
       <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
-      <p>When people look at that score, it is easy to assume you just need a prettier website, {fn}.
-      Swapping a few words on a page that is built on the wrong foundation does not fix the foundation.
-      It just gives the problem a fresh coat of paint. What you have is not a wording issue.
-      It is a <b>strategic positioning issue</b>: the page is written around what you offer, not around
-      what a stranger is already searching for.</p>
-      <p>And here is the part most coaches miss. Any new words you write without hard facts behind them
-      come from instinct, and feeling sure and being right are not the same thing. You end up picking
-      phrases that feel right to you, not phrases your buyers actually use. Nothing changes.</p>
+      <p>Swapping a few words on a page built on the wrong foundation just gives the problem a fresh
+      coat of paint, {fn}. The page is written around what you offer, not around what a stranger is
+      searching for.</p>
+      <p>And any new words you write come from the same place the old ones did. <b>Feeling sure and
+      being right are not the same thing.</b> Nothing changes.</p>
     </div>
 
     <div class="assumption">
-      <div class="a-label">Assumption 2</div>
+      <div class="a-label">Myth 2</div>
       <h3>&ldquo;I already talk to my clients every day. I know exactly what they want.&rdquo;</h3>
-      <p>Relying on a few past clients is a dangerous trap, {fn}. That is a small sample.
-      You know what your current clients say to you, in your sessions, after they have already decided
-      to hire you. That is a very small and very loyal group. It tells you almost nothing about
-      <b>the strangers who arrived on your page last Tuesday and left without getting in touch.</b></p>
-      <p>The people who never contact you are the majority of your market. They had a problem.
-      They went online and searched for a solution in their own words, not yours.
-      They looked at your page for a few seconds. They did not see themselves in it. They left.
-      You never knew they were there. Your current clients cannot tell you why that happened,
-      because they are not those people.</p>
+      <p>Your current clients talk to you after they have already decided to hire you. That is a small
+      and very loyal sample. It tells you almost nothing about <b>the strangers who arrived on your
+      page last Tuesday and left without getting in touch.</b></p>
+      <p>Those strangers are the majority of your market. They searched in their own words, not yours,
+      and your current clients cannot tell you what those words are, because they are not those people.</p>
     </div>
 
     <div class="assumption">
-      <div class="a-label">Assumption 3</div>
+      <div class="a-label">Myth 3</div>
       <h3>&ldquo;My words are fine. I just need more people to see the page.&rdquo;</h3>
       <p>More visitors to a page that is not working just means more people leaving.
       If ten people arrive and nobody gets in touch, a hundred will give you ten times the silence,
@@ -1957,17 +1952,15 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="assumption">
-      <div class="a-label">Assumption 4</div>
+      <div class="a-label">Myth 4</div>
       <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
-      <p>AI writing tools do not do research. They predict which word is likely to follow the previous word,
-      based on patterns in text they have already read. The text they have already read is the internet.
-      The internet is full of coaching pages that say &ldquo;empower&rdquo;, &ldquo;mindset&rdquo;,
-      and &ldquo;clarity&rdquo;.</p>
-      <p>So when you ask an AI to research your market, it feeds those same words back to you, because
-      that is what coaching pages say. <b>You end up sounding identical to every other coach on the internet.</b>
-      That is exactly the problem you were trying to solve. The Marketing Intelligence File does not ask AI what
-      your market wants. It reads where your market actually speaks, and extracts the language they use when
-      they are not performing for an audience. That is a different process. The output is completely different.</p>
+      <p>AI writing tools do not do research. They predict the next word from what they have already
+      read, and what they have read is the internet, full of coaching pages saying &ldquo;empower&rdquo;,
+      &ldquo;mindset&rdquo; and &ldquo;clarity&rdquo;. Ask AI to research your market and it hands those
+      same words back. <b>You sound like every other coach, which is the exact problem you started with.</b></p>
+      <p>The Marketing Intelligence File does not ask AI what your market wants. It reads where your
+      market actually speaks, and pulls out the language they use when nobody is selling to them.
+      Different process, different output.</p>
     </div>
   </div>
 
