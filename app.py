@@ -1857,7 +1857,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           <div class="rm-buyer">&ldquo;I cannot stop thinking about&hellip;&rdquo;</div>
         </div>
       </div>
-      <p class="rm-cap">Everything on the left wrote your page. The one thing that never arrived is on the right.</p>
+      <p class="rm-cap">All four of those wrote your page. The one voice that never arrived is your buyer&rsquo;s.</p>
     </div>
 
     <div class="roots-grid">
