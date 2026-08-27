@@ -1520,7 +1520,7 @@ def _sales_hook(data, page_word, niche_word):
     if hole_score > 5:
         return (
             f'<div class="hook good"><span class="hl">Your overall score is built from eight separate checks, '
-            f'and your strongest is Mind Reading: <span class="sc">{mr_score}/10</span>.</span> '
+            f'and you scored a strong <span class="sc">{mr_score}/10</span> on Mind Reading.</span> '
             f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
             f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
             f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
