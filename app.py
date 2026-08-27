@@ -435,9 +435,9 @@ PAGE = """<!doctype html><html lang="en"><head>
     <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a cold buyer does.</p>
     <p class="p2-note">One thing before you start. This is not consultancy, coaching or mentoring, and we are
     not here to work on your mindset.</p>
-    <p class="p2-note">The report takes about 30 seconds, and you can leave with it straight away, it will nail
-    a few things down for you. If you have 6 or 7 minutes more, we dig a little deeper into how to direct your
-    marketing and put you on the right track.</p>
+    <p class="p2-note">You can leave with the report straight away, it will nail a few things down for you.
+    And if you have 6 or 7 minutes more, there is a deeper dig waiting, into how to direct your marketing
+    and put you on the right track.</p>
   </div>
   <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
   <!--PROGRESS-->
