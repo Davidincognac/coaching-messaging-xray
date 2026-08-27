@@ -1367,27 +1367,13 @@ _SALES_CSS = """
   .video-copy h3{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.35}
   .video-copy p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
 
-  /* ---------- diagnosis ---------- */
-  .diag{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;
-    box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:28px;line-height:1.65}
-  @media(max-width:560px){.diag{padding:26px 18px}}
-  .diag h2{margin-bottom:16px}
-  .diag .row{margin:26px 0}
-  .diag .row:first-of-type{margin-top:0}
-  .diag .row p{margin:0 0 10px}.diag .row p:last-child{margin-bottom:0}
-  .diag .k{display:flex;align-items:center;gap:9px;font-size:13px;
-    letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin:0 0 10px}
-  .diag .k::before{content:"";width:18px;height:4px;background:var(--accent);border-radius:2px;flex-shrink:0}
-  .diag .row+.row{border-top:1px solid var(--line);padding-top:26px}
-  .fixlist{margin:6px 0 0;padding:0;list-style:none;counter-reset:fix}
-  .fixlist li{position:relative;padding:0 0 18px 44px;margin:0}
-  .fixlist li:last-child{padding-bottom:0}
-  .fixlist li::before{counter-increment:fix;content:counter(fix);position:absolute;left:0;top:0;
-    width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;
-    display:flex;align-items:center;justify-content:center;font-size:14px}
-  .verdict-note{background:var(--soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
-    padding:16px 20px;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.6}
-  .verdict-note p{margin:0 0 10px}.verdict-note p:last-child{margin:0}
+  /* ---------- the cost note (closes the areas section) ---------- */
+  .cost-note{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:20px 22px;margin-top:14px}
+  .cost-note .cn-h{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:700;margin-bottom:10px}
+  .cost-note p{font-size:15px;line-height:1.65;margin:0 0 10px}
+  .cost-note p:last-child{margin-bottom:0}
 
   /* ---------- protocol / bridge / choices ---------- */
   .protocol-section{margin-bottom:28px}
@@ -1570,28 +1556,15 @@ def _sales_voice(voice, page_word, cnt):
         'talks about it. <b>Finding their real words takes proper digging, not a quick rewrite.</b></p></div>')
 
 
-def _sales_diag(critique):
-    """The full 4-part diagnosis the audit already wrote for this exact page. Rows render only for
-    the fields the record actually has. Empty when there is no stored critique."""
-    cr = critique or {}
-    rows = []
-    if cr.get("headline_problem"):
-        rows.append(f'<div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr["headline_problem"]))}</div>')
-    if cr.get("why_it_costs_clients"):
-        rows.append(f'<div class="row"><div class="k">What it&rsquo;s costing you</div>{para_split(cr["why_it_costs_clients"])}</div>')
-    # NO fixes list on the salespage (David's rule): a to-do list two scrolls before the offer does
-    # the product's job for free. The fixes live on the report, behind its caveat. Everything here
-    # opens a loop only the Marketing Intelligence File closes.
-    if cr.get("money_left_on_table"):
-        rows.append(f'<div class="row"><div class="k">Bottom line</div><div class="verdict-note">{para_split(cr["money_left_on_table"])}</div></div>')
-    if not rows:
+def _sales_cost(critique):
+    """The one part of the stored diagnosis the criteria cards above don't already say: the COST.
+    (David's call: 'the biggest thing in the way' and 'bottom line' re-told the cards; the fixes
+    list never belonged on a salespage. What remains closes the areas section with why it hurts.)"""
+    cost = (critique or {}).get("why_it_costs_clients")
+    if not cost:
         return ""
-    return (
-        '<div class="diag">'
-        '<h2>The diagnosis, from your own audit</h2>'
-        '<p style="color:var(--muted);font-size:14px;margin-bottom:6px">This is not a template. It was written about your page, from what we read on it.</p>'
-        + "".join(rows) +
-        '</div>')
+    return (f'<div class="cost-note"><div class="cn-h">What it&rsquo;s costing you</div>'
+            f'{para_split(cost)}</div>')
 
 
 def _build_criteria_html(data, hero_quote):
@@ -1679,7 +1652,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     hook_html = _sales_hook(data, page_word, niche_word)
     voice_html = _sales_voice(voice, page_word, cnt)
-    diag_html = _sales_diag(critique)
+    cost_html = _sales_cost(critique)
     criteria_html = _build_criteria_html(data, headline)
 
     # Softer opener for low scorers (David's rule + his copy): under 5 there is no "brutal",
@@ -1785,9 +1758,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <div class="evidence-section">
     <h2 class="area-h">The areas that will grow your business fastest</h2>
     {criteria_html}
+    {cost_html}
   </div>
-
-  {diag_html}
 
   <!-- SECTION 3: THE WHY — the report said WHAT is wrong; this chapter explains WHY it happens.
        Thesis + their own words as live evidence, then the four roots. -->
