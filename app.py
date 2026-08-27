@@ -1363,6 +1363,15 @@ _SALES_CSS = """
   .video-copy h3{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.35}
   .video-copy p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
 
+  /* ---------- "you are here" progress markers (reuse the signposts art + its base rules) ---------- */
+  .steps-wrap.mini{width:min(600px,94%);margin:0 auto 26px}
+  .step-lbl.dim{color:#A3ACB8;font-weight:600}
+  .step-here{position:absolute;background:var(--gold);color:var(--navy);font-weight:700;
+    font-size:10px;font-size:max(2.2cqw, 9px);letter-spacing:.06em;text-transform:uppercase;
+    padding:.35em .8em;border-radius:999px;white-space:nowrap;box-shadow:0 1px 4px rgba(11,19,43,.25)}
+  .step-here.pos2{left:56.5%;top:50%}
+  .step-here.pos3{left:78%;top:31%}
+
   /* ---------- the roots map (the four roots in one picture) ---------- */
   .roots-map{background:var(--surface);border:1px solid var(--line);border-radius:12px;
     padding:26px 26px 20px;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:14px}
@@ -1779,6 +1788,13 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <!-- SECTION 3: THE WHY — the report said WHAT is wrong; this chapter explains WHY it happens.
        Thesis + their own words as live evidence, then the four roots. -->
   <div class="why-section">
+    <div class="steps-wrap mini">
+      <img class="steps-img" src="/angelo_steps.png" alt="You are here: the why">
+      <span class="step-lbl s1 dim">The areas</span>
+      <span class="step-lbl s2">The why</span>
+      <span class="step-lbl s3 dim">Your decision</span>
+      <span class="step-here pos2">You are here</span>
+    </div>
     <div class="section-eyebrow">Why this happens to almost every coach</div>
 
     <div class="card">
@@ -2120,6 +2136,13 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   </div>
 
   <!-- The close -->
+  <div class="steps-wrap mini">
+    <img class="steps-img" src="/angelo_steps.png" alt="You are here: your decision">
+    <span class="step-lbl s1 dim">The areas</span>
+    <span class="step-lbl s2 dim">The why</span>
+    <span class="step-lbl s3">Your decision</span>
+    <span class="step-here pos3">You are here</span>
+  </div>
   <div class="narrative-bridge">
     <div class="nb-label">Where this leaves you</div>
     <h2>You cannot write your way out of a positioning problem.</h2>
