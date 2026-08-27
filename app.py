@@ -1363,6 +1363,39 @@ _SALES_CSS = """
   .video-copy h3{font-size:16px;font-weight:700;color:var(--ink);margin:0 0 10px;line-height:1.35}
   .video-copy p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
 
+  /* ---------- the roots map (the four roots in one picture) ---------- */
+  .roots-map{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:26px 26px 20px;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:14px}
+  .rm-flow{display:grid;grid-template-columns:1fr 76px auto 76px 1fr;gap:10px;align-items:center}
+  .rm-h{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:700;margin-bottom:10px}
+  .rm-pill{background:var(--soft);border:1px solid #CBD9EC;border-radius:8px;padding:8px 12px;
+    font-size:13px;font-weight:600;color:var(--ink);line-height:1.35;margin-bottom:8px}
+  .rm-pill:last-child{margin-bottom:0}
+  .rm-arrow{display:flex;flex-direction:column;align-items:center;gap:2px}
+  .rm-glyph{font-size:26px;line-height:1;font-weight:700}
+  .rm-arrow.ok .rm-glyph{color:var(--accent)}
+  .rm-arrow.no .rm-glyph{color:var(--critical);font-size:22px}
+  .rm-albl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+  .rm-arrow.ok .rm-albl{color:var(--accent-ink)}
+  .rm-arrow.no .rm-albl{color:var(--critical)}
+  .rm-page{border:1.5px solid var(--accent);border-radius:8px;padding:16px 14px;text-align:center;
+    font-weight:700;font-size:14px;color:var(--ink);line-height:1.3;background:#fff;
+    box-shadow:0 0 0 4px var(--soft)}
+  .rm-buyer{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:0 8px 8px 0;padding:12px 14px;font-family:var(--serif);font-style:italic;
+    font-size:14px;color:var(--ink);line-height:1.5}
+  .rm-cap{font-size:13px;color:var(--muted);text-align:center;margin:16px 0 0;line-height:1.5}
+  @media(max-width:700px){
+    .rm-flow{grid-template-columns:1fr}
+    .rm-arrow{flex-direction:row;gap:8px;justify-content:center}
+    .rm-arrow.ok .rm-glyph{transform:rotate(90deg)}
+    .rm-page{justify-self:center;min-width:180px}
+  }
+  .roots-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  @media(max-width:700px){.roots-grid{grid-template-columns:1fr}}
+  .roots-grid .protocol-container{margin-bottom:0}
+
   /* ---------- the cost note (closes the areas section) ---------- */
   .cost-note{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
     border-radius:0 10px 10px 0;padding:20px 22px;margin-top:14px}
@@ -1788,6 +1821,30 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     {voice_html}
 
+    <!-- The four roots in one picture: four suppliers of words feed the page from the coach's
+         side; the buyer's head sits apart with nothing flowing from it. The missing arrow IS
+         the argument — the cards below just expand what the eye already agreed to. -->
+    <div class="roots-map">
+      <div class="rm-flow">
+        <div class="rm-col">
+          <div class="rm-h">Where your words came from</div>
+          <div class="rm-pill">Your view from the inside</div>
+          <div class="rm-pill">Trends: coaches copying coaches</div>
+          <div class="rm-pill">The opinions you paid for</div>
+          <div class="rm-pill">Your own way out of the problem</div>
+        </div>
+        <div class="rm-arrow ok"><span class="rm-glyph">&rarr;</span><span class="rm-albl">all of it</span></div>
+        <div class="rm-page">Your<br>{page_word}</div>
+        <div class="rm-arrow no"><span class="rm-glyph">&#10005;</span><span class="rm-albl">none of it</span></div>
+        <div class="rm-col">
+          <div class="rm-h">Your buyer&rsquo;s head</div>
+          <div class="rm-buyer">&ldquo;I cannot stop thinking about&hellip;&rdquo;</div>
+        </div>
+      </div>
+      <p class="rm-cap">Everything on the left wrote your page. The one thing that never arrived is on the right.</p>
+    </div>
+
+    <div class="roots-grid">
     <div class="protocol-container">
       <div class="pc-label">Root 1</div>
       <h3>Nobody can see their own business from the outside.</h3>
@@ -1821,6 +1878,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       other side of it, while your buyer is still in it.</p>
       <p>You talk like the expert who fixed the problem. They talk like someone who still has it.
       Those are two different languages.</p>
+    </div>
     </div>
 
     <div class="card">
