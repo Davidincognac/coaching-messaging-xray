@@ -1300,10 +1300,6 @@ _SALES_CSS = """
     padding:48px 24px;line-height:1.7}
 
   /* ---------- parser / tokens ---------- */
-  .tokens-block{margin:14px 0 0;background:var(--soft);border:1px solid #CBD9EC;border-radius:9px;padding:16px 20px}
-  .tokens-block .tok-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
-    font-weight:700;margin-bottom:8px}
-  .tokens-value{font-size:15px;color:var(--ink);line-height:1.7;font-weight:500}
   .xray-box{margin:22px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media(max-width:560px){.xray-box{grid-template-columns:1fr}}
   .xray-panel{border-radius:11px;overflow:hidden;border:1px solid var(--line)}
@@ -1769,20 +1765,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="card">
       <h2>Your words do not match the thoughts already inside your client&rsquo;s head.</h2>
       <p>That is not a design problem, and it is not carelessness or a lack of talent. To see what it
-      actually is, look at the words we found on your {page_word}.</p>
-      <p>Each one is abstract. Each one could sit on any coaching page on the internet.
-      When a stranger arrives on your page and reads words that do not describe their specific problem,
-      they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
-      and they leave. The problem is not your design or your credentials. It is the words.</p>
-      <div class="tokens-block">
-        <div class="tok-label">Found on your page</div>
-        <div class="tokens-value">{tok}</div>
-      </div>
-      <p style="margin-top:14px">Each of those terms means something specific to you.
-      To a cold stranger who has never met you, they describe nobody&rsquo;s life in particular.
-      Replacing them with different abstract terms is not a fix. The fix is to find out what language
-      your specific buyer uses when they describe their own problem, and use those words instead.
-      That is a research question, not a writing question.</p>
+      actually is, look at the words we found on your {page_word}, next to the words your buyer
+      actually uses.</p>
 
       <div style="margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
         color:var(--accent-ink);font-weight:700;margin-bottom:10px">The Messaging X-Ray: From Intuition to Intelligence</div>
@@ -1804,6 +1788,16 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           </div>
         </div>
       </div>
+
+      <p style="margin-top:16px">Each one is abstract. Each one could sit on any coaching page on the internet.
+      When a stranger arrives on your page and reads words that do not describe their specific problem,
+      they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
+      and they leave. The problem is not your design or your credentials. It is the words.</p>
+      <p>Each of those terms means something specific to you.
+      To a cold stranger who has never met you, they describe nobody&rsquo;s life in particular.
+      Replacing them with different abstract terms is not a fix. The fix is to find out what language
+      your specific buyer uses when they describe their own problem, and use those words instead.
+      That is a research question, not a writing question.</p>
     </div>
 
     {voice_html}
