@@ -39,12 +39,22 @@ MAILERLITE_API_KEY = os.getenv("MAILERLITE_API_KEY", "")
 # Locally it falls back to localhost so email links still work during development.
 APP_BASE_URL = os.getenv("APP_BASE_URL", f"http://localhost:{PORT}").rstrip("/")
 
-SCREENSHOTS_DIR = (
-    "/var/data/screenshots"
-    if os.getenv("RENDER")
-    else os.path.join(os.path.dirname(os.path.abspath(__file__)), "screenshots")
-)
-os.makedirs(SCREENSHOTS_DIR, exist_ok=True)
+def _pick_screenshots_dir():
+    """Persistent disk on Render, app folder locally. Same fail-soft rule as storage.py: a
+    missing /var/data degrades to non-persistent screenshots, never a dead site."""
+    if os.getenv("RENDER"):
+        d = "/var/data/screenshots"
+        try:
+            os.makedirs(d, exist_ok=True)
+            return d
+        except Exception as e:
+            print(f"[screenshots] WARNING: {d} unavailable ({e}); using the app folder (not persistent).",
+                  flush=True)
+    d = os.path.join(os.path.dirname(os.path.abspath(__file__)), "screenshots")
+    os.makedirs(d, exist_ok=True)
+    return d
+
+SCREENSHOTS_DIR = _pick_screenshots_dir()
 
 # urllib needs an explicit CA bundle on python.org macOS builds (their Python ships without system certs
 # wired in, so every https urlopen dies with CERTIFICATE_VERIFY_FAILED). certifi ships with requests,

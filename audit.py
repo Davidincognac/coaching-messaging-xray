@@ -112,27 +112,58 @@ def percentile(total_100):
             return round(y1 + (y2 - y1) * (total_100 - x1) / max(x2 - x1, 1))
     return 100
 
-# --- living count of UNIQUE coaching websites read. Seeds from the 10,954 corpus, grows on new domains only. ---
-_DOMAINS_FILE = os.path.join(HERE, "analysed_domains.txt")   # only stores domains NEW since the corpus
+# --- living count of UNIQUE coaching websites read. Seeds from the committed corpus snapshot,
+# grows on new domains only. The snapshot (corpus_domains.txt) ships in the repo so EVERY deploy,
+# Render included, counts and dedupes against the same base; regenerate it from the research CSV
+# when the corpus itself changes. The live log of domains audited since sits on the persistent
+# disk on Render (so it survives redeploys) and in the app dir locally.
+_CORPUS_FILE = os.path.join(HERE, "corpus_domains.txt")
+
+def _live_data_dir():
+    """Where the growing analysed-domains log lives. On Render prefer the persistent disk, but
+    NEVER crash if it's missing — fall back to the app dir with a loud warning (the log then
+    resets on redeploy, which is a degraded counter, not a dead site)."""
+    if os.getenv("RENDER"):
+        try:
+            os.makedirs("/var/data", exist_ok=True)
+            if os.access("/var/data", os.W_OK):
+                return "/var/data"
+        except Exception:
+            pass
+        print("[domains] WARNING: /var/data unavailable; the live domain log will not survive a redeploy.",
+              flush=True)
+    return HERE
+
+_DOMAINS_FILE = os.path.join(_live_data_dir(), "analysed_domains.txt")
 _domain_lock = threading.Lock()
 _domain_set = None
 
-_corpus_seeded = False   # True when the benchmark CSV was on disk and seeded the set
+_corpus_seeded = False   # True when a corpus seed (snapshot or CSV) filled the set
 
 def _load_domains():
     global _domain_set, _corpus_seeded
     if _domain_set is not None:
         return _domain_set
     s = set()
-    try:  # seed from the benchmark corpus (the 10,954)
-        with open(os.path.join(SCORECARD, "output", "scorecard_FULL.csv")) as f:
-            for row in csv.DictReader(f):
-                d = str(row.get("domain", "")).strip().lower()
+    try:  # committed snapshot first: present on every deploy, already includes post-corpus domains
+        with open(_CORPUS_FILE, encoding="utf-8") as f:
+            for ln in f:
+                d = ln.strip().lower()
                 if d:
                     s.add(d)
         _corpus_seeded = len(s) > 0
     except Exception:
         pass
+    if not _corpus_seeded:
+        try:  # research CSV fallback (local dev before the snapshot existed)
+            with open(os.path.join(SCORECARD, "output", "scorecard_FULL.csv")) as f:
+                for row in csv.DictReader(f):
+                    d = str(row.get("domain", "")).strip().lower()
+                    if d:
+                        s.add(d)
+            _corpus_seeded = len(s) > 0
+        except Exception:
+            pass
     # Read the live-audit domains file; deduplicate it in place if it has accumulated duplicate lines
     # (can happen after crashes or concurrent writes) so we never append a domain that's already there.
     file_lines = []
