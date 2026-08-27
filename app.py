@@ -1822,7 +1822,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
     {hook_html}
     <div class="ff-bridge">
-      <p>So here is what this page will do. First we will show you the areas that will grow your business fastest, the ones we found when we read your page. Then we will explain why this happens to almost every coach, because it is not carelessness and it is not a lack of talent. Once you can see why, you can make a sound decision about what to do next.</p>
+      <p>So here is the plan. First, the areas that will grow your business fastest, the ones we found when we read your page. Then, why this happens to almost every coach. Once you can see the why, you can make a sound decision about what to do next.</p>
     </div>
     <div class="steps-wrap">
       <img class="steps-img" src="/angelo_steps.png" alt="Angelo pointing up the three steps of this page">
@@ -1850,8 +1850,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     <div class="card">
       <h2>Your words do not match the thoughts already inside your client&rsquo;s head.</h2>
-      <p>That is not a design problem, and it is not a writing problem. To see what it actually is,
-      look at the words we found on your {page_word}.</p>
+      <p>That is not a design problem, and it is not carelessness or a lack of talent. To see what it
+      actually is, look at the words we found on your {page_word}.</p>
       <p>Each one is abstract. Each one could sit on any coaching page on the internet.
       When a stranger arrives on your page and reads words that do not describe their specific problem,
       they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
