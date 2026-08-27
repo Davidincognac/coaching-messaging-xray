@@ -1514,27 +1514,13 @@ def _sales_hook(data, page_word, niche_word):
 
 
 def _sales_voice(voice, page_word, cnt):
-    """The 'whose words are these' block, built from the coach's actual words. Same copy as the
-    report's section 4 (approved), trimmed to salespage length. Empty when we have no voice data."""
+    """Follow-on to the X-ray card. Dissolved from the old 'whose words are these' card (David:
+    it re-told the X-ray, and its best lines now live in Root 4) down to the two beats nothing
+    else on the page carries: the 1-in-14 stat and the good-news flip. The rare coach who already
+    speaks buyer language keeps their short praise variant instead. Empty without voice data."""
     leaning = (voice or {}).get("leaning")
     if not leaning:
         return ""
-    coach_terms = ", ".join(f"&lsquo;{html.escape(t)}&rsquo;" for t in voice.get("coach_terms", []) if t) or "coach language"
-    if leaning == "expert":
-        return (
-            '<div class="voice"><h4>Whose words are these? Yours, or your buyer&rsquo;s?</h4>'
-            f'<p>On your {page_word} you reach for coach words like {coach_terms}. They&rsquo;re good words. But they&rsquo;re '
-            '<b>your</b> words, not your customer&rsquo;s.</p>'
-            '<p>Right now you&rsquo;re talking expert to expert. Another coach would read this and understand you easily. '
-            'But your buyer isn&rsquo;t another expert. <b>They still have the problem.</b> They need you to talk '
-            '<b>expert to buyer</b>.</p>'
-            '<p>You talk like the expert who fixed the problem. They talk like someone who still has it. Those are two '
-            'different languages.</p>'
-            f'<p class="statpane">And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
-            f'<b>1 in {BUYER_VOICE_1_IN}</b> use their customer&rsquo;s words. The other <b>{PCT_NOT_BUYER_VOICE}%</b> sound just like this page does.</p>'
-            '<p>That&rsquo;s good news for you. Nearly every coach sounds the same, so people can&rsquo;t tell them apart. Use '
-            'the words your customers actually use, and <b>you stand out straight away</b>. You become <b>the coach who '
-            'understands them</b>. The rest of this page shows you where those words come from.</p></div>')
     if leaning == "customer":
         return (
             '<div class="voice good"><h4>You&rsquo;re speaking your buyer&rsquo;s language</h4>'
@@ -1544,12 +1530,12 @@ def _sales_voice(voice, page_word, cnt):
             f'other {PCT_NOT_BUYER_VOICE}% talk like the expert. You sound more like the person with the problem, and <b>that&rsquo;s a real edge</b>. '
             'Keep using the real words your clients say.</p></div>')
     return (
-        '<div class="voice"><h4>Whose words are these? Yours, or your buyer&rsquo;s?</h4>'
-        f'<p>Your {page_word} mixes your words with your customer&rsquo;s words.</p>'
-        '<p>The closer you get to how your customer really talks, the words they&rsquo;d use for their own problem, the '
-        'more of them will get in touch instead of just nodding and leaving.</p>'
-        '<p>And that&rsquo;s harder than it sounds. You know your work so well that you&rsquo;ve forgotten how your customer '
-        'talks about it. <b>Finding their real words takes proper digging, not a quick rewrite.</b></p></div>')
+        '<div class="voice">'
+        f'<p class="statpane">And hardly any coaches get this right. We looked at <b>{cnt}</b> coaching websites. Only about '
+        f'<b>1 in {BUYER_VOICE_1_IN}</b> use their customer&rsquo;s words. The other <b>{PCT_NOT_BUYER_VOICE}%</b> sound just like this page does.</p>'
+        '<p>That&rsquo;s good news for you. Nearly every coach sounds the same, so people can&rsquo;t tell them apart. Use '
+        'the words your customers actually use, and <b>you stand out straight away</b>. You become <b>the coach who '
+        'understands them</b>. The rest of this page shows you where those words come from.</p></div>')
 
 
 def _sales_cost(critique):
