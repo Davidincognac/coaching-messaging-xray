@@ -1340,6 +1340,8 @@ _SALES_CSS = """
   @media(max-width:800px){.evidence-grid{grid-template-columns:1fr;gap:32px}}
   .evidence-eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;
     color:var(--accent-ink);margin-bottom:18px}
+  .area-h{font-family:var(--serif);font-size:clamp(20px,3.6vw,27px);font-weight:600;color:var(--ink);
+    margin:0 0 18px;line-height:1.3}
   .crit-block{background:var(--surface);border:1px solid var(--line);border-radius:12px;
     padding:20px 24px;margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
   .crit-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
@@ -1353,12 +1355,6 @@ _SALES_CSS = """
   .crit-obs{font-size:14px;color:var(--ink);line-height:1.65;margin:0}
   .crit-fallback{background:var(--soft);border:1px solid #CBD9EC;border-radius:12px;padding:20px 24px}
   .crit-fallback p{font-size:14px;color:var(--ink);line-height:1.65;margin:0}
-  .capbox{background:var(--soft);border:1px solid #CBD9EC;border-left:4px solid var(--accent);
-    border-radius:0 10px 10px 0;padding:18px 20px;margin-bottom:14px}
-  .capbox .cb-h{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
-    font-weight:700;margin-bottom:8px}
-  .capbox p{font-size:14px;line-height:1.65;margin:0 0 10px}
-  .capbox p:last-child{margin:0}
 
   /* ---------- videos ---------- */
   .video-col{display:flex;flex-direction:column;gap:18px}
@@ -1574,54 +1570,6 @@ def _sales_voice(voice, page_word, cnt):
         'talks about it. <b>Finding their real words takes proper digging, not a quick rewrite.</b></p></div>')
 
 
-def _sales_capture(ev, page_word):
-    """Their opt-in and booking situation, named exactly (deterministic detector output, so every
-    personal claim here is the detector's own words). Empty when the record has no capture data."""
-    caps = (ev or {}).get("captures") or {}
-    if not caps:
-        return ""
-    opt = caps.get("opt_in") or {}
-    bk = caps.get("booking") or {}
-    parts = []
-    okind, odesc, buried = opt.get("kind", "none"), opt.get("desc", ""), opt.get("buried")
-    # Detector FACTS first (hedged with "we could see"), then the explanation clearly framed as
-    # an explanation — never a claim about their site we can't defend (David: true to their website).
-    explain = ("Here is why that matters. A visitor who is not ready to book today has nothing to take "
-               "away and no reason to leave their email. They leave, and there is no way to follow up.")
-    if okind == "none" or not odesc:
-        parts.append(f"We couldn&rsquo;t see any way on your {page_word} for a visitor who isn&rsquo;t ready to "
-                     "book to leave their email and hear from you again.")
-        parts.append(explain)
-    elif okind == "magnet":
-        s = (f"You&rsquo;ve got {html.escape(odesc)} on the page, something a visitor can take without booking "
-             "anything. That&rsquo;s the right move.")
-        if buried:
-            s += " But it sits low on the page, so a cold visitor may never reach it."
-        parts.append(s)
-    else:
-        s = f"The only sign-up we could see for a visitor who isn&rsquo;t ready to book is {html.escape(odesc)}"
-        s += ", and it sits low on the page." if buried else "."
-        parts.append(s)
-        parts.append(explain)
-    bkind, bdesc = bk.get("kind", "none"), bk.get("desc", "")
-    if bkind in ("booking", "booking_live") and bdesc:
-        parts.append(f"For the visitor who is ready, you have {html.escape(bdesc)}. That part works.")
-    elif bkind == "contact_form" and bdesc:
-        parts.append(f"For the visitor who is ready, the page offers {html.escape(bdesc)}. A form is passive. "
-                     "Some will fill it in. The rest close the tab.")
-    elif bkind == "application" and bdesc:
-        parts.append(f"For the visitor who is ready, the page offers {html.escape(bdesc)}. That is a lot to ask "
-                     "of someone who found you five minutes ago.")
-    elif bkind == "none":
-        parts.append("And we couldn&rsquo;t see a clear way for a ready visitor to book you, or reach you, "
-                     "straight from the page.")
-    parts.append("Both jobs run on the same thing: words. A sign-up only works when it offers something your "
-                 "buyer already knows they want, named in their words. Finding those words is research, and that "
-                 "research is exactly what the Marketing Intelligence File is.")
-    body = "".join(f"<p>{p}</p>" for p in parts)
-    return f'<div class="capbox"><div class="cb-h">How your page treats the not-ready visitor</div>{body}</div>'
-
-
 def _sales_diag(critique):
     """The full 4-part diagnosis the audit already wrote for this exact page. Rows render only for
     the fields the record actually has. Empty when there is no stored critique."""
@@ -1731,7 +1679,6 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     hook_html = _sales_hook(data, page_word, niche_word)
     voice_html = _sales_voice(voice, page_word, cnt)
-    capture_html = _sales_capture(ev, page_word)
     diag_html = _sales_diag(critique)
     criteria_html = _build_criteria_html(data, headline)
 
@@ -1836,9 +1783,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <!-- SECTION 2: THE AREAS — their own evidence, growth-framed heading (David's pick) -->
   <div class="evidence-section">
-    <div class="evidence-eyebrow">The areas that will grow your business fastest</div>
+    <h2 class="area-h">The areas that will grow your business fastest</h2>
     {criteria_html}
-    {capture_html}
   </div>
 
   {diag_html}
