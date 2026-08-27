@@ -1372,7 +1372,31 @@ _SALES_CSS = """
   .step-here.pos2{left:56.5%;top:50%}
   .step-here.pos3{left:78%;top:31%}
 
-  /* ---------- the roots map (the four roots in one picture) ---------- */
+  /* ---------- the roots map (the four roots in one picture) ----------
+     Desktop: drawn in chalk on Angelo's blackboard (.board-wrap). Small screens: the plain
+     card version (.roots-map) — the board is too small there to hold readable text. */
+  .board-wrap{display:none;position:relative;width:min(820px,100%);margin:0 auto 14px;
+    container-type:inline-size}
+  .board-img{display:block;width:100%;height:auto}
+  .board-lay{position:absolute;left:7.5%;top:29.5%;width:85%;height:60%;display:flex;
+    flex-direction:column;justify-content:center}
+  .board-lay .rm-h{color:#F4DE9C;font-size:1.35cqw;margin-bottom:.7em}
+  .board-lay .rm-col:first-child .rm-h{padding-left:17%;white-space:nowrap}
+  .board-lay .rm-pill{background:transparent;border:1.5px solid rgba(244,245,247,.75);
+    color:#F4F5F7;font-size:1.75cqw;padding:.4em .8em;margin-bottom:.45em}
+  .board-lay .rm-arrow.ok .rm-glyph{color:#F4F5F7;font-size:2.6cqw}
+  .board-lay .rm-arrow.ok .rm-albl{color:#F4DE9C;font-size:1.15cqw}
+  .board-lay .rm-arrow.no .rm-glyph{color:#FF9B8E;font-size:2.3cqw}
+  .board-lay .rm-arrow.no .rm-albl{color:#FF9B8E;font-size:1.15cqw}
+  .board-lay .rm-page{background:transparent;border:1.5px solid #F4F5F7;color:#F4F5F7;
+    box-shadow:none;font-size:1.75cqw;padding:2.6em 1em 1.1em}
+  .board-lay .rm-page::before{background:rgba(244,245,247,.3)}
+  .board-lay .rm-page::after{background:#F4F5F7;box-shadow:10px 0 0 rgba(244,245,247,.6),
+    20px 0 0 rgba(244,245,247,.35)}
+  .board-lay .rm-buyer{background:transparent;border:1.5px solid rgba(244,245,247,.75);
+    border-left:4px solid #F4DE9C;color:#F4F5F7;font-size:1.7cqw}
+  .board-lay .rm-cap{color:rgba(244,245,247,.85);font-size:1.4cqw;margin:.8em 0 0}
+  @media(min-width:701px){.board-wrap{display:block}.roots-map{display:none}}
   .roots-map{background:var(--surface);border:1px solid var(--line);border-radius:12px;
     padding:26px 26px 20px;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:14px}
   .rm-flow{display:grid;grid-template-columns:1fr 76px auto 76px 1fr;gap:10px;align-items:center}
@@ -1842,7 +1866,30 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     <!-- The four roots in one picture: four suppliers of words feed the page from the coach's
          side; the buyer's head sits apart with nothing flowing from it. The missing arrow IS
-         the argument — the cards below just expand what the eye already agreed to. -->
+         the argument — the cards below just expand what the eye already agreed to.
+         Desktop draws it in chalk on Angelo's blackboard; small screens get the card version. -->
+    <div class="board-wrap">
+      <img class="board-img" src="/angelo_board.png" alt="Angelo at the blackboard: where your words came from">
+      <div class="board-lay">
+        <div class="rm-flow">
+          <div class="rm-col">
+            <div class="rm-h">Where your words came from</div>
+            <div class="rm-pill">Your view from the inside</div>
+            <div class="rm-pill">Coaches copying coaches</div>
+            <div class="rm-pill">The opinions you paid for</div>
+            <div class="rm-pill">Your own way out</div>
+          </div>
+          <div class="rm-arrow ok"><span class="rm-glyph">&rarr;</span><span class="rm-albl">all of it</span></div>
+          <div class="rm-page">Your<br>{page_word}</div>
+          <div class="rm-arrow no"><span class="rm-glyph">&#10005;</span><span class="rm-albl">none of it</span></div>
+          <div class="rm-col">
+            <div class="rm-h">Your buyer&rsquo;s head</div>
+            <div class="rm-buyer">&ldquo;I cannot stop thinking about&hellip;&rdquo;</div>
+          </div>
+        </div>
+        <p class="rm-cap">All four of those wrote your page. The one voice that never arrived is your buyer&rsquo;s.</p>
+      </div>
+    </div>
     <div class="roots-map">
       <div class="rm-flow">
         <div class="rm-col">
@@ -2223,7 +2270,8 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path
         if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
-                    "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png"):
+                    "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png",
+                    "/angelo_board.png"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
