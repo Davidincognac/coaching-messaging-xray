@@ -1454,6 +1454,17 @@ _SALES_CSS = """
   .protocol-container ul{margin:8px 0 0;padding-left:20px}
   .protocol-container li{font-size:15px;color:var(--muted);line-height:1.6;margin:6px 0}
   .protocol-container li b{color:var(--ink)}
+  .pitch-gate{background:var(--navy);border:1.5px solid var(--gold);border-radius:16px;
+    padding:44px 34px;margin-bottom:28px;text-align:center;
+    box-shadow:0 10px 34px rgba(11,19,43,.28)}
+  @media(max-width:560px){.pitch-gate{padding:32px 20px}}
+  .pitch-gate .pg-label{display:inline-block;font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin-bottom:16px;padding:6px 16px;
+    border:1px solid rgba(212,175,55,.45);border-radius:999px}
+  .pitch-gate h2{font-family:var(--serif);color:#fff;font-size:clamp(23px,4vw,30px);margin:0 0 14px;
+    line-height:1.25}
+  .pitch-gate p{color:var(--ivory);font-size:17px;line-height:1.7;max-width:56ch;margin:0 auto}
+  .pitch-gate p b{color:var(--glow)}
   .narrative-bridge{background:var(--surface);border:1px solid var(--line);border-radius:12px;
     padding:36px 32px;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:28px}
   @media(max-width:560px){.narrative-bridge{padding:26px 18px}}
@@ -1956,12 +1967,13 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- SECTION 4: PERMISSION, THEN THE CURE -->
-  <div class="narrative-bridge">
-    <div class="nb-label">Before we go on</div>
+  <!-- SECTION 4: PERMISSION, THEN THE CURE. The pitch-gate is the page's hinge (David): navy like
+       the hero and the checkout, gold at the door, so the reader visibly crosses into the pitch. -->
+  <div class="pitch-gate">
+    <div class="pg-label">Before we go on</div>
     <h2>May we show you what the fix looks like?</h2>
     <p>The fix is not more opinions, and it is not trying harder with the same ingredients. It is the
-    missing ingredient itself: your buyer&rsquo;s actual words, as evidence. Here it is.</p>
+    missing ingredient itself: <b>your buyer&rsquo;s actual words, as evidence</b>. Here it is.</p>
   </div>
 
   <!-- What the File is -->
