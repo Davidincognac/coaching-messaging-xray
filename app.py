@@ -1515,6 +1515,24 @@ _SALES_CSS = """
   .product-reveal h2{color:var(--accent-ink);margin-bottom:14px}
   .mi-img{display:block;width:min(280px,72%);height:auto;margin:0 auto 20px;
     filter:drop-shadow(0 10px 22px rgba(11,19,43,.25))}
+  .fasc{list-style:none;margin:18px 0 20px;padding:0}
+  .fasc li{position:relative;padding:0 0 16px 34px;font-size:16px;line-height:1.55;color:var(--ink)}
+  .fasc li:last-child{padding-bottom:0}
+  .fasc li::before{content:"✓";position:absolute;left:0;top:.12em;width:21px;height:21px;
+    border-radius:50%;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;
+    display:flex;align-items:center;justify-content:center}
+  .fasc li b{color:var(--accent-ink)}
+  .fasc-close{font-size:14px;color:var(--muted);line-height:1.6}
+  .next-section{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:32px 30px;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:28px}
+  @media(max-width:560px){.next-section{padding:24px 18px}}
+  .next-steps{margin:0;padding:0;list-style:none;counter-reset:nx}
+  .next-steps li{position:relative;padding:0 0 18px 44px;font-size:16px;line-height:1.6;color:var(--ink)}
+  .next-steps li:last-child{padding-bottom:0}
+  .next-steps li::before{counter-increment:nx;content:counter(nx);position:absolute;left:0;top:0;
+    width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .next-steps li b{color:var(--accent-ink)}
   .price-anchor{font-size:14px;color:var(--muted);margin:16px 0 6px}
   .price-main{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--accent-ink);margin:0 0 4px}
   .price-main span{font-family:"Inter",sans-serif;font-size:14px;font-weight:500;color:var(--muted)}
@@ -1981,16 +1999,19 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
     <div class="pr-eyebrow">The Marketing Intelligence File</div>
     <h2>The exact words your buyers use when they describe their own problem.</h2>
-    <p>Not the polished version. Not the aspirational version. The raw, unedited language your specific market
-    uses when they are searching for a solution at two in the morning and nobody is watching.
-    The fears they do not say out loud. The specific outcomes that make them pick up the phone.
-    The words that, when they appear on your homepage, make a cold stranger stop scrolling and think:
-    <em>this person understands exactly what I am going through.</em></p>
-    <p>This is not a template. It is not a questionnaire you fill in yourself. It is real research into your
-    specific market, built on the evidence we have already read: {cnt} coaching websites, and 2,000 books
-    your market bought to fix their own problems. Every book that sells is a vote, real proof of what people
-    struggle with and what they will pay to fix. It all arrives as a single structured file you hand to anyone
-    writing your copy, or load straight into any AI tool and watch it stop producing coaching clich&eacute;s.</p>
+    <p>Not the polished version. Not the aspirational version. This is what the file puts in your hands:</p>
+    <ul class="fasc">
+      <li><b>The exact words your buyers type at 11pm,</b> so your headline says what they are already thinking.</li>
+      <li><b>What your market will happily pay to fix, and what they will not,</b> so you never build the wrong offer again.</li>
+      <li><b>The real reason buyers talk themselves out of hiring a coach,</b> and the line that answers it before they say it.</li>
+      <li><b>The one thing your buyer wants that you have never put into words.</b> It is the reason they pick one coach over another.</li>
+      <li><b>Who is actually spending money in your market right now,</b> built from evidence, not an avatar exercise.</li>
+      <li><b>The fears they do not say out loud,</b> and the outcome they picture when they imagine the problem gone.</li>
+      <li><b>Your homepage, your posts and your emails, all written in their words.</b> Load the file into any AI tool and it stops sounding like every other coach alive.</li>
+    </ul>
+    <p class="fasc-close">This is not a template, and it is not a questionnaire you fill in yourself. It is real
+    research into your specific market, built on {cnt} coaching websites read and 2,000 books your market
+    bought to fix their own problems.</p>
   </div>
 
   <!-- The benefits -->
@@ -2172,6 +2193,21 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <p>Without this data sitting underneath it, any AI tool just repeats the same coaching clich&eacute;s it has seen a thousand times. <b>With this data loaded in, it writes from your buyer&rsquo;s actual reality.</b> The output stops sounding like every other coach on the internet and starts sounding like someone who understands the specific person reading it.</p>
       <p>You are not locked into using AI. You can hand this file to a copywriter, a VA, or use it yourself. It works the same way in any of those hands because the facts it contains do not change.</p>
     </div>
+  </div>
+
+  <!-- What happens next: the door they can see behind (objective 5). Step 1 carries their
+       goals (objective 4): the questions ask where they want the business to go. -->
+  <div class="next-section">
+    <div class="section-eyebrow">What happens next</div>
+    <ol class="next-steps">
+      <li><b>You tell us about your business.</b> A few short questions: who you serve, what you sell,
+      and where you want the business to go.</li>
+      <li><b>We run the research.</b> The engine reads the evidence for your specific market, and a
+      person checks every file before it goes out.</li>
+      <li><b>Your Marketing Intelligence File arrives in your inbox,</b> within 5 working days.</li>
+      <li><b>You put it to work everywhere.</b> Your homepage, your posts, your emails, your next offer.
+      One file, every surface, all of it pulling toward the same buyers.</li>
+    </ol>
   </div>
 
   <!-- Price and guarantee -->
