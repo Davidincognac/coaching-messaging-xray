@@ -2302,12 +2302,11 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <div class="a-body">
         <div class="a-label">Belief 4</div>
         <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
-        <p>AI predicts the next word from what it has already read, and it has read every coaching page
-        saying &ldquo;empower&rdquo;, &ldquo;mindset&rdquo; and &ldquo;clarity&rdquo;. Ask it about your
-        market and it hands those same words back. <b>You sound like every other coach, which is the
-        problem you started with.</b></p>
-        <p>We do not ask AI what your market wants. We read where your market actually speaks, and pull
-        out the words they use when nobody is selling to them.</p>
+        <p>Ask AI about your market and it hands back the same words every other coaching page uses:
+        &ldquo;empower&rdquo;, &ldquo;mindset&rdquo;, &ldquo;clarity&rdquo;. That is what it learned
+        from. <b>It is the problem you started with.</b></p>
+        <p>We don&rsquo;t ask AI what your market wants. We read where your market speaks, and pull out
+        the words they use when nobody is selling to them.</p>
       </div>
     </div>
   </div>
