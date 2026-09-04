@@ -1651,6 +1651,7 @@ _SALES_CSS = """
   .payoff-tile .pt-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.3}
   .payoff-tile .pt-body{font-size:13px;color:var(--muted);line-height:1.6;flex:1}
   .assumptions-section{margin-bottom:28px}
+  .a-intro{font-size:16px;color:var(--ink);line-height:1.65;margin:0 0 18px;max-width:62ch}
   .assumption{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px 28px;
     margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
   .assumption .a-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--warn-ink);
@@ -2246,10 +2247,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <!-- The four things coaches say back. Each card concedes the point, then answers it.
        Two short paragraphs each, one idea per paragraph. -->
   <div class="assumptions-section">
-    <div class="section-eyebrow">What most coaches say when they see this</div>
+    <div class="section-eyebrow">The four things coaches go back to</div>
+    <p class="a-intro">Every one of them feels like progress. None of them move the business forward,
+    because they all start in the same place: what you already believe, not what your buyer said.</p>
 
     <div class="assumption">
-      <div class="a-label">Fair point 1</div>
+      <div class="a-label">Belief 1</div>
       <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
       <p>Swapping a few words just gives the page a fresh coat of paint, {fn}. The paint was never the
       problem. The page is written around what you offer, and a stranger is searching for their problem,
@@ -2259,7 +2262,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="assumption">
-      <div class="a-label">Fair point 2</div>
+      <div class="a-label">Belief 2</div>
       <h3>&ldquo;I already talk to my clients every day. I know exactly what they want.&rdquo;</h3>
       <p>Your current clients talk to you after they have already decided to hire you. That is a small
       and very loyal sample. It tells you almost nothing about <b>the strangers who arrived on your
@@ -2269,7 +2272,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="assumption">
-      <div class="a-label">Fair point 3</div>
+      <div class="a-label">Belief 3</div>
       <h3>&ldquo;My words are fine. I just need more people to see the page.&rdquo;</h3>
       <p>More visitors to a page that is not working just means more people leaving.
       If ten people arrive and nobody gets in touch, a hundred will give you ten times the silence,
@@ -2279,7 +2282,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="assumption">
-      <div class="a-label">Fair point 4</div>
+      <div class="a-label">Belief 4</div>
       <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
       <p>AI writing tools do not do research. They predict the next word from what they have already
       read, and what they have read is the internet, full of coaching pages saying &ldquo;empower&rdquo;,
