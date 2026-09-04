@@ -1599,8 +1599,16 @@ _SALES_CSS = """
   .protocol-section .section-eyebrow{margin-bottom:8px}
   /* This section justifies the price, so it gets a real headline rather than being announced by the
      smallest type on the page. Eyebrow says what it is; the headline says what it does for them. */
-  .protocol-h{font-family:var(--serif);font-weight:600;font-size:clamp(22px,3.6vw,30px);
-    line-height:1.22;letter-spacing:-.015em;color:var(--ink);margin:0 0 20px;max-width:24ch}
+  /* The hinge between problem and product. By this point the reader has scrolled past eight white
+     cards and is scanning, so a bare header in that same rhythm reads as a caption for the next card
+     rather than a chapter break. Changing the SURFACE is what makes the eye stop. Spans the container
+     by matched negative margins (not 100vw, which includes the scrollbar and can overflow). */
+  .reveal-plate{background:var(--soft);border-top:2px solid var(--accent-ink);
+    border-bottom:1px solid var(--line);margin:44px -22px 24px;padding:30px 22px 28px}
+  .protocol-h{font-family:var(--serif);font-weight:600;font-size:clamp(25px,4.4vw,30px);
+    line-height:1.18;letter-spacing:-.015em;color:var(--navy);margin:0;max-width:19ch}
+  .reveal-meta{margin:16px 0 0;padding-top:14px;border-top:1px solid #CBD9EC;font-size:15px;
+    line-height:1.5;color:var(--muted);max-width:42ch}
   .protocol-container{background:var(--surface);border:1px solid var(--line);border-radius:12px;
     padding:24px 28px;margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
   .protocol-container .pc-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
@@ -2368,13 +2376,17 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <!-- What you get -->
   <div class="protocol-section" id="inside">
-    <div class="section-eyebrow">Inside your Marketing Intelligence File</div>
-    <h2 class="protocol-h">Everything you need to stop sounding like every other coach.</h2>
+    <div class="reveal-plate">
+      <div class="section-eyebrow">Inside your Marketing Intelligence File</div>
+      <h2 class="protocol-h">Everything you need to stop sounding like every other coach.</h2>
+      <p class="reveal-meta">Three parts. Built from research into your market, not from a template.</p>
+    </div>
 
     <div class="protocol-container">
       <div class="pc-label">Part one of three</div>
       <h3>The Buyer Portrait</h3>
-      <p>A detailed picture of the real person buying in your niche, built from evidence, not assumptions.</p>
+      <p>A detailed picture of the real person buying in your niche, built from evidence, so readers
+      stop leaving without a word.</p>
       <ul>
         <li><b>Your real buyer.</b> A precise profile of who is actually spending money in your market right now, built from real buying signals, not a generic age bracket.</li>
         <li><b>3 AM Crisis Log.</b> A map of the specific real-life situations that keep your buyer awake, and what they typed into their phone at midnight.</li>
@@ -2387,7 +2399,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="protocol-container">
       <div class="pc-label">Part two of three</div>
       <h3>The Buyer Language Guide</h3>
-      <p>A practical guide to what to cut from your marketing and what to replace it with.</p>
+      <p>A cut-list of the words on your page and the words to use instead, so readers stop skimming
+      past you.</p>
       <ul>
         <li><b>The clich&eacute; cut list.</b> A line-by-line audit of the abstract terms already found on your page, including the ones we found ourselves: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a cold buyer.</li>
         <li><b>The AI slop list.</b> A reference list of the predictable phrase styles that mark your writing as generated and generic. Things like &ldquo;unlock your potential&rdquo;, &ldquo;on your journey&rdquo;, and &ldquo;transform your life&rdquo;. Buyers have seen these lines everywhere, so they slide right past them.</li>
@@ -2398,7 +2411,10 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="protocol-container">
       <div class="pc-label">Part three of three</div>
       <h3>The Master Prompt</h3>
-      <p>Everything above is formatted as a master prompt framework you can copy and paste straight into any AI writing tool, including ChatGPT and Claude, and get output that reads like a real human wrote it about a real problem.</p>
+      <p>Everything above, packed into one prompt for any AI tool, copywriter or VA, so you never face
+      a blank page again.</p>
+      <p>Paste it into ChatGPT or Claude and the output reads like a real human wrote it about a real
+      problem.</p>
       <p>Without this data sitting underneath it, any AI tool just repeats the same coaching clich&eacute;s it has seen a thousand times. <b>With this data loaded in, it writes from your buyer&rsquo;s actual reality.</b> The output stops sounding like every other coach on the internet and starts sounding like someone who understands the specific person reading it.</p>
       <p>You are not locked into using AI. You can hand this file to a copywriter, a VA, or use it yourself. It works the same way in any of those hands because the facts it contains do not change.</p>
     </div>
