@@ -759,6 +759,19 @@ def overall_copy(clarity, tier, in_top_tier):
         "<p>And getting a stranger to feel that isn't a headline you can polish on your own. It's knowing their real "
         "problem in their own words, and that's the part you can't see from the inside.</p>")
 
+def usable_name(raw):
+    """A first name we're willing to print INSIDE a sentence. The salespage drops the name mid-copy
+    ('a fresh coat of paint, {fn}.'), so a stray keystroke reads as a typo in our own writing: a real
+    record in the DB has first_name 'd', which renders 'a fresh coat of paint, d.'. Anything under two
+    characters, or with no letters in it, falls back to the page's existing neutral 'Coach'."""
+    n = (raw or "").strip()
+    if len(n) < 2 or not any(c.isalpha() for c in n):
+        return "Coach"
+    # People type their name in lower case. Capitalise the first letter only, so 'david' reads right
+    # mid-sentence without mangling a name that already carries its own capitals ('McDonald').
+    return n[0].upper() + n[1:] if n.islower() else n
+
+
 def _first_sentence(text, cap=280, sentences=2):
     """Opening sentences of an AI-written block, for the skim summary. TWO by default: the first is
     usually only the set-up ('Your headline reads X'), and the actual point arrives in the second.
@@ -2230,14 +2243,13 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
   </div>
 
-  <!-- The four myths (false beliefs). "Myth" not "Assumption": a myth belongs to the industry,
-       not the reader, which keeps the blame where the roots section put it. Each card holds to
-       the Myth-3 standard: two short paragraphs, one idea each. -->
+  <!-- The four things coaches say back. Each card concedes the point, then answers it.
+       Two short paragraphs each, one idea per paragraph. -->
   <div class="assumptions-section">
-    <div class="section-eyebrow">Four myths that keep coaches invisible</div>
+    <div class="section-eyebrow">What most coaches say when they see this</div>
 
     <div class="assumption">
-      <div class="a-label">Myth 1</div>
+      <div class="a-label">Fair point 1</div>
       <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
       <p>Swapping a few words just gives the page a fresh coat of paint, {fn}. The paint was never the
       problem. The page is written around what you offer, and a stranger is searching for their problem,
@@ -2247,7 +2259,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="assumption">
-      <div class="a-label">Myth 2</div>
+      <div class="a-label">Fair point 2</div>
       <h3>&ldquo;I already talk to my clients every day. I know exactly what they want.&rdquo;</h3>
       <p>Your current clients talk to you after they have already decided to hire you. That is a small
       and very loyal sample. It tells you almost nothing about <b>the strangers who arrived on your
@@ -2257,7 +2269,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="assumption">
-      <div class="a-label">Myth 3</div>
+      <div class="a-label">Fair point 3</div>
       <h3>&ldquo;My words are fine. I just need more people to see the page.&rdquo;</h3>
       <p>More visitors to a page that is not working just means more people leaving.
       If ten people arrive and nobody gets in touch, a hundred will give you ten times the silence,
@@ -2267,7 +2279,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="assumption">
-      <div class="a-label">Myth 4</div>
+      <div class="a-label">Fair point 4</div>
       <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
       <p>AI writing tools do not do research. They predict the next word from what they have already
       read, and what they have read is the internet, full of coaching pages saying &ldquo;empower&rdquo;,
@@ -2536,7 +2548,7 @@ class Handler(BaseHTTPRequestHandler):
                                 raw_json=row.get("raw_json", ""),
                             )
                     self._send(_render_salespage(
-                        first_name = row.get("first_name", "")      or "Coach",
+                        first_name = usable_name(row.get("first_name", "")),
                         headline   = row.get("headline", "")         or "your website text",
                         # No fallback here: when the stored tokens are empty, _render_salespage
                         # falls back to the coach's actual words from the voice sweep instead.
@@ -2548,7 +2560,7 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 # Domain recognised but no record yet — fall through to param fallback.
             # Backward-compatibility: read individual URL parameters (immediate post-audit flow).
-            first_name = (qs.get("first_name", [""])[0]).strip() or "Coach"
+            first_name = usable_name((qs.get("first_name", [""])[0]).strip())
             headline   = (qs.get("headline",   [""])[0]).strip() or "your website text"
             tokens     = (qs.get("tokens",     [""])[0]).strip()   # _render_salespage supplies the generic fallback
             score      = (qs.get("score",      [""])[0]).strip() or "0.0"
