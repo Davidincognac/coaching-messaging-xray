@@ -143,7 +143,8 @@ PAGE = """<!doctype html><html lang="en"><head>
     --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
     --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
     --gold:#D4AF37;--gold-h:#C2A02F;
-    --good:#2A7B56;--good-glow:#5CB88C;--warn:#A87B23;--critical:#A62626;}}
+    --good:#2A7B56;--good-glow:#5CB88C;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;
+    --coral:#F0B9B4;}}   /* the on-navy warning tint: readable where --critical would go muddy */
   *{{box-sizing:border-box}}
   html{{background:var(--navy)}}
   body{{margin:0;background:var(--navy);color:var(--ink);
@@ -204,18 +205,23 @@ PAGE = """<!doctype html><html lang="en"><head>
   .grade{{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);
     padding-bottom:18px;margin-bottom:20px}}
   .num{{font-family:var(--serif);font-size:72px;font-weight:650;letter-spacing:-.02em;line-height:1}}
-  .num.crit{{color:var(--critical)}} .num.warn{{color:#7A5A16}} .num.good{{color:var(--good)}}
+  .num.crit{{color:var(--critical)}} .num.warn{{color:var(--warn-ink)}} .num.good{{color:var(--good)}}
   .den{{font-family:"Inter",sans-serif;color:var(--muted);font-size:15px}}
   .tier{{margin-left:auto;font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--muted)}}
-  .barwrap{{padding:16px 0;border-top:1px solid var(--line)}}
-  .barwrap:first-child{{border-top:0;padding-top:2px}}
+  .barwrap{{padding:20px 22px;margin:0 0 14px;background:#F8F9FB;border:1px solid var(--line);
+    border-left:4px solid var(--line);border-radius:0 10px 10px 0}}
+  .barwrap:last-child{{margin-bottom:0}}
+  .barwrap.good{{border-left-color:var(--good)}}
+  .barwrap.warn{{border-left-color:var(--warn)}}
+  .barwrap.crit{{border-left-color:var(--critical)}}
+  @media(max-width:560px){{.barwrap{{padding:16px 14px}}}}
   .barhead{{display:flex;align-items:baseline;justify-content:space-between;gap:16px}}
   .lbl{{font-size:16px;font-weight:600;color:var(--ink);line-height:1.3}}
   .chip{{display:inline-block;font-weight:700;font-size:16px;padding:4px 12px;border-radius:8px;line-height:1.3}}
   .chip .den{{color:inherit;opacity:.65;font-weight:600;font-size:12px}}
   .chip.good{{background:#EDF5F0;color:var(--good)}}
-  .chip.warn{{background:#F8F3E7;color:#7A5A16}}
+  .chip.warn{{background:#F8F3E7;color:var(--warn-ink)}}
   .chip.crit{{background:#F8EEEE;color:var(--critical)}}
   .mark{{display:inline-block;width:22px}}
   .mark.ok::before{{content:"✓";color:var(--good);font-weight:700}}
@@ -270,6 +276,29 @@ PAGE = """<!doctype html><html lang="en"><head>
   @media(max-width:560px){{.sec-angelo{{width:76px}}}}
   .mi-img{{display:block;width:min(300px,72%);height:auto;margin:0 auto 18px;
     filter:drop-shadow(0 8px 20px rgba(0,0,0,.4))}}
+  .verdict-card{{border-top:4px solid var(--line)}}
+  .verdict-card.good{{border-top-color:var(--good)}}
+  .verdict-card.warn{{border-top-color:var(--warn)}}
+  .verdict-card.crit{{border-top-color:var(--critical)}}
+  .eyebrow-dark{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin-bottom:12px}}
+  .sum-h{{font-family:var(--serif);font-size:clamp(24px,4vw,28px);font-weight:600;letter-spacing:-.015em;
+    line-height:1.2;margin:0 0 12px;color:var(--ink)}}
+  .sum-verdict{{font-family:var(--serif);font-size:19px;line-height:1.45;margin:0 0 4px;color:var(--ink)}}
+  .sum-shot{{display:block;width:100%;height:210px;object-fit:cover;object-position:top center;
+    border:1px solid var(--line);border-radius:10px;margin:0 0 20px}}
+  @media(max-width:560px){{.sum-shot{{height:150px}}}}
+  .sec-h{{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 14px;color:var(--ink)}}
+  .sum-row{{margin:20px 0}}
+  .sum-row .k{{display:flex;align-items:center;gap:9px;font-family:"Inter",sans-serif;font-size:13px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);font-weight:700;margin:0 0 8px}}
+  .sum-row .k::before{{content:"";width:18px;height:4px;background:var(--accent);border-radius:2px;flex-shrink:0}}
+  .sum-row p{{margin:0;font-size:16px;line-height:1.6}}
+  .sum-good{{background:#EDF5F0;border:1px solid #CBE2D6;border-left:4px solid var(--good);
+    border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0;font-size:16px;line-height:1.6}}
+  .sum-good b{{color:var(--good)}}
+  .sum-foot{{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}}
+  .cta-inline{{text-align:center}}
   .cta-angelo-wrap{{position:relative;display:block;width:min(400px,90%);margin:28px auto 0;
     container-type:inline-size}}
   .cta-angelo{{display:block;width:100%;height:auto}}
@@ -369,7 +398,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     font-size:17px;line-height:1.55;font-weight:600;color:#fff}}
   .cta .hook.good{{background:rgba(58,118,189,.16);border-color:rgba(127,169,221,.5)}}
   .cta .hook .sc{{color:#fff;font-size:19px;font-weight:700}}
-  .cta .hook .hl{{color:#F0B9B4}}
+  .cta .hook .hl{{color:var(--coral)}}
   .cta .hook.good .hl{{color:var(--glow)}}
   .cta .hook .hl .sc{{color:inherit}}
   .cta .curi{{font-weight:600;color:#fff;font-size:17px}}
@@ -411,6 +440,12 @@ PAGE = """<!doctype html><html lang="en"><head>
   .report>.cta,.report>.steps,.report>.strength,.report>.pricing,.report>.media,.report>.scope,
   .report>.checklist{{margin-top:28px;margin-bottom:0}}
   .report>*:first-child{{margin-top:0}}
+  /* ONE type spec for every numbered section headline. These four used to run 19px, 21px and 25px in
+     three different colours, which read as drift. Margins stay per-section (the evidence heading sits
+     in a flex row); only the type is unified. .voice.good h4 keeps its green by higher specificity. */
+  .ev .h,.scores-h,.voice h4,.diag h3{{font-family:var(--serif);font-size:25px;font-weight:600;
+    color:var(--ink);line-height:1.3;letter-spacing:-.01em}}
+  .sec-lede{{font-size:16px;line-height:1.6;color:var(--muted);margin:0 0 18px;max-width:62ch}}
 </style></head><body>
 <div class="hero-band"><div class="wrap">
   <div class="hero">
@@ -724,6 +759,45 @@ def overall_copy(clarity, tier, in_top_tier):
         "<p>And getting a stranger to feel that isn't a headline you can polish on your own. It's knowing their real "
         "problem in their own words, and that's the part you can't see from the inside.</p>")
 
+def _first_sentence(text, cap=280, sentences=2):
+    """Opening sentences of an AI-written block, for the skim summary. TWO by default: the first is
+    usually only the set-up ('Your headline reads X'), and the actual point arrives in the second.
+    Splits on sentence ends so a decimal score ('4.6 out of 10') can never be cut in half."""
+    t = (text or "").strip()
+    if not t:
+        return ""
+    out = " ".join(_SENT_RE.split(t)[:sentences]).strip()
+    if len(out) > cap:
+        out = out[:cap].rsplit(" ", 1)[0].rstrip(",;:") + "…"   # literal …, so html.escape leaves it alone
+    return out
+
+
+def possibility_note(res):
+    """The GOOD-NEWS beat of the summary sandwich (David's call): never a compliment about their copy,
+    always POSSIBILITY built from the real market numbers. Two hard rules baked in:
+    (1) framed as OPPORTUNITY ('a weak field is cheap to win'), never as reassurance ('everyone else is
+        bad too'), which would breed complacency, and
+    (2) TIER-SAFE — a coach already at the top of the field is never told they're 'not far from the top'.
+    Numbers come from the audit constants, so this can never disagree with the scores."""
+    if res.get("in_top_tier"):
+        return (f"<b>Here's the good news.</b> {PCT_FAIL_5SEC}% of the coaching homepages we've read fail that "
+                f"same five-second test, and you're already ahead of the field. That lead is your biggest asset, "
+                f"and it grows the moment your words come from real buyer research instead of instinct.")
+    # Distance measured from the DISPLAYED score, not the rounded integer the engine stores: a coach
+    # reading "you scored 4.6, the best reach 5.7, you're 0.7 away" would spot the arithmetic instantly.
+    try:
+        _gap = max(round(TOP10_10 - float(res.get("score_10_display", res.get("score_10", 0))), 1), 0)
+    except (TypeError, ValueError):
+        _gap = res.get("gap_to_top", 0)
+    _dist = (f"You're <b>{_gap} points</b> from the top of everything we've read, and closing that distance isn't "
+             f"a rebuild or a bigger budget." if _gap else
+             "And closing that distance isn't a rebuild or a bigger budget.")
+    return (f"<b>Here's the good news.</b> {PCT_FAIL_5SEC}% of coaching homepages fail that same five-second test, "
+            f"and the best ones we score only reach {TOP10_10} out of 10. This isn't a hard field to stand out in. "
+            f"{_dist} It's a message that finally matches what your buyers are already thinking, and the coach who "
+            f"gets there first takes the enquiries everyone else is leaking.")
+
+
 # The list above reads like a to-do. This stops a coach thinking the checklist IS the cure. It isn't:
 # every one of those fixes needs their buyer's real words, and that's the part you can't guess.
 FIXES_CAVEAT = (
@@ -858,7 +932,7 @@ def render_result(res, first_name=""):
                    'but not to them.</div>')
 
     evidence_html = (
-        f'<div class="ev"><div class="ev-head"><div class="h"><span class="secnum">1 / 5</span>What we read on your {_page_word}: {html.escape(ev.get("page_display") or ev["domain"])}</div>'
+        f'<div class="ev"><div class="ev-head"><div class="h"><span class="secnum">Section 1 of 4</span>What we read on your {_page_word}: {html.escape(ev.get("page_display") or ev["domain"])}</div>'
         f'<img class="sec-angelo" src="/angelo_reading.png" alt="Angelo reading your page"></div>'
         f'{thumb}{quotes}</div>'
     )
@@ -869,7 +943,7 @@ def render_result(res, first_name=""):
     first_coach = html.escape(v.get("coach_terms", ["clarity"])[0]) if v.get("coach_terms") else "clarity"
     if v.get("leaning") == "expert":
         voice_html = (
-            '<div class="voice"><h4><span class="secnum">4 / 5</span>Whose words are these? Yours, or your buyer\'s?</h4>'
+            '<div class="voice"><h4><span class="secnum">Section 3 of 4</span>Whose words are these? Yours, or your buyer\'s?</h4>'
             f'<p>On your {_page_word} you reach for coach words like {coach_terms}. They\'re good words. But they\'re '
             '<b>your</b> words, not your customer\'s.</p>'
             '<p>Right now you\'re talking expert to expert. Another coach would read this and understand you easily. '
@@ -899,7 +973,7 @@ def render_result(res, first_name=""):
             'weekend job either. <b>The words you need aren\'t in your own head to find.</b></p></div>')
     elif v.get("leaning") == "customer":
         voice_html = (
-            '<div class="voice good"><h4><span class="secnum">4 / 5</span>You\'re speaking your buyer\'s language</h4>'
+            '<div class="voice good"><h4><span class="secnum">Section 3 of 4</span>You\'re speaking your buyer\'s language</h4>'
             f'<p>Here\'s something you\'re doing well. Your {_page_word} talks about the problem in words your customer '
             'would actually use, not just coach words.</p>'
             f'<p>That\'s rarer than you\'d think. Of the {cnt} coaching sites we scored, only about 1 in {BUYER_VOICE_1_IN} do this. The '
@@ -907,7 +981,7 @@ def render_result(res, first_name=""):
             'Keep using the real words your clients say.</p></div>')
     else:
         voice_html = (
-            '<div class="voice"><h4><span class="secnum">4 / 5</span>Whose words are these? Yours, or your buyer\'s?</h4>'
+            '<div class="voice"><h4><span class="secnum">Section 3 of 4</span>Whose words are these? Yours, or your buyer\'s?</h4>'
             f'<p>Your {_page_word} mixes your words with your customer\'s words.</p>'
             '<p>The closer you get to how your customer really talks, the words they\'d use for their own problem, the '
             'more of them will get in touch instead of just nodding and leaving.</p>'
@@ -930,7 +1004,7 @@ def render_result(res, first_name=""):
         _def = html.escape(DEFINITIONS.get(k, ""))
         if c["you"] is None:                     # N/A: no bar, no red cross, an honest 'N/A'
             rows.append(
-                f'<div class="barwrap"><div class="barhead">'
+                f'<div class="barwrap na"><div class="barhead">'
                 f'<div class="lbl"><span class="mark na"></span>{html.escape(LABELS[k])}</div>'
                 f'<div class="vs" style="color:var(--muted);font-size:14px">N/A</div></div>'
                 f'<div class="def">{_def}</div>'
@@ -942,7 +1016,7 @@ def render_result(res, first_name=""):
         # technical_health is shown but NOT part of the overall score, so it shows 'not counted', not a market gap.
         _mkt = 'not counted' if k == "technical_health" else f'market {c["market"]}'
         rows.append(
-            f'<div class="barwrap"><div class="barhead">'
+            f'<div class="barwrap {sev_class(c["you"])}"><div class="barhead">'
             f'<div class="lbl"><span class="mark {mark}"></span>{html.escape(LABELS[k])}</div>'
             f'<div class="vs"><span class="chip {sev_class(c["you"])}">{c["you"]}<span class="den">/10</span></span>'
             f'<span class="mkt">{_mkt}</span></div></div>'
@@ -967,7 +1041,8 @@ def render_result(res, first_name=""):
         return (f'<a class="cta-angelo-wrap" href="{href}">'
                 f'<img class="cta-angelo" src="/angelo_cta.png" alt="Angelo: {text}">'
                 f'<span class="bubble-txt">{text}</span></a>')
-    opener = (f'<div class="analysed"><p>{_greet} can tell in a few seconds what a cold buyer thinks when they arrive on your '
+    opener = (f'<h2 class="sec-h">The deep dive</h2>'
+              f'<div class="analysed"><p>{_greet} can tell in a few seconds what a cold buyer thinks when they arrive on your '
               f'page. We\'ve watched it go right and wrong on thousands of coaching sites.</p>'
               f'<p>We looked at '
               f'<b>{html.escape(ev.get("page_display") or ev["domain"])}</b>, scored it against all <b>{cnt}</b> of '
@@ -985,13 +1060,14 @@ def render_result(res, first_name=""):
     checklist_html = (
         '<div class="checklist"><div class="h">What we have looked at (detailed below)</div><ul>'
         + "".join(f"<li>{c}</li>" for c in CHECKLIST)
-        + '</ul><div class="foot">Read on for what we found, your <b>overall score is at the very bottom.</b></div></div>'
+        + '</ul><div class="foot">You have the score already. Below is <b>the reason behind every part of it</b>, '
+          'and what to do about it.</div></div>'
     )
 
     # Angelo's verdict image (David's rule): under 5 = thumbs down, 5-6 = unsure, 7+ = thumbs up.
     _verdict_img = ("angelo_down.png" if _sd < 5 else "angelo_unsure.png" if _sd < 7 else "angelo_up.png")
     score_reveal = (
-        f'<div class="reveal {g}"><div class="h"><span class="secnum">5 / 5</span>Your overall score</div>'
+        f'<div class="reveal {g}"><div class="h"><span class="secnum">In summary</span>Your overall score</div>'
         '<div class="grade">'
         f'<div class="num {g}">{res.get("score_10_display", res["score_10"])}<span class="den">/10</span></div>'
         f'<div><div class="verdict">{verdict}</div>'
@@ -1003,6 +1079,42 @@ def render_result(res, first_name=""):
         'homepage gets scored the same way, against the same cold buyers, and we call it exactly as we see it. A low '
         'number isn\'t us being harsh on you. It just shows how far the page is from where your buyers already are. '
         'What you do about it is up to you.</div></div>'
+    )
+
+    # ONE ask, repeated. Our own rulebook counts the SAME job repeated as one CTA (it's competing,
+    # different asks that score a page down), so every button on this report is identical in
+    # wording and destination.
+    def _cta_block():
+        return f'<div class="cta-inline"><a class="cta-btn" href="{_offer_href}">{_mid_btn}</a></div>'
+
+    # PART 1 — THE VERDICT. The whole report in one card for skim readers, in David's
+    # bad / good / bad order, with the first CTA inside it. The score is stated here rather than
+    # saved for the end: a reader who skims must still leave knowing the number and the next step.
+    _score_disp = res.get("score_10_display", res["score_10"])
+    # Their own page, right at the top of the verdict: proof this is about THEM, not a template.
+    # Cropped to the top of the shot on purpose — the first screen is the part being judged.
+    _sum_shot = (f'<img class="sum-shot" src="{res["thumbnail"]}" alt="Your {_page_word}">'
+                 if res.get("thumbnail") else "")
+    _report_head = (f'{_fn}, your report is ready.' if _fn else 'Your report is ready.')
+    summary_html = (
+        f'<div class="sec verdict-card {g}">'
+        f'<h2 class="sum-h">{_report_head}</h2>'
+        f'<p class="sec-lede">It comes in three parts. This is the quick summary, so if you read nothing else, '
+        f'read this. Below it is the deep dive, where we show you what we read on your {_page_word} and the '
+        f'reason behind every score. Then a closing statement, with what to do about it.</p>'
+        f'{_sum_shot}'
+        f'<div class="grade">'
+        f'<div class="num {g}">{_score_disp}<span class="den">/10</span></div>'
+        f'<img class="verdict-img" src="/{_verdict_img}" alt="Angelo&rsquo;s verdict">'
+        f'</div>'
+        f'<div class="sum-verdict">{verdict}</div>'
+        f'<div class="sum-row"><div class="k">The biggest thing in the way</div>'
+        f'<p>{emph(html.escape(_first_sentence(cr["headline_problem"])))}</p></div>'
+        f'<div class="sum-good">{possibility_note(res)}</div>'
+        f'<div class="sum-row"><div class="k">What it&rsquo;s costing you</div>'
+        f'<p>{html.escape(_first_sentence(cr["why_it_costs_clients"]))}</p></div>'
+        f'{_cta_block()}'
+        f'</div>'
     )
 
     if hole_score > 5:
@@ -1022,6 +1134,7 @@ def render_result(res, first_name=""):
         )
 
     return f"""<div class="report" data-sites="{cnt}">
+      {summary_html}
       <div class="sec">
       {opener}
       {reframe}
@@ -1032,19 +1145,22 @@ def render_result(res, first_name=""):
       {popup}
       {evidence_html}
       <div class="sec">
-      <div class="scores-h"><span class="secnum">2 / 5</span>Here are your scores, with the reason behind each one. A green tick means it's working for you. A red cross means it's costing you clients.</div>
+      <h3 class="scores-h"><span class="secnum">Section 2 of 4</span>Your scores, one by one</h3>
+      <p class="sec-lede">Here is every score, with the reason behind it. A green tick means it's working for you. A red cross means it's costing you clients.</p>
       <div>{''.join(rows)}</div>
       </div>
+      {_cta_block()}
+      {strength_html}
+      {pricing_html}
+      {voice_html}
       <div class="diag">
-        <h3><span class="secnum">3 / 5</span>What a visitor sees{ai}</h3>
+        <h3><span class="secnum">Section 4 of 4</span>What a visitor sees{ai}</h3>
         <div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr['headline_problem']))}</div>
         <div class="row"><div class="k">What it's costing you</div>{para_split(cr['why_it_costs_clients'])}</div>
         <div class="row"><div class="k">The obvious fixes</div><ol class="fixlist">{fixes}</ol>{FIXES_CAVEAT}</div>
         <div class="row"><div class="k">Bottom line</div><div class="verdict-note">{para_split(cr['money_left_on_table'])}</div></div>
       </div>
-      {strength_html}
-      {pricing_html}
-      {voice_html}
+      {_cta_block()}
       {score_reveal}
       <div class="taste">
         <div class="th">Here's the whole game, in two examples from the coaching world:</div>
@@ -1123,36 +1239,45 @@ OFFER_PAGE = """<!doctype html><html lang="en"><head>
 <!-- RETARGETING: paste your Meta Pixel and/or Google tag here. A visit to /offer = a warm audience. -->
 <style>
   @font-face{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}
-  :root{--paper:#eef1f5;--surface:#fff;--ink:#17222e;--muted:#5c6a67;--line:#dde3e0;--accent:#3a76bd;
-    --accent-ink:#234e83;--soft:#e6edf8;}
+  @font-face{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}
+  /* Same token block as the report and the salespage. Keep these three in step: this page is one
+     click from a gold CTA, so any drift here reads as landing on a different website. */
+  :root{
+    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
+    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
+    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
+    --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
+    --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
+    --gold:#D4AF37;--gold-h:#C2A02F;
+    --good:#2A7B56;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;--coral:#F0B9B4;}
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
-  .wrap{max-width:720px;margin:0 auto;padding:44px 22px 80px}
+  .wrap{max-width:760px;margin:0 auto;padding:44px 22px 80px}
   .eyebrow{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
     color:var(--accent-ink);font-weight:600}
-  h1{font-family:"Inter",sans-serif;font-weight:600;font-size:clamp(30px,6vw,46px);line-height:1.08;
-    letter-spacing:-.015em;margin:.3em 0 .3em;text-wrap:balance}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(26px,3.6vw,44px);line-height:1.15;
+    letter-spacing:-.02em;margin:.3em 0 .3em;text-wrap:balance}
   .lede{font-size:19px;color:var(--muted);margin:0 0 30px}
-  h2{font-family:"Inter",sans-serif;font-size:clamp(22px,4vw,28px);margin:38px 0 12px}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(19px,3.4vw,25px);line-height:1.3;
+    margin:38px 0 14px;color:var(--ink)}
   p{margin:0 0 16px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px 26px;margin:22px 0;
-    box-shadow:0 8px 30px rgba(20,40,36,.06)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:36px 32px;margin:24px 0;
+    box-shadow:0 1px 3px rgba(11,19,43,.08)}
+  @media(max-width:560px){.card{padding:26px 18px}}
   ul{margin:8px 0 0;padding-left:22px}
   li{margin:9px 0}
   li b{color:var(--accent-ink)}
   .built li{margin:12px 0}
-  .cta{margin-top:34px;padding:30px 26px;background:var(--ink);color:#eef1f5;border-radius:16px;text-align:center}
+  .cta{margin-top:34px;padding:40px 32px;background:var(--navy);color:var(--ivory);border-radius:16px;text-align:center}
+  @media(max-width:560px){.cta{padding:28px 20px}}
   .cta h2{color:#fff;margin-top:0}
-  .cta p{max-width:48ch;margin:0 auto 20px;color:#dfe7e4;font-size:15px}
-  .btn{display:inline-block;background:#e0691f;color:#fff;text-decoration:none;font-weight:600;
-    padding:16px 30px;border-radius:9px;font-size:17px}
-  .btn:hover{background:#c65a15}
-  .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+  .cta p{max-width:48ch;margin:0 auto 20px;color:var(--ivory);font-size:16px}
+  .btn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
+    padding:16px 32px;border-radius:6px;font-size:16px}
+  .btn:hover{background:var(--gold-h)}
+  .note{font-size:13px;color:var(--ivory-dim);margin-top:14px}
   .back{display:inline-block;margin-bottom:24px;color:var(--accent-ink);text-decoration:none;font-size:14px}
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-    --paper:#0e1614;--surface:#16211e;--ink:#e9efec;--muted:#93a29d;--line:#243430;--soft:#16302b;
-    --accent:#6ba6e0;--accent-ink:#9ec6f0;}}
 </style></head><body data-domain="__DOMAIN__"><div class="wrap">
   <a class="back" href="/">&larr; Back to your free audit</a>
   <div class="eyebrow">The Marketing Intelligence File</div>
@@ -1223,7 +1348,7 @@ _SALES_CSS = """
     --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
     --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
     --gold:#D4AF37;--gold-h:#C2A02F;
-    --good:#2A7B56;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;}
+    --good:#2A7B56;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;--coral:#F0B9B4;}
   *{box-sizing:border-box}
   html{background:var(--navy)}
   body{margin:0;background:var(--paper);color:var(--ink);
@@ -1274,7 +1399,7 @@ _SALES_CSS = """
     font-size:17px;line-height:1.55;font-weight:600;color:#fff}
   .hook.good{background:rgba(58,118,189,.16);border-color:rgba(127,169,221,.5)}
   .hook .sc{color:#fff;font-size:19px;font-weight:700}
-  .hook .hl{color:#F0B9B4}
+  .hook .hl{color:var(--coral)}
   .hook.good .hl{color:var(--glow)}
   .hook .hl .sc{color:inherit}
   .steps-wrap{position:relative;display:block;width:min(860px,96%);margin:36px auto 0;
@@ -1344,7 +1469,7 @@ _SALES_CSS = """
   .crit-name{font-size:14px;font-weight:700;color:var(--ink)}
   .crit-vs{text-align:right;white-space:nowrap}
   .crit-mkt{display:block;font-size:12px;color:var(--muted);margin-top:3px}
-  .crit-defn{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  .crit-defn{font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
     margin-bottom:10px;line-height:1.5}
   .crit-quote{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink);border-left:3px solid var(--accent);
     padding-left:12px;margin:10px 0;line-height:1.55}
@@ -1386,8 +1511,8 @@ _SALES_CSS = """
     color:#F4F5F7;font-size:1.75cqw;padding:.4em .8em;margin-bottom:.45em}
   .board-lay .rm-arrow.ok .rm-glyph{color:#F4F5F7;font-size:2.6cqw}
   .board-lay .rm-arrow.ok .rm-albl{color:#F4DE9C;font-size:1.15cqw}
-  .board-lay .rm-arrow.no .rm-glyph{color:#FF9B8E;font-size:2.3cqw}
-  .board-lay .rm-arrow.no .rm-albl{color:#FF9B8E;font-size:1.15cqw}
+  .board-lay .rm-arrow.no .rm-glyph{color:var(--coral);font-size:2.3cqw}
+  .board-lay .rm-arrow.no .rm-albl{color:var(--coral);font-size:1.15cqw}
   .board-lay .rm-page{background:transparent;border:1.5px solid #F4F5F7;color:#F4F5F7;
     box-shadow:none;font-size:1.75cqw;padding:2.6em 1em 1.1em}
   .board-lay .rm-page::before{background:rgba(244,245,247,.3)}
@@ -1400,8 +1525,24 @@ _SALES_CSS = """
   .roots-map{background:var(--surface);border:1px solid var(--line);border-radius:12px;
     padding:26px 26px 20px;box-shadow:0 1px 3px rgba(11,19,43,.08);margin-bottom:14px}
   .rm-flow{display:grid;grid-template-columns:1fr 76px auto 76px 1fr;gap:10px;align-items:center}
-  .rm-h{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
-    font-weight:700;margin-bottom:10px}
+  .rm-h{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
+    font-weight:700;margin-bottom:14px}
+  /* PHONE version of the roots map. The old one stacked into a downward arrow that read backwards
+     (homepage -> none of it -> buyer, when the point is the buyer's words never got IN). Now it's a
+     numbered list whose 1-4 match the Root cards directly below it, then the one absent voice. */
+  .rm-list{list-style:none;counter-reset:rm;margin:0 0 18px;padding:0}
+  .rm-list li{position:relative;min-height:28px;padding:2px 0 0 40px;margin:0 0 12px;font-size:15px;
+    font-weight:600;color:var(--ink);line-height:1.4}
+  .rm-list li:last-child{margin-bottom:0}
+  .rm-list li::before{counter-increment:rm;content:counter(rm);position:absolute;left:0;top:0;
+    width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;
+    font-size:14px;display:flex;align-items:center;justify-content:center}
+  .rm-mid{font-size:14px;color:var(--muted);margin:0 0 16px;padding-top:16px;border-top:1px solid var(--line)}
+  .rm-missing{background:#F8EEEE;border:1px solid #E3CACA;border-left:4px solid var(--critical);
+    border-radius:0 8px 8px 0;padding:14px 18px}
+  .rm-mh{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--critical);
+    font-weight:700;margin-bottom:8px}
+  .rm-missing .rm-buyer{background:transparent;border:0;padding:0}
   .rm-pill{background:var(--soft);border:1px solid #CBD9EC;border-radius:8px;padding:8px 12px;
     font-size:13px;font-weight:600;color:var(--ink);line-height:1.35;margin-bottom:8px}
   .rm-pill:last-child{margin-bottom:0}
@@ -1565,12 +1706,19 @@ _SALES_CSS = """
   .checkout-form-placeholder .cf-note{font-size:14px;color:var(--ivory-dim);line-height:1.55}
   .checkout-form-placeholder .lock-icon{font-size:28px;margin-bottom:10px}
   .cta-btn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
+    font-family:inherit;   /* a <button> does NOT inherit the page font: without this it renders in Arial */
     padding:16px 30px;border-radius:6px;font-size:16px;margin-top:18px;border:0;cursor:pointer;width:100%;
     text-align:center}
   .cta-btn:hover{background:var(--gold-h)}
   .cta-btn:disabled{opacity:.55;cursor:default}
   .guarantee{font-size:13px;color:var(--ivory-dim);margin-top:14px;text-align:center;line-height:1.5}
+  .btnwrap{text-align:center;margin-top:22px}
+  .cta-btn.mid{width:auto;margin-top:0;padding:14px 26px}
 """
+
+# The Stripe Payment Link the checkout button points at. Until it is set, the button stays
+# disabled and the note says checkout opens soon — builder's notes never reach the customer.
+STRIPE_PAYMENT_LINK = os.environ.get("STRIPE_PAYMENT_LINK", "").strip()
 
 # The criteria a Marketing Intelligence File genuinely fixes, and the plain phrase the hook uses
 # for each. Mirrors render_result's hook: never praise while one of these sits at 5/10 or under.
@@ -1597,9 +1745,9 @@ def _sales_hook(data, page_word, niche_word):
         return (
             f'<div class="hook good"><span class="hl">Your overall score is built from eight separate checks, '
             f'and you scored a strong <span class="sc">{mr_score}/10</span> on Mind Reading.</span> '
-            f'This means your instincts are lightyears ahead of the market average. However, maintaining that accuracy '
-            f'across all your outbound copy, emails, and ads without a continuous stream of hard consumer data is '
-            f'exhausting. The Marketing Intelligence File scales what you are already doing right, for the '
+            f'That is rare. Your writing already sits closer to your buyer&rsquo;s real words than nearly every '
+            f'page we have scored. The hard part is keeping that up in everything you write, week after week, '
+            f'on instinct alone. Real facts about your buyers make that far easier, for the '
             f'{niche_word}you want more of.</div>'
         )
     return (
@@ -1792,6 +1940,35 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     bub = f'Come on, {fn}. Let me show you.' if fn else 'Come on. Let me show you.'
     buy_btn = (f'{fn}, get your Marketing Intelligence File &rarr;' if fn
                else 'Get My Marketing Intelligence File &rarr;')
+    # Mid-page buy buttons, so a reader convinced early never has to hunt for the checkout.
+    mid_cta = f'<div class="btnwrap"><a class="cta-btn mid" href="#checkout">{buy_btn}</a></div>'
+
+    # The stranger story must not contradict a top-tier opener ("you are one of them"):
+    # strong pages get the same scene with a true ending, everyone else keeps the original.
+    if _sc_num >= TOP10_10:
+        stranger_html = (
+            '<p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. '
+            'They gave it five seconds. The closer your words sit to the ones already in their head, the '
+            'more of those strangers stay and get in touch. That is the edge the rest of this page is about.</p>')
+    else:
+        stranger_html = (
+            '<p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. '
+            'They gave it five seconds. Your words did not describe their problem. They left. You never knew '
+            'they were there.</p>')
+
+    # Customer-safe checkout: a live Stripe link when configured, an honest note when not.
+    if STRIPE_PAYMENT_LINK:
+        checkout_inner = (
+            '<div class="lock-icon">&#128274;</div>'
+            '<div class="cf-label">Secure checkout</div>'
+            '<div class="cf-note">Card payment handled securely by Stripe.</div>'
+            f'<a class="cta-btn" href="{html.escape(STRIPE_PAYMENT_LINK, quote=True)}">{buy_btn}</a>')
+    else:
+        checkout_inner = (
+            '<div class="lock-icon">&#128274;</div>'
+            '<div class="cf-label">Secure checkout</div>'
+            '<div class="cf-note">Checkout opens here very soon. Your link stays live, so you can come back any time.</div>'
+            f'<button class="cta-btn" disabled>{buy_btn}</button>')
 
     return f"""<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1805,18 +1982,18 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <div class="first-fold-section">
     <div class="ff-header">
-      <div class="ff-eyebrow">&#128309; YOUR PRIVATE RESULTS PAGE // PREPARED FOR: {fn_up}</div>
+      <div class="ff-eyebrow">Prepared for {fn_up}</div>
       <h1 class="ff-h1">{h1_line}</h1>
     </div>
     <div class="first-fold-inner">
       <div class="ff-left">
         {opener_html}
-        <p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. They gave it five seconds. Your words did not describe their problem. They left. You never knew they were there.</p>
+        {stranger_html}
       </div>
       <div class="ff-right">
         <div class="screenshot-container">
           {"" if not shot else f'<img src="{shot}" alt="Your coaching website homepage" loading="eager">'}
-          {"" if shot else '<div class="sc-placeholder"><img src="/angelo.png" alt="Angelo" style="width:72px;height:auto;opacity:.55;margin-bottom:14px"><div>Screenshot loading&hellip;</div></div>'}
+          {"" if shot else '<div class="sc-placeholder"><img src="/angelo.png" alt="Angelo" style="width:72px;height:auto;opacity:.55"></div>'}
         </div>
       </div>
     </div>
@@ -1855,12 +2032,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     <div class="card">
       <h2>Your words do not match the thoughts already inside your client&rsquo;s head.</h2>
-      <p>That is not a design problem, and it is not carelessness or a lack of talent. To see what it
-      actually is, look at the words we found on your {page_word}, next to the words your buyer
+      <p>That does not happen because you are careless or short of talent. To see what is
+      actually going on, look at the words we found on your {page_word}, next to the words your buyer
       actually uses.</p>
 
       <div style="margin-top:18px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
-        color:var(--accent-ink);font-weight:700;margin-bottom:10px">The Messaging X-Ray: From Intuition to Intelligence</div>
+        color:var(--accent-ink);font-weight:700;margin-bottom:10px">The Messaging X-Ray</div>
       <div class="xray-box">
         <div class="xray-panel before">
           <div class="xray-screen" style="font-size:16px;letter-spacing:.02em;font-style:italic;padding:18px 22px;text-align:center">{tok}</div>
@@ -1883,7 +2060,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <p style="margin-top:16px">Each one is abstract. Each one could sit on any coaching page on the internet.
       When a stranger arrives on your page and reads words that do not describe their specific problem,
       they do not think &ldquo;this coach is too generic.&rdquo; They think &ldquo;this is not for me&rdquo;
-      and they leave. The problem is not your design or your credentials. It is the words.</p>
+      and they leave. The problem is not your design or your badges. It is the words.</p>
       <p>Each of those terms means something specific to you.
       To a cold stranger who has never met you, they describe nobody&rsquo;s life in particular.
       Replacing them with different abstract terms is not a fix. The fix is to find out what language
@@ -1920,37 +2097,32 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       </div>
     </div>
     <div class="roots-map">
-      <div class="rm-flow">
-        <div class="rm-col">
-          <div class="rm-h">Where your words came from</div>
-          <div class="rm-pill">Your view from the inside</div>
-          <div class="rm-pill">Trends: coaches copying coaches</div>
-          <div class="rm-pill">The opinions you paid for</div>
-          <div class="rm-pill">Your own way out of the problem</div>
-        </div>
-        <div class="rm-arrow ok"><span class="rm-glyph">&rarr;</span><span class="rm-albl">all of it</span></div>
-        <div class="rm-page">Your<br>{page_word}</div>
-        <div class="rm-arrow no"><span class="rm-glyph">&#10005;</span><span class="rm-albl">none of it</span></div>
-        <div class="rm-col">
-          <div class="rm-h">Your buyer&rsquo;s head</div>
-          <div class="rm-buyer">&ldquo;I cannot stop thinking about&hellip;&rdquo;</div>
-        </div>
+      <div class="rm-h">Where your words came from</div>
+      <ol class="rm-list">
+        <li>Your view from the inside</li>
+        <li>Trends: coaches copying coaches</li>
+        <li>The opinions you paid for</li>
+        <li>Your own way out of the problem</li>
+      </ol>
+      <p class="rm-mid">All four of those wrote your {page_word}. Here is the one voice that never arrived.</p>
+      <div class="rm-missing">
+        <div class="rm-mh">Your buyer&rsquo;s head</div>
+        <div class="rm-buyer">&ldquo;I cannot stop thinking about&hellip;&rdquo;</div>
       </div>
-      <p class="rm-cap">All four of those wrote your page. The one voice that never arrived is your buyer&rsquo;s.</p>
     </div>
 
     <div class="roots-grid">
     <div class="protocol-container">
-      <div class="pc-label">Root 1</div>
+      <div class="pc-label">Root of the problem 1</div>
       <h3>Nobody can see their own business from the outside.</h3>
       <p>You built this business from the inside, so you describe it from the inside. You know what your
       coaching does, so that is what the page says. But your buyer has never been inside. They only know
       what their problem feels like.</p>
-      <p>Nobody sees their own business the way a stranger sees it. Not you, not us, nobody.</p>
+      <p>Nobody sees their own business the way a stranger sees it. Not you, and not us either.</p>
     </div>
 
     <div class="protocol-container">
-      <div class="pc-label">Root 2</div>
+      <div class="pc-label">Root of the problem 2</div>
       <h3>The trends are coaches copying coaches.</h3>
       <p>When you look around for how to write your page, you look at other coaches. The sites that look
       professional. The phrases everyone uses. But we have read {cnt} coaching homepages, and
@@ -1959,7 +2131,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="protocol-container">
-      <div class="pc-label">Root 3</div>
+      <div class="pc-label">Root of the problem 3</div>
       <h3>The people you hired could only give you opinions.</h3>
       <p>Maybe you paid for help. A designer, a brand expert, a business coach, a course. Here is the
       problem: they gave you their opinion. It may have been a good opinion.</p>
@@ -1967,7 +2139,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="protocol-container">
-      <div class="pc-label">Root 4</div>
+      <div class="pc-label">Root of the problem 4</div>
       <h3>You got through the problem you now fix.</h3>
       <p>That is exactly why you are good at fixing it. But it also means you talk like someone on the
       other side of it, while your buyer is still in it.</p>
@@ -1980,8 +2152,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <p><strong>Put those together and the mystery disappears.</strong> Nothing in your world contains
       your buyer&rsquo;s actual words. Not your own head, and not anyone you hired. So the page sounds
       like you, because your view is all anyone ever had to work with.</p>
-      <p>That is why the score is what it is. And it is why rewriting the page with the same ingredients
-      gets the same result.</p>
+      <p>That is why rewriting the page with the same ingredients gets the same result.</p>
     </div>
   </div>
 
@@ -1990,8 +2161,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <div class="pitch-gate">
     <div class="pg-label">Before we go on</div>
     <h2>May we show you what the fix looks like?</h2>
-    <p>The fix is not more opinions, and it is not trying harder with the same ingredients. It is the
-    missing ingredient itself: <b>your buyer&rsquo;s actual words, as evidence</b>. Here it is.</p>
+    <p>More opinions will not fix it, and neither will trying harder with the same ingredients. The
+    missing ingredient is <b>your buyer&rsquo;s actual words, as real evidence</b>. Here it is.</p>
   </div>
 
   <!-- What the File is -->
@@ -1999,7 +2170,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <img class="mi-img" src="/angelo_file.png" alt="Angelo with your Marketing Intelligence File">
     <div class="pr-eyebrow">The Marketing Intelligence File</div>
     <h2>The exact words your buyers use when they describe their own problem.</h2>
-    <p>Not the polished version. Not the aspirational version. This is what the file puts in your hands:</p>
+    <p>The raw version, not the polished one. Here is what the file puts in your hands:</p>
     <ul class="fasc">
       <li><b>The exact words your buyers type at 11pm,</b> so your headline says what they are already thinking.</li>
       <li><b>What your market will happily pay to fix, and what they will not,</b> so you never build the wrong offer again.</li>
@@ -2007,11 +2178,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <li><b>The one thing your buyer wants that you have never put into words.</b> It is the reason they pick one coach over another.</li>
       <li><b>Who is actually spending money in your market right now,</b> built from evidence, not an avatar exercise.</li>
       <li><b>The fears they do not say out loud,</b> and the outcome they picture when they imagine the problem gone.</li>
-      <li><b>Your homepage, your posts and your emails, all written in their words.</b> Load the file into any AI tool and it stops sounding like every other coach alive.</li>
+      <li><b>The raw material for everything you write, from your homepage to your emails.</b> Load the file into any AI tool and what comes out stops sounding like every other coach alive.</li>
     </ul>
-    <p class="fasc-close">This is not a template, and it is not a questionnaire you fill in yourself. It is real
+    <p class="fasc-close">There is no template here and nothing to fill in yourself. This is real
     research into your specific market, built on {cnt} coaching websites read and 2,000 books your market
     bought to fix their own problems.</p>
+    {mid_cta}
   </div>
 
   <!-- The benefits -->
@@ -2067,9 +2239,9 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="assumption">
       <div class="a-label">Myth 1</div>
       <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
-      <p>Swapping a few words on a page built on the wrong foundation just gives the problem a fresh
-      coat of paint, {fn}. The page is written around what you offer, not around what a stranger is
-      searching for.</p>
+      <p>Swapping a few words just gives the page a fresh coat of paint, {fn}. The paint was never the
+      problem. The page is written around what you offer, and a stranger is searching for their problem,
+      not your offer.</p>
       <p>And any new words you write come from the same place the old ones did. <b>Feeling sure and
       being right are not the same thing.</b> Nothing changes.</p>
     </div>
@@ -2138,7 +2310,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           </div>
           <div class="video-copy">
             <h3>Why ignoring standard advice gives you real authority.</h3>
-            <p>David breaks down what happens when you replace fill-in-the-blank templates with hard customer facts. The shift is structural, not cosmetic.</p>
+            <p>David breaks down what happened when he replaced fill-in-the-blank templates with hard customer facts.</p>
           </div>
         </div>
         <div class="video-block">
@@ -2150,7 +2322,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           </div>
           <div class="video-copy">
             <h3>Long-term results after switching from instinct to evidence.</h3>
-            <p>Brandon shows the financial difference between pages built on intuition and pages built on real buyer data. The difference is not subtle.</p>
+            <p>Brandon shows the financial difference, in his own numbers, between pages built on instinct and pages built on real buyer data.</p>
           </div>
         </div>
       </div>
@@ -2164,12 +2336,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     <div class="protocol-container">
       <div class="pc-label">Container A</div>
-      <h3>The Core Demographic Portrait</h3>
+      <h3>The Buyer Portrait</h3>
       <p>A detailed picture of the real person buying in your niche, built from evidence, not assumptions.</p>
       <ul>
-        <li><b>Calibrated Avatar &amp; Niche.</b> A precise profile of who is actually spending money in your market right now, built from real buying signals, not a generic age bracket.</li>
-        <li><b>3 AM Crisis Log.</b> A map of the specific real-life situations that keep your buyer awake. What they are staring at. What they are replaying in their head. What they typed into their phone at midnight.</li>
-        <li><b>The Deep Emotions.</b> The feelings driving those moments. What they are scared of. What they are ashamed of. What they are desperate to stop feeling.</li>
+        <li><b>Your real buyer.</b> A precise profile of who is actually spending money in your market right now, built from real buying signals, not a generic age bracket.</li>
+        <li><b>3 AM Crisis Log.</b> A map of the specific real-life situations that keep your buyer awake, and what they typed into their phone at midnight.</li>
+        <li><b>The Deep Emotions.</b> The feelings driving those moments: what they are scared of, and what they are desperate to stop feeling.</li>
         <li><b>What they want to feel, see, and touch.</b> The exact outcomes they are picturing when they imagine the problem being gone. In their words, not yours.</li>
         <li><b>Their secret hangups.</b> The hidden reasons they talk themselves out of buying. The doubts they do not say out loud when they speak to a coach.</li>
       </ul>
@@ -2177,18 +2349,18 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     <div class="protocol-container">
       <div class="pc-label">Container B</div>
-      <h3>The Language Filtering Matrix</h3>
+      <h3>The Buyer Language Guide</h3>
       <p>A practical guide to what to cut from your marketing and what to replace it with.</p>
       <ul>
-        <li><b>Clich&eacute; Deletion Blueprint.</b> A line-by-line audit of the abstract terms already found on your page, including the ones we found ourselves: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a cold buyer.</li>
-        <li><b>AI Slop Deletion Guide.</b> A reference list of the predictable phrase styles that mark your writing as generated and generic. Things like &ldquo;unlock your potential&rdquo;, &ldquo;on your journey&rdquo;, and &ldquo;transform your life&rdquo;. Buyers have seen these lines everywhere, so they slide right past them.</li>
-        <li><b>High-status buyer vocabulary.</b> The specific words and phrases premium clients actually use when they are ready to spend money. The language that signals to them that you understand the problem they are living with, not just the solution you sell.</li>
+        <li><b>The clich&eacute; cut list.</b> A line-by-line audit of the abstract terms already found on your page, including the ones we found ourselves: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a cold buyer.</li>
+        <li><b>The AI slop list.</b> A reference list of the predictable phrase styles that mark your writing as generated and generic. Things like &ldquo;unlock your potential&rdquo;, &ldquo;on your journey&rdquo;, and &ldquo;transform your life&rdquo;. Buyers have seen these lines everywhere, so they slide right past them.</li>
+        <li><b>The words premium buyers use.</b> The specific phrases clients reach for when they are ready to spend money. The language that shows them you understand the problem they are living with, not just the solution you sell.</li>
       </ul>
     </div>
 
     <div class="protocol-container">
       <div class="pc-label">Container C</div>
-      <h3>The Universal Marketing Fuel Cell</h3>
+      <h3>The Master Prompt</h3>
       <p>Everything above is formatted as a master prompt framework you can copy and paste straight into any AI writing tool, including ChatGPT and Claude, and get output that reads like a real human wrote it about a real problem.</p>
       <p>Without this data sitting underneath it, any AI tool just repeats the same coaching clich&eacute;s it has seen a thousand times. <b>With this data loaded in, it writes from your buyer&rsquo;s actual reality.</b> The output stops sounding like every other coach on the internet and starts sounding like someone who understands the specific person reading it.</p>
       <p>You are not locked into using AI. You can hand this file to a copywriter, a VA, or use it yourself. It works the same way in any of those hands because the facts it contains do not change.</p>
@@ -2213,24 +2385,26 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <!-- Price and guarantee -->
   <div class="product-reveal">
     <div class="pr-eyebrow">The price, and the guarantee</div>
-    <p class="price-anchor">Real market research is a corporate purchase. Agencies charge thousands of pounds
-    for even a small study, because a human analyst combs through the sources one by one. Our research engine
-    has already done years of that reading, and a person still checks every file before it goes out. That is
-    how the corporate tool reaches you at a coach&rsquo;s price.</p>
-    <div class="price-main">&pound;75 <span>(One-Time Investment)</span></div>
+    <p class="price-anchor">Real market research is normally something only big companies can pay for.
+    Agencies charge thousands of pounds for even a small study, because a human analyst combs through the
+    sources one by one. Our research engine has already done years of that reading, and a person still checks
+    every file before it goes out. That is how corporate-level research reaches you at a coach&rsquo;s price.</p>
+    <div class="price-main">&pound;75 <span>(one payment, nothing recurring)</span></div>
 
     <div class="guarantee-block">
       <div class="g-copy">
         <div class="g-label">7-Day Certainty Guarantee</div>
-        <p>If you read your file and feel it does not contain buyer language you could not have found yourself,
-        or market facts you did not already know, contact us within 7 days and we will give you a full refund.
-        No forms. No hoops. No awkward conversation.</p>
+        <p>Read your file. If it does not show you words and facts about your buyers that are new to you,
+        tell us within 7 days and we will refund you in full. No forms, no awkward conversation.</p>
+        <p>The person who checks every file before it goes out is me, <b>David Poole</b>. If a file is not
+        right, it does not go out.</p>
         <p>We can make this offer because the evidence is already in: {cnt} coaching websites read, and 2,000
         books analysed, the books your market bought to fix their own problems. We know what your market keeps
         paying for. <b>The risk is on us, not your wallet.</b></p>
       </div>
       <img class="angelo-relax" src="/angelo_relaxed.png" alt="Angelo, relaxed. The risk is on us.">
     </div>
+    {mid_cta}
   </div>
 
   <!-- The close -->
@@ -2243,7 +2417,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   </div>
   <div class="narrative-bridge">
     <div class="nb-label">Where this leaves you</div>
-    <h2>You cannot write your way out of a positioning problem.</h2>
+    <h2>You cannot write your way out of a research problem.</h2>
     <p>You can rewrite your homepage. You can hire a copywriter. You can ask an AI to help you.
     None of those things change what your buyer is already thinking before they arrive on your page.
     The only fix is to find out what they are thinking, in their own words, not yours.
@@ -2258,7 +2432,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <div class="cb-num">Option 1</div>
       <h3>Do nothing</h3>
       <p>The strangers who left your page last month will leave it again next month.
-      A low score reflects a structural problem. Without new data, the words on your page stay where they are.</p>
+      Without new facts about your buyers, the words on your page stay where they are, and so do the results.</p>
     </div>
 
     <div class="choice-block">
@@ -2273,6 +2447,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <h3>Get the facts</h3>
       <p>For &pound;75, one time, our research engine maps the exact vocabulary your specific buyers
       use when they are ready to spend money. Your page starts working.</p>
+      {mid_cta}
     </div>
   </div>
 
@@ -2285,11 +2460,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <h2>Get My Marketing Intelligence File</h2>
     <div class="cs-sub">Your niche. Your buyers&rsquo; actual language. &pound;75, one-time. No subscription.</div>
     <div class="checkout-form-placeholder">
-      <div class="lock-icon">&#128274;</div>
-      <div class="cf-label">Secure checkout</div>
-      <div class="cf-note">Card payment integration goes here.<br>
-      Stripe / payment processor embed to be wired in.</div>
-      <button class="cta-btn" disabled>{buy_btn}</button>
+      {checkout_inner}
     </div>
     <p class="guarantee">Secure payment &middot; Instant confirmation &middot; Delivered within 5 working days &middot; 7-Day Certainty Guarantee</p>
   </div>
