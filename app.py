@@ -1596,7 +1596,11 @@ _SALES_CSS = """
 
   /* ---------- protocol / bridge / choices ---------- */
   .protocol-section{margin-bottom:28px}
-  .protocol-section .section-eyebrow{margin-bottom:16px}
+  .protocol-section .section-eyebrow{margin-bottom:8px}
+  /* This section justifies the price, so it gets a real headline rather than being announced by the
+     smallest type on the page. Eyebrow says what it is; the headline says what it does for them. */
+  .protocol-h{font-family:var(--serif);font-weight:600;font-size:clamp(22px,3.6vw,30px);
+    line-height:1.22;letter-spacing:-.015em;color:var(--ink);margin:0 0 20px;max-width:24ch}
   .protocol-container{background:var(--surface);border:1px solid var(--line);border-radius:12px;
     padding:24px 28px;margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
   .protocol-container .pc-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;
@@ -2364,10 +2368,11 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <!-- What you get -->
   <div class="protocol-section" id="inside">
-    <div class="section-eyebrow">What is inside your Marketing Intelligence File</div>
+    <div class="section-eyebrow">Inside your Marketing Intelligence File</div>
+    <h2 class="protocol-h">Everything you need to stop sounding like every other coach.</h2>
 
     <div class="protocol-container">
-      <div class="pc-label">Container A</div>
+      <div class="pc-label">Part one of three</div>
       <h3>The Buyer Portrait</h3>
       <p>A detailed picture of the real person buying in your niche, built from evidence, not assumptions.</p>
       <ul>
@@ -2380,7 +2385,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="protocol-container">
-      <div class="pc-label">Container B</div>
+      <div class="pc-label">Part two of three</div>
       <h3>The Buyer Language Guide</h3>
       <p>A practical guide to what to cut from your marketing and what to replace it with.</p>
       <ul>
@@ -2391,7 +2396,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     </div>
 
     <div class="protocol-container">
-      <div class="pc-label">Container C</div>
+      <div class="pc-label">Part three of three</div>
       <h3>The Master Prompt</h3>
       <p>Everything above is formatted as a master prompt framework you can copy and paste straight into any AI writing tool, including ChatGPT and Claude, and get output that reads like a real human wrote it about a real problem.</p>
       <p>Without this data sitting underneath it, any AI tool just repeats the same coaching clich&eacute;s it has seen a thousand times. <b>With this data loaded in, it writes from your buyer&rsquo;s actual reality.</b> The output stops sounding like every other coach on the internet and starts sounding like someone who understands the specific person reading it.</p>
