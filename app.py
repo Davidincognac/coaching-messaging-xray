@@ -878,8 +878,8 @@ def render_result(res, first_name=""):
     # Carry the coach's identity into the offer page. The domain is the DB key to everything we saved
     # (name, score, tokens, screenshot), so as long as it rides in the URL, every page downstream can
     # look the full record up — no other parameters needed.
-    _offer_href = ("/offer?domain=" + _url_quote(res.get("domain", ""), safe="")
-                   if res.get("domain") else "/offer")
+    _offer_href = ("/salespage?domain=" + _url_quote(res.get("domain", ""), safe="")
+                   if res.get("domain") else "/salespage")
 
     # scope: make it unmistakable we looked at the homepage only, + date
     scope = (f'<div class="scope">{html.escape(res["scope_note"])} '
@@ -2500,11 +2500,16 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_response(404); self.end_headers()
             return
         if path == "/offer":
-            # The report card links here as /offer?domain=… — the DB key to everything we saved about
-            # this coach. Stamp it into <body data-domain> so the checkout wiring (and any onward link
-            # to the salespage) can pick it up without a second lookup. No domain = plain generic page.
+            # /offer used to serve a short generic draft. The real pitch is now the PERSONALISED
+            # salespage, so this redirects and carries the domain across. Kept as a route (rather than
+            # deleted) because the address is already out in the wild: sent emails, the report's older
+            # CTAs, and anything retargeting-tagged. OFFER_PAGE stays defined but is no longer served.
             _dom = (parse_qs(parsed.query).get("domain", [""])[0]).strip()
-            self._send(OFFER_PAGE.replace("__DOMAIN__", html.escape(_dom, quote=True)))
+            _to = "/salespage?domain=" + _url_quote(_dom, safe="") if _dom else "/salespage"
+            self.send_response(302)
+            self.send_header("Location", _to)
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
             return
         if path == "/salespage":
             qs = parse_qs(parsed.query)
