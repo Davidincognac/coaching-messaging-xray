@@ -1652,6 +1652,15 @@ _SALES_CSS = """
   .payoff-tile .pt-body{font-size:13px;color:var(--muted);line-height:1.6;flex:1}
   .assumptions-section{margin-bottom:28px}
   .a-intro{font-size:16px;color:var(--ink);line-height:1.65;margin:0 0 18px;max-width:62ch}
+  /* Illustrated belief card: art left, copy right. The picture carries the metaphor, which is why
+     the copy beside it can be shorter than the plain cards were. Stacks on phones. */
+  .assumption.has-art{display:flex;align-items:flex-start;gap:24px}
+  .a-art{width:170px;flex-shrink:0;height:auto;display:block}
+  .a-body{flex:1;min-width:0}
+  @media(max-width:620px){
+    .assumption.has-art{flex-direction:column;gap:14px}
+    .a-art{width:150px;margin:0 auto}
+  }
   .assumption{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px 28px;
     margin-bottom:14px;box-shadow:0 1px 3px rgba(11,19,43,.08)}
   .assumption .a-label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--warn-ink);
@@ -2251,46 +2260,55 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <p class="a-intro">Every one of them feels like progress. None of them move the business forward,
     because they all start in the same place: what you already believe, not what your buyer said.</p>
 
-    <div class="assumption">
-      <div class="a-label">Belief 1</div>
-      <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
-      <p>Swapping a few words just gives the page a fresh coat of paint, {fn}. The paint was never the
-      problem. The page is written around what you offer, and a stranger is searching for their problem,
-      not your offer.</p>
-      <p>And any new words you write come from the same place the old ones did. <b>Feeling sure and
-      being right are not the same thing.</b> Nothing changes.</p>
+    <div class="assumption has-art">
+      <img class="a-art" src="/belief1.png" alt="Angelo painting fresh colour over a cracked website">
+      <div class="a-body">
+        <div class="a-label">Belief 1</div>
+        <h3>&ldquo;I just need to tweak my messaging.&rdquo;</h3>
+        <p>The paint was never the problem, {fn}. The page is built around what you offer, and a
+        stranger is searching for their problem.</p>
+        <p>And any new words come from the same place the old ones did. <b>Feeling sure and being
+        right are not the same thing.</b> Nothing changes.</p>
+      </div>
     </div>
 
-    <div class="assumption">
+    <div class="assumption has-art">
+      <img class="a-art" src="/belief2.png" alt="Angelo looking past a handful of happy clients at the crowd of strangers">
+      <div class="a-body">
       <div class="a-label">Belief 2</div>
       <h3>&ldquo;I already talk to my clients every day. I know exactly what they want.&rdquo;</h3>
-      <p>Your current clients talk to you after they have already decided to hire you. That is a small
-      and very loyal sample. It tells you almost nothing about <b>the strangers who arrived on your
-      page last Tuesday and left without getting in touch.</b></p>
-      <p>Those strangers are the majority of your market. They searched in their own words, not yours,
-      and your current clients cannot tell you what those words are, because they are not those people.</p>
+      <p>Your clients talk to you after they decided to hire you. A small, loyal sample. It tells you
+      almost nothing about <b>the strangers who arrived last Tuesday and left without getting in
+      touch.</b></p>
+      <p>Those strangers are most of your market. They searched in their own words, and your clients
+      cannot tell you what those words are.</p>
+      </div>
     </div>
 
-    <div class="assumption">
-      <div class="a-label">Belief 3</div>
-      <h3>&ldquo;My words are fine. I just need more people to see the page.&rdquo;</h3>
-      <p>More visitors to a page that is not working just means more people leaving.
-      If ten people arrive and nobody gets in touch, a hundred will give you ten times the silence,
-      and you will have paid for the ads.</p>
-      <p>Traffic multiplies what a page already does. Fix the words first, so the traffic has
-      something to work with.</p>
+    <div class="assumption has-art">
+      <img class="a-art" src="/belief3.png" alt="Angelo watching paid traffic pour in one door of a website and straight out the other">
+      <div class="a-body">
+        <div class="a-label">Belief 3</div>
+        <h3>&ldquo;My words are fine. I just need more people to see the page.&rdquo;</h3>
+        <p>If ten people arrive and nobody gets in touch, a hundred will give you ten times the
+        silence, and you will have paid for the ads.</p>
+        <p>Traffic multiplies what a page already does. Fix the words first, so the traffic has
+        something to work with.</p>
+      </div>
     </div>
 
-    <div class="assumption">
-      <div class="a-label">Belief 4</div>
-      <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
-      <p>AI writing tools do not do research. They predict the next word from what they have already
-      read, and what they have read is the internet, full of coaching pages saying &ldquo;empower&rdquo;,
-      &ldquo;mindset&rdquo; and &ldquo;clarity&rdquo;. Ask AI to research your market and it hands those
-      same words back. <b>You sound like every other coach, which is the exact problem you started with.</b></p>
-      <p>The Marketing Intelligence File does not ask AI what your market wants. It reads where your
-      market actually speaks, and pulls out the language they use when nobody is selling to them.
-      Different process, different output.</p>
+    <div class="assumption has-art">
+      <img class="a-art" src="/belief4.png" alt="Angelo at a laptop, surrounded by AI tools and question marks">
+      <div class="a-body">
+        <div class="a-label">Belief 4</div>
+        <h3>&ldquo;Can&rsquo;t I just use AI to write my research for free?&rdquo;</h3>
+        <p>AI predicts the next word from what it has already read, and it has read every coaching page
+        saying &ldquo;empower&rdquo;, &ldquo;mindset&rdquo; and &ldquo;clarity&rdquo;. Ask it about your
+        market and it hands those same words back. <b>You sound like every other coach, which is the
+        problem you started with.</b></p>
+        <p>We do not ask AI what your market wants. We read where your market actually speaks, and pull
+        out the words they use when nobody is selling to them.</p>
+      </div>
     </div>
   </div>
 
@@ -2505,7 +2523,8 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
                     "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png",
-                    "/angelo_board.png"):
+                    "/angelo_board.png",
+                    "/belief1.png", "/belief2.png", "/belief3.png", "/belief4.png"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = "font/woff2" if path.endswith(".woff2") else "image/png"

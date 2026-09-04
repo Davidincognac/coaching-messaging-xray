@@ -4,6 +4,7 @@ __pycache__/
 *.png
 !angelo.png
 !angelo_*.png
+!belief*.png
 *.bak
 sweep_findings.json
 analysed_domains.txt
