@@ -466,16 +466,13 @@ PAGE = """<!doctype html><html lang="en"><head>
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a cold buyer sees</button>
   </form>
-  <!-- Angelo explains the plan: blank flipchart in the artwork, the words are real HTML
-       overlaid on the pad (same pattern as the bubble and the signposts). -->
+  <!-- Angelo explains the plan. NOTE: the words used to be HTML overlaid on a blank pad, which kept
+       them crisp and readable at any width. This artwork has them baked in, so the overlay is gone.
+       The alt text below therefore carries the words for anyone who cannot see the image. -->
   <div class="plan2">
     <div class="plan-wrap">
-      <img class="plan-img" src="/angelo_plan.png" alt="Angelo at his flipchart, explaining the two steps">
-      <div class="plan-lbl">
-        <div class="pl-h">Your homepage is a mirror.</div>
-        <div class="pl-step"><span>1</span>Your report. Free, about half a minute.</div>
-        <div class="pl-step"><span>2</span>What to do about it.</div>
-      </div>
+      <img class="plan-img" src="/angelo_plan.png"
+           alt="Angelo at his flipchart. Your homepage is a mirror. One: your report, free, about half a minute. Two: what to do about it.">
     </div>
     <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a cold buyer does.</p>
     <p class="p2-note">One thing before you start. This is not consultancy, coaching or mentoring, and we are
@@ -2469,12 +2466,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <span class="step-here pos3">You are here</span>
   </div>
   <div class="narrative-bridge">
-    <div class="nb-label">Where this leaves you</div>
-    <h2>You cannot write your way out of a research problem.</h2>
-    <p>You can rewrite your homepage. You can hire a copywriter. You can ask an AI to help you.
-    None of those things change what your buyer is already thinking before they arrive on your page.
-    The only fix is to find out what they are thinking, in their own words, not yours.
-    That is a research problem. The Marketing Intelligence File solves it.</p>
+    <div class="nb-label">So what now?</div>
+    <h2>You cannot write your way out of this.</h2>
+    <p>You can rewrite your homepage. You can hire a copywriter. You can ask AI to help. None of it
+    changes what your buyer is already thinking before they arrive.</p>
+    <p>The only fix is finding out what they think, in their words. That is what the Marketing
+    Intelligence File gives you.</p>
     <p>You now have three options.</p>
   </div>
 

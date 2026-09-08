@@ -116,6 +116,12 @@ there a free way in" is the Opt-in criterion's job).
 - BANNED words/marks: land/lands, "the gap", quietly, guessing, drift, rescue, leverage, unlock,
   elevate, harness, delve, robust, foster, tapestry, testament, furthermore, moreover, em dashes.
 - No vague grade-words: middling, moderate, decent, somewhat, reasonable.
+- **NEVER call it a "research problem"** (David). That is our internal label for our own work, not
+  language any coach uses about themselves, on a page whose whole argument is to use the buyer's
+  words instead of your own. Name what is actually happening to them, not the category we file it under.
+- **No AI-summary register in headings.** Phrases like "Where this leaves you" / "What this means for
+  you" read as machine-written. Use plain spoken words ("So what now?").
+- **Paragraph depth: 4 lines maximum.** A block running 6 lines deep gets split, not shrunk in type.
 - **No invented facts or entities:** never name a competitor, invent a rival's quote, cite a study, a
   statistic, or a source not in the copy. Example lines are your own generic illustration ("e.g. …"),
   never attributed to anyone.
