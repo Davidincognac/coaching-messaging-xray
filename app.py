@@ -127,7 +127,7 @@ MASCOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "angelo.p
 
 def mascot_img():
     """Show Angelo only if the file is actually there, so we never render a broken image."""
-    return ('<img class="mascot" src="/angelo.png" alt="Angelo, who reads your website like a cold buyer">'
+    return ('<img class="mascot" src="/angelo.png" alt="Angelo, who reads your website like a potential client">'
             if os.path.exists(MASCOT_PATH) else "")
 
 PAGE = """<!doctype html><html lang="en"><head>
@@ -463,9 +463,9 @@ PAGE = """<!doctype html><html lang="en"><head>
     <div class="hero-copy">
       <div class="eyebrow">{count} coaching websites read, and counting</div>
       <h1 class="serif">Coaches: in five seconds, does your website say &ldquo;I can fix your problem&rdquo;?</h1>
-      <p class="sub"><b>That's all the time a cold buyer gives you.</b> If they don't see it, they leave, and you
+      <p class="sub"><b>That's all the time a potential client gives you.</b> If they don't see it, they leave, and you
       never even know they came. Paste your coaching website in and in about half a minute Angelo shows you what that
-      cold buyer sees, why they stay or go, and how you score against <b>{count}</b> other coaching sites. More than 8 in 10
+      potential client sees, why they stay or go, and how you score against <b>{count}</b> other coaching sites. More than 8 in 10
       get it wrong. (83%, for those who like it exact.)</p>
     </div>
   </div>
@@ -474,7 +474,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     <input type="text" name="last_name" id="lastnameinput" placeholder="Your last name" autocomplete="family-name">
     <input type="email" name="email" id="emailinput" placeholder="Your best email address" autocomplete="email">
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
-    <button type="submit">Show me what a cold buyer sees</button>
+    <button type="submit">Show me what a potential client sees</button>
   </form>
   <!-- Angelo explains the plan. The pad in the artwork stays BLANK and the words sit underneath as a
        real subheading. Text baked into the picture shrinks with it (about 7px on a phone), and text
@@ -490,14 +490,14 @@ PAGE = """<!doctype html><html lang="en"><head>
         <li>What to do about it.</li>
       </ol>
     </div>
-    <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a cold buyer does.</p>
+    <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a potential client does.</p>
     <p class="p2-note">One thing before you start. This is not consultancy, coaching or mentoring, and we are
     not here to work on your mindset.</p>
     <p class="p2-note">You can leave with the report straight away, it will nail a few things down for you.
     And if you have 6 or 7 minutes more, there is a deeper dig waiting, into how to direct your marketing
     and put you on the right track.</p>
   </div>
-  <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a cold buyer would, then saves your dashboard link straight to your inbox.</div>
+  <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a potential client would, then saves your dashboard link straight to your inbox.</div>
   <!--PROGRESS-->
 </div></div>
 <div id="result">{result}</div>
@@ -738,7 +738,7 @@ def overall_copy(clarity, tier, in_top_tier):
         # clients. We say exactly that — never 'they can't tell it's for them', which would contradict the clear score.
         return (
             "A visitor can tell who you help, and quickly, so that part works. What's costing you clients sits below: "
-            "real gaps a cold buyer trips on before they act.",
+            "real gaps a potential client trips on before they act.",
             "You read more clearly than most coaching homepages. But clear isn't the same as convincing, and the gaps "
             "below are where the clients slip away.",
             "<p>Your page does the hard part, a stranger gets who it's for. But getting it and acting on it are two "
@@ -1068,7 +1068,7 @@ def render_result(res, first_name=""):
                 f'<img class="cta-angelo" src="/angelo_cta.png" alt="Angelo: {text}">'
                 f'<span class="bubble-txt">{text}</span></a>')
     opener = (f'<h2 class="sec-h">The deep dive</h2>'
-              f'<div class="analysed"><p>{_greet} can tell in a few seconds what a cold buyer thinks when they arrive on your '
+              f'<div class="analysed"><p>{_greet} can tell in a few seconds what a potential client thinks when they arrive on your '
               f'page. We\'ve watched it go right and wrong on thousands of coaching sites.</p>'
               f'<p>We looked at '
               f'<b>{html.escape(ev.get("page_display") or ev["domain"])}</b>, scored it against all <b>{cnt}</b> of '
@@ -1102,7 +1102,7 @@ def render_result(res, first_name=""):
         '</div>'
         f'<div class="gap" style="margin-top:14px">{gap_line}</div>'
         f'<div class="honest">A word on your {res.get("score_10_display", res["score_10"])}/10. We\'re not marking you down to make a sale. Every '
-        'homepage gets scored the same way, against the same cold buyers, and we call it exactly as we see it. A low '
+        'homepage gets scored the same way, against the same potential clients, and we call it exactly as we see it. A low '
         'number isn\'t us being harsh on you. It just shows how far the page is from where your buyers already are. '
         'What you do about it is up to you.</div></div>'
     )
@@ -1155,7 +1155,7 @@ def render_result(res, first_name=""):
         hook_html = (
             f'<div class="hook"><span class="hl">Your {_page_word} scored <span class="sc">{hole_score}/10</span> on {hole_phrase},</span> not '
             f'because you don&rsquo;t know your clients, but because it&rsquo;s written in your words, not the words '
-            f'a cold buyer uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
+            f'a potential client uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
             f'is the whole game.</div>'
         )
 
@@ -1802,7 +1802,7 @@ def _sales_hook(data, page_word, niche_word):
         f'<div class="hook"><span class="hl">Your overall score is built from eight separate checks. The one '
         f'holding yours down is {_SALES_HOLE[weak]}: <span class="sc">{hole_score}/10</span>.</span> Not '
         f'because you don&rsquo;t know your clients, but because the page is written in your words, not the words '
-        f'a cold buyer uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
+        f'a potential client uses in their own head. Getting those exact words, the ones your {niche_word}really use, '
         f'is the whole game.</div>'
     )
 
@@ -2091,7 +2091,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
           <div class="xray-screen" style="font-size:16px;letter-spacing:.02em;font-style:italic;padding:18px 22px;text-align:center">{tok}</div>
           <div class="xray-meta">
             <div class="xm-label">What your {page_word} says</div>
-            <div class="xm-body">These words describe what you offer. A cold buyer is not searching for what you offer.
+            <div class="xm-body">These words describe what you offer. A potential client is not searching for what you offer.
             They are searching for relief from a specific problem. These words do not name it.</div>
           </div>
         </div>
@@ -2415,7 +2415,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <p>A cut-list of the words on your page and the words to use instead, so readers stop skimming
       past you.</p>
       <ul>
-        <li><b>The clich&eacute; cut list.</b> A line-by-line audit of the abstract terms already found on your page, including the ones we found ourselves: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a cold buyer.</li>
+        <li><b>The clich&eacute; cut list.</b> A line-by-line audit of the abstract terms already found on your page, including the ones we found ourselves: <em>{tok}</em>. Each one explained plainly, with the reason it registers as noise to a potential client.</li>
         <li><b>The AI slop list.</b> A reference list of the predictable phrase styles that mark your writing as generated and generic. Things like &ldquo;unlock your potential&rdquo;, &ldquo;on your journey&rdquo;, and &ldquo;transform your life&rdquo;. Buyers have seen these lines everywhere, so they slide right past them.</li>
         <li><b>The words premium buyers use.</b> The specific phrases clients reach for when they are ready to spend money. The language that shows them you understand the problem they are living with, not just the solution you sell.</li>
       </ul>

@@ -76,7 +76,7 @@ DEFINITIONS = {
     "clarity_5sec": "In 5 seconds, does the right person see this is for them?",
     "specificity": "Is the page focused on ONE clear audience and ONE clear problem?",
     "symptom_resonance": "Does the copy describe the buyer's daily pain in their own words — raw and situational — not generic coaching platitudes?",
-    "proof_cred": "Does a cold buyer get real, costly-to-fake reasons to believe you can deliver?",
+    "proof_cred": "Does a potential client get real, costly-to-fake reasons to believe you can deliver?",
     "offer_clarity": "Is there one clear, defined thing to buy or a vivid outcome the buyer can picture?",
     "next_step": "Is the whole page aimed at ONE next step, or scattered across competing asks?",
     "friction": "How much psychological effort does a cold visitor need to take the next step?",
@@ -938,7 +938,7 @@ VISUAL_HEADLINE_JS = r"""
 """
 
 # Proof and credibility often live OFF the homepage, one click away (a testimonials page, an Amazon book
-# page with hundreds of reviews). A cold buyer won't click in the first few seconds, so it doesn't work in
+# page with hundreds of reviews). A potential client won't click in the first few seconds, so it doesn't work in
 # the moment that matters, but it's WRONG to say "no proof" when it's really just hidden. We spot the LINK,
 # and never visit it (homepage-only scope stays intact).
 EXT_REVIEW_HOSTS = {"amazon.": "Amazon", "goodreads.": "Goodreads", "trustpilot.": "Trustpilot",
@@ -1669,7 +1669,7 @@ def ai_analyse(row, scores, score_10, ev=None):
     prompt = (
         f"You are diagnosing ONE PAGE of a coach's website, their {pw} (that one page only, so scope everything "
         f"to 'your {pw}', never 'your site'). Your job: extract structured flags for all 8 criteria by reading the ACTUAL "
-        "page copy below, then write the diagnosis. Judge exactly what a cold buyer would perceive, be strict and "
+        "page copy below, then write the diagnosis. Judge exactly what a potential client would perceive, be strict and "
         "honest, no benefit of the doubt for things that aren't there.\n"
         "You are given a FULL-PAGE SCREENSHOT of the page as well as the text. USE THE SCREENSHOT to judge "
         "anything visual, a client logo strip, an 'as seen on' media row (TV networks, big publications), named "
@@ -1760,7 +1760,7 @@ def ai_analyse(row, scores, score_10, ev=None):
         "wording; (2) what it's costing them, and make this one FELT and present-tense, a real person who needs "
         "exactly what they do arriving, feeling nothing, and leaving for someone else, not an abstract explanation "
         "(still no invented numbers); (3) 2-3 concrete fixes; "
-        "(4) a sharp bottom line. Frame everything as how a cold BUYER perceives them in the first few seconds, "
+        "(4) a sharp bottom line. Frame everything as how a POTENTIAL CLIENT perceives them in the first few seconds, "
         "this is marketing and buyer psychology, not a website-quality checklist. The deeper problem is almost "
         "always the same: they don't understand their buyer well enough. Only claim what the copy supports; if a "
         f"signal is missing say 'we didn't spot X on your {pw}', never a flat 'you have no X'.\n"
@@ -1813,7 +1813,7 @@ def ai_analyse(row, scores, score_10, ev=None):
         "FORMAT instead ('text testimonials with no photo', 'a logo strip'). Inventing one specific name or number "
         "destroys the coach's trust in the whole report."
     )
-    # Show the AI the full-page screenshot so it scores what a cold buyer actually SEES (logos, media, video proof),
+    # Show the AI the full-page screenshot so it scores what a potential client actually SEES (logos, media, video proof),
     # not just the text. Falls back to text-only when we couldn't grab a shot.
     content = [{"type": "text", "text": prompt}]
     shot = row.get("screenshot_b64")
@@ -1851,7 +1851,7 @@ HOMEPAGE_PROBLEMS = {
     "clarity_5sec": "in the first five seconds on your homepage, it’s hard to tell who you help and what they’d get",
     "specificity": "on your homepage, it isn’t clear enough who you help or what problem you solve, a first-time visitor may not be able to tell whether you’re the right coach for them",
     "symptom_resonance": "the copy on your homepage describes coaching outcomes in abstract terms rather than the raw, daily pain your buyer actually feels",
-    "proof_cred": "we didn’t spot the proof or credibility a cold buyer believes on your homepage, results, testimonials, and real reviews that show you deliver",
+    "proof_cred": "we didn’t spot the proof or credibility a potential client believes on your homepage, results, testimonials, and real reviews that show you deliver",
     "offer_clarity": "on your homepage there’s no clearly defined offer that connects to the problem you’re solving, just a vague sense of what you do",
     "next_step": "the page scatters a visitor across competing asks instead of pointing at one clear next step",
     "friction": "the first step your homepage asks for is too big a commitment for a cold stranger who just found you",
@@ -1949,14 +1949,14 @@ def criterion_note(key, sc, ev=None):
                     "visitor won’t hunt for it in the first few seconds, so it isn’t working when they decide. "
                     "Bring your strongest proof onto the homepage, where they see it without hunting.")
         if sc >= 6:
-            return ("A cold buyer gets real reason to believe you: results or testimonials that show you deliver, "
+            return ("A potential client gets real reason to believe you: results or testimonials that show you deliver, "
                     "plus names or reviews that show you’re the real thing.")
         if sc >= 3:
             return ("There’s some here, but it’s the easy-to-fake kind. A neat text testimonial counts, but a cold "
                     "buyer half-assumes you wrote it yourself. What they really believe is a video testimonial, or a "
                     "screenshot of a real review with the person’s name and face on it. Put one of those up and it "
                     "does far more work than a wall of typed quotes.")
-        return ("We didn’t spot the proof or credibility a cold buyer believes: client results, testimonials that "
+        return ("We didn’t spot the proof or credibility a potential client believes: client results, testimonials that "
                 "name the problem you solved, real reviews, or names a stranger recognises. What you say about "
                 "yourself (awards, ‘certified’, ‘as seen on’) a stranger discounts.")
     if key == "symptom_resonance":
@@ -1972,12 +1972,12 @@ def criterion_note(key, sc, ev=None):
                 "the raw, specific daily situation your buyer is actually stuck in.")
     if key == "offer_clarity":
         if sc >= 7:
-            return ("A cold buyer can see what you actually fix, and the offer connects directly to that pain. "
+            return ("A potential client can see what you actually fix, and the offer connects directly to that pain. "
                     "That’s the clearest path from ‘I have this problem’ to ‘this person can fix it’.")
         if sc >= 4:
             return ("There’s an offer here, but it doesn’t clearly connect to the problem you say you solve. "
-                    "A cold buyer needs to see the bridge: ‘I have THIS pain, you fix THAT pain, I’ll buy THIS.’")
-        return ("We didn’t spot a clear offer that connects to a specific problem. A cold buyer needs to see "
+                    "A potential client needs to see the bridge: ‘I have THIS pain, you fix THAT pain, I’ll buy THIS.’")
+        return ("We didn’t spot a clear offer that connects to a specific problem. A potential client needs to see "
                 "exactly what you fix and one clear thing to start with.")
     if key == "next_step":
         if sc >= 7:
@@ -2000,7 +2000,7 @@ def criterion_note(key, sc, ev=None):
                 "You must build a smaller first step.")
     if key == "shield":
         if sc >= 7:
-            return ("You’ve given a cold buyer a reason to say yes without feeling like they’re taking a risk. "
+            return ("You’ve given a potential client a reason to say yes without feeling like they’re taking a risk. "
                     "A guarantee or safety net removes the last objection.")
         return ("Nothing on the page lowers the risk of saying yes. A sceptical visitor stays sceptical. "
                 "A clear guarantee, a refund window, or a free trial makes saying yes feel safer.")
@@ -2008,8 +2008,8 @@ def criterion_note(key, sc, ev=None):
         "clarity_5sec": "A stranger gets who you help and what they'd get, fast.",
         "specificity": "You name who you help and their exact problem, which most coaches don't.",
         "symptom_resonance": "Your copy describes real, daily pain in the buyer's own words.",
-        "proof_cred": "A cold buyer gets real reason to believe you: results and third-party trust.",
-        "offer_clarity": "A cold buyer can see what you fix and there's one clear thing to start.",
+        "proof_cred": "A potential client gets real reason to believe you: results and third-party trust.",
+        "offer_clarity": "A potential client can see what you fix and there's one clear thing to start.",
         "next_step": "The page points at one clear next step, nothing competing with it.",
         "friction": "The first step is low-commitment enough that a curious visitor will take it.",
         "shield": "You lower the risk of saying yes, making it easier to commit.",
@@ -2018,8 +2018,8 @@ def criterion_note(key, sc, ev=None):
         "clarity_5sec": "In five seconds, a stranger can't tell who this is for or what they'd get.",
         "specificity": "It could be for anyone. You don't name who you help or their exact problem.",
         "symptom_resonance": "The copy leans on generic coaching words that don't describe a real, felt pain.",
-        "proof_cred": "We didn't spot the proof or credibility a cold buyer believes: results, testimonials, real reviews.",
-        "offer_clarity": "A cold buyer can't see what you actually fix, or there's no clear thing to buy.",
+        "proof_cred": "We didn't spot the proof or credibility a potential client believes: results, testimonials, real reviews.",
+        "offer_clarity": "A potential client can't see what you actually fix, or there's no clear thing to buy.",
         "next_step": "The page scatters a visitor across competing asks instead of one clear next step.",
         "friction": "The first step asks for too much commitment from someone who just found you.",
         "shield": "Nothing lowers the risk of saying yes, so sceptical visitors stay sceptical.",
@@ -2281,7 +2281,7 @@ def audit_url(url):
                 "message": "This doesn't look like a coaching or therapy website, so we haven't scored it. Our "
                            "benchmark is built from thousands of real coaching homepages, and those checks wouldn't "
                            "be fair or meaningful on a different kind of site. If this IS a coaching business, the "
-                           "words a cold buyer looks for, what you do and who it's for, may not be on the page yet, "
+                           "words a potential client looks for, what you do and who it's for, may not be on the page yet, "
                            "which is itself the first thing worth fixing."}
     # POLICY-PAGE GATE: if we captured a cookie/privacy/legal page (a consent wall, or a policy URL), refuse honestly
     # rather than inventing a homepage from legal boilerplate. No score, no record.
