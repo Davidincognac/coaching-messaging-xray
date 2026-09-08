@@ -187,6 +187,16 @@ PAGE = """<!doctype html><html lang="en"><head>
   .pl-step span{{position:absolute;left:0;top:.1em;width:10%;aspect-ratio:1;border-radius:50%;
     background:var(--gold);color:var(--navy);font-weight:700;display:flex;align-items:center;
     justify-content:center;font-size:1.7cqw}}
+  .plan-say{{margin:18px auto 0;max-width:560px}}
+  .ps-h{{font-family:var(--serif);font-weight:600;font-size:clamp(20px,3.4vw,25px);line-height:1.25;
+    color:#fff;margin:0 0 14px}}
+  .ps-steps{{list-style:none;counter-reset:ps;margin:0;padding:0}}
+  .ps-steps li{{position:relative;padding:2px 0 0 42px;margin:0 0 10px;color:var(--ivory);
+    font-size:16px;line-height:1.5}}
+  .ps-steps li:last-child{{margin-bottom:0}}
+  .ps-steps li::before{{counter-increment:ps;content:counter(ps);position:absolute;left:0;top:0;
+    width:28px;height:28px;border-radius:50%;background:var(--glow);color:var(--navy);
+    font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}}
   .p2-cap{{color:var(--ivory);font-size:14px;line-height:1.6;margin:12px 0 0;text-align:center}}
   .p2-cap b{{color:var(--glow)}}
   .p2-note{{color:var(--ivory);font-size:14px;line-height:1.6;margin:12px 0 0;border-top:1px solid var(--navy-line);
@@ -466,13 +476,19 @@ PAGE = """<!doctype html><html lang="en"><head>
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a cold buyer sees</button>
   </form>
-  <!-- Angelo explains the plan. NOTE: the words used to be HTML overlaid on a blank pad, which kept
-       them crisp and readable at any width. This artwork has them baked in, so the overlay is gone.
-       The alt text below therefore carries the words for anyone who cannot see the image. -->
+  <!-- Angelo explains the plan. The pad in the artwork stays BLANK and the words sit underneath as a
+       real subheading. Text baked into the picture shrinks with it (about 7px on a phone), and text
+       overlaid on the pad has to fit a small fixed area. Underneath, it stays crisp at every width. -->
   <div class="plan2">
     <div class="plan-wrap">
-      <img class="plan-img" src="/angelo_plan.png"
-           alt="Angelo at his flipchart. Your homepage is a mirror. One: your report, free, about half a minute. Two: what to do about it.">
+      <img class="plan-img" src="/angelo_plan.png" alt="Angelo at his flipchart">
+    </div>
+    <div class="plan-say">
+      <div class="ps-h">Your homepage is a mirror.</div>
+      <ol class="ps-steps">
+        <li>Your report. Free, about half a minute.</li>
+        <li>What to do about it.</li>
+      </ol>
     </div>
     <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a cold buyer does.</p>
     <p class="p2-note">One thing before you start. This is not consultancy, coaching or mentoring, and we are
