@@ -1,4 +1,5 @@
 import os
+import secrets
 import sqlite3
 from datetime import datetime
 
@@ -109,6 +110,7 @@ def init_leads():
         conn.execute("""
             CREATE TABLE IF NOT EXISTS trigger_leads (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                token       TEXT NOT NULL DEFAULT '',
                 email       TEXT NOT NULL,
                 first_name  TEXT NOT NULL DEFAULT '',
                 last_name   TEXT NOT NULL DEFAULT '',
@@ -119,22 +121,45 @@ def init_leads():
             )
         """)
         conn.execute("CREATE INDEX IF NOT EXISTS idx_trigger_leads_email ON trigger_leads(email)")
+        # A table created before tokens existed has no such column. Add it rather than lose the rows.
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(trigger_leads)")}
+        if "token" not in cols:
+            conn.execute("ALTER TABLE trigger_leads ADD COLUMN token TEXT NOT NULL DEFAULT ''")
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_trigger_leads_token "
+                     "ON trigger_leads(token) WHERE token != ''")
         conn.commit()
 
 
 def save_trigger_lead(email, first_name="", last_name="", niche_typed="", niche_match=""):
     """One row per submission. Deliberately NOT deduped on email: a coach asking twice, or asking for
-    a second market, is a real signal we want to keep."""
+    a second market, is a real signal we want to keep.
+
+    Returns the row's TOKEN, not its id. The token is what travels in a link to the next step, so a
+    coach who has already told us their name, email and niche never has to type any of it again. An
+    id would work too, but a guessable one lets anyone walk through other people's records.
+    """
     now = datetime.utcnow().isoformat()
+    token = secrets.token_urlsafe(16)
     with _connect() as conn:
-        cur = conn.execute(
+        conn.execute(
             """INSERT INTO trigger_leads
-                   (email, first_name, last_name, niche_typed, niche_match, created_at)
-               VALUES (?, ?, ?, ?, ?, ?)""",
-            (email, first_name, last_name, niche_typed, niche_match, now),
+                   (token, email, first_name, last_name, niche_typed, niche_match, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (token, email, first_name, last_name, niche_typed, niche_match, now),
         )
         conn.commit()
-        return cur.lastrowid
+    return token
+
+
+def get_trigger_lead(token):
+    """The lead behind a token, or None. This is how a later step knows who it is talking to."""
+    if not token:
+        return None
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT * FROM trigger_leads WHERE token = ?", (token,)
+        ).fetchone()
+    return dict(row) if row else None
 
 
 def trigger_leads(limit=200):

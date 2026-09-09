@@ -220,10 +220,15 @@ _REPORT_CSS = """
     font-weight:600;margin:0 0 14px}
   h1.r-title{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.4vw,42px);line-height:1.14;
     margin:0 0 10px;color:var(--ivory);letter-spacing:-.015em}
-  .r-for{font-size:17px;color:var(--ivory);margin:0 0 26px;line-height:1.6;max-width:60ch}
+  .r-for{font-size:17px;color:var(--ivory);margin:0 0 8px;line-height:1.6;max-width:60ch}
+  .r-parent{font-size:15px;color:var(--ivory-dim);margin:0 0 26px;line-height:1.6;max-width:60ch}
   .r-base{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:10px;
     padding:18px 20px;font-size:14px;line-height:1.7;color:var(--ivory);margin:0 0 40px}
   .r-base b{font-weight:600}
+  .r-what{font-size:17px;line-height:1.7;color:var(--ivory);margin:0 0 40px;max-width:62ch}
+  .r-depth{font-size:16px;line-height:1.72;color:var(--ivory-dim);max-width:64ch;
+    margin:44px 0 0;padding:20px 0 0;border-top:1px solid var(--navy-line)}
+  .r-cat{font-size:14px;color:var(--ivory-dim);margin:0 0 4px;line-height:1.5}
   section.r{margin:0 0 40px;padding:0 0 4px}
   section.r > h2{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ivory);
     margin:0 0 6px;line-height:1.25}
@@ -489,39 +494,41 @@ PLAIN_FORCE = {
     "to be superior / win / keep up":   "to be better at something, or to keep up with the people around them",
     "care & protection of loved ones":  "to look after the people they love",
     "social approval":                  "to be thought well of by other people",
-    "to be informed":                   "to know what is going on",
-    "to be informed / curiosity":       "to know what is going on",
-    "curiosity":                        "to find out",
-    "efficiency":                       "to waste less time",
-    "convenience":                      "to make it easier on themselves",
-    "dependability/quality":            "to get something that actually works",
+    "to be informed":                   "to understand what is happening to them",
+    "to be informed / curiosity":       "to understand what is happening to them",
+    "curiosity":                        "to find out for themselves",
+    "efficiency":                       "to stop wasting time",
+    "convenience":                      "an easier way of doing it",
+    "dependability/quality":            "something that actually works",
     "beauty/style":                     "to look good",
-    "economy/profit":                   "to save money or make money",
+    "economy/profit":                   "to save money, or make some",
     "economy/profit (survival of the business)": "to keep the business alive",
-    "cleanliness":                      "to be clean",
-    "bargains":                         "to get a good deal",
+    "cleanliness":                      "to feel clean",
+    "bargains":                         "a good deal",
 }
 
 # Where the buyer's head is when they find you.
 PLAIN_AWARENESS = {
-    "unaware":        "They don't know they've got this problem yet. Nobody has named it for them.",
-    "problem-aware":  "They know something's wrong. They don't yet know what fixes it, so they're still "
-                      "describing the problem rather than shopping for an answer.",
-    "solution-aware": "They already know help like yours exists. They're not deciding whether to get "
-                      "help any more. They're deciding who from.",
-    "product-aware":  "They know who you are and they're weighing you up. They're past the problem now "
-                      "and onto whether you're the one.",
-    "most-aware":     "They're ready. What's holding them is timing, not doubt.",
+    "unaware":        "they still hadn't put a name to what was wrong. They only knew they felt bad.",
+    "problem-aware":  "they knew something was wrong. They just didn't know what fixes it, so they "
+                      "were searching for a name for it, not for a coach.",
+    "solution-aware": "they already knew help like yours exists. So they weren't asking whether to "
+                      "get help. They were asking who from.",
+    "product-aware":  "they already knew who you are. They were weighing you up against the others.",
+    "most-aware":     "they were ready to go. The only question left was when.",
 }
 
 # How worn out the promises in the market already are.
 PLAIN_SOPH = {
-    "1": "Your market hasn't heard this promise before. It's still new to them.",
-    "2": "A few coaches have made this promise already. It's familiar, not worn out.",
-    "3": "They've heard the promise too many times to believe it on its own. Now they want to know "
-         "how it works before they'll believe anyone.",
-    "4": "They've heard the how as well. A general version of it doesn't register with them any more.",
-    "5": "They've heard all of it before. Claims on their own don't move them at all now.",
+    "1": "Nobody has made this promise to your market yet. It's new to them.",
+    "2": "A few coaches have promised this already. Your market has heard it, but they're not sick "
+         "of it yet.",
+    "3": "Your market has heard this promise so many times they don't believe it on its own any "
+         "more. Now they want to hear how it works.",
+    "4": "They've heard coaches explain how it works too. A vague explanation doesn't move them "
+         "now. They only believe one that is exact, or clearly built for someone like them.",
+    "5": "They've heard all of it before. Being told something works doesn't move them any more. "
+         "They need to see it.",
 }
 
 # The plain sentence only. The framework's name for each lever stays on our side of the wall.
@@ -535,51 +542,39 @@ PLAIN_LEVER = {
     "scarcity":      "A real limit moves them. A made-up one costs you the sale.",
 }
 
-# The section headings.
+# The six triggers.
 #
-# Each has two forms. `aud` is used when the rewrite pass has given this market a natural audience
-# label ("women in menopause"), so the heading can name the reader's own market. `plain` is the
-# fallback for any market not rewritten yet, so nothing ever renders a raw {audience} slot.
-# Ruled by the expert table (Klaff, Hughes, Ogilvy, Columbo, Cialdini, Orwell, Sutherland, Solomon):
-# four changed, two left alone on purpose, because leaving some untouched is what stops the rest
-# reading like a rewrite. David signs off. Change the strings here and every report follows.
+# Every one is a thing that actually moves a buyer. The old structure numbered a state ("where their
+# head is"), a history ("what they've heard") and the evidence as triggers, which they are not. David:
+# "we are after triggers, that is what this whole thing is about."
+#
+# `cat` is the fixed category, shown small above the heading. `key` is the field holding the name we
+# wrote for this market, which becomes the heading. `plain` is the fallback for any market that has
+# not been through the naming pass, so a raw slot never renders.
 SECTION_HEADINGS = [
-    # Unanimous change. Two of the three pairs picked this wording; the third wanted "really buying"
-    # and was answered on it, a correction lands badly before any evidence has been shown.
-    {"n": "Buying Trigger 1", "plain": "What they want enough to pay for",
-                              "aud":   "What {audience} want enough to pay for"},
-    # LEFT ALONE. The table split evenly. Broken on David's standing rule: the winning replacement
-    # opened "You are not the first coach they looked at", and a coach who is sure they are
-    # distinctive reads that as a knock before we have earned the right to make one.
-    {"n": "Buying Trigger 2", "plain": "Where their head is when they find you",
-                              "aud":   "Where their head is when they find you"},
-    # All three pairs wrote this exact line, independently. The old one seated the coach in the same
-    # room as "other coaches" and left them working out whether they were the accused.
-    {"n": "Buying Trigger 3", "plain": "The promises they have stopped believing",
-                              "aud":   "The promises {audience} have stopped believing"},
-    # Two of three wanted this shape, because the old heading sold one row of a table that holds
-    # four, and the row it left out is the one the buyer never says out loud. Their verbs were
-    # "fixed" and "done"; both were dropped because the table only saw one market and neither verb
-    # travels across all of them.
-    {"n": "Buying Trigger 4", "plain": "What they want, and what stops them",
-                              "aud":   "What they want, and what stops them"},
-    # Unanimous change. "What moves them" could sit above anything. Moves them where.
-    {"n": "Buying Trigger 5", "plain": "What makes them choose you over the next coach",
-                              "aud":   "What makes them choose you over the next coach"},
-    # LEFT ALONE, deliberately. Two pairs voted to change it and both said they would not fight for
-    # it. The pair that voted to leave it argued hardest: the reader is about to meet a real woman
-    # asking why she cannot spell any more, so do not stand in front of that.
-    {"n": "Buying Trigger 6", "plain": "Their own words",
-                              "aud":   "Their own words"},
+    {"n": "Buying Trigger 1", "key": "t1_name", "plain": "What they're really buying"},
+    {"n": "Buying Trigger 2", "key": "t2_name", "plain": "What made them start looking for help"},
+    {"n": "Buying Trigger 3", "key": "t3_name", "plain": "What they want to happen instead"},
+    {"n": "Buying Trigger 4", "key": "t4_name", "plain": "What stops them buying"},
+    {"n": "Buying Trigger 5", "key": "t5_name", "plain": "What they've stopped believing"},
+    {"n": "Buying Trigger 6", "key": "t6_name", "plain": "What makes them pick one coach over another"},
+]
+
+# The category line, so the reader knows what each trigger covers even when the name is specific.
+SECTION_CATS = [
+    "What they're really buying",
+    "What made them start looking for help",
+    "What they want to happen instead",
+    "What stops them buying",
+    "What they've stopped believing",
+    "What makes them pick one coach over another",
 ]
 
 
-def _heading(i, audience):
-    """Heading i, with the market's own audience in it when we have one."""
+def _heading(i, rec):
+    """Trigger i, named for this market. Falls back to the plain category if it has no name yet."""
     h = SECTION_HEADINGS[i]
-    if audience and "{audience}" in h["aud"]:
-        return h["aud"].replace("{audience}", audience)
-    return h["plain"]
+    return (rec.get(h["key"]) or "").strip() or h["plain"]
 
 
 VOICE_LABELS = [
@@ -610,15 +605,12 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
 
     # What each trigger gives them. Paired with the real headings, in the report's own order.
     PROMISE = [
-        "The one thing your market is buying its way out of, or buying its way into. Everything "
-        "else you write sits under this.",
-        "Whether they already know what they need, or only know that something hurts. It changes "
-        "your first line.",
-        "The promises your market has heard too many times, and what stopped working years ago.",
-        "What pushed them to look, what they want instead, and what stops them with their card "
-        "in their hand.",
-        "Why a buyer picks one coach over the next one, in your market and not in general.",
-        "How your buyer says it. Not how a coach says it.",
+        "The deep thing your market is trying to get, or trying to get away from.",
+        "The moment it got too much for them, and they started looking for help.",
+        "The picture in their head of what life looks like once this is sorted.",
+        "The fear that keeps their card in their pocket, and what they do instead of buying.",
+        "The promises they have heard so often they no longer believe them.",
+        "Why a buyer picks one coach and not the next one, in your market.",
     ]
     gets = ""
     for i, why in enumerate(PROMISE):
@@ -672,7 +664,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
           <span class="ps-status ps-waiting" id="tp2">[WAITING]</span></li>
       <li><b>Three:</b> Reading what they say is wrong, in their words
           <span class="ps-status ps-waiting" id="tp3">[WAITING]</span></li>
-      <li><b>Four:</b> Working out what they are really paying for
+      <li><b>Four:</b> Working out what they're really paying for
           <span class="ps-status ps-waiting" id="tp4">[WAITING]</span></li>
       <li><b>Five:</b> Building your report
           <span class="ps-status ps-waiting" id="tp5">[WAITING]</span></li>
@@ -689,7 +681,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
   </div>
 
   <div class="whats real">
-    <h2>Why this is not another AI freebie</h2>
+    <h2>Why this isn't another AI freebie</h2>
     <p class="rl">We didn't guess these, and we didn't ask an AI what it reckons. We went to what your
     market already spends money on. Then we got the words your buyers use about their own problem,
     written by them, not by a coach.</p>
@@ -827,67 +819,79 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
     shown = rec.get("shown_as", niche)
     voice = rec.get("voice", {}) or {}
     audience = rec.get("audience", "")
-    H = [_heading(i, audience) for i in range(len(SECTION_HEADINGS))]
+    H = [_heading(i, rec) for i in range(len(SECTION_HEADINGS))]
 
-    # One. The trigger. Plain words only. The framework's name for it stays on our side.
+    def sect(i, paras, box=None, box_label="How we know"):
+        """One trigger. Category, name, explanation. The explanation only ever describes the buyer."""
+        out = ('<section class="r"><p class="r-num">' + SECTION_HEADINGS[i]["n"] + '</p>'
+               '<p class="r-cat">' + e(SECTION_CATS[i]) + '</p>'
+               '<h2>' + e(H[i]) + '</h2>')
+        for para in paras:
+            if para:
+                out += "<p>" + para + "</p>"
+        if box:
+            out += '<div class="r-ev"><b>' + e(box_label) + '</b>' + e(box) + '</div>'
+        return out + "</section>"
+
+    # 1. What they're really buying. The deep drivers, in plain words.
     forces = ""
     for f in rec.get("lf8_primary", [])[:2]:
         plain = _plain(PLAIN_FORCE, f, "")
         if plain:
             forces += ('<div class="r-force"><p class="fplain">'
                        + e(plain[0].upper() + plain[1:]) + '.</p></div>')
-    # The audience goes AFTER the verb on purpose. Put it in front and the verb has to agree with
-    # whatever the label happens to be ("Job seekers wants one thing"), and there are a thousand
-    # labels to get right. This way the subject is always "One thing" or "Two things".
-    n_forces = forces.count('class="r-force"')
-    who = rec.get("audience", "") or "this market"
-    want_line = (("One thing matters most to " if n_forces == 1 else "Two things matter most to ")
-                 + e(who) + ":")
     secondary = [x for x in (_plain(PLAIN_FORCE, y, "") for y in rec.get("lf8_secondary", [])[:3]) if x]
-    sec_html = ""
-    if secondary:
-        sec_html = ('<p class="r-sec">These pull at them too, less hard: '
-                    + e(", ".join(secondary)) + '.</p>')
-    ev = _clean(rec.get("lf8_evidence", ""))
-    ev_html = '<div class="r-ev"><b>Where we see it</b>' + e(ev) + '</div>' if ev else ""
+    if len(secondary) > 1:
+        joined = ", ".join(secondary[:-1]) + " and " + secondary[-1]
+        sec_line = ("They also want " + e(joined) + ". These are smaller reasons to buy. They still "
+                    "help.")
+    elif secondary:
+        sec_line = ("They also want " + e(secondary[0]) + ". That's a smaller reason to buy. It "
+                    "still helps.")
+    else:
+        sec_line = ""
+    s1 = sect(0, ["Nobody buys coaching. They buy what coaching gets them."], None)
+    s1 = s1.replace("</section>", forces + ('<p class="r-sec">' + sec_line + "</p>" if sec_line else "")
+                    + ('<div class="r-ev"><b>How we know</b>' + e(_clean(rec.get("lf8_evidence","")))
+                       + "</div>" if rec.get("lf8_evidence") else "") + "</section>")
 
-    # The research writes the stage with a qualifier attached ("Solution-aware, seeking the
-    # established frameworks", "Problem-aware (grieving before the death)"). Matching the whole cell
-    # missed those and rendered an EMPTY paragraph, so find the stage name wherever it sits. Longest
-    # name first, or "aware" inside "Solution-aware" would match "Unaware".
+    # 2. What made them start looking. The push, plus how far along they already were.
     aw = (rec.get("awareness") or "").lower()
     aw_plain = ""
     for stage in sorted(PLAIN_AWARENESS, key=len, reverse=True):
         if stage in aw:
             aw_plain = PLAIN_AWARENESS[stage]
             break
-    lead = _clean(rec.get("lead_with", ""))
-    lead_html = '<div class="r-ev"><b>What they already know</b>' + e(lead) + '</div>' if lead else ""
+    aw_line = ("By the time they started looking, " + aw_plain) if aw_plain else ""
+    s2 = sect(1, [e(_clean(rec.get("push",""))), aw_line])
 
+    # 3. What they're reaching for.
+    s3 = sect(2, [e(_clean(rec.get("pull","")))])
+
+    # 4. What stops them, and what they do instead of buying.
+    s4 = sect(3, [e(_clean(rec.get("anxiety",""))),
+                  ("So instead of buying, " + e(_clean(rec.get("habit",""))[0:1].lower()
+                   + _clean(rec.get("habit",""))[1:])) if rec.get("habit") else ""])
+
+    # 5. What they've stopped believing.
     soph_digit = re.search(r"[1-5]", str(rec.get("sophistication", "")))
     soph_plain = PLAIN_SOPH.get(soph_digit.group(0), "") if soph_digit else ""
-    imp = _clean(rec.get("implication", ""))
-    imp_html = '<div class="r-ev"><b>What they have been promised before</b>' + e(imp) + '</div>' if imp else ""
+    s5 = sect(4, [soph_plain, e(_clean(rec.get("implication","")))])
 
-    jt = ""
-    for label, key in (("The job", "jtbd_job"), ("What pushed them", "push"),
-                       ("What they want", "pull"), ("What stops them", "anxiety"),
-                       ("What they do instead", "habit")):
-        val = rec.get(key, "")
-        if val:
-            jt += "<div><dt>" + label + "</dt><dd>" + e(_clean(val)) + "</dd></div>"
-
-    # Five. The levers, said plainly. The framework's names for them stay on our side too.
+    # 6. What tips them to one coach over another.
     lev = ""
     for l in rec.get("cialdini", [])[:3]:
         line = _plain(PLAIN_LEVER, l, "")
         if line:
             lev += "<p>" + e(line) + "</p>"
-    lev_why = _clean(_strip_levers(rec.get("cialdini_why", "")))
-    lev_html = '<div class="r-ev"><b>Why those</b>' + e(lev_why) + '</div>' if lev_why else ""
+    s6 = sect(5, [])
+    s6 = s6.replace("</section>", lev + ('<div class="r-ev"><b>Why these three work</b>'
+                    + e(_clean(_strip_levers(rec.get("cialdini_why","")))) + "</div>"
+                    if rec.get("cialdini_why") else "") + "</section>")
 
+    # The proof. Deliberately NOT numbered as a trigger: their own words are evidence, not a trigger.
     vhtml = ""
-    seen = set()                        # the same sentence must not appear under two headings
+    seen = set()
     for key, label in VOICE_LABELS:
         items = []
         for phrase in (voice.get(key) or []):
@@ -907,78 +911,60 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
                       + "".join("<li>&ldquo;" + e(x) + "&rdquo;</li>" for x in items) + "</ul>")
     voice_section = ""
     if vhtml:
-        voice_section = (
-            '<section class="r">' + '<p class="r-num">' + SECTION_HEADINGS[5]["n"] + '</p>' + '<h2>' + e(H[5]) + '</h2>'
-            "<p>This is how your buyer says it. If your website doesn't sound like this, they won't "
-            "think it's for them.</p>"
-            '<div class="voice">' + vhtml + '</div></section>')
+        voice_section = ('<section class="r"><p class="r-num">The proof</p>'
+                         '<h2>In their own words</h2>'
+                         "<p>These are your buyer's own words. This is how they talk about it to "
+                         "each other, not to a coach.</p>"
+                         '<div class="voice">' + vhtml + '</div></section>')
 
     fn = first_name.strip().split(" ")[0] if first_name.strip() else ""
-    if fn.islower():                    # they typed "david", the report should say "David"
+    if fn.islower():
         fn = fn.capitalize()
     fn = e(fn)
-    for_line = ("Here it is, " + fn + ". This is what your market buys on."
-                if fn else "Here it is. This is what your market buys on.")
+    for_line = ((fn + ", here are your buying triggers. This is why people buy&hellip;")
+                if fn else "Here are your buying triggers. This is why people buy&hellip;")
+    parent_line = ""
     if rec.get("level") == "subniche" and rec.get("parent"):
         if rec.get("diverges"):
-            for_line += " It's its own market, sitting inside " + e(rec["parent"]) + "."
+            parent_line = ("Your market sits inside " + e(rec["parent"])
+                           + ", and it buys its own way.")
         else:
-            for_line += (" It buys the same way as " + e(rec["parent"])
-                         + ", so that's the research you're getting.")
+            parent_line = ("Your market buys the same way as " + e(rec["parent"])
+                           + ", so that's the research you're getting.")
+
+    # Built here, not inside the body string. A quote escaped next to the triple-quote terminator
+    # silently produced "href= + e(audit_url) +" as literal text, and the button had no link at all.
+    cta_link = ('<a class="nextbtn" href="' + e(audit_url, quote=True)
+                + '">Show me what a potential client sees</a>')
 
     body = """
   <div class="rwrap">
   <p class="r-eyebrow">Your Buying Triggers report is ready</p>
   <h1 class="r-title">""" + e(shown) + """</h1>
   <p class="r-for">""" + for_line + """</p>
+  """ + ('<p class="r-parent">' + parent_line + "</p>" if parent_line else "") + """
 
-  <div class="r-base"><b>These are real.</b> We didn't guess them, and we didn't ask an AI what it
-  reckons. AI makes things up when it doesn't know. So we went to what your market has already proven
-  it buys, then got the words your buyers use about their own problem. That's where every trigger below
-  comes from. Your competitors don't have it.</div>
+  <div class="r-base"><b>We didn't guess at these triggers.</b> They're real. This isn't an AI making
+  things up when it doesn't know. You see, we went direct to your niche, worked out exactly what they
+  already spend money on, and took the words your next buyers use to describe their problem. Your
+  competitors don't have this.</div>
 
-  <section class="r">
-    <p class="r-num">""" + SECTION_HEADINGS[0]["n"] + """</p>
-    <h2>""" + e(H[0]) + """</h2>
-    <p>Nobody buys coaching. They buy what coaching gets them. """ + want_line + """</p>
-    """ + forces + sec_html + ev_html + """
-  </section>
+  <p class="r-what">A trigger is anything that pushes your buyer towards you, or holds them back. Here
+  are the six in your market.</p>
 
-  <section class="r">
-    <p class="r-num">""" + SECTION_HEADINGS[1]["n"] + """</p>
-    <h2>""" + e(H[1]) + """</h2>
-    <p>""" + aw_plain + """</p>
-    """ + lead_html + """
-  </section>
+  """ + s1 + s2 + s3 + s4 + s5 + s6 + voice_section + """
 
-  <section class="r">
-    <p class="r-num">""" + SECTION_HEADINGS[2]["n"] + """</p>
-    <h2>""" + e(H[2]) + """</h2>
-    <p>""" + soph_plain + """</p>
-    """ + imp_html + """
-  </section>
 
-  <section class="r">
-    <p class="r-num">""" + SECTION_HEADINGS[3]["n"] + """</p>
-    <h2>""" + e(H[3]) + """</h2>
-    <dl class="jt">""" + jt + """</dl>
-  </section>
-
-  <section class="r">
-    <p class="r-num">""" + SECTION_HEADINGS[4]["n"] + """</p>
-    <h2>""" + e(H[4]) + """</h2>
-    """ + lev + lev_html + """
-  </section>
-
-  """ + voice_section + """
 
   <div class="r-next">
-    <h2>Now your website</h2>
-    <p>That's what your buyer responds to. This report says nothing about your own website, because we
-    haven't looked at it. Different job.</p>
-    <p>Put your website in and a second report reads your page the way a potential client reads it. It
-    shows you which of the things above are missing. Half a minute, free, same as this one.</p>
-    <a class="nextbtn" href=\"""" + e(audit_url, quote=True) + """\">Show me what a potential client sees</a>
+    <h2>Now let's look at you</h2>
+    <p>We built this report in about 20 seconds, and it's an excellent view of your market. But
+    there's more to find, and more you can use to your advantage. So let's look at your social media
+    profile, and your website if you have one.</p>
+    <p>You've just read the words your buyers use. The next report shows you where your own words
+    don't sound like theirs, and what your buyer misses when they read you. Takes about half a
+    minute, and it's free like this one&hellip;</p>
+    """ + cta_link + """
   </div>
 
   <p class="r-foot">Buying Triggers comes from what your market already buys, and from your buyers

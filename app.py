@@ -31,7 +31,7 @@ from audit import (audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_c
                    PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH)   # market stats: single source of truth in audit.py
 # "1 in 14 speak their buyer's language" => the other 93%. Derived, so the pair can never disagree.
 PCT_NOT_BUYER_VOICE = 100 - round(100 / BUYER_VOICE_1_IN)
-from storage import save_audit, get_audit, save_trigger_lead
+from storage import save_audit, get_audit, save_trigger_lead, get_trigger_lead
 import triggers as _triggers            # the Buying Triggers page (book + Cashvertising research)
 
 PORT = int(os.getenv("PORT", "8000"))
@@ -2618,10 +2618,14 @@ class Handler(BaseHTTPRequestHandler):
             # The report itself. Open for now so the emailed link just works and so David can preview
             # any market. If it ever needs locking to the person who asked, key it off the lead row.
             qs = parse_qs(parsed.query)
+            # A stored token fills in the coach behind this report, so a link that has been mailed
+            # or bookmarked still knows who it belongs to.
+            lead = get_trigger_lead((qs.get("lead", [""])[0]).strip())
+            nxt = f"{APP_BASE_URL}/" + (f"?lead={_url_quote(lead['token'], safe='')}" if lead else "")
             self._send(_triggers.render_report(
-                niche      = (qs.get("niche", [""])[0]).strip(),
-                first_name = (qs.get("first_name", [""])[0]).strip(),
-                audit_url  = f"{APP_BASE_URL}/",
+                niche      = (qs.get("niche", [""])[0]).strip() or (lead or {}).get("niche_match", ""),
+                first_name = (qs.get("first_name", [""])[0]).strip() or (lead or {}).get("first_name", ""),
+                audit_url  = nxt,
             ))
             return
         if path == "/triggers/niches.json":
@@ -2788,10 +2792,13 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         matched = _triggers.have_triggers_for(niche)
+        # The token travels with the coach from here on, so the next step in the funnel already knows
+        # their name, their email and their market and never has to ask for any of it again.
+        token = ""
         try:
-            save_trigger_lead(email, first_name, last_name, niche, matched)
+            token = save_trigger_lead(email, first_name, last_name, niche, matched)
         except Exception:
-            pass                        # a DB hiccup must not lose the coach their thank-you page
+            pass                        # a DB hiccup must not cost the coach their report
         threading.Thread(
             target=_push_mailerlite_trigger,
             args=(email, first_name, last_name, niche, matched),
@@ -2800,10 +2807,13 @@ class Handler(BaseHTTPRequestHandler):
         # The page asks for a fragment so it can drop the report in behind Angelo's progress bar.
         # A plain POST (no JavaScript) gets the whole page instead, and lands on the same report.
         fragment = (form.get("fragment", [""])[0]).strip() == "1"
+        # The audit link carries the token too, so whatever they do next can be tied back to this
+        # coach and this market without a second form.
+        nxt = f"{APP_BASE_URL}/" + (f"?lead={_url_quote(token, safe='')}" if token else "")
         self._send(_triggers.render_report(
             niche      = matched or niche,
             first_name = first_name,
-            audit_url  = f"{APP_BASE_URL}/",
+            audit_url  = nxt,
             fragment   = fragment,
         ))
         return

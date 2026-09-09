@@ -58,7 +58,8 @@ VOICE = (
     "BANNED, these read as AI slop: em dashes (never), 'land'/'lands', 'quietly', 'the gap', "
     "'drift', 'rescue', 'delve', 'leverage', 'robust', 'navigate', 'unlock', 'elevate', 'harness', "
     "'foster', 'realm', 'tapestry', 'testament', 'furthermore', 'moreover', 'additionally', "
-    "'ultimately', \"it's not just X, it's Y\", 'guessing'. No lists of three for rhythm. No neat "
+    "'ultimately', \"it's not just X, it's Y\", 'guessing', 'matter', 'matters', 'no matter how'. "
+    "No lists of three for rhythm. No neat "
     "endings that restate what you just said.\n"
     "Return ONLY a JSON object mapping each key you were given to its rewritten string. No commentary."
 )
@@ -169,6 +170,104 @@ def audience_only(client, name, rec):
     return {"audience": v}
 
 
+TRIGGERS_SYS = (
+    "You write a report that EXPLAINS what makes a coach's clients buy. You never tell the coach what "
+    "to do, write, say or lead with. They will copy any instruction you give and never need us again. "
+    "THE RULE: the BUYER is the subject of every sentence. If a sentence's subject is 'you' or 'your "
+    "page', it is wrong. 'Start by naming their exhaustion' is WRONG. 'They are exhausted and they "
+    "say so before they say anything else' is RIGHT. Same fact, no instruction.\n"
+    "VOICE: blunt, warm, plain. Everyday words a twelve-year-old reads out loud and gets. CONTRACTIONS "
+    "ALWAYS (don't, they're, it's, won't, haven't). Vary sentence length hard, a short one then a "
+    "longer one. Never a run of same-length sentences. Be obvious, never clever. No writerly flourish, "
+    "no dramatic one-word sentences for effect, no 'That's the whole thing' punchlines.\n"
+    "NEVER use a vague picture where a plain fact will do. Banned in names especially: winning, "
+    "taking over, creeping, spiralling, drowning, crushing, eating away, slipping away. A "
+    "twelve-year-old must understand every name on first reading.\n"
+    "NEVER: name a framework, an author, a book, or a count of anything. No em dashes. No 'layer', "
+    "'mechanism', 'positioning', 'leverage', 'unlock', 'navigate', 'elevate', 'foster', 'quietly', "
+    "'drift', 'the gap', 'at the end of the day', 'it's not just X it's Y'. And NEVER the "
+    "word 'matter' or 'matters' in any form, including 'no matter how'. David has banned it outright. "
+    "Say what actually happens instead.\n"
+    "Return ONLY a JSON object with exactly these keys and nothing else."
+)
+
+TRIGGER_KEYS = ["t1_name","t2_name","t3_name","t4_name","t5_name","t6_name",
+                "implication","cialdini_why","push","pull","anxiety","habit"]
+
+
+def merged(rec, niches):
+    """A sub-market's own record holds only what DIVERGES from its parent. The naming pass needs the
+    whole picture, so lay the sub over the parent first. Without this the pass sees empty push, pull,
+    anxiety and habit fields and names the triggers off half the evidence."""
+    parent = niches.get(rec.get("parent", ""), {})
+    if not parent:
+        return rec
+    out = dict(parent)
+    out.update(parent.get("prose_plain") or {})
+    out.update({k: v for k, v in rec.items() if v and k not in ("voice", "books", "prose_plain")})
+    out.update({k: v for k, v in (rec.get("prose_plain") or {}).items() if v})
+    return out
+
+
+def triggers_pass(client, name, rec):
+    """Names the six triggers for one market, and rewrites the fields that came back as instructions
+    into plain description of the buyer."""
+    src = {k: rec.get(k, "") for k in
+           ("lf8_primary","lf8_evidence","push","pull","anxiety","habit","jtbd_job",
+            "awareness","sophistication","implication","cialdini","cialdini_why")}
+    ask = (
+        f"Market: {name}. The people are: {rec.get('audience','')}.\n\n"
+        "Research:\n" + json.dumps(src, ensure_ascii=False, indent=1) + "\n\n"
+        "Return JSON with these keys:\n"
+        "t1_name: what this market is really buying, named in 3-7 words, buyer as subject. "
+        "e.g. 'They want to stop hurting'\n"
+        "t2_name: what made them start looking, 3-7 words. Name the actual EVENT or the moment it "
+        "got too much, in words a twelve-year-old reads out loud and gets. e.g. 'They stopped "
+        "sleeping through the night', 'Their doctor told them nothing was wrong'. NOT vague "
+        "pictures like 'the symptoms started winning' or 'it started taking over', which mean "
+        "nothing to a reader.\n"
+        "t3_name: what they're reaching for, 3-7 words. e.g. 'They want to feel like themselves again'\n"
+        "t4_name: what stops them, 3-7 words. e.g. 'They think nothing will work'\n"
+        "t5_name: what they've stopped believing, 3-7 words. e.g. 'They've been promised relief before'\n"
+        "t6_name: what tips them to one coach over another, 3-7 words. "
+        "e.g. 'They need someone who can explain it'\n"
+        "implication: 2-3 sentences on what this market has been promised before and why they no "
+        "longer believe it. Describe THEM, never instruct the coach.\n"
+        "cialdini_why: 2-3 sentences on why those particular things tip this buyer. Describe THEM.\n"
+        "push, pull, anxiety, habit: keep the meaning, plain words, buyer as subject, no instructions."
+    )
+    msg = client.messages.create(model=MODEL, max_tokens=1200, system=TRIGGERS_SYS,
+                                 messages=[{"role": "user", "content": ask}])
+    text = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text").strip()
+    if text.startswith("```"):
+        text = text.split("```")[1].lstrip("json").strip()
+    try:
+        out = json.loads(text)
+    except json.JSONDecodeError:
+        print(f"  ! {name}: not JSON", file=sys.stderr)
+        return None
+    # The framework's own words for the levers leak through as ordinary English ("Authority earns
+    # their attention"). Swap them for what they mean, so the wall holds.
+    LEVER_WORDS = [("Authority", "someone who plainly knows more"),
+                   ("Social Proof", "seeing people like them come through"),
+                   ("Social proof", "seeing people like them come through"),
+                   ("Unity", "someone who is one of them"),
+                   ("Reciprocity", "being given something real first"),
+                   ("Scarcity", "a real limit"),
+                   ("Commitment", "a small first step"),
+                   ("Liking", "warming to someone")]
+    kept = {}
+    for k in TRIGGER_KEYS:
+        v = out.get(k)
+        if isinstance(v, str) and v.strip():
+            for a, b in LEVER_WORDS:
+                v = re.sub(r"(?<![a-z])" + a + r"(?![a-z])", b, v)
+            v = v[:1].upper() + v[1:]
+            kept[k] = fix_acronyms(v.replace("\u2014", ",").strip()) if k.endswith("_name") else \
+                      v.replace("\u2014", ",").strip()
+    return kept or None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--niche")
@@ -176,6 +275,10 @@ def main():
     ap.add_argument("--count", action="store_true")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--from-file",
+                    help="rewrite exactly the markets named in this file, one per line")
+    ap.add_argument("--triggers", action="store_true",
+                    help="name the six triggers and strip instructions out of the prose")
     ap.add_argument("--audience-only", action="store_true",
                     help="fill in just the missing heading labels, without redoing the prose")
     ap.add_argument("--workers", type=int, default=5,
@@ -203,10 +306,19 @@ def main():
     import anthropic
     client = anthropic.Anthropic()
 
-    if args.niche:
+    if args.from_file:
+        wanted = [l.strip() for l in open(args.from_file, encoding="utf-8") if l.strip()]
+        targets = [n for n in wanted if n in table]
+        skipped = len(wanted) - len(targets)
+        if skipped:
+            print(f"  ({skipped} of the listed markets are not in this table, skipped)")
+    elif args.niche:
         targets = [args.niche] if args.niche in table else []
         if not targets:
             sys.exit(f"{args.niche!r} is not one of the {what}s.")
+    elif args.all and args.triggers:
+        targets = [n for n, r in table.items()
+                   if not (r.get("prose_plain") or {}).get("t1_name")]
     elif args.all and args.audience_only:
         targets = [n for n, r in table.items()
                    if not (r.get("prose_plain") or {}).get("audience")]
@@ -225,8 +337,10 @@ def main():
     def work(name):
         """Runs on a worker thread. Only ever READS the table, never writes it."""
         try:
-            fn = audience_only if args.audience_only else rewrite
-            return name, fn(client, name, table[name]), None
+            fn = (triggers_pass if args.triggers else
+                  audience_only if args.audience_only else rewrite)
+            src = merged(table[name], niches) if (args.subniches and args.triggers) else table[name]
+            return name, fn(client, name, src), None
         except Exception as ex:
             return name, None, ex
 
