@@ -31,7 +31,8 @@ from audit import (audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_c
                    PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH)   # market stats: single source of truth in audit.py
 # "1 in 14 speak their buyer's language" => the other 93%. Derived, so the pair can never disagree.
 PCT_NOT_BUYER_VOICE = 100 - round(100 / BUYER_VOICE_1_IN)
-from storage import save_audit, get_audit
+from storage import save_audit, get_audit, save_trigger_lead
+import triggers as _triggers            # the Buying Triggers page (book + Cashvertising research)
 
 PORT = int(os.getenv("PORT", "8000"))
 MAILERLITE_API_KEY = os.getenv("MAILERLITE_API_KEY", "")
@@ -652,6 +653,38 @@ def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_fo
             pass
     except Exception:
         pass   # never let a MailerLite failure touch the audit result
+
+
+def _push_mailerlite_trigger(email, first_name, last_name, niche_typed, niche_match):
+    """Fire-and-forget MailerLite upsert for a Buying Triggers opt-in. Same rules as the audit push:
+    daemon thread, never blocks the page, never raises. The lead is already safe in our own DB."""
+    if not MAILERLITE_API_KEY or not email:
+        return
+    try:
+        payload = _json.dumps({
+            "email": email,
+            "fields": {
+                "name": first_name or "",
+                "last_name": last_name or "",
+                "niche_typed": niche_typed or "",
+                "niche_match": niche_match or "",
+                "lead_source": "buying-triggers",
+            },
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            "https://connect.mailerlite.com/api/subscribers",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {MAILERLITE_API_KEY}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX):
+            pass
+    except Exception:
+        pass
 
 
 def sev_class(v):
@@ -2578,6 +2611,28 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             return
+        if path == "/triggers":
+            self._send(_triggers.render_triggers())
+            return
+        if path == "/triggers/report":
+            # The report itself. Open for now so the emailed link just works and so David can preview
+            # any market. If it ever needs locking to the person who asked, key it off the lead row.
+            qs = parse_qs(parsed.query)
+            self._send(_triggers.render_report(
+                niche      = (qs.get("niche", [""])[0]).strip(),
+                first_name = (qs.get("first_name", [""])[0]).strip(),
+                audit_url  = f"{APP_BASE_URL}/",
+            ))
+            return
+        if path == "/triggers/niches.json":
+            # Names only. The research itself stays on the server.
+            body = _json.dumps(_triggers.niche_list()).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "public, max-age=3600")
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if path == "/salespage":
             qs = parse_qs(parsed.query)
             domain = (qs.get("domain", [""])[0]).strip()
@@ -2702,6 +2757,56 @@ class Handler(BaseHTTPRequestHandler):
         page = PAGE.format(url_value=html.escape(url, quote=True), result=result_html,
                            count=f"{websites_read_count():,}", mascot=mascot_img())
         self._send(page.replace("<!--PROGRESS-->", PROGRESS_UI))
+
+    def do_POST(self):
+        parsed = urlparse(self.path)
+        if parsed.path != "/triggers":
+            self.send_response(404); self.end_headers(); return
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            length = 0
+        if length > 64 * 1024:          # a form this small has no business being bigger
+            self.send_response(413); self.end_headers(); return
+        raw = self.rfile.read(length).decode("utf-8", "replace") if length else ""
+        form = parse_qs(raw)
+        first_name = (form.get("first_name", [""])[0]).strip()[:80]
+        last_name  = (form.get("last_name",  [""])[0]).strip()[:80]
+        email      = (form.get("email",      [""])[0]).strip()[:160]
+        niche      = (form.get("niche",      [""])[0]).strip()[:120]
+
+        # Deliberately loose: a real address we cannot parse is worse than a typo we let through.
+        bad = ""
+        if not first_name:
+            bad = "We need a first name, so the report knows who it is for."
+        elif "@" not in email or "." not in email.split("@")[-1] or len(email) < 6:
+            bad = "That email address does not look right. Have another look."
+        elif len(niche) < 2:
+            bad = "Tell us who you coach, even roughly, so we know which research to send."
+        if bad:
+            self._send(_triggers.render_triggers(first_name, last_name, email, niche, error=bad))
+            return
+
+        matched = _triggers.have_triggers_for(niche)
+        try:
+            save_trigger_lead(email, first_name, last_name, niche, matched)
+        except Exception:
+            pass                        # a DB hiccup must not lose the coach their thank-you page
+        threading.Thread(
+            target=_push_mailerlite_trigger,
+            args=(email, first_name, last_name, niche, matched),
+            daemon=True,
+        ).start()
+        # The page asks for a fragment so it can drop the report in behind Angelo's progress bar.
+        # A plain POST (no JavaScript) gets the whole page instead, and lands on the same report.
+        fragment = (form.get("fragment", [""])[0]).strip() == "1"
+        self._send(_triggers.render_report(
+            niche      = matched or niche,
+            first_name = first_name,
+            audit_url  = f"{APP_BASE_URL}/",
+            fragment   = fragment,
+        ))
+        return
 
     def log_message(self, *a):
         pass  # quiet

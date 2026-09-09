@@ -1,0 +1,991 @@
+"""The Buying Triggers page — the first door into the funnel.
+
+A coach tells us their niche, we send them the buying triggers for it. What sits behind it is the
+book research: what each market actually buys, read through the buying-trigger lenses. "Best
+sellers" must NOT appear in copy a coach reads: it points them at a shortcut they can take alone.
+The frameworks and the counts stay on our side of the wall. They never appear on a page a coach sees.
+
+Nothing here touches the coaching-website corpus. That is the audit's job, and it is the NEXT step.
+"""
+import html
+import json
+import re
+import os
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_DATA_PATH = os.path.join(_HERE, "triggers_data.json")
+
+# Loaded once at import. ~1.4MB of research; the browser never sees it, it only gets the name list.
+try:
+    with open(_DATA_PATH, encoding="utf-8") as _f:
+        DATA = json.load(_f)
+except Exception:                      # a missing data file must not take the whole site down
+    DATA = {"niches": {}, "subniches": {}, "totals": {}}
+
+NICHES = DATA.get("niches", {})
+SUBNICHES = DATA.get("subniches", {})
+TOTALS = DATA.get("totals", {})
+
+
+def is_complete(name):
+    """Can we deliver all six triggers for this market?
+
+    Trigger six is the buyer's own words, and it is the strongest thing in the report. A market with
+    no record of how the buyer talks renders five, which would make the "six" on the landing page a
+    lie and would send a coach the weakest version of the report. So a market has to be complete to
+    be offered at all.
+    """
+    rec = report_data(name)
+    if not rec:
+        return False
+    if not any((rec.get("voice") or {}).get(k) for k, _ in VOICE_LABELS):
+        return False
+    return bool(rec.get("lf8_primary") and rec.get("jtbd_job") and rec.get("cialdini"))
+
+
+def niche_list():
+    """The slim list the browser needs for the suggestions: every market we can actually deliver.
+
+    A micro-niche carries its parent so the coach can see which family it sits in, and so two
+    similarly named entries can be told apart.
+    """
+    out = []
+    for name in sorted(NICHES):
+        if is_complete(name):
+            out.append({"n": name, "a": report_data(name).get("audience", "")})
+    for name, rec in sorted(SUBNICHES.items()):
+        if is_complete(name):
+            out.append({"n": name, "p": rec.get("parent", ""),
+                        "a": report_data(name).get("audience", "")})
+    return out
+
+
+def have_triggers_for(niche):
+    """Do we hold a real lens for what they typed? Exact match first, then a forgiving one.
+
+    Returns the matched name, or "" when we hold nothing. We would rather tell a coach we do not
+    have their market yet than send them a report built on nothing.
+    """
+    if not niche:
+        return ""
+    q = niche.strip().lower()
+    names = [n for n in list(NICHES) + list(SUBNICHES) if is_complete(n)]
+    for name in names:
+        if name.lower() == q:
+            return name
+    for name in names:
+        if q in name.lower() or name.lower() in q:
+            return name
+    return ""
+
+
+_CSS = """
+  @font-face{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}
+  @font-face{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}
+  :root{
+    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
+    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
+    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
+    --gold:#D4AF37;--gold-h:#C2A02F;--glow:#7FA9DD;
+    --critical:#A62626;--coral:#F0B9B4;}
+  *{box-sizing:border-box}
+  html{background:var(--navy)}
+  body{margin:0;background:var(--navy);color:var(--ivory);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:56px 24px 72px}
+  .eyebrow{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--ivory-dim);
+    font-weight:600;margin:0 0 18px}
+  h1.serif{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,48px);line-height:1.12;
+    letter-spacing:-.015em;margin:0 0 20px;color:var(--ivory)}
+  .sub{color:var(--ivory);font-weight:300;font-size:17px;line-height:1.7;margin:0 0 14px;max-width:60ch}
+  .sub b{font-weight:600}
+  form{display:flex;flex-direction:column;gap:12px;background:var(--navy-card);
+    border:1px solid var(--navy-line);border-radius:12px;padding:22px;margin:32px 0 0}
+  .f-lead{font-size:15px;line-height:1.6;color:var(--ivory);margin:0 0 4px}
+  .f-lead .free{color:var(--gold);font-weight:700}
+  input[type=text],input[type=email]{border:1px solid var(--navy-line);border-radius:6px;
+    padding:14px 16px;font-size:16px;color:var(--ivory);background:var(--navy-deep);width:100%;
+    font-family:inherit}
+  input::placeholder{color:var(--ivory-dim)}
+  input:focus{outline:2px solid var(--glow);outline-offset:1px}
+  button{background:var(--gold);color:var(--navy);border:0;border-radius:6px;padding:16px 24px;
+    font-size:17px;font-weight:700;cursor:pointer;font-family:inherit}
+  button:hover{background:var(--gold-h)}
+  button[disabled]{opacity:.55;cursor:default}
+  .hint{font-size:13px;color:var(--ivory-dim);margin:14px 0 0;line-height:1.6}
+  .err{color:var(--coral);font-size:14px;line-height:1.6;margin:0 0 4px}
+
+  /* The niche box and its suggestions. */
+  .nichebox{position:relative}
+  .nichelab{font-size:14px;color:var(--ivory);margin:6px 0 8px;line-height:1.6}
+  .sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:var(--navy-deep);
+    border:1px solid var(--navy-line);border-radius:8px;max-height:290px;overflow-y:auto;display:none;
+    box-shadow:0 12px 30px rgba(0,0,0,.45)}
+  .sugg.open{display:block}
+  .sugg li{list-style:none;padding:11px 14px;font-size:15px;cursor:pointer;color:var(--ivory);
+    border-bottom:1px solid var(--navy-line);line-height:1.4}
+  .sugg li:last-child{border-bottom:0}
+  .sugg li:hover,.sugg li[aria-selected=true]{background:var(--navy-card)}
+  .sugg ul{margin:0;padding:0}
+  .sugg .par{display:block;font-size:12px;color:var(--ivory-dim);margin-top:3px}
+  .sugg mark{background:transparent;color:var(--gold);font-weight:700}
+  .sugg .none{padding:12px 14px;font-size:14px;color:var(--ivory-dim);line-height:1.5}
+
+  .whats{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--navy-line);
+    border-radius:12px;padding:26px}
+  .whats h2{font-family:var(--serif);font-size:23px;font-weight:600;margin:0 0 14px;color:var(--ivory)}
+  .whats ol{margin:0;padding:0;counter-reset:w}
+  .whats li{list-style:none;position:relative;padding:0 0 0 42px;margin:0 0 14px;
+    color:var(--ivory);font-size:15px;line-height:1.6}
+  .whats li:last-child{margin-bottom:0}
+  .whats li:before{counter-increment:w;content:counter(w);position:absolute;left:0;top:-1px;
+    width:28px;height:28px;border-radius:50%;background:var(--glow);color:var(--navy);
+    font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .whats b{font-weight:600}
+  .base{margin:26px 0 0;font-size:14px;line-height:1.7;color:var(--ivory-dim);
+    border-top:1px solid var(--navy-line);padding-top:18px}
+  .base b{color:var(--ivory);font-weight:600}
+
+  /* The thank-you state. */
+  .done{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:12px;
+    padding:30px;margin:32px 0 0}
+  .done h2{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
+  .done p{font-size:16px;line-height:1.7;margin:0 0 14px;color:var(--ivory);max-width:62ch}
+  .done .tick{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--navy);
+    display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 0 16px}
+  .nextbtn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;
+    font-weight:700;padding:15px 26px;border-radius:6px;font-size:16px;margin-top:6px}
+  .nextbtn:hover{background:var(--gold-h)}
+  /* Hero, with Angelo alongside the promise. */
+  .hero{display:flex;gap:26px;align-items:flex-start;margin:0 0 6px}
+  .mascot{width:118px;height:118px;border-radius:50%;object-fit:cover;flex:0 0 auto;
+    border:2px solid var(--glow);box-shadow:0 0 0 5px rgba(127,169,221,.16)}
+  .hero-copy{flex:1;min-width:0}
+  .hero h1.serif{margin-top:0}
+
+  /* The blocks under the form. */
+  .whats.real{border-color:var(--gold)}
+  .whats .rl{font-size:15.5px;line-height:1.7;color:var(--ivory);margin:0 0 14px;max-width:64ch}
+  .whats .rl:last-child{margin-bottom:0}
+  .whats h2 + .rl{margin-top:-4px;margin-bottom:18px;color:var(--ivory-dim)}
+  .closer{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--gold);
+    border-radius:12px;padding:30px}
+  .closer h2{font-family:var(--serif);font-size:24px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
+  .closer p{font-size:16px;line-height:1.7;color:var(--ivory);margin:0 0 18px;max-width:62ch}
+  .nextbtn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;
+    font-weight:700;padding:15px 26px;border-radius:6px;font-size:16px}
+  .nextbtn:hover{background:var(--gold-h)}
+  .backup{margin:0}
+  .backup a{color:var(--glow);font-size:15px;text-decoration:underline;text-underline-offset:3px}
+  .backup a:hover{color:var(--gold)}
+  @media(max-width:640px){
+    .wrap{padding:36px 18px 56px}
+    .hero{gap:16px}
+    .mascot{width:76px;height:76px}
+  }
+
+  /* Angelo pulling the market. Same shape as the audit's progress panel, so the two pages feel
+     like one product. */
+  #processing{display:none;margin:32px 0 0;padding:32px;border-radius:12px;
+    background:var(--navy-card);border:1px solid var(--navy-line)}
+  #processing.on{display:block}
+  .angelo-loader{display:block;width:150px;aspect-ratio:1;object-fit:cover;margin:0 auto 20px;
+    border-radius:50%;border:2px solid var(--glow);box-shadow:0 0 0 5px rgba(127,169,221,.18)}
+  #processing h3{font-size:21px;margin:0 0 8px;color:var(--ivory);text-align:center;font-weight:600}
+  .pbar{height:6px;background:var(--navy-deep);border:1px solid var(--navy-line);border-radius:4px;
+    overflow:hidden;margin:0 0 20px}
+  .pbar i{display:block;height:100%;width:0;background:var(--gold);border-radius:4px;
+    transition:width .6s linear}
+  #processing ul{list-style:none;margin:0 0 18px;padding:0}
+  #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;
+    line-height:1.5;color:var(--ivory);display:flex;gap:8px;align-items:baseline}
+  #processing li .ps-status{margin-left:auto}
+  #processing li:last-child{border-bottom:0}
+  #processing li b{color:#fff;font-weight:600}
+  .ps-status{font-weight:700;font-size:13px;white-space:nowrap}
+  .ps-done{color:#5CB88C}
+  .ps-progress{color:var(--glow)}
+  .ps-waiting{color:var(--ivory-dim)}
+  #processing .p-note{font-size:13px;color:var(--ivory-dim);line-height:1.6;margin:0;text-align:center}
+  @media(max-width:640px){
+    #processing{padding:22px 18px}
+    #processing li{flex-direction:column;gap:3px}
+  }
+"""
+
+_REPORT_CSS = """
+  .rwrap{max-width:820px;margin:0 auto;padding:48px 24px 80px}
+  .r-eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ivory-dim);
+    font-weight:600;margin:0 0 14px}
+  h1.r-title{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4.4vw,42px);line-height:1.14;
+    margin:0 0 10px;color:var(--ivory);letter-spacing:-.015em}
+  .r-for{font-size:17px;color:var(--ivory);margin:0 0 26px;line-height:1.6;max-width:60ch}
+  .r-base{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:10px;
+    padding:18px 20px;font-size:14px;line-height:1.7;color:var(--ivory);margin:0 0 40px}
+  .r-base b{font-weight:600}
+  section.r{margin:0 0 40px;padding:0 0 4px}
+  section.r > h2{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ivory);
+    margin:0 0 6px;line-height:1.25}
+  .r-num{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+    font-weight:700;margin:0 0 8px}
+  section.r p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:66ch}
+  .r-force{background:var(--navy-card);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+    padding:16px 20px;margin:0 0 14px}
+  .r-force .fname{font-family:var(--serif);font-size:20px;color:var(--ivory);margin:0 0 4px;font-weight:600}
+  .r-force .fplain{font-size:16px;color:var(--gold);line-height:1.6;margin:0}
+  .r-sec{font-size:14px;color:var(--ivory-dim);line-height:1.7;margin:10px 0 0}
+  .r-ev{font-size:15px;line-height:1.7;color:var(--ivory);background:var(--navy-deep);
+    border:1px solid var(--navy-line);border-radius:8px;padding:15px 18px;margin:14px 0 0}
+  .r-ev b{color:var(--gold);font-weight:600;display:block;font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;margin:0 0 6px}
+  .jt{margin:0;padding:0}
+  .jt div{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:13px 0;
+    border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.65}
+  .jt div:last-child{border-bottom:0}
+  .jt dt{color:var(--gold);font-weight:600}
+  .jt dd{margin:0;color:var(--ivory)}
+  .voice{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:10px;
+    padding:6px 20px;margin:0 0 14px}
+  .voice h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+    font-weight:700;margin:20px 0 10px}
+  .voice ul{margin:0 0 18px;padding:0}
+  .voice li{list-style:none;font-size:15.5px;line-height:1.6;color:var(--ivory);
+    padding:9px 0 9px 20px;border-left:2px solid var(--navy-line);margin:0 0 7px;font-style:italic}
+  .jargon{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px;padding:0}
+  .jargon li{list-style:none;background:var(--navy-deep);border:1px solid var(--navy-line);
+    border-radius:20px;padding:6px 14px;font-size:14px;color:var(--ivory)}
+  .books{margin:0;padding:0}
+  .books li{list-style:none;padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;
+    line-height:1.5;color:var(--ivory)}
+  .books li:last-child{border-bottom:0}
+  .books .au{display:block;font-size:13px;color:var(--ivory-dim);margin-top:2px}
+  .r-next{background:var(--navy-card);border:1px solid var(--gold);border-radius:12px;
+    padding:28px;margin:48px 0 0}
+  .r-next h2{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
+  .r-next p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:64ch}
+  .r-foot{margin:36px 0 0;padding-top:18px;border-top:1px solid var(--navy-line);
+    font-size:13px;line-height:1.7;color:var(--ivory-dim)}
+  @media(max-width:640px){
+    .rwrap{padding:32px 18px 56px}
+    .jt div{grid-template-columns:1fr;gap:3px}
+  }
+"""
+
+
+_JS = """
+(function(){
+  var input = document.getElementById('nicheinput');
+  var box   = document.getElementById('nichesugg');
+  if(!input || !box) return;
+  var LIST = [], cur = -1, items = [];
+
+  fetch('/triggers/niches.json').then(function(r){return r.json();}).then(function(d){ LIST = d; });
+
+  function esc(s){ return s.replace(/[&<>"]/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+
+  function mark(name, q){
+    var i = name.toLowerCase().indexOf(q);
+    if(i < 0) return esc(name);
+    return esc(name.slice(0,i)) + '<mark>' + esc(name.slice(i, i+q.length)) + '</mark>' + esc(name.slice(i+q.length));
+  }
+
+  function close(){ box.classList.remove('open'); box.innerHTML = ''; cur = -1; items = []; }
+
+  function choose(name){ input.value = name; close(); input.focus(); }
+
+  function render(q){
+    // A word-start match first (typing "div" should offer Divorce before it offers anything that
+    // merely contains those letters), then anything else that contains what they typed.
+    // Three tiers. A word-start in the market NAME beats a match anywhere in the name, and both beat
+    // a match on the audience label, so typing "divorce" still leads with the divorce market rather
+    // than every market whose people happen to be described as divorced.
+    var starts = [], has = [], aud = [];
+    for(var i=0; i<LIST.length && starts.length + has.length + aud.length < 200; i++){
+      var low = LIST[i].n.toLowerCase();
+      var at = low.indexOf(q);
+      if(at < 0){
+        if((LIST[i].a || '').toLowerCase().indexOf(q) >= 0) aud.push(LIST[i]);
+        continue;
+      }
+      if(at === 0 || /[^a-z0-9]/.test(low.charAt(at-1))) starts.push(LIST[i]); else has.push(LIST[i]);
+    }
+    var hits = starts.concat(has).concat(aud).slice(0, 8);
+    if(!hits.length){
+      box.innerHTML = '<div class="none">Not on our list yet. Type it in your own words and we will '
+                    + 'tell you straight whether we have read the books for it.</div>';
+      box.classList.add('open'); items = []; cur = -1; return;
+    }
+    var ul = document.createElement('ul');
+    hits.forEach(function(h){
+      var li = document.createElement('li');
+      li.setAttribute('role','option');
+      li.dataset.name = h.n;          // the real name, so Enter never has to read it back off the label
+      var under = h.a ? 'for ' + esc(h.a) : (h.p ? 'part of ' + esc(h.p) : '');
+      li.innerHTML = mark(h.n, q) + (under ? '<span class="par">' + under + '</span>' : '');
+      li.addEventListener('mousedown', function(e){ e.preventDefault(); choose(h.n); });
+      ul.appendChild(li);
+    });
+    box.innerHTML = '';
+    box.appendChild(ul);
+    box.classList.add('open');
+    items = Array.prototype.slice.call(ul.children);
+    cur = -1;
+  }
+
+  function move(step){
+    if(!items.length) return;
+    if(cur > -1) items[cur].setAttribute('aria-selected','false');
+    cur = (cur + step + items.length) % items.length;
+    items[cur].setAttribute('aria-selected','true');
+    items[cur].scrollIntoView({block:'nearest'});
+  }
+
+  input.addEventListener('input', function(){
+    var q = input.value.trim().toLowerCase();
+    if(q.length < 2){ close(); return; }
+    render(q);
+  });
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowDown'){ e.preventDefault(); move(1); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); move(-1); }
+    else if(e.key === 'Enter'){
+      if(cur > -1 && items[cur]){ e.preventDefault(); choose(items[cur].dataset.name); }
+    }
+    else if(e.key === 'Escape'){ close(); }
+  });
+  input.addEventListener('blur', function(){ setTimeout(close, 120); });
+  input.addEventListener('focus', function(){
+    var q = input.value.trim().toLowerCase();
+    if(q.length >= 2) render(q);
+  });
+})();
+
+// The submit. Angelo works for twenty seconds while the report is fetched behind him, then the
+// report opens on this page. Without JavaScript the plain POST still returns the report, so nobody
+// is left staring at a dead form.
+(function(){
+  var cta = document.getElementById('cta2');
+  if(cta) cta.addEventListener('click', function(ev){
+    ev.preventDefault();
+    var form = document.getElementById('trigform');
+    form.scrollIntoView({behavior:'smooth', block:'center'});
+    // Put them in the first box they have not filled, so the button does the whole job.
+    var first = ['fnameinput','lnameinput','emailinput','nicheinput']
+                  .map(function(id){ return document.getElementById(id); })
+                  .filter(function(el){ return el && !el.value.trim(); })[0];
+    if(first) setTimeout(function(){ first.focus({preventScroll:true}); }, 400);
+  });
+})();
+
+(function(){
+  var form = document.getElementById('trigform');
+  if(!form) return;
+  var proc = document.getElementById('processing');
+  var slot = document.getElementById('reportslot');
+  var whats = document.getElementById('whatsin');
+  var bar, busy = false;
+  var STEPS = 5, HOLD = 20000;
+
+  function setStep(n, state){
+    var el = document.getElementById('tp' + n);
+    if(!el) return;
+    el.textContent = '[' + state + ']';
+    el.className = 'ps-status ' + (state === 'DONE' ? 'ps-done'
+                 : state === 'WORKING' ? 'ps-progress' : 'ps-waiting');
+  }
+
+  form.addEventListener('submit', function(ev){
+    if(!form.checkValidity()) return;             // let the browser show its own message
+    ev.preventDefault();
+    if(busy) return;
+    busy = true;
+
+    form.style.display = 'none';
+    if(whats) whats.style.display = 'none';
+    slot.innerHTML = '';
+    proc.className = 'on';
+    bar = proc.querySelector('.pbar i');
+    proc.scrollIntoView({behavior:'smooth', block:'center'});
+
+    for(var i = 1; i <= STEPS; i++) setStep(i, i === 1 ? 'WORKING' : 'WAITING');
+    var step = 1;
+    var tick = setInterval(function(){
+      setStep(step, 'DONE');
+      step++;
+      if(step <= STEPS) setStep(step, 'WORKING');
+      if(bar) bar.style.width = Math.round((step - 1) / STEPS * 100) + '%';
+      if(step > STEPS) clearInterval(tick);
+    }, HOLD / STEPS);
+    if(bar) setTimeout(function(){ bar.style.width = '4%'; }, 60);
+
+    var started = Date.now();
+    var body = new URLSearchParams(new FormData(form)).toString() + '&fragment=1';
+    fetch('/triggers', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: body
+    }).then(function(r){ return r.text(); }).then(function(htmlText){
+      var wait = Math.max(0, HOLD - (Date.now() - started));
+      setTimeout(function(){
+        clearInterval(tick);
+        for(var i = 1; i <= STEPS; i++) setStep(i, 'DONE');
+        if(bar) bar.style.width = '100%';
+        setTimeout(function(){
+          proc.className = '';
+          // The pitch has done its job. From here the report IS the page.
+          ['heroblock','belowfold'].forEach(function(id){
+            var el = document.getElementById(id);
+            if(el) el.style.display = 'none';
+          });
+          slot.innerHTML = htmlText;
+          window.scrollTo({top: 0, behavior: 'smooth'});
+          busy = false;
+        }, 450);
+      }, wait);
+    }).catch(function(){
+      // Anything goes wrong and the plain form submit takes over, which returns the same report.
+      clearInterval(tick);
+      busy = false;
+      form.style.display = '';
+      proc.className = '';
+      form.submit();
+    });
+  });
+})();
+"""
+
+_SHELL = """<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Buying Triggers __TITLE__</title>
+<meta name="description" content="The reason your clients actually buy, worked out from the books they buy.">
+<style>__CSS__</style></head><body>
+<div class="wrap">
+__BODY__
+</div>
+<script>__JS__</script>
+</body></html>"""
+
+
+def _shell(body, title_suffix=""):
+    # The report is injected into the landing page after the progress bar, so its stylesheet has to be
+    # on every page, not only on the standalone report URL.
+    return (_SHELL
+            .replace("__CSS__", _CSS + _REPORT_CSS)
+            .replace("__JS__", _JS)
+            .replace("__TITLE__", title_suffix)
+            .replace("__BODY__", body))
+
+
+PLAIN_FORCE = {
+    "survival/health/life-extension":   "to stay well and live longer",
+    "survival, enjoyment of life, life extension": "to stay well and live longer",
+    "enjoyment of food and beverages":  "to enjoy food and drink",
+    "freedom from fear, pain & danger": "to stop something that frightens them or hurts",
+    "freedom from fear, pain and danger": "to stop something that frightens them or hurts",
+    "sexual companionship":             "to be wanted, and not be on their own",
+    "comfortable living conditions":    "to have an easier life",
+    "to be superior / win / keep up":   "to be better at something, or to keep up with the people around them",
+    "care & protection of loved ones":  "to look after the people they love",
+    "social approval":                  "to be thought well of by other people",
+    "to be informed":                   "to know what is going on",
+    "to be informed / curiosity":       "to know what is going on",
+    "curiosity":                        "to find out",
+    "efficiency":                       "to waste less time",
+    "convenience":                      "to make it easier on themselves",
+    "dependability/quality":            "to get something that actually works",
+    "beauty/style":                     "to look good",
+    "economy/profit":                   "to save money or make money",
+    "economy/profit (survival of the business)": "to keep the business alive",
+    "cleanliness":                      "to be clean",
+    "bargains":                         "to get a good deal",
+}
+
+# Where the buyer's head is when they find you.
+PLAIN_AWARENESS = {
+    "unaware":        "They don't know they've got this problem yet. Nobody has named it for them.",
+    "problem-aware":  "They know something's wrong. They don't yet know what fixes it, so they're still "
+                      "describing the problem rather than shopping for an answer.",
+    "solution-aware": "They already know help like yours exists. They're not deciding whether to get "
+                      "help any more. They're deciding who from.",
+    "product-aware":  "They know who you are and they're weighing you up. They're past the problem now "
+                      "and onto whether you're the one.",
+    "most-aware":     "They're ready. What's holding them is timing, not doubt.",
+}
+
+# How worn out the promises in the market already are.
+PLAIN_SOPH = {
+    "1": "Your market hasn't heard this promise before. It's still new to them.",
+    "2": "A few coaches have made this promise already. It's familiar, not worn out.",
+    "3": "They've heard the promise too many times to believe it on its own. Now they want to know "
+         "how it works before they'll believe anyone.",
+    "4": "They've heard the how as well. A general version of it doesn't register with them any more.",
+    "5": "They've heard all of it before. Claims on their own don't move them at all now.",
+}
+
+# The plain sentence only. The framework's name for each lever stays on our side of the wall.
+PLAIN_LEVER = {
+    "authority":     "They want someone who plainly knows more than they do.",
+    "social proof":  "They want to see people like them who came out the other side.",
+    "unity":         "They want someone who is one of them, not someone looking in.",
+    "reciprocity":   "Give them something real first and they feel the pull to come back.",
+    "commitment/consistency": "A small first step makes the bigger one feel normal to them.",
+    "liking":        "They buy from someone they warm to.",
+    "scarcity":      "A real limit moves them. A made-up one costs you the sale.",
+}
+
+# The section headings.
+#
+# Each has two forms. `aud` is used when the rewrite pass has given this market a natural audience
+# label ("women in menopause"), so the heading can name the reader's own market. `plain` is the
+# fallback for any market not rewritten yet, so nothing ever renders a raw {audience} slot.
+# Ruled by the expert table (Klaff, Hughes, Ogilvy, Columbo, Cialdini, Orwell, Sutherland, Solomon):
+# four changed, two left alone on purpose, because leaving some untouched is what stops the rest
+# reading like a rewrite. David signs off. Change the strings here and every report follows.
+SECTION_HEADINGS = [
+    # Unanimous change. Two of the three pairs picked this wording; the third wanted "really buying"
+    # and was answered on it, a correction lands badly before any evidence has been shown.
+    {"n": "Buying Trigger 1", "plain": "What they want enough to pay for",
+                              "aud":   "What {audience} want enough to pay for"},
+    # LEFT ALONE. The table split evenly. Broken on David's standing rule: the winning replacement
+    # opened "You are not the first coach they looked at", and a coach who is sure they are
+    # distinctive reads that as a knock before we have earned the right to make one.
+    {"n": "Buying Trigger 2", "plain": "Where their head is when they find you",
+                              "aud":   "Where their head is when they find you"},
+    # All three pairs wrote this exact line, independently. The old one seated the coach in the same
+    # room as "other coaches" and left them working out whether they were the accused.
+    {"n": "Buying Trigger 3", "plain": "The promises they have stopped believing",
+                              "aud":   "The promises {audience} have stopped believing"},
+    # Two of three wanted this shape, because the old heading sold one row of a table that holds
+    # four, and the row it left out is the one the buyer never says out loud. Their verbs were
+    # "fixed" and "done"; both were dropped because the table only saw one market and neither verb
+    # travels across all of them.
+    {"n": "Buying Trigger 4", "plain": "What they want, and what stops them",
+                              "aud":   "What they want, and what stops them"},
+    # Unanimous change. "What moves them" could sit above anything. Moves them where.
+    {"n": "Buying Trigger 5", "plain": "What makes them choose you over the next coach",
+                              "aud":   "What makes them choose you over the next coach"},
+    # LEFT ALONE, deliberately. Two pairs voted to change it and both said they would not fight for
+    # it. The pair that voted to leave it argued hardest: the reader is about to meet a real woman
+    # asking why she cannot spell any more, so do not stand in front of that.
+    {"n": "Buying Trigger 6", "plain": "Their own words",
+                              "aud":   "Their own words"},
+]
+
+
+def _heading(i, audience):
+    """Heading i, with the market's own audience in it when we have one."""
+    h = SECTION_HEADINGS[i]
+    if audience and "{audience}" in h["aud"]:
+        return h["aud"].replace("{audience}", audience)
+    return h["plain"]
+
+
+VOICE_LABELS = [
+    ("pain",   "How they describe the problem"),
+    ("desire", "What they say they want"),
+    ("blame",  "Who or what they blame"),
+    ("tried",  "What they have already tried"),
+    ("trigger", "What made them start looking"),
+    ("jargon", "Words they use that outsiders don't"),
+]
+
+
+def _plain(mapping, key, fallback=""):
+    return mapping.get((key or "").strip().lower(), fallback)
+
+def render_triggers(first_name="", last_name="", email="", niche="", error=""):
+    """The landing page.
+
+    The form sits high, because the whole promise is that the report arrives in twenty seconds and
+    nothing has to be read first. Everything under the form is there for the coach who wants to know
+    who we are before handing over an address.
+
+    The "what you get" list is generated from SECTION_HEADINGS, so the page can never promise a
+    section the report does not have.
+    """
+    e = html.escape
+    err_html = '<p class="err">' + e(error) + '</p>' if error else ""
+
+    # What each trigger gives them. Paired with the real headings, in the report's own order.
+    PROMISE = [
+        "The one thing your market is buying its way out of, or buying its way into. Everything "
+        "else you write sits under this.",
+        "Whether they already know what they need, or only know that something hurts. It changes "
+        "your first line.",
+        "The promises your market has heard too many times, and what stopped working years ago.",
+        "What pushed them to look, what they want instead, and what stops them with their card "
+        "in their hand.",
+        "Why a buyer picks one coach over the next one, in your market and not in general.",
+        "How your buyer says it. Not how a coach says it.",
+    ]
+    gets = ""
+    for i, why in enumerate(PROMISE):
+        gets += ('<li><b>' + e(SECTION_HEADINGS[i]["plain"]) + '.</b> ' + why + '</li>')
+
+    body = """
+  <div id="heroblock">
+  <div class="eyebrow">Buying Triggers</div>
+  <div class="hero">
+    <img class="mascot" src="/angelo.png"
+         alt="Angelo, who works out what your market already buys">
+    <div class="hero-copy">
+      <h1 class="serif">Coaches: the 6 buying triggers that turn a stranger into a client.</h1>
+      <p class="sub"><b>Your client buys for a reason. They won't tell you what it is.</b>
+      So we went and worked out what your market already buys, and why.</p>
+    </div>
+  </div>
+  <p class="sub">Tell us who you coach. Your report opens on this page in about twenty seconds.</p>
+  </div>
+
+  <form method="post" action="/triggers" id="trigform" autocomplete="on">
+    """ + err_html + """
+    <p class="f-lead"><span class="free">Nothing to pay.</span> We built this research for our own
+    work, so it costs us nothing to hand you a copy. Please take your time over your details.</p>
+    <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
+           autocomplete="given-name" value=\"""" + e(first_name, quote=True) + """\" required>
+    <input type="text"  name="last_name"  id="lnameinput" placeholder="Your last name"
+           autocomplete="family-name" value=\"""" + e(last_name, quote=True) + """\">
+    <input type="email" name="email"      id="emailinput" placeholder="Your best email address"
+           autocomplete="email" value=\"""" + e(email, quote=True) + """\" required>
+    <div class="nichebox">
+      <p class="nichelab">Who do you coach? Start typing and pick yours from the list.</p>
+      <input type="text" name="niche" id="nicheinput" placeholder="divorce, ADHD, first-time managers&hellip;"
+             autocomplete="off" role="combobox" aria-expanded="false" aria-controls="nichesugg"
+             value=\"""" + e(niche, quote=True) + """\" required>
+      <div class="sugg" id="nichesugg" role="listbox"></div>
+    </div>
+    <button type="submit">Show me my buying triggers</button>
+    <p class="hint">One report. No newsletter, nothing to unsubscribe from later.</p>
+  </form>
+
+  <div id="processing">
+    <img class="angelo-loader" src="/angelo_reading.png"
+         alt="Angelo reading your market">
+    <h3>Angelo is pulling your market</h3>
+    <div class="pbar"><i></i></div>
+    <ul>
+      <li><b>One:</b> Finding your market in the research
+          <span class="ps-status ps-progress" id="tp1">[WORKING]</span></li>
+      <li><b>Two:</b> Pulling what your buyers already spend money on
+          <span class="ps-status ps-waiting" id="tp2">[WAITING]</span></li>
+      <li><b>Three:</b> Reading what they say is wrong, in their words
+          <span class="ps-status ps-waiting" id="tp3">[WAITING]</span></li>
+      <li><b>Four:</b> Working out what they are really paying for
+          <span class="ps-status ps-waiting" id="tp4">[WAITING]</span></li>
+      <li><b>Five:</b> Building your report
+          <span class="ps-status ps-waiting" id="tp5">[WAITING]</span></li>
+    </ul>
+    <p class="p-note">About twenty seconds. Leave this page open. Your report opens here on its own.</p>
+  </div>
+  <div id="reportslot"></div>
+
+  <div id="belowfold">
+  <div class="whats">
+    <h2>The six triggers Angelo pulls for your market</h2>
+    <p class="rl">He does it on this page while you watch. Takes about twenty seconds.</p>
+    <ol>""" + gets + """</ol>
+  </div>
+
+  <div class="whats real">
+    <h2>Why this is not another AI freebie</h2>
+    <p class="rl">We didn't guess these, and we didn't ask an AI what it reckons. We went to what your
+    market already spends money on. Then we got the words your buyers use about their own problem,
+    written by them, not by a coach.</p>
+    <p class="rl">Check it yourself before you type anything. Start typing your niche in the box above.
+    Every market it offers you is one we've already read. If yours isn't in there, we'll say so, rather
+    than send you somebody else's market with your name on it.</p>
+  </div>
+
+  <div class="closer">
+    <h2>Your buyer already told us why they buy</h2>
+    <p>They wrote it down. We went and read it. Costs you nothing to see, and the coaches you're up
+    against are working without it.</p>
+    <p class="backup"><a href="#trigform" id="cta2">Take me back up to the form</a></p>
+  </div>
+
+  <p class="base" id="baseline">Buying Triggers comes from what your market already buys, and from your
+  buyers describing the problem in their own words. <b>Going Beyond The Illusion.</b></p>
+  </div>
+"""
+    return _shell(body)
+
+
+# The research prose was written for us, not for a coach. It carries analyst shorthand: category tags
+# in brackets like "(health/pain/appearance)", "(comfort)", "(tried: medication)", and semicolons
+# joining two thoughts. None of that belongs on a page a coach reads.
+_TAG_WORDS = {
+    "health", "pain", "appearance", "comfort", "validation", "danger", "fear", "superiority",
+    "winning", "status", "approval", "social", "belonging", "identity", "money", "profit",
+    "curiosity", "efficiency", "convenience", "beauty", "style", "survival", "companionship",
+    "authority", "proof", "unity", "scarcity", "liking", "reciprocity", "commitment", "consistency",
+    "self", "directed", "external", "blame", "tried", "trigger", "desire", "pull", "push",
+}
+
+
+def _is_tag(inner):
+    """A bracket is analyst shorthand when every word inside it is a category label."""
+    if inner.lower().startswith(("tried:", "blame:", "trigger:", "source:")):
+        return True
+    words = [w for w in re.split(r"[\s/,&+-]+", inner.lower()) if w]
+    return bool(words) and len(words) <= 5 and all(w in _TAG_WORDS for w in words)
+
+
+def _clean(text):
+    """Research prose goes through here on its way to the page.
+
+    Three things come out. Em dashes, which David bans. The bracketed category tags we wrote for
+    ourselves. And semicolons, which become full stops, because a coach reading this should get two
+    plain sentences rather than one long one.
+    """
+    t = str(text or "")
+    t = re.sub(r"\s*\(([^()]*)\)", lambda m: "" if _is_tag(m.group(1)) else m.group(0), t)
+    t = t.replace("\u2014", ",").replace("\u2013", ",").replace(" -- ", ", ")
+    t = re.sub(r"\s*;\s*", ". ", t)
+    t = re.sub(r"\s*,\s*", ", ", t)
+    t = re.sub(r",\s*([.;:,])", r"\1", t)
+    t = re.sub(r"\s+", " ", t).strip().rstrip(",").strip()
+    # A full stop from a semicolon leaves the next word lowercase. Lift it.
+    t = re.sub(r"(?<=\.\s)([a-z])", lambda m: m.group(1).upper(), t)
+    return t[:1].upper() + t[1:] if t else t
+
+
+def report_data(name):
+    """Pull the research for one market. A micro-niche that does not diverge falls back to its parent,
+    and says so, rather than pretending to be its own study."""
+    if name in NICHES:
+        rec = dict(NICHES[name])
+        rec.update(rec.get("prose_plain") or {})   # the plain rewrite wins where we have one
+        rec["level"] = "niche"
+        rec["shown_as"] = name
+        return rec
+    if name in SUBNICHES:
+        sub = SUBNICHES[name]
+        parent = NICHES.get(sub.get("parent", ""), {})
+        rec = dict(parent)
+        rec.update(parent.get("prose_plain") or {})
+        rec.update({k: v for k, v in sub.items() if v and k not in ("voice", "books", "prose_plain")})
+        rec.update(sub.get("prose_plain") or {})
+        # A micro-niche only overrides the parent where the research says it genuinely differs.
+        if sub.get("lf8"):
+            rec["lf8_primary"] = sub["lf8"]
+        if sub.get("voice"):
+            rec["voice"] = sub["voice"]
+        if sub.get("books"):
+            rec["books"] = sub["books"]
+            rec["book_count"] = sub.get("book_count", 0)
+        rec["level"] = "subniche"
+        rec["shown_as"] = name
+        rec["parent"] = sub.get("parent", "")
+        rec["diverges"] = sub.get("diverges", False)
+        return rec
+    return {}
+
+
+
+
+
+_LEVER_WORDS = ("authority", "social proof", "unity", "reciprocity", "liking", "scarcity",
+                "commitment", "consistency")
+
+
+def _strip_levers(text):
+    """The research prose names the persuasion framework in brackets, like "(Social Proof)". We keep
+    the framework on our side of the wall, so the brackets come out and the sentence stands alone."""
+    t = str(text or "")
+    t = re.sub(r"\s*\((?:[^()]*)\)", lambda m: "" if any(
+        w in m.group(0).lower() for w in _LEVER_WORDS) else m.group(0), t)
+    return re.sub(r"\s+", " ", t).strip(" ,;")
+
+
+def render_report(niche, first_name="", audit_url="/", fragment=False):
+    """One market's buying triggers, straight off the research.
+
+    Three rules the copy obeys, all for the same reason. We never name the frameworks the research was
+    read against, we never list the books by title, and we never give a count of anything. Each one
+    hands the coach a shortcut to doing it themselves, and none of them makes the report more useful.
+    """
+    # The gate is enforced HERE as well as in the box, because the POST falls back to whatever the
+    # coach typed when nothing matched, and that raw string can still name a market we hold but hold
+    # back. Without this check a held-back market renders five triggers under a headline promising six.
+    rec = report_data(niche) if is_complete(niche) else {}
+    e = html.escape
+    if not rec:
+        # No promise of an email here. Nothing in the app sends one. What we CAN do is hand them
+        # straight back to the form, where the list only ever offers markets we actually hold.
+        miss = ('<div class="done"><h2>We haven’t read this market yet.</h2>'
+                f'<p>We hold a long list of markets, and the smaller ones inside them. {e(niche)} '
+                'isn’t on it. We’d rather tell you straight than hand you somebody else’s market '
+                'with your name typed over the top.</p>'
+                '<p>We’ve kept your details and put it on the list to read. If something close enough '
+                'to yours is on the list, type that in and we’ll build it now. Every market the box '
+                'offers you is one we’ve read.</p>'
+                '<a class="nextbtn" href="/triggers">Try another market</a></div>')
+        return miss if fragment else _shell(miss)
+
+    shown = rec.get("shown_as", niche)
+    voice = rec.get("voice", {}) or {}
+    audience = rec.get("audience", "")
+    H = [_heading(i, audience) for i in range(len(SECTION_HEADINGS))]
+
+    # One. The trigger. Plain words only. The framework's name for it stays on our side.
+    forces = ""
+    for f in rec.get("lf8_primary", [])[:2]:
+        plain = _plain(PLAIN_FORCE, f, "")
+        if plain:
+            forces += ('<div class="r-force"><p class="fplain">'
+                       + e(plain[0].upper() + plain[1:]) + '.</p></div>')
+    # The audience goes AFTER the verb on purpose. Put it in front and the verb has to agree with
+    # whatever the label happens to be ("Job seekers wants one thing"), and there are a thousand
+    # labels to get right. This way the subject is always "One thing" or "Two things".
+    n_forces = forces.count('class="r-force"')
+    who = rec.get("audience", "") or "this market"
+    want_line = (("One thing matters most to " if n_forces == 1 else "Two things matter most to ")
+                 + e(who) + ":")
+    secondary = [x for x in (_plain(PLAIN_FORCE, y, "") for y in rec.get("lf8_secondary", [])[:3]) if x]
+    sec_html = ""
+    if secondary:
+        sec_html = ('<p class="r-sec">These pull at them too, less hard: '
+                    + e(", ".join(secondary)) + '.</p>')
+    ev = _clean(rec.get("lf8_evidence", ""))
+    ev_html = '<div class="r-ev"><b>Where we see it</b>' + e(ev) + '</div>' if ev else ""
+
+    # The research writes the stage with a qualifier attached ("Solution-aware, seeking the
+    # established frameworks", "Problem-aware (grieving before the death)"). Matching the whole cell
+    # missed those and rendered an EMPTY paragraph, so find the stage name wherever it sits. Longest
+    # name first, or "aware" inside "Solution-aware" would match "Unaware".
+    aw = (rec.get("awareness") or "").lower()
+    aw_plain = ""
+    for stage in sorted(PLAIN_AWARENESS, key=len, reverse=True):
+        if stage in aw:
+            aw_plain = PLAIN_AWARENESS[stage]
+            break
+    lead = _clean(rec.get("lead_with", ""))
+    lead_html = '<div class="r-ev"><b>What they already know</b>' + e(lead) + '</div>' if lead else ""
+
+    soph_digit = re.search(r"[1-5]", str(rec.get("sophistication", "")))
+    soph_plain = PLAIN_SOPH.get(soph_digit.group(0), "") if soph_digit else ""
+    imp = _clean(rec.get("implication", ""))
+    imp_html = '<div class="r-ev"><b>What they have been promised before</b>' + e(imp) + '</div>' if imp else ""
+
+    jt = ""
+    for label, key in (("The job", "jtbd_job"), ("What pushed them", "push"),
+                       ("What they want", "pull"), ("What stops them", "anxiety"),
+                       ("What they do instead", "habit")):
+        val = rec.get(key, "")
+        if val:
+            jt += "<div><dt>" + label + "</dt><dd>" + e(_clean(val)) + "</dd></div>"
+
+    # Five. The levers, said plainly. The framework's names for them stay on our side too.
+    lev = ""
+    for l in rec.get("cialdini", [])[:3]:
+        line = _plain(PLAIN_LEVER, l, "")
+        if line:
+            lev += "<p>" + e(line) + "</p>"
+    lev_why = _clean(_strip_levers(rec.get("cialdini_why", "")))
+    lev_html = '<div class="r-ev"><b>Why those</b>' + e(lev_why) + '</div>' if lev_why else ""
+
+    vhtml = ""
+    seen = set()                        # the same sentence must not appear under two headings
+    for key, label in VOICE_LABELS:
+        items = []
+        for phrase in (voice.get(key) or []):
+            phrase = _clean(phrase)
+            if phrase and phrase.lower() not in seen:
+                seen.add(phrase.lower())
+                items.append(phrase)
+            if len(items) == 4:
+                break
+        if not items:
+            continue
+        if key == "jargon":
+            vhtml += ("<h3>" + label + "</h3><ul class='jargon'>"
+                      + "".join("<li>" + e(x) + "</li>" for x in items) + "</ul>")
+        else:
+            vhtml += ("<h3>" + label + "</h3><ul>"
+                      + "".join("<li>&ldquo;" + e(x) + "&rdquo;</li>" for x in items) + "</ul>")
+    voice_section = ""
+    if vhtml:
+        voice_section = (
+            '<section class="r">' + '<p class="r-num">' + SECTION_HEADINGS[5]["n"] + '</p>' + '<h2>' + e(H[5]) + '</h2>'
+            "<p>This is how your buyer says it. If your website doesn't sound like this, they won't "
+            "think it's for them.</p>"
+            '<div class="voice">' + vhtml + '</div></section>')
+
+    fn = first_name.strip().split(" ")[0] if first_name.strip() else ""
+    if fn.islower():                    # they typed "david", the report should say "David"
+        fn = fn.capitalize()
+    fn = e(fn)
+    for_line = ("Here it is, " + fn + ". This is what your market buys on."
+                if fn else "Here it is. This is what your market buys on.")
+    if rec.get("level") == "subniche" and rec.get("parent"):
+        if rec.get("diverges"):
+            for_line += " It's its own market, sitting inside " + e(rec["parent"]) + "."
+        else:
+            for_line += (" It buys the same way as " + e(rec["parent"])
+                         + ", so that's the research you're getting.")
+
+    body = """
+  <div class="rwrap">
+  <p class="r-eyebrow">Your Buying Triggers report is ready</p>
+  <h1 class="r-title">""" + e(shown) + """</h1>
+  <p class="r-for">""" + for_line + """</p>
+
+  <div class="r-base"><b>These are real.</b> We didn't guess them, and we didn't ask an AI what it
+  reckons. AI makes things up when it doesn't know. So we went to what your market has already proven
+  it buys, then got the words your buyers use about their own problem. That's where every trigger below
+  comes from. Your competitors don't have it.</div>
+
+  <section class="r">
+    <p class="r-num">""" + SECTION_HEADINGS[0]["n"] + """</p>
+    <h2>""" + e(H[0]) + """</h2>
+    <p>Nobody buys coaching. They buy what coaching gets them. """ + want_line + """</p>
+    """ + forces + sec_html + ev_html + """
+  </section>
+
+  <section class="r">
+    <p class="r-num">""" + SECTION_HEADINGS[1]["n"] + """</p>
+    <h2>""" + e(H[1]) + """</h2>
+    <p>""" + aw_plain + """</p>
+    """ + lead_html + """
+  </section>
+
+  <section class="r">
+    <p class="r-num">""" + SECTION_HEADINGS[2]["n"] + """</p>
+    <h2>""" + e(H[2]) + """</h2>
+    <p>""" + soph_plain + """</p>
+    """ + imp_html + """
+  </section>
+
+  <section class="r">
+    <p class="r-num">""" + SECTION_HEADINGS[3]["n"] + """</p>
+    <h2>""" + e(H[3]) + """</h2>
+    <dl class="jt">""" + jt + """</dl>
+  </section>
+
+  <section class="r">
+    <p class="r-num">""" + SECTION_HEADINGS[4]["n"] + """</p>
+    <h2>""" + e(H[4]) + """</h2>
+    """ + lev + lev_html + """
+  </section>
+
+  """ + voice_section + """
+
+  <div class="r-next">
+    <h2>Now your website</h2>
+    <p>That's what your buyer responds to. This report says nothing about your own website, because we
+    haven't looked at it. Different job.</p>
+    <p>Put your website in and a second report reads your page the way a potential client reads it. It
+    shows you which of the things above are missing. Half a minute, free, same as this one.</p>
+    <a class="nextbtn" href=\"""" + e(audit_url, quote=True) + """\">Show me what a potential client sees</a>
+  </div>
+
+  <p class="r-foot">Buying Triggers comes from what your market already buys, and from your buyers
+  describing the problem in their own words. Going Beyond The Illusion.</p>
+  </div>
+"""
+    if fragment:
+        return body
+    page = _shell(body, title_suffix="&mdash; " + e(shown))
+    return page.replace("</style>", _REPORT_CSS + "</style>")

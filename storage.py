@@ -102,5 +102,49 @@ def get_audit(domain):
     return dict(row) if row else None
 
 
+def init_leads():
+    """The Buying Triggers opt-in. Kept in our own DB as well as MailerLite, so a lead is never lost
+    to a failed API call, and so we can see which markets coaches actually ask for."""
+    with _connect() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS trigger_leads (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                email       TEXT NOT NULL,
+                first_name  TEXT NOT NULL DEFAULT '',
+                last_name   TEXT NOT NULL DEFAULT '',
+                niche_typed TEXT NOT NULL DEFAULT '',
+                niche_match TEXT NOT NULL DEFAULT '',
+                sent        INTEGER NOT NULL DEFAULT 0,
+                created_at  TEXT NOT NULL
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_trigger_leads_email ON trigger_leads(email)")
+        conn.commit()
+
+
+def save_trigger_lead(email, first_name="", last_name="", niche_typed="", niche_match=""):
+    """One row per submission. Deliberately NOT deduped on email: a coach asking twice, or asking for
+    a second market, is a real signal we want to keep."""
+    now = datetime.utcnow().isoformat()
+    with _connect() as conn:
+        cur = conn.execute(
+            """INSERT INTO trigger_leads
+                   (email, first_name, last_name, niche_typed, niche_match, created_at)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (email, first_name, last_name, niche_typed, niche_match, now),
+        )
+        conn.commit()
+        return cur.lastrowid
+
+
+def trigger_leads(limit=200):
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT * FROM trigger_leads ORDER BY id DESC LIMIT ?", (limit,)
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 # Initialise on import — table exists before any route touches it.
 init_db()
+init_leads()
