@@ -269,8 +269,8 @@
 
 <section class="phase">
   <div class="phase-head"><span class="phase-n">Phase 4</span><h2>Website page</h2></div>
-  <p class="phase-note">The page itself is finished and is the most developed thing in the
-  project. What is left is wiring, not building.</p>
+  <p class="phase-note">Wired. The page itself was already the most developed thing in the project
+  and is untouched; what changed is that it now knows who is arriving.</p>
 
   <div class="task">
     <div class="task-top"><h3>Everything the page does today</h3><span class="chip c-done">built</span></div>
@@ -281,20 +281,33 @@
   </div>
 
   <div class="task">
-    <div class="task-top"><h3>Recognise them from the token</h3><span class="chip c-todo">not started</span></div>
-    <p class="why">Today it asks for first name, last name and email again — the second ask you
-    wanted rid of. The token is already on the link arriving; the page ignores it.</p>
+    <div class="task-top"><h3>Recognise them from the token</h3><span class="chip c-done">built</span></div>
+    <p class="why">A coach arriving on a token sees the website box and nothing else. The three
+    identity boxes are replaced by one hidden field, and <code>/audit</code> looks the coach up
+    rather than trusting what the query string claims they are called. If they gave us a website on
+    the social form, the box is already filled in.</p>
+    <p class="why"><strong>A side effect worth having:</strong> the old form put the coach's email
+    address in the URL on every audit. It no longer travels at all; only the token does.</p>
+    <p class="why"><strong>Two bugs this turned up.</strong> The submit handler read the three
+    identity boxes by id, so removing them made it throw and the form stopped working. And filling
+    the website box from their stored address also started the audit, so simply opening the page
+    meant a live 45-second run before anything rendered. Those are two different things now: the
+    query string asks for an audit, the stored address only fills the box.</p>
   </div>
 
   <div class="task">
-    <div class="task-top"><h3>Tie the audit to the lead</h3><span class="chip c-todo">not started</span></div>
-    <p class="why">Audits are stored by domain. A coach's audit and their lead record have no
-    connection, so nothing downstream can say "this person did all three steps".</p>
+    <div class="task-top"><h3>Tie the audit to the lead</h3><span class="chip c-done">built</span></div>
+    <p class="why">A finished audit stamps the lead's website step and stores the domain against
+    them, and the saved audit row now carries the name and email resolved from the token. Proved on
+    a real 45-second run: the audit row came back with a name and an address that were nowhere in
+    the request.</p>
   </div>
 
   <div class="task">
-    <div class="task-top"><h3>Send them on with the token</h3><span class="chip c-todo">not started</span></div>
-    <p class="why">The closing button goes to the sales page. It needs to carry who they are.</p>
+    <div class="task-top"><h3>Send them on with the token</h3><span class="chip c-done">built</span></div>
+    <p class="why">The report's closing button carries the token alongside the domain, as does the
+    sales page link sent to MailerLite. The domain finds the audit; it never finds the person, their
+    market or their profile. A cold visitor's button is unchanged.</p>
   </div>
 </section>
 

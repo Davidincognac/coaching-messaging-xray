@@ -498,9 +498,7 @@ PAGE = """<!doctype html><html lang="en"><head>
     </div>
   </div>
   <form method="get" action="/" id="auditform">
-    <input type="text" name="first_name" id="firstnameinput" placeholder="Your first name" autocomplete="given-name" autofocus>
-    <input type="text" name="last_name" id="lastnameinput" placeholder="Your last name" autocomplete="family-name">
-    <input type="email" name="email" id="emailinput" placeholder="Your best email address" autocomplete="email">
+    {identity}
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a potential client sees</button>
   </form>
@@ -586,10 +584,14 @@ document.addEventListener('DOMContentLoaded',function(){
   }
 
   form.addEventListener('submit',function(e){
-    var url=document.getElementById('urlinput').value.trim();
-    var fn=document.getElementById('firstnameinput').value.trim();
-    var ln=document.getElementById('lastnameinput').value.trim();
-    var em=document.getElementById('emailinput').value.trim();
+    function val(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+    var url=val('urlinput');
+    // A coach who came through the funnel has no name, surname or email box on the page, only a
+    // hidden token. Reading a missing box directly threw, and the whole form stopped working.
+    var fn=val('firstnameinput');
+    var ln=val('lastnameinput');
+    var em=val('emailinput');
+    var lead=val('leadinput');
     if(!url) return;
     e.preventDefault();
     if(busy) return;
@@ -615,6 +617,8 @@ document.addEventListener('DOMContentLoaded',function(){
     if(fn) qs+='&first_name='+encodeURIComponent(fn);
     if(ln) qs+='&last_name='+encodeURIComponent(ln);
     if(em) qs+='&email='+encodeURIComponent(em);
+    // The token instead of their details. Their email never goes in a URL.
+    if(lead) qs+='&lead='+encodeURIComponent(lead);
 
     var t0=Date.now();
     fetch('/audit?'+qs+'&_t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
@@ -896,7 +900,7 @@ FIXES_CAVEAT = (
 )
 
 
-def render_result(res, first_name=""):
+def render_result(res, first_name="", lead_token=""):
     if not res.get("ok"):
         return f'<div class="card"><p class="err">{html.escape(res.get("error",""))}</p></div>'
     if res.get("status") == "dead":
@@ -966,6 +970,10 @@ def render_result(res, first_name=""):
     # look the full record up — no other parameters needed.
     _offer_href = ("/salespage?domain=" + _url_quote(res.get("domain", ""), safe="")
                    if res.get("domain") else "/salespage")
+    # And the token, when we have one. The domain alone loses the thread for a coach who came
+    # through the funnel: it finds the audit, but not the person, their market or their profile.
+    if lead_token:
+        _offer_href += ("&" if "?" in _offer_href else "?") + "lead=" + _url_quote(lead_token, safe="")
 
     # scope: make it unmistakable we looked at the homepage only, + date
     scope = (f'<div class="scope">{html.escape(res["scope_note"])} '
@@ -2604,6 +2612,28 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 _HEAD = PAGE.split('<div class="hero-band"><div class="wrap">', 1)[0].replace("{{", "{").replace("}}", "}")
 
 
+IDENTITY_FIELDS = (
+    '<input type="text" name="first_name" id="firstnameinput" placeholder="Your first name" '
+    'autocomplete="given-name" autofocus>\n'
+    '    <input type="text" name="last_name" id="lastnameinput" placeholder="Your last name" '
+    'autocomplete="family-name">\n'
+    '    <input type="email" name="email" id="emailinput" placeholder="Your best email address" '
+    'autocomplete="email">')
+
+
+def identity_block(lead):
+    """The three identity boxes, or nothing but a token.
+
+    A coach who came through the triggers page already gave us all three, and asking again is the
+    exact thing the token exists to stop. The token also keeps their email out of the query string,
+    which the three boxes did not: /audit used to be called with the address sitting in the URL.
+    """
+    if not lead:
+        return IDENTITY_FIELDS
+    return ('<input type="hidden" name="lead" id="leadinput" value="'
+            + html.escape(lead.get("token", "") or "", quote=True) + '">')
+
+
 def inner_page(result, eyebrow=""):
     """A page in the funnel after the first one. Same styling, no second ask for identity."""
     brow = f'<div class="eyebrow">{eyebrow}</div>' if eyebrow else ""
@@ -2858,7 +2888,7 @@ class Handler(BaseHTTPRequestHandler):
             if row.get("screenshot_path"):
                 res["thumbnail"] = row["screenshot_path"]
             frag = render_result(res, first_name=usable_name(row.get("first_name", "")))
-            page = PAGE.format(url_value="", result=frag,
+            page = PAGE.format(url_value="", result=frag, identity=IDENTITY_FIELDS,
                                count=f"{websites_read_count():,}", mascot=mascot_img())
             self._send(page.replace("<!--PROGRESS-->", ""))
             return
@@ -3011,6 +3041,13 @@ class Handler(BaseHTTPRequestHandler):
             first_name = (qs.get("first_name", [""])[0]).strip()
             last_name = (qs.get("last_name", [""])[0]).strip()
             email = (qs.get("email", [""])[0]).strip()
+            # With a token we look the coach up rather than trusting what the query string says
+            # they are called. It also means the address never has to travel in the URL.
+            lead = get_trigger_lead((qs.get("lead", [""])[0]).strip())
+            if lead:
+                first_name = lead.get("first_name", "") or first_name
+                last_name  = lead.get("last_name", "") or last_name
+                email      = lead.get("email", "") or email
             res = audit_url(url) if url else {}
             shot_path = ""
             if url and res.get("ok") and res.get("status") == "ok":
@@ -3025,7 +3062,8 @@ class Handler(BaseHTTPRequestHandler):
                     shot_path = _save_screenshot(_shot_key)
                 if not res.get("thumbnail") and shot_path:
                     res["thumbnail"] = shot_path
-            frag = render_result(res, first_name=first_name) if url else ""
+            frag = (render_result(res, first_name=first_name,
+                                  lead_token=(lead or {}).get("token", "")) if url else "")
             # Subpage audits are never SAVED: the DB record for a domain is its homepage audit (the
             # salespage and email funnel key off it), and a subpage result must not overwrite that.
             if url and res.get("ok") and res.get("status") == "ok" and res.get("is_home", True):
@@ -3045,7 +3083,16 @@ class Handler(BaseHTTPRequestHandler):
                     screenshot_path=shot_path,
                     raw_json=_json.dumps(storable),
                 )
+                # Tie the finished audit to the coach, so the sales page and any later email
+                # know this is the same person who read their triggers and their profile.
+                if lead:
+                    update_trigger_lead(lead["token"], website=res.get("domain", url))
+                    mark_step(lead["token"], "website")
+                # The token rides along to the sales page. Today that page still keys off the
+                # domain, so both go, and the token is there for when it stops needing the domain.
                 salespage_url = f"{APP_BASE_URL}/salespage?domain={res.get('domain', url)}"
+                if lead:
+                    salespage_url += f"&lead={_url_quote(lead['token'], safe='')}"
                 threading.Thread(
                     target=_push_mailerlite,
                     args=(
@@ -3062,7 +3109,15 @@ class Handler(BaseHTTPRequestHandler):
         if path not in ("/", ""):
             self.send_response(404); self.end_headers(); return
         qs = parse_qs(parsed.query)
+        # A coach arriving from the social page carries a token. We already hold their name, their
+        # email and, if they filled it in, their website, so none of it gets asked for again.
+        lead = get_trigger_lead((qs.get("lead", [""])[0]).strip())
         url = (qs.get("url", [""])[0]).strip()
+        # Two different things, and merging them cost a coach thirty seconds of blank screen.
+        # `url` is an instruction to go and audit a site, and only ever comes from the query
+        # string. `prefill` is just what sits in the box, so a coach who already told us their
+        # address on the social form does not type it twice. Filling the box must not start a run.
+        prefill = url or ((lead.get("website") or "").strip() if lead else "")
         result_html = ""
         if url:
             res = audit_url(url)
@@ -3072,8 +3127,12 @@ class Handler(BaseHTTPRequestHandler):
                 _sp = _save_screenshot(res.get("page_display") or res.get("domain", url))
                 if _sp:
                     res["thumbnail"] = _sp
-            result_html = render_result(res, first_name=(qs.get("first_name", [""])[0]).strip())
-        page = PAGE.format(url_value=html.escape(url, quote=True), result=result_html,
+            result_html = render_result(
+                res,
+                first_name=(lead or {}).get("first_name", "") or (qs.get("first_name", [""])[0]).strip(),
+                lead_token=(lead or {}).get("token", ""))
+        page = PAGE.format(url_value=html.escape(prefill, quote=True), result=result_html,
+                           identity=identity_block(lead),
                            count=f"{websites_read_count():,}", mascot=mascot_img())
         self._send(page.replace("<!--PROGRESS-->", PROGRESS_UI))
 
