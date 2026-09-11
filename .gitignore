@@ -11,3 +11,7 @@ analysed_domains.txt
 analysed_domains.txt.bak
 .DS_Store
 pipeline.db
+
+# Coaches' uploaded banners. Their material, not ours, and never in the repo.
+uploads/
+*.webp

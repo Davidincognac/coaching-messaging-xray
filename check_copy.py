@@ -20,12 +20,40 @@ from clean_banned import protected_phrases
 
 SAMPLE = 60
 
+# The Poole house style blocklist, from ~/Documents/claude/poole-house-style.md. Banned JOBS, not
+# banned words: each of these is almost always doing Pattern A (physical verb on an abstract noun),
+# Pattern B (signposting that a line matters instead of writing one that does), or Pattern C (a mood
+# word bolted to an abstraction). If one is ever genuinely doing work, keep it and exempt it here.
+HOUSE_PHRASES = [
+    "that matters", "in today's fast-moving world", "in today's fast-paced world",
+    "at the end of the day", "the bottom line is", "let that sink in", "read that again",
+    "here's the thing", "the truth is", "the reality is", "this is where the magic happens",
+    "game-changer", "unlock your potential", "lean into", "embrace the journey",
+    "show up as your best self", "step into your power", "create meaningful impact",
+    "make an impact", "drive meaningful change", "move the needle", "foster a culture of",
+    "create space for", "lead with intention", "lead with empathy", "lead with authenticity",
+    "bring your whole self", "it starts with you", "it all starts with", "the key is",
+    "the secret is", "the future belongs to", "now more than ever",
+    "we need to shift the conversation", "reframe the way we think about",
+    "challenge the status quo", "think outside the box", "a powerful reminder",
+    "a gentle reminder", "food for thought", "pause and reflect", "ask yourself",
+    "you're too close to it", "shallow end", "quantum leap", "vibrational alignment",
+    "holding space", "in conclusion",
+]
+HOUSE_WORDS = [
+    "delve", "leverage", "robust", "navigate", "unlock", "elevate", "harness", "foster",
+    "realm", "tapestry", "testament", "furthermore", "moreover", "additionally", "ultimately",
+    "drift", "rescue", "intake", "third-party", "credentials", "resource", "capture",
+    "holistic", "curious",
+]
+
 # Words and marks David has banned outright.
 BANNED_WORDS = [
     "land", "lands", "landed", "quietly", "the gap", "drift", "drifts", "drifted", "rescue",
     "delve", "leverage", "robust", "navigate", "unlock", "elevate", "harness", "foster", "realm",
     "tapestry", "testament", "furthermore", "moreover", "additionally", "ultimately",
     "in today's world", "guessing", "—", "matter", "matters", "mattered",
+] + HOUSE_WORDS + [
 ]
 
 # A banned word is banned in ONE sense. "foster care" is the literal thing a market is named after,
@@ -72,7 +100,9 @@ BANNED_SHAPES = [
     (r"\bsits? (under|beneath|underneath) (this|that|those|it)\b", "abstract picture"),
     (r"\bunder (that|this) (is|sits|lies)\b", "abstract picture"),
     (r"\bon (a|the) deeper level\b|\bat a deeper level\b", "abstract"),
-    (r"\bspeaks? to (them|their)\b", "vague. Say what it actually does"),
+    # Only the abstract sense. "Someone who speaks to them like a normal person" is a person
+    # speaking, which is concrete and fine.
+    (r"\bspeaks? to (them|their)\b(?! like)", "vague. Say what it actually does"),
     (r"\bresonates?\b", "jargon a coach would not say out loud"),
 ]
 
@@ -89,6 +119,13 @@ ADVICE = [
     (r"you need to (explain|show|say|write|name)", "instruction to the coach"),
     (r"name the.{0,20}first", "instruction to the coach"),
 ]
+
+# Kept for reference only. US spellings are fine, so nothing checks this any more.
+AMERICAN = re.compile(
+    r"\b(judgment|apologiz\w+|recogniz\w+|behavior\w*|realiz\w+|organiz\w+|prioritiz\w+|"
+    r"minimiz\w+|maximiz\w+|normaliz\w+|analyz\w+|paralyz\w+|fulfill\w*|skillful|labeled|"
+    r"canceled|practicing|traveling|colors?|favorite|favor|honor|centere?d?|defense|offense)\b",
+    re.I)
 
 # Full-form negatives. His style file says contractions always.
 FORMAL = re.compile(
@@ -131,7 +168,15 @@ def text_of(page_html):
     allowed to say "I cannot find anyone appropriate there." Policing their grammar would be both
     wrong and pointless, since we would have to change the quote to fix it.
     """
-    stripped = re.sub(r"<script.*?</script>", " ", page_html, flags=re.S)
+    # HTML comments are notes from us to us. They ship inside the page but no coach ever reads
+    # them, and treating a comment that explains a CSS decision as copy is how the checker starts
+    # crying wolf about words that are not on the screen.
+    stripped = re.sub(r"<!--.*?-->", " ", page_html, flags=re.S)
+    stripped = re.sub(r"<script.*?</script>", " ", stripped, flags=re.S)
+    # Same for the stylesheet. A CSS comment explaining why four headings share one size is a note
+    # to whoever edits the CSS next, not a sentence anybody reads, and leaving it in the haystack
+    # means the checker reports words that are nowhere on the screen.
+    stripped = re.sub(r"<style.*?</style>", " ", stripped, flags=re.S)
     stripped = re.sub(r'<div class="voice">.*?</div>\s*</section>', " ", stripped, flags=re.S)
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", stripped)))
 
@@ -157,6 +202,10 @@ def check(label, page_html, hits):
         m = re.search(pat, txt, re.I)
         if m:
             hits.append((label, f"{why}: {m.group(0)!r}"))
+    for phrase in HOUSE_PHRASES:
+        i = low.find(phrase)
+        if i >= 0 and not _inside_their_words(low, i, i + len(phrase)):
+            hits.append((label, f"house style: {phrase!r}"))
     m = FORMAL.search(txt)
     if m:
         hits.append((label, f"no contraction: {m.group(0)!r}"))

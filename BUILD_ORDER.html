@@ -1,0 +1,457 @@
+<title>Triggers to Sale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --ground:#FBFAF7;
+    --panel:#FFFFFF;
+    --edge:#E4E0D6;
+    --ink:#1B1F27;
+    --body:#3D4450;
+    --dim:#767D8B;
+    --gold:#9A7716;
+    --gold-soft:#F3EAD2;
+    --done:#2F6B4F;
+    --done-soft:#E2EFE7;
+    --open:#8A4B22;
+    --open-soft:#F7E9DE;
+    --stop:#96322F;
+    --stop-soft:#FAE4E2;
+    --display:'Fraunces',Georgia,serif;
+    --text:'Source Sans 3',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#14171E; --panel:#1B1F28; --edge:#2C323E;
+      --ink:#F2F0EA; --body:#C3C8D2; --dim:#868D9B;
+      --gold:#D6B45C; --gold-soft:#332C16;
+      --done:#7FC29E; --done-soft:#1B2E25;
+      --open:#E0A171; --open-soft:#33231A;
+      --stop:#E28C88; --stop-soft:#331E1D;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#14171E; --panel:#1B1F28; --edge:#2C323E;
+    --ink:#F2F0EA; --body:#C3C8D2; --dim:#868D9B;
+    --gold:#D6B45C; --gold-soft:#332C16;
+    --done:#7FC29E; --done-soft:#1B2E25;
+    --open:#E0A171; --open-soft:#33231A;
+    --stop:#E28C88; --stop-soft:#331E1D;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--body);
+    font-family:var(--text); font-size:17px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:56px 24px 96px}
+
+  header{border-bottom:2px solid var(--ink); padding-bottom:22px; margin-bottom:8px}
+  .kicker{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 10px}
+  h1{font-family:var(--display); font-size:clamp(34px,6vw,52px); line-height:1.04;
+    letter-spacing:-.02em; color:var(--ink); margin:0 0 12px; font-weight:600; text-wrap:balance}
+  .standfirst{font-size:19px; color:var(--body); margin:0; max-width:60ch}
+
+  .legend{display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 0}
+  .chip{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    padding:4px 9px; border-radius:3px; font-weight:500}
+  .c-done{background:var(--done-soft); color:var(--done)}
+  .c-part{background:var(--open-soft); color:var(--open)}
+  .c-todo{background:var(--stop-soft); color:var(--stop)}
+  .c-ask{background:var(--gold-soft); color:var(--gold)}
+
+  .phase{margin:52px 0 0}
+  .phase-head{display:flex; align-items:baseline; gap:14px; margin:0 0 6px}
+  .phase-n{font-family:var(--mono); font-size:13px; font-weight:500; color:var(--gold);
+    border:1px solid var(--edge); border-radius:3px; padding:2px 8px; flex:0 0 auto}
+  h2{font-family:var(--display); font-size:27px; font-weight:600; color:var(--ink);
+    margin:0; letter-spacing:-.01em; line-height:1.2}
+  .phase-note{font-size:15px; color:var(--dim); margin:0 0 20px; max-width:62ch}
+
+  .task{background:var(--panel); border:1px solid var(--edge); border-radius:5px;
+    padding:16px 18px; margin:0 0 10px}
+  .task-top{display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap}
+  .task h3{font-family:var(--text); font-size:17px; font-weight:600; color:var(--ink);
+    margin:0; flex:1 1 260px; line-height:1.35}
+  .why{font-size:15.5px; color:var(--body); margin:9px 0 0; max-width:64ch}
+  .why:first-of-type{margin-top:10px}
+  code{font-family:var(--mono); font-size:.88em; background:var(--gold-soft); color:var(--gold);
+    padding:1px 5px; border-radius:3px; word-break:break-word}
+
+  .flow{border:1px solid var(--edge); border-radius:5px; overflow:hidden; margin:26px 0 0}
+  .flow table{border-collapse:collapse; width:100%; font-size:15.5px}
+  .flow th{font-family:var(--mono); font-size:11px; letter-spacing:.07em; text-transform:uppercase;
+    text-align:left; color:var(--dim); font-weight:500; padding:11px 14px;
+    background:var(--ground); border-bottom:1px solid var(--edge)}
+  .flow td{padding:12px 14px; border-bottom:1px solid var(--edge); vertical-align:top;
+    color:var(--body)}
+  .flow tr:last-child td{border-bottom:0}
+  .flow td:first-child{font-family:var(--mono); font-size:13.5px; color:var(--ink); white-space:nowrap}
+  .scroller{overflow-x:auto}
+
+  .callout{border-left:3px solid var(--gold); background:var(--gold-soft);
+    padding:14px 18px; margin:26px 0 0; border-radius:0 5px 5px 0}
+  .callout p{margin:0; color:var(--ink); font-size:16px}
+  .callout p + p{margin-top:9px}
+
+  footer{margin:64px 0 0; padding-top:20px; border-top:1px solid var(--edge);
+    font-size:14.5px; color:var(--dim)}
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="kicker">Going Beyond The Illusion &middot; build order</p>
+  <h1>Triggers to Sale</h1>
+  <p class="standfirst">Four pages, one identity carried the whole way, and one ask for a name.
+  Three of the four are built. Status below is what is true in the code today, not what is
+  planned.</p>
+  <div class="legend">
+    <span class="chip c-done">built</span>
+    <span class="chip c-part">partly built</span>
+    <span class="chip c-todo">not started</span>
+    <span class="chip c-ask">needs your decision</span>
+  </div>
+</header>
+
+<div class="flow scroller">
+  <table>
+    <thead><tr><th>Page</th><th>Asks for</th><th>Carries in</th><th>Sends them to</th></tr></thead>
+    <tbody>
+      <tr><td>/triggers</td><td>name, email, niche</td><td>nothing</td><td>Social</td></tr>
+      <tr><td>/social</td><td>banner, bio, last post, website (optional)</td><td>token</td><td>Website <em>or</em> Sales</td></tr>
+      <tr><td>/ Website</td><td>website address</td><td>token</td><td>Sales</td></tr>
+      <tr><td>/salespage</td><td>nothing</td><td>token</td><td>checkout</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="callout">
+  <p><strong>The rule underneath all of it:</strong> we ask for a name and an email exactly once, on
+  the triggers page. Every page after that recognises the coach from the token in the link.</p>
+  <p>A coach can still land cold on any page. Those pages ask for identity; the ones reached by
+  token never do.</p>
+</div>
+
+<!-- ─────────────────────────────────────────────── -->
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-n">Phase 1</span><h2>Foundations</h2></div>
+  <p class="phase-note">Settled. Nothing here blocks the social page any more.</p>
+
+  <div class="task">
+    <div class="task-top"><h3>One visual language, decided</h3><span class="chip c-part">partly built</span></div>
+    <p class="why"><strong>The ground tells them whose page it is.</strong> Dark navy when we are
+    talking: the triggers report and the sales page. Light when we are showing them their own
+    material: the social report and the website report. Dark, light, light, dark.</p>
+    <p class="why">Type is already uniform. Both pages use Inter and SourceSerif, so what is left is
+    the ground and one shared set of components: cards, quote blocks, scored bars, section headers.
+    The audit already has most of them.</p>
+    <p class="why">There is a practical reason as well as a felt one. A website screenshot and a
+    photograph of a person are light objects and sit badly on navy, which is why the audit already
+    puts them on light cards inside a dark shell.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Extend the leads table</h3><span class="chip c-done">built</span></div>
+    <p class="why">Seven columns added: the banner path, the bio, the last post, the website, and a
+    timestamp for each step a coach finishes. Added by migration, so the leads already in there kept
+    their place. <code>update_trigger_lead()</code> only ever adds and ignores an unknown column, so
+    a typo cannot corrupt a row, and <code>mark_step()</code> stamps social, website or sales.</p>
+    <p class="why">This is what lets the sales page know what evidence it holds, and what makes
+    drop-off visible in phase 6.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Where uploaded images live</h3><span class="chip c-done">built</span></div>
+    <p class="why"><code>storage.UPLOADS_DIR</code> follows the same rule as the database: Render's
+    persistent disk when deployed there, the project directory locally, and a loud warning with a
+    fallback if the disk is missing. Without it every banner a coach uploads would vanish at the
+    next deploy.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────── -->
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-n">Phase 2</span><h2>Triggers page</h2></div>
+  <p class="phase-note">Built and committed. Two small changes, both of which point at the social
+  page, so they wait until it exists. Writing a button to a page that is not there, or a promise
+  about a page we would be guessing at, is the fault this whole session was spent removing.</p>
+
+  <div class="task">
+    <div class="task-top"><h3>Point the closing button at the social page</h3>
+      <span class="chip c-done">built</span></div>
+    <p class="why">It currently sends them to the website audit. The token is already on the link,
+    so this is a change of destination, not of plumbing.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Rewrite the invitation</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Not "advice" — the page gives them their own material back and four questions.
+    Something true and soft: <em>see what a stranger sees</em>.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────── -->
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-n">Phase 3</span><h2>Social page</h2></div>
+  <p class="phase-note">Built. The form, the upload, the token, the report and both exits all run,
+  and the chain from the triggers page through to the exits has been followed end to end.</p>
+
+  <div class="task">
+    <div class="task-top"><h3>File upload</h3><span class="chip c-done">built</span></div>
+    <p class="why">The app's form handler reads plain text only, capped at 64KB. Accepting an image
+    means multipart parsing, a size cap, and checking the file really is an image rather than
+    trusting what it claims to be. This is the one genuinely new piece of engineering and the one
+    real security surface.</p>
+    <p class="why"><strong>Done:</strong> <code>banner_image.py</code> takes the raw bytes and hands
+    back something safe to store. It rejects anything that is not an image, caps the upload at 10MB,
+    applies the rotation a phone records so a sideways photo comes out the right way up, and drops
+    all EXIF, which matters because a phone photo can carry the location it was taken at. Filenames
+    come from the lead token, so one coach cannot overwrite another's. A <code>/uploads/</code> route
+    serves them back, and it only serves files matching the names we write. Tested against nine real
+    coach banners plus empty files, oversized files, a PDF, an HTML page renamed to .png, and path
+    traversal in the token.</p>
+    <p class="why"><strong>Settled:</strong> stored as WebP quality 80, longest edge 1600px. Those
+    nine banners went from 14.7MB to 584KB, about thirty times smaller, worst single file 165KB.
+    WebP beat JPEG roughly two to one on every one. Checked by eye at magnification on the hardest
+    cases, fine gold linework on dark purple, a serif over a pink gradient, condensed caps with a
+    tiny trademark symbol, and a sunset photo. No visible difference from the original. 1600 rather
+    than 1400 because a phone upload arrives portrait, and it is the width that carries the text.</p>
+    <p class="why"><strong>The parsing, now done:</strong> Python 3.13 removed
+    <code>cgi.FieldStorage</code>, so <code>multipart.py</code> is our own, with a cap on every axis
+    a stranger controls: body size refused on Content-Length before a byte is allocated, part count,
+    per-part header size, per-field size, one file only. Repeated field names keep the first value,
+    so nothing can be smuggled past a check that only read one. 39 adversarial tests in
+    <code>test_multipart.py</code>.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>The form</h3><span class="chip c-done">built</span></div>
+    <p class="why">Banner, bio, last post, and the website as an optional fourth. No name, no email,
+    no platform. At least one field filled, and the page survives every combination.</p>
+    <p class="why"><strong>Decide:</strong> this list had the website as a separate step and you
+    later floated putting it on the same page as an optional field. It is built the second way, with
+    the two exits kept for anyone who leaves it blank, so both readings work. Say if you want it off
+    the form.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Recognise them from the token</h3><span class="chip c-done">built</span></div>
+    <p class="why">Greets them by name, knows their market, asks for nothing they have already
+    given. A coach arriving with no token goes back to the triggers page rather than leaving us an
+    orphan row and an uploaded file belonging to nobody. Someone returning to the link after they
+    have filled it in gets their report back, not a blank form again.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Two exits, weighted</h3><span class="chip c-done">built</span></div>
+    <p class="why">Website assessment or straight to the sales page. The website route is the one
+    where the sale is easiest, because it ends in a real score against 11,011 sites — so it should be
+    the obvious choice, with the direct route there for the coach who has no website.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>The report itself</h3><span class="chip c-done">built</span></div>
+    <p class="why">Banner, bio and opening line fed back, then the four questions. Built in the
+    audit's own components, and every input combination is tested.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────── -->
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-n">Phase 4</span><h2>Website page</h2></div>
+  <p class="phase-note">The page itself is finished and is the most developed thing in the
+  project. What is left is wiring, not building.</p>
+
+  <div class="task">
+    <div class="task-top"><h3>Everything the page does today</h3><span class="chip c-done">built</span></div>
+    <p class="why">A 2,527-line scoring engine, a 942-line report renderer, and a 143-line rulebook
+    that defines how every criterion is judged. Screenshot, headline read back, eight scored
+    criteria against 11,011 sites, the section on whose words they are using, the deep dive and the
+    summary. Untouched by any of this work and not to be redesigned.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Recognise them from the token</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Today it asks for first name, last name and email again — the second ask you
+    wanted rid of. The token is already on the link arriving; the page ignores it.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Tie the audit to the lead</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Audits are stored by domain. A coach's audit and their lead record have no
+    connection, so nothing downstream can say "this person did all three steps".</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Send them on with the token</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">The closing button goes to the sales page. It needs to carry who they are.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────── -->
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-n">Phase 5</span><h2>Sales page</h2></div>
+  <p class="phase-note">756 lines of finished sales copy, personalised from the coach's own audit.
+  The work here is making it survive a coach who has no website, not rewriting it.</p>
+
+  <div class="task">
+    <div class="task-top"><h3>Everything the page does today</h3><span class="chip c-done">built</span></div>
+    <p class="why">Seven sections built around their own record: their score, their headline, their
+    screenshot, the four-part diagnosis, the false beliefs, the reveal and the checkout. Already
+    reskinned once and copy-reviewed. One page that adapts, rather than two versions that drift.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Recognise the token, not just a domain</h3>
+      <span class="chip c-todo">not started</span></div>
+    <p class="why">It identifies people only by their website domain. A coach with no website has no
+    domain, so today the page cannot greet them, cannot show a score, and cannot show any of their
+    own evidence. This is what breaks the shortcut from the social page.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Gate every section on the evidence held</h3>
+      <span class="chip c-todo">not started</span></div>
+    <p class="why">Score, screenshot and headline appear only for a coach who gave a website.
+    Everyone gets the argument built on their triggers. No section ever renders with a hole in it,
+    and nothing claims evidence we do not have.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Use the triggers, do not repeat them</h3>
+      <span class="chip c-todo">not started</span></div>
+    <p class="why">They have already read them and already accepted them. The argument is the
+    distance between what their market buys on and what their page scored. Re-explaining the
+    triggers re-sells something already agreed, which weakens it.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────── -->
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-n">Phase 6</span><h2>Across every page</h2></div>
+  <p class="phase-note">The things that go wrong quietly, and only show up with a real coach's data.</p>
+
+  <div class="task">
+    <div class="task-top"><h3>Run the copy checker on every new page</h3>
+      <span class="chip c-part">partly built</span></div>
+    <p class="why"><code>check_copy.py</code> renders the real pages and fails on banned words,
+    missing contractions, advice aimed at the coach, dead links, empty sections and unrendered
+    template text. It needs pointing at the social and sales pages as they are built.</p>
+    <p class="why">Now carries the full house style blocklist as well: the fancy register, the
+    buzzwords, and the shapes. It flags a banned JOB rather than a banned word, and the market's own
+    language is masked before anything is tested, so a coach's own vocabulary is never touched.</p>
+    <p class="why"><strong>The social pages are covered now</strong>, in both their states, empty
+    form and filled-in report. Running it found one real contraction miss in copy a coach reads, and
+    two faults in the checker itself: it was treating the stylesheet and our own HTML comments as
+    copy, so it reported words that are nowhere on the screen.</p>
+    <p class="why"><strong>Still uncovered:</strong> the sales page, and <code>/combined</code> in
+    its three shapes. Worth knowing while you are there: the sales page has two
+    <em>&ldquo;this is not about&rdquo;</em> constructions that break the contractions rule. They are
+    deliberate-looking emphasis in copy you have already signed off, so they are flagged rather than
+    changed.</p>
+    <p class="why"><strong>Settled:</strong> US spellings are fine. The checker no longer flags them
+    and the cleaner no longer rewrites them. The list stays in <code>clean_banned.py</code> as a
+    comment, one line to switch back.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Hunt the claim-without-checking bug on every page</h3>
+      <span class="chip c-todo">not started</span></div>
+    <p class="why">Four of the five bugs found today were the same fault: copy asserting something
+    without checking it was true of that coach. We trimmed your post when we had not. Read your
+    banner when there was no banner. Section 5 of 5 with one section on the page. Every new page
+    needs testing against a coach who gave the bare minimum.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Mobile</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">A pasted bio, a wide banner and a long post are all things that break a narrow
+    screen. Check nothing scrolls sideways.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Delete uploaded photos after 30 days</h3>
+      <span class="chip c-todo">not started</span></div>
+    <p class="why">Long enough that a coach coming back at the weekend finds their report whole,
+    short enough that you are not warehousing photographs of people. Storage is not the reason: a
+    banner is about 2MB, so a thousand coaches is 2GB.</p>
+    <p class="why">A sweep when the app starts, plus a check whenever a social report renders. No
+    scheduler to forget. What happens afterwards is already built and tested, because the social
+    section survives a missing banner and simply stops mentioning one.</p>
+    <p class="why">One line under the upload field, as a fact rather than a warning: <em>we keep your
+    screenshot for 30 days so you can come back to this report, then we delete it.</em> The report
+    itself is kept, because it is a few kilobytes and it is the thing that sells.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>See where people drop out</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Recording which steps each token completed costs almost nothing once the leads
+    table is extended, and it is the only way to know whether the social page earns its place.</p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────── -->
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-n">Phase 7</span><h2>Email</h2></div>
+  <p class="phase-note">Deliberately last. Nothing in the app sends email today, and no page
+  promises one.</p>
+
+  <div class="task">
+    <div class="task-top"><h3>Decide what actually sends</h3><span class="chip c-ask">needs your decision</span></div>
+    <p class="why">The reports appear on screen, so email is not delivery. It is for the coach who
+    leaves halfway and the one who wants their report back later.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Send the report link</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Every report already has a permanent link with the token in it. Mailing that is
+    the cheapest useful email you can send, and it is the one that brings people back.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Pick up the ones who stopped</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Read the triggers and went no further. Did the social page and never came back
+    for the website. Different messages, and both need the step-tracking from phase 6.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Markets we do not hold</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Twelve markets are held back on purpose, and anything unrecognised gets an honest
+    "we have not read this yet". Those coaches are still captured with what they typed. They are
+    told they will hear either way, so somebody has to close that loop.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>The photo deletion note</h3><span class="chip c-todo">not started</span></div>
+    <p class="why">Thirty days after they upload, their screenshot comes off the disk. Worth one
+    short email saying so, with their report link, because the link keeps working afterwards.</p>
+    <p class="why">Say it as housekeeping, not as a deadline to act on. Your house style rules out
+    fake scarcity, and a real deletion used as a lever still reads like one.</p>
+  </div>
+
+  <div class="task">
+    <div class="task-top"><h3>Tidy the MailerLite fields</h3><span class="chip c-part">partly built</span></div>
+    <p class="why">Two different pushes exist with different fields. Worth one shape that covers the
+    whole journey rather than two that half overlap.</p>
+  </div>
+</section>
+
+<footer>
+  Status verified against the code on 10 September 2026. Where something says built, it is built and
+  tested. Where it says partly built, the piece exists but is not wired into this flow.
+</footer>
+
+</div>

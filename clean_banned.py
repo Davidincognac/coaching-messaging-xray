@@ -51,6 +51,42 @@ RULES = [
     (r"\bunlock\b", "open up"), (r"\belevate\b", "lift"), (r"\bleverage\b", "use"),
     (r"\brobust\b", "solid"), (r"\bharness\b", "use"), (r"\bdelve into\b", "dig into"),
     (r"\brescue\b", "fix"), (r"\bat the end of the day,?\s*", ""),
+    # House style: "credentials" is on the blocklist and David's standing swap is "badges".
+    (r"\bcredentials\b", "badges"), (r"\bcredential\b", "badge"),
+    (r"\bthird-party\b", "other people's"), (r"\bintake\b", "what they tell us"),
+    (r"\bhere's the thing[,.]?\s*", ""), (r"\bthe truth is[,.]?\s*", ""),
+    (r"\bthe reality is[,.]?\s*", ""), (r"\blet that sink in[.]?\s*", ""),
+    (r"\bmove the needle\b", "change anything"), (r"\blean into\b", "go towards"),
+    (r"\bgame-changer\b", "the thing that changes it"),
+    (r"\bfeels like guessing\b", "feels made up"), (r"\blike guessing\b", "like it was made up"),
+    (r"\bevery resource\b", "everything"), (r"\bresources\b", "guides"), (r"\bresource\b", "guide"),
+    (r"\bat a deeper level than\b", "better than"), (r"\bat a deeper level\b", "underneath it"),
+    (r"\bon a deeper level\b", "underneath it"),
+]
+
+# British spelling. This is a British business writing to British and international coaches, and the
+# research came back with 137 American spellings that nothing was checking for.
+BRITISH = [
+    ("judgment", "judgement"), ("apologize", "apologise"), ("apologized", "apologised"),
+    ("apologizing", "apologising"), ("recognize", "recognise"), ("recognized", "recognised"),
+    ("recognizing", "recognising"), ("behavior", "behaviour"), ("behaviors", "behaviours"),
+    ("behavioral", "behavioural"), ("realize", "realise"), ("realized", "realised"),
+    ("realizing", "realising"), ("organize", "organise"), ("organized", "organised"),
+    ("organizing", "organising"), ("prioritize", "prioritise"), ("prioritized", "prioritised"),
+    ("minimize", "minimise"), ("maximize", "maximise"), ("normalize", "normalise"),
+    ("normalized", "normalised"), ("analyze", "analyse"), ("analyzed", "analysed"),
+    ("paralyzed", "paralysed"), ("fulfillment", "fulfilment"), ("fulfill", "fulfil"),
+    ("skillful", "skilful"), ("labeled", "labelled"), ("canceled", "cancelled"),
+    ("practicing", "practising"), ("traveling", "travelling"), ("color", "colour"),
+    ("colors", "colours"), ("favorite", "favourite"), ("favor", "favour"), ("honor", "honour"),
+    ("center", "centre"), ("centered", "centred"), ("defense", "defence"), ("offense", "offence"),
+]
+# David has no issue with US spellings, so we no longer rewrite them. The list stays here because
+# turning it back on is one line, and because it documents what the research came back with.
+# RULES += [(r"\b" + us + r"\b", uk) for us, uk in BRITISH] + [
+#     (r"\b" + us.capitalize() + r"\b", uk.capitalize()) for us, uk in BRITISH]
+# The rest of the original rule set, appended after the British list.
+RULES += [
     (r"\bThat's the whole thing\.\s*Under that is\s*", "There's "),
     (r"\bThat's the whole thing\.\s*", ""), (r"\bUnder that is\b", "Underneath it is"),
     (r"\banother layer\b", "another part of it"),

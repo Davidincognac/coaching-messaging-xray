@@ -26,6 +26,27 @@ def _pick_db_path():
 DB_PATH = _pick_db_path()
 
 
+def _pick_uploads_dir():
+    """Where a coach's uploaded banner lives.
+
+    The same rule as the database: Render's persistent disk when we are on Render, the project
+    directory otherwise. Anywhere else and the file is gone at the next deploy.
+    """
+    base = "/var/data" if os.getenv("RENDER") and os.path.isdir("/var/data") else _HERE
+    path = os.path.join(base, "uploads")
+    try:
+        os.makedirs(path, exist_ok=True)
+    except Exception as e:
+        print(f"[storage] WARNING: cannot create {path} ({e}); falling back to the app directory.",
+              flush=True)
+        path = os.path.join(_HERE, "uploads")
+        os.makedirs(path, exist_ok=True)
+    return path
+
+
+UPLOADS_DIR = _pick_uploads_dir()
+
+
 def _connect():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -127,6 +148,21 @@ def init_leads():
             conn.execute("ALTER TABLE trigger_leads ADD COLUMN token TEXT NOT NULL DEFAULT ''")
         conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_trigger_leads_token "
                      "ON trigger_leads(token) WHERE token != ''")
+        # What the coach gave us at each step, and when. Added as the funnel grew, so every one is
+        # an ALTER rather than a rebuild: the rows already in here are real leads.
+        later = {
+            "banner_path":  "TEXT NOT NULL DEFAULT ''",   # their uploaded profile banner
+            "bio":          "TEXT NOT NULL DEFAULT ''",   # pasted, exactly as they wrote it
+            "last_post":    "TEXT NOT NULL DEFAULT ''",   # pasted, exactly as they wrote it
+            "social_at":    "TEXT NOT NULL DEFAULT ''",   # when they finished the social step
+            "website":      "TEXT NOT NULL DEFAULT ''",   # the domain, so the audit ties to the lead
+            "website_at":   "TEXT NOT NULL DEFAULT ''",
+            "sales_at":     "TEXT NOT NULL DEFAULT ''",   # when they reached the sales page
+        }
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(trigger_leads)")}
+        for name, decl in later.items():
+            if name not in cols:
+                conn.execute(f"ALTER TABLE trigger_leads ADD COLUMN {name} {decl}")
         conn.commit()
 
 
@@ -160,6 +196,32 @@ def get_trigger_lead(token):
             "SELECT * FROM trigger_leads WHERE token = ?", (token,)
         ).fetchone()
     return dict(row) if row else None
+
+
+def update_trigger_lead(token, **fields):
+    """Record what a coach gave us at a later step. Only ever adds; never clears what is there.
+
+    Unknown column names are ignored rather than raising, so a caller cannot corrupt the row by
+    passing a typo, and the step timestamps are set here rather than by every caller.
+    """
+    allowed = {"banner_path", "bio", "last_post", "social_at", "website", "website_at", "sales_at"}
+    fields = {k: v for k, v in fields.items() if k in allowed and v not in (None, "")}
+    if not (token and fields):
+        return False
+    sets = ", ".join(f"{k} = ?" for k in fields)
+    with _connect() as conn:
+        cur = conn.execute(f"UPDATE trigger_leads SET {sets} WHERE token = ?",
+                           (*fields.values(), token))
+        conn.commit()
+    return cur.rowcount > 0
+
+
+def mark_step(token, step):
+    """Stamp a step as done. `step` is one of social, website, sales."""
+    column = {"social": "social_at", "website": "website_at", "sales": "sales_at"}.get(step)
+    if not column:
+        return False
+    return update_trigger_lead(token, **{column: datetime.utcnow().isoformat()})
 
 
 def trigger_leads(limit=200):

@@ -31,7 +31,12 @@ from audit import (audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_c
                    PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH)   # market stats: single source of truth in audit.py
 # "1 in 14 speak their buyer's language" => the other 93%. Derived, so the pair can never disagree.
 PCT_NOT_BUYER_VOICE = 100 - round(100 / BUYER_VOICE_1_IN)
-from storage import save_audit, get_audit, save_trigger_lead, get_trigger_lead
+from storage import (save_audit, get_audit, save_trigger_lead, get_trigger_lead,
+                     update_trigger_lead, mark_step, UPLOADS_DIR)
+import multipart as _mp                 # the multipart parser, tested in test_multipart.py
+import banner_image as _banner          # turns an upload into a safe, small WebP
+import social_page as _social           # the form and the two exits
+import social_section, combined_parts   # the report itself, already built and checked
 import triggers as _triggers            # the Buying Triggers page (book + Cashvertising research)
 
 PORT = int(os.getenv("PORT", "8000"))
@@ -152,6 +157,12 @@ PAGE = """<!doctype html><html lang="en"><head>
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}}
   .wrap{{max-width:760px;margin:0 auto;padding:64px 24px 72px}}
   .hero-band{{background:var(--navy);color:var(--ivory)}}
+  /* The slim band on the pages after the homepage. Same navy, same mascot, none of the
+     height the homepage hero needs for a headline and a form. */
+  .hero-band.slim .wrap{{padding-top:22px;padding-bottom:22px}}
+  .hero-band.slim .hero{{margin-bottom:0;gap:20px;align-items:center}}
+  .hero-band.slim .mascot{{width:86px}}
+  .hero-band.slim .eyebrow{{margin:0}}
   .serif{{font-family:"Inter",sans-serif}}
   .eyebrow{{font-family:"Inter",sans-serif;font-size:12px;letter-spacing:.24em;
     text-transform:uppercase;color:var(--ivory-dim);font-weight:600}}
@@ -171,6 +182,22 @@ PAGE = """<!doctype html><html lang="en"><head>
     padding:14px 16px;font-size:16px;color:var(--ivory);background:var(--navy-deep);width:100%}}
   input[type=text]::placeholder,input[type=email]::placeholder{{color:var(--ivory-dim)}}
   input[type=text]:focus,input[type=email]:focus{{outline:2px solid var(--accent);border-color:var(--accent)}}
+  input[type=url],textarea{{border:1px solid var(--navy-line);border-radius:6px;
+    padding:14px 16px;font-size:16px;color:var(--ivory);background:var(--navy-deep);width:100%;
+    font-family:inherit;line-height:1.5}}
+  textarea{{resize:vertical;min-height:96px}}
+  input[type=url]::placeholder,textarea::placeholder{{color:var(--ivory-dim)}}
+  input[type=url]:focus,textarea:focus{{outline:2px solid var(--accent);border-color:var(--accent)}}
+  input[type=file]{{font-size:15px;color:var(--ivory-dim);width:100%}}
+  input[type=file]::file-selector-button{{background:var(--navy-line);color:var(--ivory);border:0;
+    border-radius:6px;padding:11px 16px;font-family:inherit;font-size:15px;font-weight:600;
+    cursor:pointer;margin-right:12px}}
+  input[type=file]::file-selector-button:hover{{background:var(--accent);color:var(--navy)}}
+  .fieldset{{display:flex;flex-direction:column;gap:7px}}
+  .fieldset > label{{font-size:15px;font-weight:700;color:var(--ivory)}}
+  .fieldset .sub{{font-size:13.5px;color:var(--ivory-dim);margin:0;line-height:1.5}}
+  .formerr{{background:rgba(214,80,74,.13);border:1px solid rgba(214,80,74,.5);border-radius:6px;
+    padding:13px 16px;font-size:15px;color:var(--ivory)}}
   button{{background:var(--gold);color:var(--navy);border:0;border-radius:6px;padding:16px 24px;
     font-family:inherit;font-size:16px;font-weight:700;letter-spacing:.01em;cursor:pointer;margin-top:4px}}
   button:hover{{background:var(--gold-h)}}
@@ -2567,7 +2594,177 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 </div></body></html>"""
 
 
+# The PAGE template above IS the homepage: hero, the audit form, Angelo's plan, then {result}
+# underneath. Every later page in the funnel wants its stylesheet and nothing else. Rendering a
+# later page in the full shell puts the homepage form back on screen, asking for the first name and
+# the email we already hold, which is the one thing the whole token design exists to prevent.
+#
+# The head half carries no placeholders, so the doubled braces the CSS needs for .format() are
+# undoubled by hand here instead.
+_HEAD = PAGE.split('<div class="hero-band"><div class="wrap">', 1)[0].replace("{{", "{").replace("}}", "}")
+
+
+def inner_page(result, eyebrow=""):
+    """A page in the funnel after the first one. Same styling, no second ask for identity."""
+    brow = f'<div class="eyebrow">{eyebrow}</div>' if eyebrow else ""
+    return (_HEAD
+            + '<div class="hero-band slim"><div class="wrap"><div class="hero">'
+            + mascot_img()
+            + f'<div class="hero-copy">{brow}</div>'
+            + '</div></div></div>'
+            + f'<div id="result">{result}</div>\n</body></html>')
+
+
+def social_page_form(lead, error="", values=None):
+    """The social form for a known coach, with their market's audience worked out."""
+    rec = _triggers.report_data(lead.get("niche_match") or "") or {}
+    return _social.render_form(
+        first_name = lead.get("first_name", "") or "",
+        audience   = rec.get("audience", "") or "",
+        token      = lead.get("token", "") or "",
+        error      = error,
+        values     = values,
+    )
+
+
 class Handler(BaseHTTPRequestHandler):
+    # socketserver hands this to socket.settimeout, and _read_body leans on it as the stall
+    # window: 25 seconds with nothing arriving at all. Any data resets it, so a slow upload is
+    # fine and a stopped one is not. Without a timeout, one dead POST parks a worker forever.
+    timeout = 25
+
+    def _social_page(self, frag):
+        """Wrap a fragment in the funnel shell. Styling shared with the audit, form not."""
+        return inner_page(frag, eyebrow=f"{websites_read_count():,} coaching websites read, and counting")
+
+    def _social_report(self, lead):
+        """Their profile read back to them, then the two exits. No audit runs here.
+
+        The website half deliberately does not happen on this request. Auditing a site takes real
+        time, and making someone wait for it behind a form they have just submitted is how you lose
+        them. They gave us the address, we store it, and the website route picks it up.
+        """
+        rec = _triggers.report_data(lead.get("niche_match") or "") or {}
+        audience = rec.get("audience", "") or "your market"
+        banner = lead.get("banner_path") or ""
+        frag = social_section.render(
+            banner_url    = f"/uploads/{banner}" if banner else "",
+            bio           = lead.get("bio") or "",
+            post          = lead.get("last_post") or "",
+            section_label = "Your profile",
+        )
+        trigs = [(_triggers.SECTION_CATS[k], _triggers._heading(k, rec)) for k in range(6)] if rec else []
+        return (combined_parts.opening(lead.get("first_name", "") or "", audience, True, False)
+                + (combined_parts.trigger_reminder(audience, trigs) if trigs else "")
+                + frag
+                + _social.exits(lead.get("token", "") or "", lead.get("website") or "",
+                                f"{websites_read_count():,}"))
+
+    def _post_social(self):
+        """The one route on this app that takes a file from a stranger.
+
+        Order matters. The boundary is checked before the body is read, the body is capped before
+        it is allocated, the parts are capped before they are parsed, and the image is opened by
+        Pillow before it is ever called an image. Nothing is stored until all of that has passed.
+        """
+        try:
+            boundary = _mp.boundary_from(self.headers.get("Content-Type"))
+        except _mp.BadForm:
+            self.send_response(400); self.end_headers(); return
+        body = self._read_body(11 * 1024 * 1024)    # 10MB image plus the text fields and framing
+        if body is None:
+            return
+
+        # The token first, because without a coach behind it there is nothing to do and nothing we
+        # would be willing to write to disk.
+        try:
+            fields, files = _mp.parse(body, boundary)
+        except _mp.BadForm:
+            self.send_response(400); self.end_headers(); return
+        lead = get_trigger_lead(_mp.text(fields, "token", 64))
+        if not lead:
+            self.send_response(302)
+            self.send_header("Location", "/triggers")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
+
+        bio     = _mp.text(fields, "bio", 2000, keep_newlines=True)
+        post    = _mp.text(fields, "post", 4000, keep_newlines=True)
+        website = _mp.text(fields, "website", 200)
+        values  = {"bio": bio, "post": post, "website": website}
+
+        def again(msg):
+            self._send(self._social_page(social_page_form(lead, error=msg, values=values)))
+
+        raw = files.get("banner") or b""            # a browser sends an empty part when none chosen
+        banner_name = ""
+        if raw:
+            try:
+                banner_name = _banner.save_for(lead["token"], raw, UPLOADS_DIR)
+            except _banner.BadImage as ex:
+                again(str(ex)); return
+            except OSError:
+                again("We couldn't save that image. Try the upload again."); return
+
+        if not (banner_name or bio or post or website):
+            again("Give us something to read. Any one of the four is enough."); return
+
+        update_trigger_lead(lead["token"], banner_path=banner_name, bio=bio,
+                            last_post=post, website=website)
+        mark_step(lead["token"], "social")
+        fresh = get_trigger_lead(lead["token"]) or lead
+        self._send(self._social_page(self._social_report(fresh)))
+
+    def _read_body(self, max_bytes):
+        """Read a request body, or refuse it. Returns bytes, or None having already replied.
+
+        Everything an attacker controls is bounded before anything is allocated. Content-Length is
+        required, because it is the only way to apply the cap before reading rather than after.
+        Chunked bodies are refused outright: we have no use for them, and accepting a framing we do
+        not need is how request smuggling gets in.
+        """
+        if (self.headers.get("Transfer-Encoding") or "").strip():
+            self.send_response(411); self.end_headers(); return None
+        raw_len = self.headers.get("Content-Length")
+        if raw_len is None:
+            self.send_response(411); self.end_headers(); return None
+        try:
+            length = int(raw_len)
+        except (TypeError, ValueError):
+            self.send_response(400); self.end_headers(); return None
+        if length < 0:
+            self.send_response(400); self.end_headers(); return None
+        if length > max_bytes:
+            self.send_response(413); self.end_headers(); return None
+
+        # Reading a body from a stranger, slowly, without being held open by one.
+        #
+        # Two facts about a BufferedReader decide the shape of this. It cannot be read again after
+        # a timeout, so there is no retrying: the first TimeoutError is the end. And read(n) blocks
+        # until it has the whole n, which means a coach on bad mobile data sending 10KB and then
+        # pausing loses that 10KB and the request with it. read1() hands back whatever has arrived,
+        # so a slow upload makes progress instead of failing.
+        #
+        # The socket timeout is therefore the stall window: every read that returns data starts a
+        # fresh one. An upload that is slow but moving finishes. One that has stopped gets a 408,
+        # which still writes fine, because only the read side of the socket is spent.
+        hard_stop = time.monotonic() + 180      # a dribbler cannot stay all day by sending a byte
+        buf = bytearray()
+        while len(buf) < length:
+            if time.monotonic() > hard_stop:
+                self.send_response(408); self.end_headers(); return None
+            try:
+                chunk = self.rfile.read1(min(65536, length - len(buf)))
+            except TimeoutError:
+                self.send_response(408); self.end_headers(); return None
+            except OSError:
+                return None             # connection is gone, so there is nobody left to reply to
+            if not chunk:
+                break                   # client stopped early; hand back what we actually got
+            buf.extend(chunk)
+        return bytes(buf)
+
     def _send(self, body):
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -2599,6 +2796,20 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_response(404); self.end_headers()
             return
+        if path.startswith("/uploads/"):
+            # A coach's own uploaded banner. Everything we write here is a .webp we made
+            # ourselves and named from the lead token, so the filename is checked against that
+            # shape rather than trusted. basename() on top of it, so no path can climb out of
+            # the uploads directory.
+            name = os.path.basename(path[len("/uploads/"):])
+            ok = name.endswith(".webp") and name[:-5].replace("-", "").replace("_", "").isalnum()
+            fpath = os.path.join(UPLOADS_DIR, name) if ok else ""
+            if fpath and os.path.isfile(fpath):
+                with open(fpath, "rb") as f:
+                    self._send_bytes(f.read(), "image/webp")
+            else:
+                self.send_response(404); self.end_headers()
+            return
         if path == "/offer":
             # /offer used to serve a short generic draft. The real pitch is now the PERSONALISED
             # salespage, so this redirects and carries the domain across. Kept as a route (rather than
@@ -2611,8 +2822,108 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             return
+        if path == "/social":
+            # Step two. We already have their name, email and market from the triggers page, so the
+            # token is the identity and this form asks for none of it again. No token means we have
+            # nobody to attach the upload to and no way to reach them, so they go back to step one
+            # rather than leaving us an orphan row and a file nobody owns.
+            lead = get_trigger_lead((parse_qs(parsed.query).get("lead", [""])[0]).strip())
+            if not lead:
+                self.send_response(302)
+                self.send_header("Location", "/triggers")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                return
+            # Somebody who has already done this step gets their report back, not a blank form.
+            # The link lands in an email and gets bookmarked, and a coach returning to it should
+            # find what they filled in, not be asked for it a second time.
+            if lead.get("social_at"):
+                self._send(self._social_page(self._social_report(lead)))
+            else:
+                self._send(self._social_page(social_page_form(lead)))
+            return
         if path == "/triggers":
             self._send(_triggers.render_triggers())
+            return
+        if path == "/mockup/website":
+            # NOT a mockup. This re-renders a REAL stored audit, so David is looking at what the
+            # product actually produces today rather than something I drew.
+            qs = parse_qs(parsed.query)
+            dom = (qs.get("domain", [""])[0]).strip() or "reachingbetteralternatives.com"
+            row = get_audit(dom)
+            if not row or not row.get("raw_json"):
+                self._send(f"<p>no stored audit for {html.escape(dom)}</p>")
+                return
+            res = _json.loads(row["raw_json"])
+            if row.get("screenshot_path"):
+                res["thumbnail"] = row["screenshot_path"]
+            frag = render_result(res, first_name=usable_name(row.get("first_name", "")))
+            page = PAGE.format(url_value="", result=frag,
+                               count=f"{websites_read_count():,}", mascot=mascot_img())
+            self._send(page.replace("<!--PROGRESS-->", ""))
+            return
+        if path == "/combined":
+            # Order: opening, their triggers, SOCIAL, bridge, WEBSITE, ending. Social first because
+            # it ends with questions the coach answers, and the website half answers questions for
+            # them. Question then answer, not the other way round.
+            qs = parse_qs(parsed.query)
+            have = (qs.get("have", ["both"])[0]).strip()
+            if have not in ("both", "website", "social"):
+                have = "both"
+            dom = (qs.get("domain", [""])[0]).strip() or "reachingbetteralternatives.com"
+            import social_section, combined_parts, importlib
+            importlib.reload(social_section); importlib.reload(combined_parts)
+
+            # Decide what is ACTUALLY going on the page before numbering or wrapping anything.
+            audit_frag = ""
+            if have in ("both", "website"):
+                row = get_audit(dom)
+                if row and row.get("raw_json"):
+                    res = _json.loads(row["raw_json"])
+                    if row.get("screenshot_path"):
+                        res["thumbnail"] = row["screenshot_path"]
+                    audit_frag = render_result(res, first_name=usable_name(row.get("first_name", "")))
+            social_frag = ""
+            if have in ("both", "social"):
+                social_frag = social_section.render(
+                    banner_url=((qs.get("banner", [""])[0]).strip()
+                                or "/screenshots/christie_banner.png"),
+                    bio=("I help people with chronic pain find relief using spiritually connected "
+                         "mind-body techniques."),
+                    post="What area of your life no longer fits the person you're becoming?",
+                    section_label="__SOCIAL_LABEL__")
+
+            has_soc, has_web = bool(social_frag), bool(audit_frag)
+            # Social comes first now, so it is section one and the audit's four follow it.
+            if has_soc and has_web:
+                social_frag = social_frag.replace("__SOCIAL_LABEL__", "Section 1 of 5")
+                for n in (4, 3, 2, 1):
+                    audit_frag = audit_frag.replace(f"Section {n} of 4", f"Section {n + 1} of 5")
+            else:
+                social_frag = social_frag.replace("__SOCIAL_LABEL__", "Your profile")
+
+            mkt = _triggers.have_triggers_for("chronic pain")
+            rec = _triggers.report_data(mkt)
+            audience = rec.get("audience", "your market")
+            trigs = [(_triggers.SECTION_CATS[k], _triggers._heading(k, rec)) for k in range(6)]
+
+            if not (has_soc or has_web):
+                frag = ('<div class="card"><p class="dead">We have nothing to show for that yet. '
+                        'Give us a social profile, a website, or both.</p></div>')
+            else:
+                frag = (combined_parts.opening("Christie", audience, has_soc, has_web)
+                        + combined_parts.trigger_reminder(audience, trigs)
+                        + social_frag
+                        + (combined_parts.bridge() if (has_soc and has_web) else "")
+                        + audit_frag
+                        + combined_parts.ending(audience, has_soc, has_web))
+            self._send(inner_page(frag, eyebrow=f"{websites_read_count():,} coaching websites read"))
+            return
+        if path == "/mockup/social":
+            # A drawn mockup so David can see the shape before we build the plumbing. Throwaway.
+            import mockup_social
+            import importlib; importlib.reload(mockup_social)
+            self._send(mockup_social.render())
             return
         if path == "/triggers/report":
             # The report itself. Open for now so the emailed link just works and so David can preview
@@ -2621,7 +2932,11 @@ class Handler(BaseHTTPRequestHandler):
             # A stored token fills in the coach behind this report, so a link that has been mailed
             # or bookmarked still knows who it belongs to.
             lead = get_trigger_lead((qs.get("lead", [""])[0]).strip())
-            nxt = f"{APP_BASE_URL}/" + (f"?lead={_url_quote(lead['token'], safe='')}" if lead else "")
+            # Step two is the social page, not the website audit. The report's own closing words
+            # already say we will look at the profile first, so pointing this at the homepage sent
+            # a coach straight past the page that sentence promised them.
+            nxt = (f"{APP_BASE_URL}/social?lead={_url_quote(lead['token'], safe='')}"
+                   if lead else f"{APP_BASE_URL}/triggers")
             self._send(_triggers.render_report(
                 niche      = (qs.get("niche", [""])[0]).strip() or (lead or {}).get("niche_match", ""),
                 first_name = (qs.get("first_name", [""])[0]).strip() or (lead or {}).get("first_name", ""),
@@ -2764,20 +3079,24 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/social":
+            self._post_social()
+            return
         if parsed.path != "/triggers":
             self.send_response(404); self.end_headers(); return
-        try:
-            length = int(self.headers.get("Content-Length") or 0)
-        except ValueError:
-            length = 0
-        if length > 64 * 1024:          # a form this small has no business being bigger
-            self.send_response(413); self.end_headers(); return
-        raw = self.rfile.read(length).decode("utf-8", "replace") if length else ""
-        form = parse_qs(raw)
-        first_name = (form.get("first_name", [""])[0]).strip()[:80]
-        last_name  = (form.get("last_name",  [""])[0]).strip()[:80]
-        email      = (form.get("email",      [""])[0]).strip()[:160]
-        niche      = (form.get("niche",      [""])[0]).strip()[:120]
+        body = self._read_body(64 * 1024)   # a form this small has no business being bigger
+        if body is None:
+            return
+        form = parse_qs(body.decode("utf-8", "replace"))
+        # Same control-character stripping the social form uses. A name or an email carrying a null
+        # or an escape sequence is either a mistake or an attempt, and neither belongs in the
+        # database or in a MailerLite field.
+        def _f(name, limit):
+            return _mp.text({k: v[0] for k, v in form.items()}, name, limit)
+        first_name = _f("first_name", 80)
+        last_name  = _f("last_name", 80)
+        email      = _f("email", 160)
+        niche      = _f("niche", 120)
 
         # Deliberately loose: a real address we cannot parse is worse than a typo we let through.
         bad = ""
@@ -2809,7 +3128,8 @@ class Handler(BaseHTTPRequestHandler):
         fragment = (form.get("fragment", [""])[0]).strip() == "1"
         # The audit link carries the token too, so whatever they do next can be tied back to this
         # coach and this market without a second form.
-        nxt = f"{APP_BASE_URL}/" + (f"?lead={_url_quote(token, safe='')}" if token else "")
+        nxt = (f"{APP_BASE_URL}/social?lead={_url_quote(token, safe='')}"
+               if token else f"{APP_BASE_URL}/triggers")
         self._send(_triggers.render_report(
             niche      = matched or niche,
             first_name = first_name,

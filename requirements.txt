@@ -1,6 +1,7 @@
 anthropic
 beautifulsoup4
 pandas
+Pillow
 playwright
 python-dotenv
 requests

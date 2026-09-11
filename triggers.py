@@ -489,9 +489,9 @@ PLAIN_FORCE = {
     "enjoyment of food and beverages":  "to enjoy food and drink",
     "freedom from fear, pain & danger": "to stop something that frightens them or hurts",
     "freedom from fear, pain and danger": "to stop something that frightens them or hurts",
-    "sexual companionship":             "to be wanted, and not be on their own",
+    "sexual companionship":             "to be wanted and not be on their own",
     "comfortable living conditions":    "to have an easier life",
-    "to be superior / win / keep up":   "to be better at something, or to keep up with the people around them",
+    "to be superior / win / keep up":   "to be better at something or keep up with the people around them",
     "care & protection of loved ones":  "to look after the people they love",
     "social approval":                  "to be thought well of by other people",
     "to be informed":                   "to understand what is happening to them",
@@ -501,7 +501,7 @@ PLAIN_FORCE = {
     "convenience":                      "an easier way of doing it",
     "dependability/quality":            "something that actually works",
     "beauty/style":                     "to look good",
-    "economy/profit":                   "to save money, or make some",
+    "economy/profit":                   "to save or make money",
     "economy/profit (survival of the business)": "to keep the business alive",
     "cleanliness":                      "to feel clean",
     "bargains":                         "a good deal",
@@ -833,27 +833,22 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
             out += '<div class="r-ev"><b>' + e(box_label) + '</b>' + e(box) + '</div>'
         return out + "</section>"
 
-    # 1. What they're really buying. The deep drivers, in plain words.
-    forces = ""
-    for f in rec.get("lf8_primary", [])[:2]:
-        plain = _plain(PLAIN_FORCE, f, "")
-        if plain:
-            forces += ('<div class="r-force"><p class="fplain">'
-                       + e(plain[0].upper() + plain[1:]) + '.</p></div>')
-    secondary = [x for x in (_plain(PLAIN_FORCE, y, "") for y in rec.get("lf8_secondary", [])[:3]) if x]
-    if len(secondary) > 1:
-        joined = ", ".join(secondary[:-1]) + " and " + secondary[-1]
-        sec_line = ("They also want " + e(joined) + ". These are smaller reasons to buy. They still "
-                    "help.")
-    elif secondary:
-        sec_line = ("They also want " + e(secondary[0]) + ". That's a smaller reason to buy. It "
-                    "still helps.")
+    # 1. What they're really buying. Written as one paragraph, not floating fragments in boxes.
+    primary = [x for x in (_plain(PLAIN_FORCE, f, "") for f in rec.get("lf8_primary", [])[:2]) if x]
+    if len(primary) > 1:
+        want = "Here it's two things: " + e(primary[0]) + ", and " + e(primary[1]) + "."
+    elif primary:
+        want = "Here it's one thing: " + e(primary[0]) + "."
     else:
-        sec_line = ""
-    s1 = sect(0, ["Nobody buys coaching. They buy what coaching gets them."], None)
-    s1 = s1.replace("</section>", forces + ('<p class="r-sec">' + sec_line + "</p>" if sec_line else "")
-                    + ('<div class="r-ev"><b>How we know</b>' + e(_clean(rec.get("lf8_evidence","")))
-                       + "</div>" if rec.get("lf8_evidence") else "") + "</section>")
+        want = ""
+    secondary = [x for x in (_plain(PLAIN_FORCE, y, "") for y in rec.get("lf8_secondary", [])[:2]) if x]
+    if len(secondary) > 1:
+        want += (" Wanting " + e(secondary[0]) + " and " + e(secondary[1])
+                 + " comes into it too, but those are smaller reasons.")
+    elif secondary:
+        want += " Wanting " + e(secondary[0]) + " comes into it too, but that's a smaller reason."
+    s1 = sect(0, ["Nobody buys coaching. They buy what coaching gets them. " + want],
+              _clean(rec.get("lf8_evidence", "")) or None)
 
     # 2. What made them start looking. The push, plus how far along they already were.
     aw = (rec.get("awareness") or "").lower()
