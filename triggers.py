@@ -956,9 +956,8 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
     <p>We built this report in about 20 seconds, and it's an excellent view of your market. But
     there's more to find, and more you can use to your advantage. So let's look at your social media
     profile, and your website if you have one.</p>
-    <p>You've just read the words your buyers use. The next report shows you where your own words
-    don't sound like theirs, and what your buyer misses when they read you. Takes about half a
-    minute, and it's free like this one&hellip;</p>
+    <p>You've just read the words your buyers use. Next you see your own words the way a stranger
+    sees them, and the four questions they're asking while they read. It's free like this one&hellip;</p>
     """ + cta_link + """
   </div>
 
