@@ -252,9 +252,12 @@ def check_report_shape(market, page_html, hits):
     """The landing page promises six triggers. Every report has to have six, plus the proof."""
     if "read this market" in page_html:
         return                                   # the honest "we do not hold this one" page
-    n = len(re.findall(r'class="r-num"', page_html))
+    # Count the rails, not a class name that happens to be on the number today. Every section gets
+    # exactly one, so this survives the next time somebody restyles the thing, which is precisely
+    # what just happened to the check that counted "r-num".
+    n = len(re.findall(r'class="r-rail"', page_html))
     if n != 7:
-        hits.append((f"report: {market}", f"STRUCTURE: {n} numbered sections, expected 7"))
+        hits.append((f"report: {market}", f"STRUCTURE: {n} sections, expected 6 triggers plus the proof"))
     if 'class="nextbtn"' not in page_html:
         hits.append((f"report: {market}", "STRUCTURE: no call to action at the end"))
 

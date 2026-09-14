@@ -228,20 +228,40 @@ _REPORT_CSS = """
   .r-what{font-size:17px;line-height:1.7;color:var(--ivory);margin:0 0 40px;max-width:62ch}
   .r-depth{font-size:16px;line-height:1.72;color:var(--ivory-dim);max-width:64ch;
     margin:44px 0 0;padding:20px 0 0;border-top:1px solid var(--navy-line)}
-  .r-cat{font-size:14px;color:var(--ivory-dim);margin:0 0 4px;line-height:1.5}
-  section.r{margin:0 0 40px;padding:0 0 4px}
-  section.r > h2{font-family:var(--serif);font-size:25px;font-weight:600;color:var(--ivory);
-    margin:0 0 6px;line-height:1.25}
-  .r-num{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
-    font-weight:700;margin:0 0 8px}
-  section.r p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:66ch}
+  /* Every gap used to be roughly the same, 40px between whole triggers and up to 14px inside one,
+     with no rule anywhere, so the six ran together as one long column.
+     Now each trigger is a numbered row: a narrow rail carrying the number, the trigger beside it.
+     The numerals give the left edge a steady beat, which is what keeps very uneven block lengths
+     from reading as a lurch, and the hairline says plainly where one ends. */
+  section.r{display:grid;grid-template-columns:66px minmax(0,1fr);column-gap:26px;
+    margin:0;padding:36px 0 0;border-top:1px solid var(--navy-line)}
+  section.r:first-of-type{border-top:0;padding-top:0}
+  section.r + section.r{margin-top:36px}
+
+  .r-rail{text-align:right;padding-top:2px}
+  .r-n{display:block;font-family:var(--serif);font-size:42px;font-weight:600;line-height:.86;
+    color:var(--gold);letter-spacing:-.02em}
+  .r-n.r-mark{font-size:54px;line-height:.6}
+  .r-lab{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ivory-dim);font-weight:700;margin-top:10px;line-height:1.4}
+
+  .r-main{min-width:0}
+  .r-cat{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ivory-dim);
+    font-weight:700;margin:0 0 10px;line-height:1.6}
+  .r-main > h2{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--ivory);
+    margin:0 0 13px;line-height:1.2;max-width:25ch;letter-spacing:-.012em;
+    /* Without this every one of these broke with a single orphan word on line two:
+       "feeling / dumb", "pulling / ahead". Balance splits them evenly instead. */
+    text-wrap:balance}
+  section.r p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:64ch}
+  section.r p:last-of-type{margin-bottom:0}
   .r-force{background:var(--navy-card);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
     padding:16px 20px;margin:0 0 14px}
   .r-force .fname{font-family:var(--serif);font-size:20px;color:var(--ivory);margin:0 0 4px;font-weight:600}
   .r-force .fplain{font-size:16px;color:var(--gold);line-height:1.6;margin:0}
   .r-sec{font-size:14px;color:var(--ivory-dim);line-height:1.7;margin:10px 0 0}
   .r-ev{font-size:15px;line-height:1.7;color:var(--ivory);background:var(--navy-deep);
-    border:1px solid var(--navy-line);border-radius:8px;padding:15px 18px;margin:14px 0 0}
+    border:1px solid var(--navy-line);border-radius:8px;padding:15px 18px;margin:18px 0 0}
   .r-ev b{color:var(--gold);font-weight:600;display:block;font-size:12px;letter-spacing:.14em;
     text-transform:uppercase;margin:0 0 6px}
   .jt{margin:0;padding:0}
@@ -274,6 +294,17 @@ _REPORT_CSS = """
   @media(max-width:640px){
     .rwrap{padding:32px 18px 56px}
     .jt div{grid-template-columns:1fr;gap:3px}
+    /* The rail becomes a single line above the trigger. A 66px column is 66px a phone cannot spare,
+       and the numeral still has to arrive before the words it belongs to. */
+    section.r{grid-template-columns:1fr}
+    .r-rail{display:flex;align-items:baseline;gap:11px;text-align:left;margin:0 0 16px;padding:0}
+    .r-n{font-size:31px;line-height:1}
+    .r-n.r-mark{font-size:38px;line-height:1}
+    .r-lab{margin-top:0;line-height:1.25;white-space:nowrap}
+    .r-main > h2{font-size:24px;max-width:none}
+    /* .2em of tracking is generous on a desktop and wasteful on a 375px phone, where it pushes
+       a short category label onto two lines for no gain. */
+    .r-cat{letter-spacing:.11em}
   }
 """
 
@@ -823,7 +854,13 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
 
     def sect(i, paras, box=None, box_label="How we know"):
         """One trigger. Category, name, explanation. The explanation only ever describes the buyer."""
-        out = ('<section class="r"><p class="r-num">' + SECTION_HEADINGS[i]["n"] + '</p>'
+        # A numbered rail on the left, the trigger beside it. The six ARE a sequence, so numbering
+        # them states something true rather than decorating. It also gives the page a steady beat
+        # down the left edge, which is what stops wildly uneven block lengths reading as a lurch.
+        out = ('<section class="r">'
+               '<div class="r-rail"><span class="r-n">' + str(i + 1) + '</span>'
+               '<span class="r-lab">Buying Trigger</span></div>'
+               '<div class="r-main">'
                '<p class="r-cat">' + e(SECTION_CATS[i]) + '</p>'
                '<h2>' + e(H[i]) + '</h2>')
         for para in paras:
@@ -831,7 +868,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
                 out += "<p>" + para + "</p>"
         if box:
             out += '<div class="r-ev"><b>' + e(box_label) + '</b>' + e(box) + '</div>'
-        return out + "</section>"
+        return out + "</div></section>"
 
     # 1. What they're really buying. Written as one paragraph, not floating fragments in boxes.
     primary = [x for x in (_plain(PLAIN_FORCE, f, "") for f in rec.get("lf8_primary", [])[:2]) if x]
@@ -874,15 +911,17 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
     s5 = sect(4, [soph_plain, e(_clean(rec.get("implication","")))])
 
     # 6. What tips them to one coach over another.
-    lev = ""
-    for l in rec.get("cialdini", [])[:3]:
-        line = _plain(PLAIN_LEVER, l, "")
-        if line:
-            lev += "<p>" + e(line) + "</p>"
-    s6 = sect(5, [])
-    s6 = s6.replace("</section>", lev + ('<div class="r-ev"><b>Why these three work</b>'
-                    + e(_clean(_strip_levers(rec.get("cialdini_why","")))) + "</div>"
-                    if rec.get("cialdini_why") else "") + "</section>")
+    # A list of lines, not a pre-wrapped blob. sect() does the wrapping, and handing it HTML that
+    # was already wrapped nested a <p> inside a <p>.
+    lev = [e(line) for line in
+           (_plain(PLAIN_LEVER, l, "") for l in rec.get("cialdini", [])[:3]) if line]
+    # Built through sect() like every other trigger rather than by splicing onto a closing tag.
+    # The old version string-replaced "</section>", which put this content on the wrong side of
+    # the div that closes the text column the moment the markup grew one, and the levers ended up
+    # rendering down the number rail a word at a time.
+    s6 = sect(5, lev,
+              box=_clean(_strip_levers(rec.get("cialdini_why", ""))) or None,
+              box_label="Why these three work")
 
     # The proof. Deliberately NOT numbered as a trigger: their own words are evidence, not a trigger.
     vhtml = ""
@@ -906,11 +945,14 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
                       + "".join("<li>&ldquo;" + e(x) + "&rdquo;</li>" for x in items) + "</ul>")
     voice_section = ""
     if vhtml:
-        voice_section = ('<section class="r"><p class="r-num">The proof</p>'
+        voice_section = ('<section class="r"><div class="r-rail">'
+                         '<span class="r-n r-mark">&ldquo;</span>'
+                         '<span class="r-lab">The proof</span></div>'
+                         '<div class="r-main">'
                          '<h2>In their own words</h2>'
                          "<p>These are your buyer's own words. This is how they talk about it to "
                          "each other, not to a coach.</p>"
-                         '<div class="voice">' + vhtml + '</div></section>')
+                         '<div class="voice">' + vhtml + '</div></div></section>')
 
     fn = first_name.strip().split(" ")[0] if first_name.strip() else ""
     if fn.islower():
