@@ -371,8 +371,10 @@
     <p class="why">Now carries the full house style blocklist as well: the fancy register, the
     buzzwords, and the shapes. It flags a banned JOB rather than a banned word, and the market's own
     language is masked before anything is tested, so a coach's own vocabulary is never touched.</p>
-    <p class="why"><strong>The social pages are covered now</strong>, in both their states, empty
-    form and filled-in report. Running it found one real contraction miss in copy a coach reads, and
+    <p class="why"><strong>The social pages have been checked by hand</strong>, in both their
+    states, empty form and filled-in report, but they are NOT in the automated run: check_copy.py
+    still only renders the triggers landing page and the market reports. Wiring them in is what
+    makes it a gate rather than something somebody has to remember. Running it found one real contraction miss in copy a coach reads, and
     two faults in the checker itself: it was treating the stylesheet and our own HTML comments as
     copy, so it reported words that are nowhere on the screen.</p>
     <p class="why"><strong>Still uncovered:</strong> the sales page, and <code>/combined</code> in
@@ -395,9 +397,17 @@
   </div>
 
   <div class="task">
-    <div class="task-top"><h3>Mobile</h3><span class="chip c-todo">not started</span></div>
+    <div class="task-top"><h3>Mobile</h3><span class="chip c-part">partly built</span></div>
     <p class="why">A pasted bio, a wide banner and a long post are all things that break a narrow
     screen. Check nothing scrolls sideways.</p>
+    <p class="why"><strong>Checked at 375px, nothing scrolls sideways:</strong> the triggers report,
+    the social form and the sales page. Not one element crosses the viewport on any of them. The
+    triggers report also got real phone work during the redesign, where its number rail collapses to
+    a single line above each trigger.</p>
+    <p class="why"><strong>Not checked:</strong> the social report carrying a real uploaded banner
+    and a long pasted post, which is the case most likely to break, and the website audit, which is
+    by far the biggest page in the project. Nor tap target sizes, nor a real handset rather than a
+    resized desktop browser.</p>
   </div>
 
   <div class="task">
