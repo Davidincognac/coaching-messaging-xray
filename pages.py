@@ -60,6 +60,7 @@ _SHELL = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>__TITLE__</title>
 <meta name="description" content="__DESC__">
+__SEO__
 <style>__CSS__</style></head><body>
 __NAV__
 <main class="prose">
@@ -69,8 +70,9 @@ __FOOTER__
 </body></html>"""
 
 
-def shell(body, title, desc="", active=""):
+def shell(body, title, desc="", active="", path="/", index=True):
     return (_SHELL
+            .replace("__SEO__", _brand.head_meta(path, title, desc, index))
             .replace("__CSS__", _brand.FONT_FACES + _brand.BRAND_TOKENS
                      + _brand.CHROME_CSS + _PROSE_CSS)
             .replace("__NAV__", _brand.nav_html(active))
@@ -156,7 +158,7 @@ happens unless you want it to.</p>
 <a href="mailto:{_brand.COMPANY['email']}">{_brand.COMPANY['email']}</a>.</p>
 """
     return shell(body, "About David Poole", "Who runs Going Beyond The Illusion, and why "
-                 "the research comes before the advice.", active="about")
+                 "the research comes before the advice.", active="about", path="/about")
 
 
 # --------------------------------------------------------------------------- blog
@@ -230,7 +232,7 @@ happy to give away.</p>
 <p>In the meantime, <a href="/">the buying triggers page</a> is the useful thing.</p>
 """
         return shell(body, "Blog", "Research notes from reading coaching websites.",
-                     active="blog")
+                     active="blog", path="/blog")
     items = []
     for p in posts:
         when = _pretty_date(p["date"])
@@ -240,7 +242,7 @@ happy to give away.</p>
             + (f'<span class="when">{html.escape(when)}</span>' if when else "")
             + summary + "</li>")
     body = ("<h1>Blog</h1>\n<ul class=\"postlist\">" + "".join(items) + "</ul>")
-    return shell(body, "Blog", "Research notes from reading coaching websites.", active="blog")
+    return shell(body, "Blog", "Research notes from reading coaching websites.", active="blog", path="/blog")
 
 
 def render_post(slug):
@@ -249,7 +251,7 @@ def render_post(slug):
             when = _pretty_date(p["date"])
             stamp = f'<p class="stamp">{html.escape(when)}</p>' if when else ""
             body = stamp + markdown(p["body"]) + '<p><a class="backlink" href="/blog">Back to the blog</a></p>'
-            return shell(body, p["title"], p["summary"], active="blog")
+            return shell(body, p["title"], p["summary"], active="blog", path="/blog/" + p["slug"])
     return None
 
 
@@ -324,7 +326,7 @@ the address and we will remove it.</p>
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Privacy", "What this site collects and who else sees it.")
+    return shell(body, "Privacy", "What this site collects and who else sees it.", path="/privacy")
 
 
 def render_terms():
@@ -374,7 +376,7 @@ this does not remove the protections of your own country's law.</p>
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Terms", "The terms covering the free tools and the paid file.")
+    return shell(body, "Terms", "The terms covering the free tools and the paid file.", path="/terms")
 
 
 def render_cookies():
@@ -400,7 +402,7 @@ Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.<
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Cookies", "This site sets no cookies.")
+    return shell(body, "Cookies", "This site sets no cookies.", path="/cookies")
 
 
 # ------------------------------------------------------------------- tiny markdown

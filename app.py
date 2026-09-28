@@ -141,6 +141,7 @@ def mascot_img():
 PAGE = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Coaching Website Report Card</title>
+<!--SEO-->
 <style>""" + _brand.fmt(_brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS) + """
   *{{box-sizing:border-box}}
   html{{background:var(--navy)}}
@@ -2059,6 +2060,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     return f"""<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Your Marketing Intelligence File | {fn}</title>
+{_brand.head_meta("/salespage", index=False)}
 <style>{_SALES_CSS}</style></head><body>
 
   <nav class="site-nav">
@@ -2607,7 +2609,7 @@ def identity_block(lead):
 def inner_page(result, eyebrow=""):
     """A page in the funnel after the first one. Same styling, no second ask for identity."""
     brow = f'<div class="eyebrow">{eyebrow}</div>' if eyebrow else ""
-    return (_HEAD
+    return (_HEAD.replace("<!--SEO-->", _brand.head_meta("/social", index=False))
             + '<div class="hero-band slim"><div class="wrap"><div class="hero">'
             + mascot_img()
             + f'<div class="hero-copy">{brow}</div>'
@@ -2846,6 +2848,16 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(self._social_page(social_page_form(lead)))
             return
+        if path == "/robots.txt":
+            self._send_bytes(_brand.robots_txt().encode("utf-8"), "text/plain; charset=utf-8")
+            return
+        if path == "/sitemap.xml":
+            # Blog posts are files on disk, so the sitemap is built from whatever is
+            # actually there rather than a list that drifts out of date.
+            posts = [f"/blog/{p['slug']}" for p in _pages._read_posts()]
+            self._send_bytes(_brand.sitemap_xml(posts).encode("utf-8"),
+                             "application/xml; charset=utf-8")
+            return
         if path == "/triggers":
             # The landing page moved to the root. This address is already in sent emails and
             # links, so it redirects rather than 404s, and it is a permanent move.
@@ -2893,7 +2905,8 @@ class Handler(BaseHTTPRequestHandler):
             frag = render_result(res, first_name=usable_name(row.get("first_name", "")))
             page = PAGE.format(url_value="", result=frag, identity=IDENTITY_FIELDS,
                                count=f"{websites_read_count():,}", mascot=mascot_img())
-            self._send(page.replace("<!--PROGRESS-->", ""))
+            self._send(page.replace("<!--PROGRESS-->", "")
+                           .replace("<!--SEO-->", _brand.head_meta("/website", index=False)))
             return
         if path == "/combined":
             # Order: opening, their triggers, SOCIAL, bridge, WEBSITE, ending. Social first because
@@ -3142,7 +3155,12 @@ class Handler(BaseHTTPRequestHandler):
         page = PAGE.format(url_value=html.escape(prefill, quote=True), result=result_html,
                            identity=identity_block(lead),
                            count=f"{websites_read_count():,}", mascot=mascot_img())
-        self._send(page.replace("<!--PROGRESS-->", PROGRESS_UI))
+        _seo = _brand.head_meta(
+            "/website",
+            "Have your coaching website read the way a stranger reads it",
+            "A free messaging X-ray of your homepage, scored against the market.",
+            index=not (url or lead))
+        self._send(page.replace("<!--SEO-->", _seo).replace("<!--PROGRESS-->", PROGRESS_UI))
 
     def do_POST(self):
         parsed = urlparse(self.path)

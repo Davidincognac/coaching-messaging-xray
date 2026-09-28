@@ -490,6 +490,7 @@ _SHELL = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Buying Triggers __TITLE__</title>
 <meta name="description" content="The reason your clients actually buy, worked out from the books they buy.">
+__SEO__
 <style>__CSS__</style></head><body>
 __NAV__
 <div class="wrap">
@@ -507,6 +508,8 @@ def _shell(body, title_suffix=""):
             .replace("__CSS__", _CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
             .replace("__TITLE__", title_suffix)
+            .replace("__SEO__", _brand.head_meta("/", "Coaches: the 6 buying triggers that turn a stranger into a client",
+                     "The reason your clients actually buy, worked out from the books they buy.", True))
             .replace("__NAV__", _brand.nav_html("home"))
             .replace("__FOOTER__", _brand.footer_html())
             .replace("__BODY__", body))

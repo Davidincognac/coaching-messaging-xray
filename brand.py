@@ -21,6 +21,7 @@ PAGE in app.py is a .format() template, so its CSS braces have to be doubled. Us
 `fmt(BRAND_TOKENS)` there and the plain string everywhere else.
 """
 
+import html
 import os
 
 # --------------------------------------------------------------------------- company
@@ -200,3 +201,94 @@ def fmt(css):
     has to be escaped first or format() reads them as field names and raises.
     """
     return css.replace("{", "{{").replace("}", "}}")
+
+
+# ------------------------------------------------------------------------ seo
+
+# The one address search engines should ever see. Everything else 301s here, so every
+# page names this as its canonical and no two URLs compete for the same content.
+BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000").rstrip("/")
+
+
+def head_meta(path="/", title="", description="", index=True):
+    """Canonical, robots and the social-share tags for one page.
+
+    `index=False` is for anything personal: a coach's own report, their salespage, any
+    URL carrying their token. Those must never reach a search result. They are thin and
+    duplicated across thousands of coaches, and the token in the URL is theirs, not
+    something to publish.
+    """
+    canonical = BASE_URL + path
+    robots = ("index,follow" if index
+              else "noindex,nofollow,noarchive")
+    og_title = html.escape(title or COMPANY["site"], quote=True)
+    og_desc = html.escape(description or "", quote=True)
+    tags = [
+        f'<link rel="canonical" href="{html.escape(canonical, quote=True)}">',
+        f'<meta name="robots" content="{robots}">',
+        f'<meta property="og:site_name" content="{html.escape(COMPANY["site"], quote=True)}">',
+        f'<meta property="og:type" content="website">',
+        f'<meta property="og:title" content="{og_title}">',
+        f'<meta property="og:url" content="{html.escape(canonical, quote=True)}">',
+        f'<meta name="twitter:card" content="summary_large_image">',
+        f'<meta name="twitter:title" content="{og_title}">',
+    ]
+    if og_desc:
+        tags.append(f'<meta property="og:description" content="{og_desc}">')
+        tags.append(f'<meta name="twitter:description" content="{og_desc}">')
+    # Angelo is the only image we have that reads at thumbnail size.
+    tags.append(f'<meta property="og:image" content="{BASE_URL}/angelo.png">')
+    tags.append(f'<meta name="twitter:image" content="{BASE_URL}/angelo.png">')
+    return "\n".join(tags)
+
+
+# The pages worth a search engine's time. Everything else is either personal or a
+# duplicate of one of these, so the sitemap lists these and only these.
+PUBLIC_PAGES = [
+    ("/", "1.0", "weekly"),
+    ("/about", "0.8", "monthly"),
+    ("/blog", "0.7", "weekly"),
+    ("/website", "0.6", "monthly"),
+    ("/privacy", "0.2", "yearly"),
+    ("/terms", "0.2", "yearly"),
+    ("/cookies", "0.2", "yearly"),
+]
+
+
+def robots_txt():
+    """Public pages open, everything personal closed.
+
+    The Disallow lines are not a privacy control (a token in a URL is still a token), they
+    stop thousands of near-identical coach reports being crawled and treated as thin
+    duplicate content across the whole site.
+    """
+    return (
+        "User-agent: *\n"
+        "Allow: /$\n"
+        "Disallow: /social\n"
+        "Disallow: /salespage\n"
+        "Disallow: /offer\n"
+        "Disallow: /mockup/\n"
+        "Disallow: /uploads/\n"
+        "Disallow: /audit\n"
+        "Disallow: /*?lead=\n"
+        "Disallow: /*?url=\n"
+        "Disallow: /*?domain=\n"
+        "\n"
+        f"Sitemap: {BASE_URL}/sitemap.xml\n"
+    )
+
+
+def sitemap_xml(blog_urls=()):
+    """The public pages plus whatever posts exist. No dates we cannot stand behind:
+    a lastmod we invent is worse than no lastmod at all."""
+    out = ['<?xml version="1.0" encoding="UTF-8"?>',
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for path, priority, freq in PUBLIC_PAGES:
+        out.append(f"  <url><loc>{BASE_URL}{path}</loc>"
+                   f"<changefreq>{freq}</changefreq><priority>{priority}</priority></url>")
+    for path in blog_urls:
+        out.append(f"  <url><loc>{BASE_URL}{path}</loc>"
+                   f"<changefreq>monthly</changefreq><priority>0.6</priority></url>")
+    out.append("</urlset>")
+    return "\n".join(out)
