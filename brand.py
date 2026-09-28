@@ -45,12 +45,14 @@ COMPANY = {
 FONT_FACES = """
   @font-face{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}
   @font-face{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}
+  @font-face{font-family:'Outfit';font-weight:100 900;font-display:swap;src:url(/outfit.woff2) format('woff2')}
 """
 
 # --------------------------------------------------------------------------- palette
 
 BRAND_TOKENS = """
   :root{
+    --display:'Outfit',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --serif:'SourceSerif',Georgia,'Times New Roman',serif;
 
     /* dark bands: hero, footer, the triggers and social pages */
@@ -72,6 +74,11 @@ BRAND_TOKENS = """
     /* the click colour. white text on it, always. */
     --cta:#C8102E;--cta-h:#A50D26;--cta-ink:#FFFFFF;
     --cta-soft:#F05A6E;      /* the readable red, for text and marks on a dark band */
+    --grad:linear-gradient(100deg,#F05A6E 0%,#C8102E 55%,#8F1D1D 100%);
+    --halo:radial-gradient(900px 480px at 78% -8%,rgba(200,16,46,.28),transparent 68%);
+    --pill:999px;
+    --card-dark:rgba(255,255,255,.045);
+    --card-dark-line:rgba(255,255,255,.10);
 
     /* verdicts. --critical is deliberately a duller red than --cta so a bad score
        does not read as something you are meant to click. */
@@ -121,6 +128,81 @@ CHROME_CSS = """
   .gb-foot .gb-me p{font-size:13.5px;margin:0}
   .gb-foot .gb-rule{max-width:1060px;margin:32px auto 0;padding-top:18px;
     border-top:1px solid var(--navy-line);font-size:12.5px;color:var(--muted)}
+
+  /* ---------- the craft layer ---------- */
+  /* Borrowed in shape from noneed2shout.com, kept in David's colours: Outfit headings
+     set tight and large, pill buttons, a gradient on the phrase that carries the idea,
+     and a glow so a dark band has depth rather than reading as a flat rectangle. */
+
+  .gb-display{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height:1.04}
+  h1.gb-display{font-size:clamp(38px,6.4vw,76px)}
+  h2.gb-display{font-size:clamp(27px,3.6vw,40px);letter-spacing:-.028em;line-height:1.1}
+  h3.gb-display{font-size:clamp(19px,1.8vw,22px);letter-spacing:-.022em;line-height:1.3}
+
+  /* The one phrase per page that carries the idea. Used once, or it stops meaning anything. */
+  .gb-grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;
+    color:transparent;-webkit-text-fill-color:transparent}
+
+  /* A dark band with light behind it, rather than a flat fill. */
+  .gb-dark{background:var(--navy);color:var(--ivory);position:relative;overflow:hidden}
+  .gb-dark::before{content:"";position:absolute;inset:0;background:var(--halo);pointer-events:none}
+  .gb-dark > *{position:relative}
+
+  .gb-eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--cta-soft);margin:0 0 14px}
+  .gb-dark .gb-lede{font-size:clamp(16px,1.5vw,19px);line-height:1.62;color:var(--ivory-dim);
+    max-width:56ch;margin:0 0 30px}
+
+  /* Pill buttons. Filled red is the one real action; the outline is the way out. */
+  .gb-btn{display:inline-block;border-radius:var(--pill);padding:14px 26px;font-weight:600;
+    font-size:16px;text-decoration:none;border:1.5px solid transparent;cursor:pointer;
+    font-family:inherit;transition:background .15s,color .15s}
+  .gb-btn.primary{background:var(--cta);color:var(--cta-ink)}
+  .gb-btn.primary:hover{background:var(--cta-h)}
+  .gb-btn.ghost{background:transparent;color:var(--ivory);border-color:rgba(255,255,255,.30)}
+  .gb-btn.ghost:hover{border-color:var(--ivory);background:rgba(255,255,255,.06)}
+  .gb-btnrow{display:flex;gap:13px;flex-wrap:wrap;align-items:center}
+
+  /* Cards on a dark band: barely-there fill, one hairline, a big numeral doing the work. */
+  .gb-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin:34px 0 0}
+  .gb-card{background:var(--card-dark);border:1px solid var(--card-dark-line);
+    border-radius:16px;padding:28px 26px}
+  .gb-card .num{font-family:var(--display);font-weight:800;font-size:40px;line-height:1;
+    color:var(--cta-soft);margin-bottom:14px;letter-spacing:-.03em}
+  .gb-card h3{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.02em;
+    margin:0 0 9px;color:#fff;line-height:1.28}
+  .gb-card p{margin:0;font-size:15.5px;line-height:1.62;color:var(--ivory-dim)}
+
+  /* A short gradient rule above a heading on a light band. Replaces an eyebrow where the
+     heading can carry itself. */
+  .gb-rule-sm{width:48px;height:4px;border-radius:2px;background:var(--grad);margin:0 0 20px}
+
+  /* The bordered callout. Gradient edge, white fill, for the one paragraph that answers
+     the question the page title asked. */
+  .gb-callout{position:relative;background:var(--surface);border-radius:16px;
+    padding:26px 30px;margin:0 0 30px}
+  .gb-callout::before{content:"";position:absolute;inset:0;border-radius:16px;padding:1.5px;
+    background:var(--grad);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    mask-composite:exclude;pointer-events:none}
+  .gb-callout .gb-eyebrow{color:var(--cta)}
+  .gb-callout p{margin:0;font-size:17.5px;line-height:1.6;color:var(--ink)}
+
+  /* Portrait with an offset gradient block behind it. */
+  .gb-portrait{position:relative;flex-shrink:0}
+  .gb-portrait img{display:block;width:100%;border-radius:18px;position:relative;z-index:1}
+  .gb-portrait::after{content:"";position:absolute;inset:16px -16px -16px 16px;border-radius:18px;
+    background:var(--grad);z-index:0}
+  .gb-namecard{position:absolute;left:-14px;bottom:26px;z-index:2;background:#fff;color:var(--ink);
+    border-radius:10px;padding:10px 14px;font-size:13.5px;line-height:1.35;font-weight:600;
+    box-shadow:0 6px 22px rgba(0,0,0,.28)}
+  .gb-namecard span{display:block;font-weight:400;color:var(--muted)}
+
+  .gb-split{display:flex;gap:56px;align-items:center}
+  .gb-split .gb-copy{flex:1;min-width:0}
+  .gb-split .gb-portrait{width:38%;max-width:380px}
+  @media(max-width:820px){.gb-split{flex-direction:column;gap:36px}
+    .gb-split .gb-portrait{width:100%;max-width:320px}}
 """
 
 

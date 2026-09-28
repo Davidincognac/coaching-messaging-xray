@@ -25,12 +25,21 @@ _PROSE_CSS = """
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     line-height:1.68;-webkit-font-smoothing:antialiased}
-  .prose{max-width:680px;margin:0 auto;padding:56px 24px 72px}
-  .prose h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5vw,42px);
-    line-height:1.14;letter-spacing:-.02em;margin:0 0 28px;color:#111111}
-  .prose h2{font-family:var(--serif);font-weight:600;font-size:clamp(20px,3.4vw,26px);
-    line-height:1.3;margin:44px 0 14px;color:#111111}
-  .prose h3{font-weight:700;font-size:17px;margin:32px 0 10px;color:#111111}
+  .gb-hero{padding:72px 24px 78px}
+  .gb-herowrap{max-width:1060px;margin:0 auto}
+  .gb-hero .gb-lede{margin-bottom:0}
+  @media(max-width:720px){.gb-hero{padding:48px 20px 54px}}
+  .prose{max-width:680px;margin:0 auto;padding:56px 24px 78px}
+  .prose > h2:first-child{margin-top:0}
+  .prose h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,5vw,46px);
+    line-height:1.06;letter-spacing:-.035em;margin:0 0 28px;color:#111111}
+  .prose h2{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.4vw,32px);
+    line-height:1.12;letter-spacing:-.028em;margin:52px 0 16px;color:#111111}
+  /* the short gradient rule sits above every h2, the way the reference site marks a turn */
+  .prose h2::before{content:"";display:block;width:48px;height:4px;border-radius:2px;
+    background:var(--grad);margin:0 0 18px}
+  .prose h3{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.02em;
+    margin:34px 0 10px;color:#111111}
   .prose p{font-size:17px;margin:0 0 18px}
   .prose li{font-size:17px;margin-bottom:9px}
   .prose ul,.prose ol{padding-left:22px;margin:0 0 18px}
@@ -48,11 +57,21 @@ _PROSE_CSS = """
   .prose th{font-weight:700;color:#111111}
   .prose .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:0 8px 8px 0;padding:16px 20px;margin:0 0 22px;font-size:15.5px}
-  .prose .postlist{list-style:none;padding:0}
-  .prose .postlist li{border-bottom:1px solid var(--line);padding:18px 0;margin:0}
-  .prose .postlist a{font-size:19px;font-weight:600;text-decoration:none;color:#111111}
+  .prose .postlist{list-style:none;padding:0;margin:0}
+  .prose .postlist li{border-bottom:1px solid var(--line);padding:26px 0;margin:0}
+  .prose .postlist li:first-child{padding-top:0}
+  .prose .postlist a{font-family:var(--display);font-size:25px;font-weight:700;
+    letter-spacing:-.025em;line-height:1.2;text-decoration:none;color:#111111;display:block}
   .prose .postlist a:hover{color:var(--cta)}
-  .prose .postlist .when{display:block;font-size:13px;color:var(--muted);margin-top:4px}
+  .prose .postlist .when{display:block;font-size:12.5px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--cta);margin-top:10px}
+  .prose .postlist .sum{margin:8px 0 0;color:var(--muted);font-size:16px}
+  /* byline sits inside the dark hero, under the heading */
+  .gb-byline{display:flex;align-items:center;gap:11px;margin-top:26px;
+    font-size:15px;color:var(--ivory-dim)}
+  .gb-byline img{width:40px;height:40px;border-radius:50%;object-fit:cover;
+    border:2px solid var(--cta)}
+  .gb-byline b{color:var(--ivory);font-weight:600}
   .backlink{display:inline-block;margin-top:40px;font-size:15px}
 """
 
@@ -63,6 +82,7 @@ _SHELL = """<!doctype html><html lang="en"><head>
 __SEO__
 <style>__CSS__</style></head><body>
 __NAV__
+__HERO__
 <main class="prose">
 __BODY__
 </main>
@@ -70,8 +90,19 @@ __FOOTER__
 </body></html>"""
 
 
-def shell(body, title, desc="", active="", path="/", index=True):
+def hero(eyebrow, heading_html, lede="", buttons="", portrait=""):
+    """The dark band every page opens on. `heading_html` is passed through unescaped so a
+    single phrase can carry the gradient; everything in it is ours, never a coach's."""
+    brow = f'<p class="gb-eyebrow">{html.escape(eyebrow)}</p>' if eyebrow else ""
+    led = f'<p class="gb-lede">{lede}</p>' if lede else ""
+    copy = f'<div class="gb-copy">{brow}<h1 class="gb-display">{heading_html}</h1>{led}{buttons}</div>'
+    inner = f'<div class="gb-split">{copy}{portrait}</div>' if portrait else copy
+    return f'<section class="gb-dark gb-hero"><div class="gb-herowrap">{inner}</div></section>'
+
+
+def shell(body, title, desc="", active="", path="/", index=True, hero_html=""):
     return (_SHELL
+            .replace("__HERO__", hero_html)
             .replace("__SEO__", _brand.head_meta(path, title, desc, index))
             .replace("__CSS__", _brand.FONT_FACES + _brand.BRAND_TOKENS
                      + _brand.CHROME_CSS + _PROSE_CSS)
@@ -88,19 +119,33 @@ def render_about():
     # The counts come from the live corpus, not from a number typed in here, so the page
     # can never claim a figure the tool would contradict two clicks later.
     cnt = f"{websites_read_count():,}"
+
+    hero_html = hero(
+        eyebrow="About",
+        heading_html='I <span class="gb-grad">count things</span>, then I build from what the counting says',
+        lede="That is the whole job. Everything below is how I got here and what I have "
+             "counted so far.",
+        buttons='<div class="gb-btnrow">'
+                '<a class="gb-btn primary" href="/">See your buying triggers</a>'
+                f'<a class="gb-btn ghost" href="mailto:{_brand.COMPANY["email"]}">Email me</a>'
+                '</div>',
+        portrait='<div class="gb-portrait">'
+                 '<img src="/david.jpg" alt="David Poole">'
+                 '<div class="gb-namecard">David Poole<span>Going Beyond The Illusion</span></div>'
+                 '</div>',
+    )
+
     body = f"""
-<h1>I count things, then I build from what the counting says</h1>
+<div class="gb-callout">
+  <p class="gb-eyebrow">The short answer</p>
+  <p>Most people advising coaches start from experience. I start from a count. I read
+     {cnt} coaching websites and scored every one of them, and I build from what that
+     says rather than from what sounds right.</p>
+</div>
 
-<p class="lede">That is the whole job. Everything below is how I got here and what I have
-counted so far.</p>
-
-<p>Most people advising coaches start from experience. What worked for them, what they
-have seen, what sounds right. That has real value and I am not going to pretend
-otherwise. It is also filtered through somebody else's market and somebody else's
-situation, and you are in neither of those.</p>
-
-<p>I start somewhere else. I count what a market is already doing, and then I build to
-match it.</p>
+<p>Experience has real value and I am not going to pretend otherwise. It is also filtered
+through somebody else's market and somebody else's situation, and you are in neither of
+those.</p>
 
 <h2>Before this</h2>
 
@@ -122,20 +167,18 @@ national conferences with 150, 150 and 268 people in the room.</p>
 <p>I never told those instructors what ought to work. I researched how their market
 moved, built everything to match it, and ran that for twelve years before I sold it.</p>
 
-<h2>Now</h2>
+<h2>What the counting says</h2>
 
-<p>The same thing, for coaches.</p>
-
-<p>So far that is {cnt} coaching websites read and scored out of 10, 11,384 LinkedIn
-profiles, and 2,000 books their buyers actually paid for.</p>
+<p>So far: {cnt} coaching websites read and scored out of 10, 11,384 LinkedIn profiles,
+and 2,000 books their buyers actually paid for.</p>
 
 <p>The average website scored {MARKET_AVG_10}.</p>
 
-<p>That number is the reason I keep doing this. A coach who knows their subject cold,
-who has done the inner work, who is genuinely good in the room, still ends up with a
-homepage scoring under 5 to the stranger who lands on it. Not because they are lazy.
-Because they wrote it from the inside, using the words they use with other coaches, and
-nobody ever showed them what their buyer types at eleven at night.</p>
+<p>That number is the reason I keep doing this. A coach who knows their subject cold, who
+has done the inner work, who is genuinely good in the room, still ends up with a homepage
+scoring under 5 to the stranger who lands on it. Not because they are lazy. Because they
+wrote it from the inside, using the words they use with other coaches, and nobody ever
+showed them what their buyer types at eleven at night.</p>
 
 <h2>Why a cartoon reads your website</h2>
 
@@ -145,8 +188,6 @@ nobody ever showed them what their buyer types at eleven at night.</p>
 stranger would, in about a minute, and I would rather it looked like a machine than
 pretend to be me leaning over your shoulder. When I am the one doing the work, you will
 know, because it will have my name on it and it will take longer than a minute.</p>
-
-<p>I am in the footer. Also deliberate.</p>
 
 <h2>Where to start</h2>
 
@@ -158,7 +199,8 @@ happens unless you want it to.</p>
 <a href="mailto:{_brand.COMPANY['email']}">{_brand.COMPANY['email']}</a>.</p>
 """
     return shell(body, "About David Poole", "Who runs Going Beyond The Illusion, and why "
-                 "the research comes before the advice.", active="about", path="/about")
+                 "the research comes before the advice.", active="about", path="/about",
+                 hero_html=hero_html)
 
 
 # --------------------------------------------------------------------------- blog
@@ -220,38 +262,62 @@ def _pretty_date(iso):
 
 def render_blog_index():
     posts = _read_posts()
+    hero_html = hero(
+        eyebrow="Blog",
+        heading_html='What the <span class="gb-grad">numbers</span> keep saying about coaching websites',
+        lede="Not opinion pieces. If something goes up here it has a number in it and I "
+             "will tell you where the number came from.",
+    )
     if not posts:
         # An honest empty state beats three invented posts. It also says when to come back.
         body = """
-<h1>Blog</h1>
-<p class="lede">Nothing here yet.</p>
-<p>What will go here: what the research keeps turning up across coaching markets, what
-the scores look like when you read enough websites, and the bits of the method I am
-happy to give away.</p>
-<p>Not opinion pieces. If I write something here it will have a number in it.</p>
-<p>In the meantime, <a href="/">the buying triggers page</a> is the useful thing.</p>
+<div class="gb-callout">
+  <p class="gb-eyebrow">Nothing here yet</p>
+  <p>I am writing the first ones. They will cover what the research keeps turning up
+     across coaching markets, what the scores look like once you have read enough
+     websites, and the parts of the method I am happy to give away.</p>
+</div>
+<h2>In the meantime</h2>
+<p>The useful thing is <a href="/">the buying triggers page</a>. It takes a couple of
+minutes and it tells you what your market is already responding to.</p>
 """
         return shell(body, "Blog", "Research notes from reading coaching websites.",
-                     active="blog", path="/blog")
+                     active="blog", path="/blog", hero_html=hero_html)
+
     items = []
-    for p in posts:
-        when = _pretty_date(p["date"])
-        summary = f'<span class="when">{html.escape(p["summary"])}</span>' if p["summary"] else ""
+    for p_ in posts:
+        when = _pretty_date(p_["date"])
+        meta = " · ".join(x for x in [html.escape(when)] if x)
+        summ = f'<p class="sum">{html.escape(p_["summary"])}</p>' if p_["summary"] else ""
         items.append(
-            f'<li><a href="/blog/{html.escape(p["slug"])}">{html.escape(p["title"])}</a>'
-            + (f'<span class="when">{html.escape(when)}</span>' if when else "")
-            + summary + "</li>")
-    body = ("<h1>Blog</h1>\n<ul class=\"postlist\">" + "".join(items) + "</ul>")
-    return shell(body, "Blog", "Research notes from reading coaching websites.", active="blog", path="/blog")
+            f'<li><a href="/blog/{html.escape(p_["slug"])}">{html.escape(p_["title"])}</a>'
+            + (f'<span class="when">{meta}</span>' if meta else "")
+            + summ + "</li>")
+    body = '<ul class="postlist">' + "".join(items) + "</ul>"
+    return shell(body, "Blog", "Research notes from reading coaching websites.",
+                 active="blog", path="/blog", hero_html=hero_html)
 
 
 def render_post(slug):
-    for p in _read_posts():
-        if p["slug"] == slug:
-            when = _pretty_date(p["date"])
-            stamp = f'<p class="stamp">{html.escape(when)}</p>' if when else ""
-            body = stamp + markdown(p["body"]) + '<p><a class="backlink" href="/blog">Back to the blog</a></p>'
-            return shell(body, p["title"], p["summary"], active="blog", path="/blog/" + p["slug"])
+    for p_ in _read_posts():
+        if p_["slug"] == slug:
+            when = _pretty_date(p_["date"])
+            byline = (
+                '<div class="gb-byline">'
+                + ('<img src="/david.jpg" alt="">' if os.path.exists(
+                    os.path.join(os.path.dirname(os.path.abspath(__file__)), "david.jpg")) else "")
+                + f'<span>By <b>David Poole</b>'
+                + (f' · {html.escape(when)}' if when else "")
+                + "</span></div>")
+            hero_html = hero(
+                eyebrow="Blog",
+                heading_html=html.escape(p_["title"]),
+                lede=html.escape(p_["summary"]) if p_["summary"] else "",
+            ).replace("</div></section>", byline + "</div></section>")
+            body = (markdown(p_["body"])
+                    + '<p><a class="backlink" href="/blog">&larr; Back to the blog</a></p>')
+            return shell(body, p_["title"], p_["summary"], active="blog",
+                         path="/blog/" + p_["slug"], hero_html=hero_html)
     return None
 
 

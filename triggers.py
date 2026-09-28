@@ -87,7 +87,15 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   body{margin:0;background:var(--navy);color:var(--ivory);
     font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
     -webkit-font-smoothing:antialiased}
-  .wrap{max-width:900px;margin:0 auto;padding:56px 24px 72px}
+  .wrap{max-width:1020px;margin:0 auto;padding:60px 24px 76px;position:relative;z-index:1}
+  /* the glow that stops a black band reading as a flat rectangle */
+  body::before{content:"";position:fixed;inset:0;background:var(--halo);pointer-events:none;z-index:0}
+  #heroblock{margin-bottom:38px}
+  #heroblock .gb-split{gap:40px;align-items:center}
+  /* Angelo has to hold his own against a 76px headline, so he is sized like the portrait
+     block on the about page rather than like an icon. */
+  .heromascot{width:250px;height:auto;flex-shrink:0;align-self:center}
+  @media(max-width:820px){.heromascot{width:150px;align-self:flex-start}}
   .eyebrow{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--ivory-dim);
     font-weight:600;margin:0 0 18px}
   h1.serif{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,48px);line-height:1.12;
@@ -103,7 +111,7 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
     font-family:inherit}
   input::placeholder{color:var(--ivory-dim)}
   input:focus{outline:2px solid var(--glow);outline-offset:1px}
-  button{background:var(--cta);color:var(--cta-ink);border:0;border-radius:6px;padding:16px 24px;
+  button{background:var(--cta);color:var(--cta-ink);border:0;border-radius:var(--pill);padding:16px 30px;
     font-size:17px;font-weight:700;cursor:pointer;font-family:inherit}
   button:hover{background:var(--cta-h)}
   button[disabled]{opacity:.55;cursor:default}
@@ -650,17 +658,18 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
 
     body = """
   <div id="heroblock">
-  <div class="eyebrow">Buying Triggers</div>
-  <div class="hero">
-    <img class="mascot" src="/angelo.png"
-         alt="Angelo, who works out what your market already buys">
-    <div class="hero-copy">
-      <h1 class="serif">Coaches: the 6 buying triggers that turn a stranger into a client.</h1>
-      <p class="sub"><b>Your client buys for a reason. They won't tell you what it is.</b>
-      So we went and worked out what your market already buys, and why.</p>
+  <div class="gb-split">
+    <div class="gb-copy">
+      <p class="gb-eyebrow">Buying triggers</p>
+      <h1 class="gb-display">The 6 <span class="gb-grad">buying triggers</span> that turn a
+        stranger into a client</h1>
+      <p class="gb-lede"><b>Your client buys for a reason, and they will not tell you what it
+      is.</b> So we went and worked out what your market already buys, and why. Tell us who you
+      coach and your report opens on this page in about twenty seconds.</p>
     </div>
+    <img class="mascot heromascot" src="/angelo.png"
+         alt="Angelo, who works out what your market already buys">
   </div>
-  <p class="sub">Tell us who you coach. Your report opens on this page in about twenty seconds.</p>
   </div>
 
   <form method="post" action="/triggers" id="trigform" autocomplete="on">

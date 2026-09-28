@@ -2787,7 +2787,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
-        if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/angelo_up.png", "/angelo_down.png",
+        if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/outfit.woff2", "/angelo_up.png", "/angelo_down.png",
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
                     "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png",
                     "/angelo_board.png",
