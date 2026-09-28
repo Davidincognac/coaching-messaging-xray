@@ -676,7 +676,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
 
   <form method="post" action="/triggers" id="trigform" autocomplete="on">
     """ + err_html + """
-    <h2 class="gb-display f-head">Tell us who you coach</h2>
+    <h2 class="gb-display f-head">Tell us who you coach, and we will tell you why they&nbsp;buy</h2>
     <p class="f-lead">Your report opens on this page in about twenty seconds.
     <span class="free">Nothing to pay.</span> We built this research for our own work, so it
     costs us nothing to hand you a copy.</p>
