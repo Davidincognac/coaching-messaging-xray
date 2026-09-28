@@ -38,6 +38,8 @@ import banner_image as _banner          # turns an upload into a safe, small Web
 import social_page as _social           # the form and the two exits
 import social_section, combined_parts   # the report itself, already built and checked
 import triggers as _triggers            # the Buying Triggers page (book + Cashvertising research)
+import brand as _brand                  # palette, nav and footer: one source for all three stylesheets
+import pages as _pages                  # about, blog and the legal pages
 
 PORT = int(os.getenv("PORT", "8000"))
 MAILERLITE_API_KEY = os.getenv("MAILERLITE_API_KEY", "")
@@ -139,18 +141,7 @@ def mascot_img():
 PAGE = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Coaching Website Report Card</title>
-<style>
-  @font-face{{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}}
-  @font-face{{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}}
-  :root{{
-    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
-    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
-    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
-    --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
-    --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
-    --gold:#D4AF37;--gold-h:#C2A02F;
-    --good:#2A7B56;--good-glow:#5CB88C;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;
-    --coral:#F0B9B4;}}   /* the on-navy warning tint: readable where --critical would go muddy */
+<style>""" + _brand.fmt(_brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS) + """
   *{{box-sizing:border-box}}
   html{{background:var(--navy)}}
   body{{margin:0;background:var(--navy);color:var(--ink);
@@ -198,9 +189,9 @@ PAGE = """<!doctype html><html lang="en"><head>
   .fieldset .sub{{font-size:13.5px;color:var(--ivory-dim);margin:0;line-height:1.5}}
   .formerr{{background:rgba(214,80,74,.13);border:1px solid rgba(214,80,74,.5);border-radius:6px;
     padding:13px 16px;font-size:15px;color:var(--ivory)}}
-  button{{background:var(--gold);color:var(--navy);border:0;border-radius:6px;padding:16px 24px;
+  button{{background:var(--cta);color:var(--cta-ink);border:0;border-radius:6px;padding:16px 24px;
     font-family:inherit;font-size:16px;font-weight:700;letter-spacing:.01em;cursor:pointer;margin-top:4px}}
-  button:hover{{background:var(--gold-h)}}
+  button:hover{{background:var(--cta-h)}}
   .hint{{font-size:13px;color:var(--ivory-dim);margin-top:16px;line-height:1.6}}
   .hint b{{color:var(--glow)}}
   .plan2{{margin-top:14px;background:var(--navy-card);border:1px solid var(--navy-line);
@@ -213,7 +204,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .pl-step{{position:relative;padding-left:14%;color:#141414;font-size:11px;font-size:2.1cqw;
     line-height:1.3;font-weight:600}}
   .pl-step span{{position:absolute;left:0;top:.1em;width:10%;aspect-ratio:1;border-radius:50%;
-    background:var(--gold);color:var(--navy);font-weight:700;display:flex;align-items:center;
+    background:var(--cta);color:var(--cta-ink);font-weight:700;display:flex;align-items:center;
     justify-content:center;font-size:1.7cqw}}
   .plan-say{{margin:18px auto 0;max-width:560px}}
   .ps-h{{font-family:var(--serif);font-weight:600;font-size:clamp(20px,3.4vw,25px);line-height:1.25;
@@ -441,9 +432,9 @@ PAGE = """<!doctype html><html lang="en"><head>
   .cta .hook .hl .sc{{color:inherit}}
   .cta .curi{{font-weight:600;color:#fff;font-size:17px}}
   .cta .btnwrap{{text-align:center;margin-top:8px}}
-  .cta-btn{{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
+  .cta-btn{{display:inline-block;background:var(--cta);color:var(--cta-ink);text-decoration:none;font-weight:700;
     padding:16px 32px;border-radius:6px;font-size:16px}}
-  .cta-btn:hover{{background:var(--gold-h)}}
+  .cta-btn:hover{{background:var(--cta-h)}}
   .positioning{{margin-top:32px;padding:24px;background:var(--navy);color:var(--ivory);border-radius:16px;line-height:1.6;font-size:15px}}
   .positioning h4{{font-family:"Inter",sans-serif;font-size:20px;margin:0 0 10px;color:#fff}}
   .positioning b{{color:var(--glow)}}
@@ -484,7 +475,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   .ev .h,.scores-h,.voice h4,.diag h3{{font-family:var(--serif);font-size:25px;font-weight:600;
     color:var(--ink);line-height:1.3;letter-spacing:-.01em}}
   .sec-lede{{font-size:16px;line-height:1.6;color:var(--muted);margin:0 0 18px;max-width:62ch}}
-</style></head><body>
+</style></head><body>""" + _brand.fmt(_brand.nav_html(links=False)) + """
 <div class="hero-band"><div class="wrap">
   <div class="hero">
     {mascot}
@@ -497,7 +488,7 @@ PAGE = """<!doctype html><html lang="en"><head>
       get it wrong. (83%, for those who like it exact.)</p>
     </div>
   </div>
-  <form method="get" action="/" id="auditform">
+  <form method="get" action="/website" id="auditform">
     {identity}
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a potential client sees</button>
@@ -527,6 +518,7 @@ PAGE = """<!doctype html><html lang="en"><head>
   <!--PROGRESS-->
 </div></div>
 <div id="result">{result}</div>
+""" + _brand.fmt(_brand.footer_html()) + """
 </body></html>"""
 
 # The live-progress overlay. Kept as a PLAIN string (real braces) and injected into PAGE after .format(), so its
@@ -644,7 +636,7 @@ document.addEventListener('DOMContentLoaded',function(){
       clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
       clearTimeout(t5); clearTimeout(t6); clearTimeout(t7);
       proc.className=''; form.style.display=''; busy=false;
-      window.location.href='/?'+qs;
+      window.location.href='/website?'+qs;
     });
   });
 });
@@ -1331,19 +1323,7 @@ OFFER_PAGE = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Marketing Intelligence File</title>
 <!-- RETARGETING: paste your Meta Pixel and/or Google tag here. A visit to /offer = a warm audience. -->
-<style>
-  @font-face{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}
-  @font-face{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}
-  /* Same token block as the report and the salespage. Keep these three in step: this page is one
-     click from a gold CTA, so any drift here reads as landing on a different website. */
-  :root{
-    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
-    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
-    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
-    --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
-    --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
-    --gold:#D4AF37;--gold-h:#C2A02F;
-    --good:#2A7B56;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;--coral:#F0B9B4;}
+<style>""" + _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
@@ -1367,13 +1347,13 @@ OFFER_PAGE = """<!doctype html><html lang="en"><head>
   @media(max-width:560px){.cta{padding:28px 20px}}
   .cta h2{color:#fff;margin-top:0}
   .cta p{max-width:48ch;margin:0 auto 20px;color:var(--ivory);font-size:16px}
-  .btn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
+  .btn{display:inline-block;background:var(--cta);color:var(--cta-ink);text-decoration:none;font-weight:700;
     padding:16px 32px;border-radius:6px;font-size:16px}
-  .btn:hover{background:var(--gold-h)}
+  .btn:hover{background:var(--cta-h)}
   .note{font-size:13px;color:var(--ivory-dim);margin-top:14px}
   .back{display:inline-block;margin-bottom:24px;color:var(--accent-ink);text-decoration:none;font-size:14px}
 </style></head><body data-domain="__DOMAIN__"><div class="wrap">
-  <a class="back" href="/">&larr; Back to your free audit</a>
+  <a class="back" href="/website">&larr; Back to your free audit</a>
   <div class="eyebrow">The Marketing Intelligence File</div>
   <h1>Your buyers are already telling you exactly what to say. You just can't hear it yet.</h1>
   <p class="lede">A deep-research file on the exact people you help, their real problem, the words they use,
@@ -1432,17 +1412,7 @@ OFFER_PAGE = """<!doctype html><html lang="en"><head>
 # ============================================================================
 
 # Plain string (not a template), so the CSS braces need no doubling.
-_SALES_CSS = """
-  @font-face{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}
-  @font-face{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}
-  :root{
-    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
-    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
-    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
-    --paper:#F4F5F7;--surface:#fff;--ink:#1B222C;--muted:#5A6472;--line:#E1E4EA;
-    --accent:#3a76bd;--accent-ink:#234e83;--glow:#7FA9DD;--soft:#EBF1F8;
-    --gold:#D4AF37;--gold-h:#C2A02F;
-    --good:#2A7B56;--warn:#A87B23;--warn-ink:#7A5A16;--critical:#A62626;--coral:#F0B9B4;}
+_SALES_CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   *{box-sizing:border-box}
   html{background:var(--navy)}
   body{margin:0;background:var(--paper);color:var(--ink);
@@ -1585,7 +1555,7 @@ _SALES_CSS = """
   /* ---------- "you are here" progress markers (reuse the signposts art + its base rules) ---------- */
   .steps-wrap.mini{width:min(600px,94%);margin:0 auto 26px}
   .step-lbl.dim{color:#A3ACB8;font-weight:600}
-  .step-here{position:absolute;background:var(--gold);color:var(--navy);font-weight:700;
+  .step-here{position:absolute;background:var(--cta);color:var(--cta-ink);font-weight:700;
     font-size:10px;font-size:max(2.2cqw, 9px);letter-spacing:.06em;text-transform:uppercase;
     padding:.35em .8em;border-radius:999px;white-space:nowrap;box-shadow:0 1px 4px rgba(11,19,43,.25)}
   .step-here.pos2{left:56.5%;top:50%}
@@ -1599,12 +1569,12 @@ _SALES_CSS = """
   .board-img{display:block;width:100%;height:auto}
   .board-lay{position:absolute;left:7.5%;top:29.5%;width:85%;height:60%;display:flex;
     flex-direction:column;justify-content:center}
-  .board-lay .rm-h{color:#F4DE9C;font-size:1.35cqw;margin-bottom:.7em}
+  .board-lay .rm-h{color:var(--cta-soft);font-size:1.35cqw;margin-bottom:.7em}
   .board-lay .rm-col:first-child .rm-h{padding-left:17%;white-space:nowrap}
   .board-lay .rm-pill{background:transparent;border:1.5px solid rgba(244,245,247,.75);
     color:#F4F5F7;font-size:1.75cqw;padding:.4em .8em;margin-bottom:.45em}
   .board-lay .rm-arrow.ok .rm-glyph{color:#F4F5F7;font-size:2.6cqw}
-  .board-lay .rm-arrow.ok .rm-albl{color:#F4DE9C;font-size:1.15cqw}
+  .board-lay .rm-arrow.ok .rm-albl{color:var(--cta-soft);font-size:1.15cqw}
   .board-lay .rm-arrow.no .rm-glyph{color:var(--coral);font-size:2.3cqw}
   .board-lay .rm-arrow.no .rm-albl{color:var(--coral);font-size:1.15cqw}
   .board-lay .rm-page{background:transparent;border:1.5px solid #F4F5F7;color:#F4F5F7;
@@ -1613,7 +1583,7 @@ _SALES_CSS = """
   .board-lay .rm-page::after{background:#F4F5F7;box-shadow:10px 0 0 rgba(244,245,247,.6),
     20px 0 0 rgba(244,245,247,.35)}
   .board-lay .rm-buyer{background:transparent;border:1.5px solid rgba(244,245,247,.75);
-    border-left:4px solid #F4DE9C;color:#F4F5F7;font-size:1.7cqw}
+    border-left:4px solid var(--cta-soft);color:#F4F5F7;font-size:1.7cqw}
   .board-lay .rm-cap{color:rgba(244,245,247,.85);font-size:1.4cqw;margin:.8em 0 0}
   @media(min-width:701px){.board-wrap{display:block}.roots-map{display:none}}
   .roots-map{background:var(--surface);border:1px solid var(--line);border-radius:12px;
@@ -1701,12 +1671,12 @@ _SALES_CSS = """
   .protocol-container ul{margin:8px 0 0;padding-left:20px}
   .protocol-container li{font-size:15px;color:var(--muted);line-height:1.6;margin:6px 0}
   .protocol-container li b{color:var(--ink)}
-  .pitch-gate{background:var(--navy);border:1.5px solid var(--gold);border-radius:16px;
+  .pitch-gate{background:var(--navy);border:1.5px solid var(--cta);border-radius:16px;
     padding:44px 34px;margin-bottom:28px;text-align:center;
     box-shadow:0 10px 34px rgba(11,19,43,.28)}
   @media(max-width:560px){.pitch-gate{padding:32px 20px}}
   .pitch-gate .pg-label{display:inline-block;font-size:12px;letter-spacing:.22em;text-transform:uppercase;
-    color:var(--gold);font-weight:700;margin-bottom:16px;padding:6px 16px;
+    color:var(--cta-soft);font-weight:700;margin-bottom:16px;padding:6px 16px;
     border:1px solid rgba(212,175,55,.45);border-radius:999px}
   .pitch-gate h2{font-family:var(--serif);color:#fff;font-size:clamp(23px,4vw,30px);margin:0 0 14px;
     line-height:1.25}
@@ -1776,7 +1746,7 @@ _SALES_CSS = """
   .fasc li{position:relative;padding:0 0 16px 34px;font-size:16px;line-height:1.55;color:var(--ink)}
   .fasc li:last-child{padding-bottom:0}
   .fasc li::before{content:"✓";position:absolute;left:0;top:.12em;width:21px;height:21px;
-    border-radius:50%;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;
+    border-radius:50%;background:var(--cta);color:var(--cta-ink);font-size:12px;font-weight:700;
     display:flex;align-items:center;justify-content:center}
   .fasc li b{color:var(--accent-ink)}
   .fasc-close{font-size:14px;color:var(--muted);line-height:1.6}
@@ -1787,7 +1757,7 @@ _SALES_CSS = """
   .next-steps li{position:relative;padding:0 0 18px 44px;font-size:16px;line-height:1.6;color:var(--ink)}
   .next-steps li:last-child{padding-bottom:0}
   .next-steps li::before{counter-increment:nx;content:counter(nx);position:absolute;left:0;top:0;
-    width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;
+    width:28px;height:28px;border-radius:50%;background:var(--cta);color:var(--cta-ink);font-weight:700;
     display:flex;align-items:center;justify-content:center;font-size:14px}
   .next-steps li b{color:var(--accent-ink)}
   .price-anchor{font-size:14px;color:var(--muted);margin:16px 0 6px}
@@ -1821,11 +1791,11 @@ _SALES_CSS = """
     color:var(--ivory-dim);font-weight:600;margin-bottom:12px}
   .checkout-form-placeholder .cf-note{font-size:14px;color:var(--ivory-dim);line-height:1.55}
   .checkout-form-placeholder .lock-icon{font-size:28px;margin-bottom:10px}
-  .cta-btn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;font-weight:700;
+  .cta-btn{display:inline-block;background:var(--cta);color:var(--cta-ink);text-decoration:none;font-weight:700;
     font-family:inherit;   /* a <button> does NOT inherit the page font: without this it renders in Arial */
     padding:16px 30px;border-radius:6px;font-size:16px;margin-top:18px;border:0;cursor:pointer;width:100%;
     text-align:center}
-  .cta-btn:hover{background:var(--gold-h)}
+  .cta-btn:hover{background:var(--cta-h)}
   .cta-btn:disabled{opacity:.55;cursor:default}
   .guarantee{font-size:13px;color:var(--ivory-dim);margin-top:14px;text-align:center;line-height:1.5}
   .btnwrap{text-align:center;margin-top:22px}
@@ -2599,7 +2569,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <p class="guarantee">Secure payment &middot; Instant confirmation &middot; Delivered within 5 working days &middot; 7-Day Certainty Guarantee</p>
   </div>
 
-</div></body></html>"""
+</div>""" + _brand.footer_html() + """</body></html>"""
 
 
 # The PAGE template above IS the homepage: hero, the audit form, Angelo's plan, then {result}
@@ -2642,7 +2612,9 @@ def inner_page(result, eyebrow=""):
             + mascot_img()
             + f'<div class="hero-copy">{brow}</div>'
             + '</div></div></div>'
-            + f'<div id="result">{result}</div>\n</body></html>')
+            + f'<div id="result">{result}</div>\n'
+            + _brand.footer_html()
+            + '\n</body></html>')
 
 
 def social_page_form(lead, error="", values=None):
@@ -2714,7 +2686,7 @@ class Handler(BaseHTTPRequestHandler):
         lead = get_trigger_lead(_mp.text(fields, "token", 64))
         if not lead:
             self.send_response(302)
-            self.send_header("Location", "/triggers")
+            self.send_header("Location", "/")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             return
@@ -2817,10 +2789,12 @@ class Handler(BaseHTTPRequestHandler):
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
                     "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png",
                     "/angelo_board.png",
-                    "/belief1.png", "/belief2.png", "/belief3.png", "/belief4.png"):
+                    "/belief1.png", "/belief2.png", "/belief3.png", "/belief4.png",
+                    "/david.jpg"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
-                ctype = "font/woff2" if path.endswith(".woff2") else "image/png"
+                ctype = ("font/woff2" if path.endswith(".woff2")
+                         else "image/jpeg" if path.endswith(".jpg") else "image/png")
                 with open(fpath, "rb") as f:
                     self._send_bytes(f.read(), ctype)
             else:
@@ -2860,7 +2834,7 @@ class Handler(BaseHTTPRequestHandler):
             lead = get_trigger_lead((parse_qs(parsed.query).get("lead", [""])[0]).strip())
             if not lead:
                 self.send_response(302)
-                self.send_header("Location", "/triggers")
+                self.send_header("Location", "/")
                 self.send_header("Cache-Control", "no-store")
                 self.end_headers()
                 return
@@ -2873,7 +2847,36 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(self._social_page(social_page_form(lead)))
             return
         if path == "/triggers":
-            self._send(_triggers.render_triggers())
+            # The landing page moved to the root. This address is already in sent emails and
+            # links, so it redirects rather than 404s, and it is a permanent move.
+            self.send_response(301)
+            self.send_header("Location", "/")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
+        # The pages that are not the funnel. Flat routes, no query strings, nothing
+        # stored: these are the ones a stranger or a regulator reads.
+        if path in ("/about", "/blog", "/privacy", "/terms", "/cookies"):
+            self._send({
+                "/about": _pages.render_about,
+                "/blog": _pages.render_blog_index,
+                "/privacy": _pages.render_privacy,
+                "/terms": _pages.render_terms,
+                "/cookies": _pages.render_cookies,
+            }[path]())
+            return
+        if path.startswith("/blog/"):
+            # The slug comes off the filename of a post WE wrote, so anything that is not
+            # a plain slug is a probe rather than a reader. Send it back to the index.
+            slug = path[len("/blog/"):].strip("/")
+            post = _pages.render_post(slug) if re.fullmatch(r"[a-z0-9-]{1,80}", slug) else None
+            if post:
+                self._send(post)
+            else:
+                self.send_response(302)
+                self.send_header("Location", "/blog")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
             return
         if path == "/mockup/website":
             # NOT a mockup. This re-renders a REAL stored audit, so David is looking at what the
@@ -3106,7 +3109,12 @@ class Handler(BaseHTTPRequestHandler):
                 ).start()
             self._send(frag)
             return
-        if path not in ("/", ""):
+        if path in ("/", ""):
+            # Step one. Buying Triggers is the front door of the whole funnel, so it owns the
+            # root; the website audit that used to live here is at /website.
+            self._send(_triggers.render_triggers())
+            return
+        if path != "/website":
             self.send_response(404); self.end_headers(); return
         qs = parse_qs(parsed.query)
         # A coach arriving from the social page carries a token. We already hold their name, their

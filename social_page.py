@@ -94,7 +94,7 @@ def exits(token="", website="", count=""):
   <h3 class="scores-h">Have your website read</h3>
   <p class="sub">{reading}</p>
   {known}
-  <p class="btnwrap"><a class="btn" href="/{q}">Read my website</a></p>
+  <p class="btnwrap"><a class="btn" href="/website{q}">Read my website</a></p>
 </div>
 <div class="card">
   <h3 class="scores-h">No website?</h3>

@@ -12,6 +12,8 @@ import json
 import re
 import os
 
+import brand as _brand   # palette, nav and footer
+
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _DATA_PATH = os.path.join(_HERE, "triggers_data.json")
 
@@ -79,15 +81,7 @@ def have_triggers_for(niche):
     return ""
 
 
-_CSS = """
-  @font-face{font-family:'Inter';font-weight:100 900;font-display:swap;src:url(/inter.woff2) format('woff2')}
-  @font-face{font-family:'SourceSerif';font-weight:200 900;font-display:swap;src:url(/serif.woff2) format('woff2')}
-  :root{
-    --serif:'SourceSerif',Georgia,'Times New Roman',serif;
-    --navy:#0B132B;--navy-card:#131D3E;--navy-deep:#0F1834;--navy-line:#27335C;
-    --ivory:#F4F5F7;--ivory-dim:#A9B1C4;
-    --gold:#D4AF37;--gold-h:#C2A02F;--glow:#7FA9DD;
-    --critical:#A62626;--coral:#F0B9B4;}
+_CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   *{box-sizing:border-box}
   html{background:var(--navy)}
   body{margin:0;background:var(--navy);color:var(--ivory);
@@ -103,15 +97,15 @@ _CSS = """
   form{display:flex;flex-direction:column;gap:12px;background:var(--navy-card);
     border:1px solid var(--navy-line);border-radius:12px;padding:22px;margin:32px 0 0}
   .f-lead{font-size:15px;line-height:1.6;color:var(--ivory);margin:0 0 4px}
-  .f-lead .free{color:var(--gold);font-weight:700}
+  .f-lead .free{color:var(--cta-soft);font-weight:700}
   input[type=text],input[type=email]{border:1px solid var(--navy-line);border-radius:6px;
     padding:14px 16px;font-size:16px;color:var(--ivory);background:var(--navy-deep);width:100%;
     font-family:inherit}
   input::placeholder{color:var(--ivory-dim)}
   input:focus{outline:2px solid var(--glow);outline-offset:1px}
-  button{background:var(--gold);color:var(--navy);border:0;border-radius:6px;padding:16px 24px;
+  button{background:var(--cta);color:var(--cta-ink);border:0;border-radius:6px;padding:16px 24px;
     font-size:17px;font-weight:700;cursor:pointer;font-family:inherit}
-  button:hover{background:var(--gold-h)}
+  button:hover{background:var(--cta-h)}
   button[disabled]{opacity:.55;cursor:default}
   .hint{font-size:13px;color:var(--ivory-dim);margin:14px 0 0;line-height:1.6}
   .err{color:var(--coral);font-size:14px;line-height:1.6;margin:0 0 4px}
@@ -129,7 +123,7 @@ _CSS = """
   .sugg li:hover,.sugg li[aria-selected=true]{background:var(--navy-card)}
   .sugg ul{margin:0;padding:0}
   .sugg .par{display:block;font-size:12px;color:var(--ivory-dim);margin-top:3px}
-  .sugg mark{background:transparent;color:var(--gold);font-weight:700}
+  .sugg mark{background:transparent;color:var(--cta-soft);font-weight:700}
   .sugg .none{padding:12px 14px;font-size:14px;color:var(--ivory-dim);line-height:1.5}
 
   .whats{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--navy-line);
@@ -152,11 +146,11 @@ _CSS = """
     padding:30px;margin:32px 0 0}
   .done h2{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
   .done p{font-size:16px;line-height:1.7;margin:0 0 14px;color:var(--ivory);max-width:62ch}
-  .done .tick{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--navy);
+  .done .tick{width:44px;height:44px;border-radius:50%;background:var(--cta);color:var(--cta-ink);
     display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 0 16px}
-  .nextbtn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;
+  .nextbtn{display:inline-block;background:var(--cta);color:var(--cta-ink);text-decoration:none;
     font-weight:700;padding:15px 26px;border-radius:6px;font-size:16px;margin-top:6px}
-  .nextbtn:hover{background:var(--gold-h)}
+  .nextbtn:hover{background:var(--cta-h)}
   /* Hero, with Angelo alongside the promise. */
   .hero{display:flex;gap:26px;align-items:flex-start;margin:0 0 6px}
   .mascot{width:118px;height:118px;border-radius:50%;object-fit:cover;flex:0 0 auto;
@@ -165,20 +159,20 @@ _CSS = """
   .hero h1.serif{margin-top:0}
 
   /* The blocks under the form. */
-  .whats.real{border-color:var(--gold)}
+  .whats.real{border-color:var(--cta-soft)}
   .whats .rl{font-size:15.5px;line-height:1.7;color:var(--ivory);margin:0 0 14px;max-width:64ch}
   .whats .rl:last-child{margin-bottom:0}
   .whats h2 + .rl{margin-top:-4px;margin-bottom:18px;color:var(--ivory-dim)}
-  .closer{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--gold);
+  .closer{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--cta);
     border-radius:12px;padding:30px}
   .closer h2{font-family:var(--serif);font-size:24px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
   .closer p{font-size:16px;line-height:1.7;color:var(--ivory);margin:0 0 18px;max-width:62ch}
-  .nextbtn{display:inline-block;background:var(--gold);color:var(--navy);text-decoration:none;
+  .nextbtn{display:inline-block;background:var(--cta);color:var(--cta-ink);text-decoration:none;
     font-weight:700;padding:15px 26px;border-radius:6px;font-size:16px}
-  .nextbtn:hover{background:var(--gold-h)}
+  .nextbtn:hover{background:var(--cta-h)}
   .backup{margin:0}
   .backup a{color:var(--glow);font-size:15px;text-decoration:underline;text-underline-offset:3px}
-  .backup a:hover{color:var(--gold)}
+  .backup a:hover{color:var(--cta-soft)}
   @media(max-width:640px){
     .wrap{padding:36px 18px 56px}
     .hero{gap:16px}
@@ -195,7 +189,7 @@ _CSS = """
   #processing h3{font-size:21px;margin:0 0 8px;color:var(--ivory);text-align:center;font-weight:600}
   .pbar{height:6px;background:var(--navy-deep);border:1px solid var(--navy-line);border-radius:4px;
     overflow:hidden;margin:0 0 20px}
-  .pbar i{display:block;height:100%;width:0;background:var(--gold);border-radius:4px;
+  .pbar i{display:block;height:100%;width:0;background:var(--cta);border-radius:4px;
     transition:width .6s linear}
   #processing ul{list-style:none;margin:0 0 18px;padding:0}
   #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;
@@ -240,7 +234,7 @@ _REPORT_CSS = """
 
   .r-rail{text-align:right;padding-top:2px}
   .r-n{display:block;font-family:var(--serif);font-size:42px;font-weight:600;line-height:.86;
-    color:var(--gold);letter-spacing:-.02em}
+    color:var(--cta-soft);letter-spacing:-.02em}
   .r-n.r-mark{font-size:54px;line-height:.6}
   .r-lab{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--ivory-dim);font-weight:700;margin-top:10px;line-height:1.4}
@@ -255,24 +249,24 @@ _REPORT_CSS = """
     text-wrap:balance}
   section.r p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:64ch}
   section.r p:last-of-type{margin-bottom:0}
-  .r-force{background:var(--navy-card);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;
+  .r-force{background:var(--navy-card);border-left:3px solid var(--cta);border-radius:0 8px 8px 0;
     padding:16px 20px;margin:0 0 14px}
   .r-force .fname{font-family:var(--serif);font-size:20px;color:var(--ivory);margin:0 0 4px;font-weight:600}
-  .r-force .fplain{font-size:16px;color:var(--gold);line-height:1.6;margin:0}
+  .r-force .fplain{font-size:16px;color:var(--cta-soft);line-height:1.6;margin:0}
   .r-sec{font-size:14px;color:var(--ivory-dim);line-height:1.7;margin:10px 0 0}
   .r-ev{font-size:15px;line-height:1.7;color:var(--ivory);background:var(--navy-deep);
     border:1px solid var(--navy-line);border-radius:8px;padding:15px 18px;margin:18px 0 0}
-  .r-ev b{color:var(--gold);font-weight:600;display:block;font-size:12px;letter-spacing:.14em;
+  .r-ev b{color:var(--cta-soft);font-weight:600;display:block;font-size:12px;letter-spacing:.14em;
     text-transform:uppercase;margin:0 0 6px}
   .jt{margin:0;padding:0}
   .jt div{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:13px 0;
     border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.65}
   .jt div:last-child{border-bottom:0}
-  .jt dt{color:var(--gold);font-weight:600}
+  .jt dt{color:var(--cta-soft);font-weight:600}
   .jt dd{margin:0;color:var(--ivory)}
   .voice{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:10px;
     padding:6px 20px;margin:0 0 14px}
-  .voice h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+  .voice h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cta-soft);
     font-weight:700;margin:20px 0 10px}
   .voice ul{margin:0 0 18px;padding:0}
   .voice li{list-style:none;font-size:15.5px;line-height:1.6;color:var(--ivory);
@@ -285,7 +279,7 @@ _REPORT_CSS = """
     line-height:1.5;color:var(--ivory)}
   .books li:last-child{border-bottom:0}
   .books .au{display:block;font-size:13px;color:var(--ivory-dim);margin-top:2px}
-  .r-next{background:var(--navy-card);border:1px solid var(--gold);border-radius:12px;
+  .r-next{background:var(--navy-card);border:1px solid var(--cta);border-radius:12px;
     padding:28px;margin:48px 0 0}
   .r-next h2{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
   .r-next p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:64ch}
@@ -497,9 +491,11 @@ _SHELL = """<!doctype html><html lang="en"><head>
 <title>Buying Triggers __TITLE__</title>
 <meta name="description" content="The reason your clients actually buy, worked out from the books they buy.">
 <style>__CSS__</style></head><body>
+__NAV__
 <div class="wrap">
 __BODY__
 </div>
+__FOOTER__
 <script>__JS__</script>
 </body></html>"""
 
@@ -511,6 +507,8 @@ def _shell(body, title_suffix=""):
             .replace("__CSS__", _CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
             .replace("__TITLE__", title_suffix)
+            .replace("__NAV__", _brand.nav_html("home"))
+            .replace("__FOOTER__", _brand.footer_html())
             .replace("__BODY__", body))
 
 
