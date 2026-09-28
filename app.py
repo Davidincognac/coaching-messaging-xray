@@ -17,6 +17,7 @@ import re
 import ssl
 import threading
 import time
+import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs, quote as _url_quote
@@ -675,8 +676,14 @@ def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_fo
         )
         with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX):
             pass
-    except Exception:
-        pass   # never let a MailerLite failure touch the audit result
+    except urllib.error.HTTPError as e:
+        try:
+            detail = e.read().decode("utf-8", "replace")[:300]
+        except Exception:
+            detail = ""
+        print(f"[mailerlite] subscriber push failed: HTTP {e.code} {detail}", flush=True)
+    except Exception as e:
+        print(f"[mailerlite] subscriber push failed: {type(e).__name__}: {e}", flush=True)   # never let a MailerLite failure touch the audit result
 
 
 
@@ -715,7 +722,15 @@ def _ml_group_id(name):
             if gid:
                 _ML_GROUPS[name] = gid
             return gid
-    except Exception:
+    except urllib.error.HTTPError as e:
+        try:
+            detail = e.read().decode("utf-8", "replace")[:300]
+        except Exception:
+            detail = ""
+        print(f"[mailerlite] group lookup/create failed: HTTP {e.code} {detail}", flush=True)
+        return None
+    except Exception as e:
+        print(f"[mailerlite] group lookup/create failed: {type(e).__name__}: {e}", flush=True)
         return None
 
 
@@ -751,8 +766,14 @@ def _push_mailerlite_trigger(email, first_name, last_name, niche_typed, niche_ma
         )
         with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX):
             pass
-    except Exception:
-        pass
+    except urllib.error.HTTPError as e:
+        try:
+            detail = e.read().decode("utf-8", "replace")[:300]
+        except Exception:
+            detail = ""
+        print(f"[mailerlite] subscriber push failed: HTTP {e.code} {detail}", flush=True)
+    except Exception as e:
+        print(f"[mailerlite] subscriber push failed: {type(e).__name__}: {e}", flush=True)
 
 
 def sev_class(v):
