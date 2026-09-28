@@ -73,6 +73,36 @@ _PROSE_CSS = """
     border:2px solid var(--cta)}
   .gb-byline b{color:var(--ivory);font-weight:600}
   .backlink{display:inline-block;margin-top:40px;font-size:15px}
+  /* ---------- blog furniture ---------- */
+  .gb-crumbs{font-size:13.5px;color:var(--ivory-dim);margin:0 0 22px}
+  .gb-crumbs a{color:var(--ivory-dim);text-decoration:none}
+  .gb-crumbs a:hover{color:var(--cta-soft)}
+  .gb-crumbs .sep{margin:0 9px;opacity:.45}
+  .gb-crumbs [aria-current]{color:var(--ivory)}
+
+  .prose .gb-faq{border-top:1px solid var(--line);padding:20px 0 0;margin:0 0 20px}
+  .prose .gb-faq h3{margin:0 0 8px}
+  .prose .gb-faq p{margin:0;color:var(--muted)}
+
+  /* The point of the whole post. Dark, so it stops the page rather than blending in. */
+  .gb-cta{background:var(--navy);border-radius:18px;padding:36px 34px;margin:52px 0 0;
+    position:relative;overflow:hidden}
+  .gb-cta::before{content:"";position:absolute;inset:0;background:var(--halo);pointer-events:none}
+  .gb-cta > *{position:relative}
+  .gb-cta h2{font-size:clamp(23px,3vw,30px);color:#fff;margin:0 0 12px}
+  .gb-cta h2::before{display:none}
+  .gb-cta p{color:var(--ivory-dim);font-size:16.5px;margin:0 0 22px;max-width:48ch}
+  /* the prose column underlines every link; a button is not a link in that sense */
+  .gb-cta .gb-btn{text-decoration:none;color:var(--cta-ink)}
+  .gb-cta .gb-btn:hover{color:var(--cta-ink)}
+  @media(max-width:560px){.gb-cta{padding:28px 22px}}
+
+  .prose .gb-related{list-style:none;padding:0;margin:0}
+  .prose .gb-related li{border-bottom:1px solid var(--line);padding:14px 0;margin:0}
+  .prose .gb-related a{font-family:var(--display);font-weight:700;font-size:18px;
+    letter-spacing:-.02em;text-decoration:none;color:#111111}
+  .prose .gb-related a:hover{color:var(--cta)}
+
 """
 
 _SHELL = """<!doctype html><html lang="en"><head>
@@ -80,6 +110,7 @@ _SHELL = """<!doctype html><html lang="en"><head>
 <title>__TITLE__</title>
 <meta name="description" content="__DESC__">
 __SEO__
+__EXTRA__
 <style>__CSS__</style></head><body>
 __NAV__
 __HERO__
@@ -100,9 +131,10 @@ def hero(eyebrow, heading_html, lede="", buttons="", portrait=""):
     return f'<section class="gb-dark gb-hero"><div class="gb-herowrap">{inner}</div></section>'
 
 
-def shell(body, title, desc="", active="", path="/", index=True, hero_html=""):
+def shell(body, title, desc="", active="", path="/", index=True, hero_html="", extra_head=""):
     return (_SHELL
             .replace("__HERO__", hero_html)
+            .replace("__EXTRA__", extra_head)
             .replace("__SEO__", _brand.head_meta(path, title, desc, index))
             .replace("__CSS__", _brand.FONT_FACES + _brand.BRAND_TOKENS
                      + _brand.CHROME_CSS + _PROSE_CSS)
@@ -260,6 +292,46 @@ def _pretty_date(iso):
         return iso or ""
 
 
+def split_faq(body):
+    """Separate a post's `## FAQ` section from the rest.
+
+    The convention is one rule: everything under a `## FAQ` heading, as `### question`
+    followed by its answer, until the next `##`. Write ordinary markdown and the schema
+    comes out of it, so there is no second place to keep the questions in step.
+
+    Returns (body_without_faq, [(question, answer_text), ...]).
+    """
+    lines = body.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if re.match(r"^##\s+(FAQ|FAQs|Questions)\s*$", line.strip(), re.I):
+            start = i
+            break
+    if start is None:
+        return body, []
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if lines[j].startswith("## "):
+            end = j
+            break
+    faqs, q, buf = [], None, []
+    for line in lines[start + 1:end]:
+        if line.startswith("### "):
+            if q:
+                faqs.append((q, " ".join(buf).strip()))
+            q, buf = line[4:].strip(), []
+        elif q and line.strip():
+            buf.append(line.strip())
+    if q:
+        faqs.append((q, " ".join(buf).strip()))
+    rest = "\n".join(lines[:start] + lines[end:])
+    return rest, [(a, b) for a, b in faqs if a and b]
+
+
+def related(posts, slug, limit=3):
+    return [p for p in posts if p["slug"] != slug][:limit]
+
+
 def render_blog_index():
     posts = _read_posts()
     hero_html = hero(
@@ -299,25 +371,58 @@ minutes and it tells you what your market is already responding to.</p>
 
 
 def render_post(slug):
-    for p_ in _read_posts():
-        if p_["slug"] == slug:
-            when = _pretty_date(p_["date"])
-            byline = (
-                '<div class="gb-byline">'
-                + ('<img src="/david.jpg" alt="">' if os.path.exists(
-                    os.path.join(os.path.dirname(os.path.abspath(__file__)), "david.jpg")) else "")
-                + f'<span>By <b>David Poole</b>'
-                + (f' · {html.escape(when)}' if when else "")
-                + "</span></div>")
-            hero_html = hero(
-                eyebrow="Blog",
-                heading_html=html.escape(p_["title"]),
-                lede=html.escape(p_["summary"]) if p_["summary"] else "",
-            ).replace("</div></section>", byline + "</div></section>")
-            body = (markdown(p_["body"])
-                    + '<p><a class="backlink" href="/blog">&larr; Back to the blog</a></p>')
-            return shell(body, p_["title"], p_["summary"], active="blog",
-                         path="/blog/" + p_["slug"], hero_html=hero_html)
+    posts = _read_posts()
+    for p_ in posts:
+        if p_["slug"] != slug:
+            continue
+        path = "/blog/" + p_["slug"]
+        when = _pretty_date(p_["date"])
+        trail = [("Home", "/"), ("Blog", "/blog"), (p_["title"], path)]
+
+        byline = (
+            '<div class="gb-byline">'
+            + ('<img src="/david.jpg" alt="">' if os.path.exists(
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), "david.jpg")) else "")
+            + "<span>By <b>David Poole</b>"
+            + (f" · {html.escape(when)}" if when else "")
+            + "</span></div>")
+
+        hero_html = hero(
+            eyebrow="Blog",
+            heading_html=html.escape(p_["title"]),
+        ).replace('<div class="gb-herowrap">',
+                  '<div class="gb-herowrap">' + _brand.breadcrumbs(trail)
+                  ).replace("</div></section>", byline + "</div></section>")
+
+        rest, faqs = split_faq(p_["body"])
+
+        # The summary doubles as the answer-first paragraph. A model lifting one passage
+        # from this page should be able to lift this one and be right.
+        short = (f'<div class="gb-callout"><p class="gb-eyebrow">The short answer</p>'
+                 f'<p>{html.escape(p_["summary"])}</p></div>') if p_["summary"] else ""
+
+        faq_html = ""
+        if faqs:
+            items = "".join(
+                f'<div class="gb-faq"><h3>{html.escape(q)}</h3><p>{html.escape(a)}</p></div>'
+                for q, a in faqs)
+            faq_html = f'<h2>Questions coaches ask about this</h2>{items}'
+
+        rel = related(posts, slug)
+        rel_html = ""
+        if rel:
+            links = "".join(
+                f'<li><a href="/blog/{html.escape(r["slug"])}">{html.escape(r["title"])}</a></li>'
+                for r in rel)
+            rel_html = f'<h2>Read next</h2><ul class="gb-related">{links}</ul>'
+
+        body = (short + markdown(rest) + faq_html
+                + _brand.cta_block() + rel_html)
+
+        extra = _brand.article_schema(p_["title"], p_["summary"], path, p_["date"],
+                                      faqs, trail)
+        return shell(body, p_["title"], p_["summary"], active="blog", path=path,
+                     hero_html=hero_html, extra_head=extra)
     return None
 
 

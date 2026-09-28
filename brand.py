@@ -374,3 +374,129 @@ def sitemap_xml(blog_urls=()):
                    f"<changefreq>monthly</changefreq><priority>0.6</priority></url>")
     out.append("</urlset>")
     return "\n".join(out)
+
+
+# ------------------------------------------------------------------- blog furniture
+
+def cta_block(heading="Want to know why your market buys?"):
+    """The one thing every blog post is for. Same trade as the homepage heading, because
+    a reader who meets the offer twice in two different wordings is being sold to twice;
+    meeting the same sentence twice is being told the same thing."""
+    return f"""<aside class="gb-cta">
+  <h2 class="gb-display">{html.escape(heading)}</h2>
+  <p>Tell us who you coach and we will tell you why they&nbsp;buy. Your report opens in
+     about twenty seconds. Nothing to pay, and no newsletter to unsubscribe from later.</p>
+  <a class="gb-btn primary" href="/">Show me my buying triggers</a>
+</aside>"""
+
+
+def breadcrumbs(trail):
+    """`trail` is [(label, href), ...] ending with the current page, whose href is ignored."""
+    parts = []
+    for i, (label, href) in enumerate(trail):
+        last = i == len(trail) - 1
+        parts.append(f'<span aria-current="page">{html.escape(label)}</span>' if last
+                     else f'<a href="{html.escape(href, quote=True)}">{html.escape(label)}</a>')
+    return '<nav class="gb-crumbs">' + '<span class="sep">/</span>'.join(parts) + "</nav>"
+
+
+def _jsonld(obj):
+    import json as _j
+    # "</" inside a script block would close it early, so it is escaped rather than trusted.
+    return ('<script type="application/ld+json">'
+            + _j.dumps(obj, ensure_ascii=False).replace("</", "<\\/")
+            + "</script>")
+
+
+PERSON = {
+    "@type": "Person",
+    "name": "David Poole",
+    "url": BASE_URL + "/about",
+    "jobTitle": "Market researcher and marketing builder",
+    "worksFor": {"@type": "Organization", "name": COMPANY["legal"]},
+}
+
+
+def article_schema(title, description, path, date="", faqs=(), trail=()):
+    """Article + BreadcrumbList + FAQPage in one block.
+
+    The Person entity is what ties a claim to David rather than to an anonymous site, and
+    it is the half most blogs leave out. FAQPage is only emitted when the post actually
+    has questions, because claiming a structure the page does not have is the kind of
+    thing that gets a site ignored rather than rewarded.
+    """
+    graph = [
+        {
+            "@type": "Article",
+            "headline": title[:110],
+            "description": description,
+            "url": BASE_URL + path,
+            "mainEntityOfPage": BASE_URL + path,
+            "author": PERSON,
+            "publisher": {"@type": "Organization", "name": COMPANY["site"],
+                          "url": BASE_URL},
+            **({"datePublished": date, "dateModified": date} if date else {}),
+        }
+    ]
+    if trail:
+        graph.append({
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": i + 1, "name": label,
+                 "item": BASE_URL + href}
+                for i, (label, href) in enumerate(trail)
+            ],
+        })
+    if faqs:
+        graph.append({
+            "@type": "FAQPage",
+            "mainEntity": [
+                {"@type": "Question", "name": q,
+                 "acceptedAnswer": {"@type": "Answer", "text": a}}
+                for q, a in faqs
+            ],
+        })
+    return _jsonld({"@context": "https://schema.org", "@graph": graph})
+
+
+def llms_txt(posts=()):
+    """A plain-language file telling a model what this site is and which facts are ours.
+
+    The point is not to rank. It is that the numbers below exist nowhere else, so a model
+    that cites them has to cite us.
+    """
+    lines = [
+        f"# {COMPANY['site']}",
+        "",
+        "> Market research for coaches. We read and scored 10,954 coaching websites out of 10 "
+        "against eleven criteria, and we publish what the scoring found.",
+        "",
+        "Run by David Poole (David Poole and Associates, Cognac, France). Twelve years building "
+        "the marketing infrastructure for the UK driving-instructor market, sold in 2019. Now the "
+        "same work for coaches.",
+        "",
+        "## Original findings you can cite",
+        "",
+        "- The average coaching homepage scores 4.5 out of 10 across eleven criteria (n=10,954).",
+        "- The top 10% score 5.7 or higher.",
+        "- 83% fail the five-second test: a stranger cannot say what the coach does.",
+        "- About 1 in 14 use their buyer's own language. The other 93% use the coach's language.",
+        "",
+        "Source: our own corpus, scored by the tool at " + BASE_URL + "/website",
+        "",
+        "## Pages",
+        "",
+        f"- [Buying triggers]({BASE_URL}/): what a given coaching market already buys, and why.",
+        f"- [Website X-ray]({BASE_URL}/website): scores any coaching homepage against the corpus.",
+        f"- [About]({BASE_URL}/about): who runs this and the evidence behind it.",
+        f"- [Blog]({BASE_URL}/blog): what the scoring keeps turning up.",
+    ]
+    if posts:
+        lines.append("")
+        lines.append("## Articles")
+        lines.append("")
+        for p in posts:
+            summ = f" — {p['summary']}" if p.get("summary") else ""
+            lines.append(f"- [{p['title']}]({BASE_URL}/blog/{p['slug']}){summ}")
+    lines.append("")
+    return "\n".join(lines)

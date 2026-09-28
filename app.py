@@ -2848,6 +2848,12 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(self._social_page(social_page_form(lead)))
             return
+        if path == "/llms.txt":
+            # Plain-language brief for language models. The numbers in it are ours, so a
+            # model that uses them has to name us.
+            self._send_bytes(_brand.llms_txt(_pages._read_posts()).encode("utf-8"),
+                             "text/plain; charset=utf-8")
+            return
         if path == "/robots.txt":
             self._send_bytes(_brand.robots_txt().encode("utf-8"), "text/plain; charset=utf-8")
             return
