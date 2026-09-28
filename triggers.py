@@ -90,8 +90,11 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   .wrap{max-width:1020px;margin:0 auto;padding:60px 24px 76px;position:relative;z-index:1}
   /* the glow that stops a black band reading as a flat rectangle */
   body::before{content:"";position:fixed;inset:0;background:var(--halo);pointer-events:none;z-index:0}
-  #heroblock{margin-bottom:38px}
+  #heroblock{margin-bottom:26px}
   #heroblock .gb-split{gap:40px;align-items:center}
+  #heroblock .gb-lede{margin-bottom:0}
+  /* The instruction belongs at the point of action, not three lines up in the hero. */
+  .f-head{font-size:clamp(22px,2.6vw,28px);margin:0 0 10px;color:#fff}
   /* Angelo has to hold his own against a 76px headline, so he is sized like the portrait
      block on the about page rather than like an icon. */
   .heromascot{width:250px;height:auto;flex-shrink:0;align-self:center}
@@ -664,8 +667,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
       <h1 class="gb-display">The 6 <span class="gb-grad">buying triggers</span> that turn a
         stranger into a client</h1>
       <p class="gb-lede"><b>Your client buys for a reason, and they will not tell you what it
-      is.</b> So we went and worked out what your market already buys, and why. Tell us who you
-      coach and your report opens on this page in about twenty seconds.</p>
+      is.</b> So we went and worked out what your market already buys, and why.</p>
     </div>
     <img class="mascot heromascot" src="/angelo.png"
          alt="Angelo, who works out what your market already buys">
@@ -674,8 +676,10 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
 
   <form method="post" action="/triggers" id="trigform" autocomplete="on">
     """ + err_html + """
-    <p class="f-lead"><span class="free">Nothing to pay.</span> We built this research for our own
-    work, so it costs us nothing to hand you a copy. Please take your time over your details.</p>
+    <h2 class="gb-display f-head">Tell us who you coach</h2>
+    <p class="f-lead">Your report opens on this page in about twenty seconds.
+    <span class="free">Nothing to pay.</span> We built this research for our own work, so it
+    costs us nothing to hand you a copy.</p>
     <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
            autocomplete="given-name" value=\"""" + e(first_name, quote=True) + """\" required>
     <input type="text"  name="last_name"  id="lnameinput" placeholder="Your last name"
@@ -683,7 +687,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     <input type="email" name="email"      id="emailinput" placeholder="Your best email address"
            autocomplete="email" value=\"""" + e(email, quote=True) + """\" required>
     <div class="nichebox">
-      <p class="nichelab">Who do you coach? Start typing and pick yours from the list.</p>
+      <p class="nichelab">Start typing and pick yours from the list.</p>
       <input type="text" name="niche" id="nicheinput" placeholder="divorce, ADHD, first-time managers&hellip;"
              autocomplete="off" role="combobox" aria-expanded="false" aria-controls="nichesugg"
              value=\"""" + e(niche, quote=True) + """\" required>
