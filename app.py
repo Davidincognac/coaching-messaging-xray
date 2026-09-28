@@ -679,13 +679,53 @@ def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_fo
         pass   # never let a MailerLite failure touch the audit result
 
 
+
+# MailerLite fires its "new subscriber" notification when somebody joins a GROUP, so a
+# subscriber pushed with no group is invisible to it. It is also how the stage-gated
+# sequences will branch later, so every push names its group from here on.
+#
+# The id is looked up (and the group created if missing) on first use and cached, rather
+# than held in another env var David has to keep in step with MailerLite.
+_ML_GROUPS = {}
+
+
+def _ml_group_id(name):
+    """Group id for `name`, creating the group if it does not exist. None on any failure,
+    which callers treat as "push without a group" rather than as an error worth surfacing."""
+    if name in _ML_GROUPS:
+        return _ML_GROUPS[name]
+    if not MAILERLITE_API_KEY:
+        return None
+    hdrs = {"Authorization": f"Bearer {MAILERLITE_API_KEY}",
+            "Content-Type": "application/json", "Accept": "application/json"}
+    try:
+        req = urllib.request.Request(
+            "https://connect.mailerlite.com/api/groups?limit=100", headers=hdrs)
+        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX) as r:
+            for g in (_json.loads(r.read().decode("utf-8")) or {}).get("data", []):
+                if (g.get("name") or "").strip().lower() == name.lower():
+                    _ML_GROUPS[name] = g["id"]
+                    return g["id"]
+        req = urllib.request.Request(
+            "https://connect.mailerlite.com/api/groups",
+            data=_json.dumps({"name": name}).encode("utf-8"),
+            headers=hdrs, method="POST")
+        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX) as r:
+            gid = ((_json.loads(r.read().decode("utf-8")) or {}).get("data") or {}).get("id")
+            if gid:
+                _ML_GROUPS[name] = gid
+            return gid
+    except Exception:
+        return None
+
+
 def _push_mailerlite_trigger(email, first_name, last_name, niche_typed, niche_match):
     """Fire-and-forget MailerLite upsert for a Buying Triggers opt-in. Same rules as the audit push:
     daemon thread, never blocks the page, never raises. The lead is already safe in our own DB."""
     if not MAILERLITE_API_KEY or not email:
         return
     try:
-        payload = _json.dumps({
+        body = {
             "email": email,
             "fields": {
                 "name": first_name or "",
@@ -694,7 +734,11 @@ def _push_mailerlite_trigger(email, first_name, last_name, niche_typed, niche_ma
                 "niche_match": niche_match or "",
                 "lead_source": "buying-triggers",
             },
-        }).encode("utf-8")
+        }
+        gid = _ml_group_id("Buying triggers")
+        if gid:
+            body["groups"] = [gid]
+        payload = _json.dumps(body).encode("utf-8")
         req = urllib.request.Request(
             "https://connect.mailerlite.com/api/subscribers",
             data=payload,
