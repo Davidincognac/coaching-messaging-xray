@@ -225,7 +225,7 @@ It only covers markets where people are buying books, because that's what we cou
 
 The sub niche counts came out of that same reading. Seven or eight per market is what the evidence gave us, not a number we were aiming for.
 
-One more thing worth saying. We've [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came in at 4.5. Almost none of those marks were lost on the niche the coach picked. They were lost on never saying it out loud on the page. If you want to know which yours does, you can [have it read the way a stranger reads it](/website).
+One more thing worth saying. We've [scored 10,954 live coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came back at 3.7. Almost none of those marks were lost on the niche the coach picked. They were lost on never saying it out loud on the page. If you want to know which yours does, you can [have it read the way a stranger reads it](/website).
 
 ## FAQ
 

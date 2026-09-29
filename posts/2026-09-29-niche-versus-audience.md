@@ -19,7 +19,7 @@ Scan the [117 coaching niches we found](/blog/2026-09-29-coaching-niches) and ha
 ## Things to know
 
 - "Women over 40" keeps everybody eligible and gives nobody a reason to stay.
-- We scored 11,011 coaching homepages and almost none lost marks on design.
+- We scored 10,954 coaching homepages and technical health averaged 9 out of 10. The build isn't the problem.
 - Naming a type of person feels careful, right up until you count what it costs you.
 - There's a version that does both, and getting the order wrong wastes it.
 
@@ -55,7 +55,7 @@ Naming the person, and then naming your method instead of her problem.
 
 "I help women over 40 through my signature five-step framework." There's an audience and there's a process, and nowhere on that line does anybody find out what it's actually for. A page like that can sit on the internet for two years while not one stranger works out what it does.
 
-We scored 11,011 coaching homepages out of 10 and [the average came in at 4.5](/blog/2026-09-28-average-coaching-website). Hardly any of those marks went on design. They went on somebody landing and not being able to say what the page was for.
+We scored 10,954 coaching homepages out of 10 and [the average came back at 3.7](/blog/2026-09-28-average-coaching-website). Technical health averaged 9, so hardly any of those marks went on the build. They went on somebody landing and not being able to say what the page was for.
 
 ## Am I telling you who to work with?
 

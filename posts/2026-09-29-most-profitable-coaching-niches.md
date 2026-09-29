@@ -72,7 +72,7 @@ No. Plenty of people buy coaching who'd never buy a book, and a market can be bu
 
 Are the sophistication scores exact? No. They came out of reading what people in each market say and buy, so it's judgement on top of evidence rather than a figure off a chart. Treat a 4 and a 5 as the same warning.
 
-One more thing. We've also [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came in at 4.5. Not one of those marks was lost over which niche the coach picked.
+One more thing. We've also [scored 10,954 live coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came back at 3.7. Not one of those marks was lost over which niche the coach picked.
 
 ## FAQ
 

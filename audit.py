@@ -51,9 +51,13 @@ AUDIT_MODEL = os.getenv("AUDIT_MODEL", "claude-sonnet-4-6")
 # Re-benchmarked 2026-08-24 under the CURRENT flag-judge scoring model: 150-site random sample
 # of the corpus scored through the exact live pipeline (text-only), voice stats from a
 # 2,000-site rule-based sweep. The old numbers came from the retired keyword scorer.
-MARKET_AVG_10 = 4.5
-TOP10_10 = 5.7
-PCT_FAIL_5SEC = 83          # % of corpus failing the five-second test (clarity < 6)
+# Recomputed 29 Sep 2026 straight from coach_site_research/scorecard/output/scorecard_FULL.csv,
+# which holds 10,954 live sites: mean 3.65, top decile 5.6, and 85.7% scoring under 7 of 10 on
+# the five-second read. These had drifted to 4.5 / 5.7 / 83 at some point, and every archived
+# version from v1.0 to v1.7-split still carried the corpus figures, so the drift was here.
+MARKET_AVG_10 = 3.7
+TOP10_10 = 5.6
+PCT_FAIL_5SEC = 86          # % of corpus failing the five-second test (clarity < 7 of 10)
 BUYER_VOICE_1_IN = 14       # "only about 1 in N speak their buyer's language" (93% don't)
 BENCH = {
     "clarity_5sec": 3.9, "specificity": 5.2, "symptom_resonance": 4.7,
