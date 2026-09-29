@@ -1,9 +1,8 @@
 ---
-title: Health coach websites, scored against 10,954 others
+title: Health coach website design, scored against 10,954 others
 date: 2026-09-29
-summary: We pulled the 622 health, nutrition and wellness coaching sites out of our corpus and scored them separately. Not one of them came out strong, and they're worse than the market at the one thing that decides whether anybody stays.
+summary: Health and nutrition coaches score 3.55 against a market average of 3.65, and the shortfall is all in clarity. Practitioner language is why.
 ---
-
 Health coaching is one of the most crowded corners of the whole industry, and the websites in it are quietly worse than average at the one thing that decides whether anybody stays.
 
 We scored 10,954 live coaching websites out of 10, against [the ten things a coaching homepage is marked on](/blog/2026-09-29-website-design-for-life-coaches). 622 of them are health, nutrition, wellness or fitness coaches, and in this article I'm showing you how that group compares with everybody else.

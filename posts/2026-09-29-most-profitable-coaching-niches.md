@@ -1,9 +1,8 @@
 ---
-title: The most profitable coaching niches, and why profitable is the wrong question
+title: The most profitable coaching niches, and a better question
 date: 2026-09-29
-summary: Somebody will tell you mindset coaching is where the money is. They're right, and that's exactly why you'll struggle in it. We counted the books people in each market already buy, and the top ten markets are also the ten hardest to say anything new in.
+summary: Nine of the ten richest coaching markets are ones where every claim has already been made. Mindset alone has 255 books that got there first.
 ---
-
 Somebody will have told you mindset coaching is where the money is.
 
 They're right. And in this article I'm showing you why that's exactly the problem.
@@ -34,7 +33,6 @@ The second column is market size. The third is where it gets expensive.
 - Mindset has 255 books behind it. That's 255 authors who got to your buyer first.
 - Nine of the ten richest coaching markets are ones where every claim has already been made.
 - A market with 12 books in it is quiet for a reason, and that reason will cost you.
-- You can work out how hard a market is yourself in fifteen minutes, without our numbers.
 
 ## What the third column means
 

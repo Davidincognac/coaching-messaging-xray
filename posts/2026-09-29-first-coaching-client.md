@@ -1,12 +1,11 @@
 ---
-title: How to get your first coaching client when you've got no proof yet
+title: How to get your first life coaching client with no proof
 date: 2026-09-29
-summary: Proof decides the sale in 92.9% of coaching markets, and when you're starting out it's the one thing you haven't got. Here's the part nobody tells you: 66.5% of the 10,954 coaching websites we scored show no proof either, and the ones that score well average 4.56 out of 10 on it. The bar is far lower than it looks.
+summary: Proof decides the sale in 92.9% of coaching markets, and on day one you have none. Why the bar is far lower than it looks, and what counts.
 ---
-
 Your first client is hard for one reason and it isn't skill. It's that the thing people need most before they hire a coach is evidence other people already did, and on day one you haven't got any.
 
-In this article I'm showing you how big that problem really is, using 918 coaching markets we mapped for what the buying decision turns on, and 10,954 live coaching websites we scored on whether they show any evidence at all. It's one piece of [the three jobs that get a stranger to book a call](/blog/2026-09-29-how-to-get-coaching-clients), and it's the piece that hurts on day one.
+Here's how big that problem really is, measured two ways: 918 coaching markets we mapped for what the buying decision turns on, and 10,954 live coaching websites we scored on whether they show any evidence at all. It's one piece of [the three jobs that get a stranger to book a call](/blog/2026-09-29-how-to-get-coaching-clients), and it's the piece that hurts on day one.
 
 Proof comes up in 92.9% of the 918 markets. It's the most common thing a buying decision hangs on, ahead of qualifications, ahead of price, ahead of everything.
 
@@ -16,7 +15,6 @@ Then you look at what coaches actually have on their sites. 66.5% show none.
 
 - Proof decides the sale in 92.9% of the 918 markets we mapped. 66.5% of live coaching websites show none at all.
 - The coaching sites that score well average 4.56 out of 10 on proof. Two testimonials puts you ahead of the market.
-- A third of coaching websites have nothing human on them anywhere. No story, no photo, nobody home.
 - 87.9% of markets also want authority, which isn't the same thing as a certificate.
 
 ## Why is the first one so much harder than the fifth?
@@ -86,6 +84,10 @@ It's the cheapest way to buy the thing you're short of. One named person saying 
 ### How many testimonials do I need on my coaching website?
 
 Fewer than you think. The coaching sites that score well average 4.56 out of 10 on proof, which in practice is two or three named quotes. The market average is 1.51.
+
+### Can I use testimonials from clients I coached for free?
+
+Yes, and you can say they were free. What a stranger needs is a named person saying what changed, not a receipt. 66.5% of coaching websites show nothing at all, so one real quote already puts you ahead of two thirds of the market.
 
 ### Does a coaching certification get me clients?
 

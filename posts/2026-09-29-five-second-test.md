@@ -1,9 +1,8 @@
 ---
-title: The five second test, and why 86% of coaching websites fail it
+title: The five second test 86% of coaching websites fail
 date: 2026-09-29
-summary: Somebody lands on your homepage. Five seconds later, can they say what you do and who you do it for? We scored 10,954 coaching websites on exactly that, and 86% couldn't.
+summary: Five seconds on your homepage: can a stranger say what you do and who for? We scored 10,954 coaching sites on exactly that. 86% couldn't.
 ---
-
 A woman on her phone, waiting for the kettle, has landed on your homepage from a search. She'll give it about five seconds.
 
 In that time she's answering one question. Is this for me?
@@ -17,7 +16,6 @@ It's the widest gap in [everything we scored a coaching website on](/blog/2026-0
 - 86% of coaching websites fail the five-second read. It's the biggest single hole in the market.
 - Sites that score well on it average 9.25 out of 10. Poor sites average 2.92.
 - Nearly half the market, 49.2%, isn't specific about who it helps or what it fixes.
-- Passing it costs you nothing and takes one sentence.
 
 ## What we actually measured
 
@@ -69,8 +67,5 @@ Whether a stranger can say what you do and who you do it for, from the homepage 
 
 ### How do I test my own homepage?
 
-Read your headline to somebody who doesn't know what you do, then ask them who it's for and what they'd get. If they pause, a stranger on her phone has already gone. You can also [have it read the way a stranger reads it](/website).
+Read your headline to somebody who doesn't know what you do, then ask them who it's for and what they'd get. If they pause, a stranger on her phone has already gone. You can also [score it against the 10,954](/website).
 
-### Is this about design?
-
-No. Technical health averages 9 out of 10 across the market and barely differs between good and poor sites. This is about the sentence at the top.

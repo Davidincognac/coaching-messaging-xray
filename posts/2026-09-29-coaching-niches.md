@@ -1,9 +1,8 @@
 ---
-title: 117 coaching niches, and what the buyers in each one actually want
+title: The list of 117 life coaching niches, and what each buys
 date: 2026-09-29
-summary: The problem coaches have is they try to talk to too many people. Anxiety is anxiety, but the woman under pressure at work, the man who can't face a date and the parent worried about their child are all after different things. Here are the 117 main coaching niches, and the almost 1,000 sub niches underneath them.
+summary: 117 niches and 918 sub-niches, and four out of five sub-niches want something the market above them doesn't cover. What each one's buyers are after.
 ---
-
 The problem coaches have is they try to talk to too many people. In this article I'm showing you why that slows down your business when it comes to finding new clients.
 
 Let's take anxiety as an example.
@@ -240,6 +239,10 @@ Wrong question, and the list is what invites it. Profit follows whether the buye
 ### Do I have to pick a niche at all?
 
 No, but the page has to. A coach can work across several markets and still have a homepage that speaks to one of them. What doesn't work is a page that averages them, because the average is a sentence nobody recognises as theirs.
+
+### How specific should a coaching niche be?
+
+Specific enough that the sub-market is the thing you name, not the niche above it. 79.8% of the 918 sub-markets we mapped want something the broader market doesn't cover, so "anxiety" and "social anxiety at work" are two different conversations.
 
 ### What if my niche isn't on this list?
 

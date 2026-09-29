@@ -1,12 +1,11 @@
 ---
-title: Christian life coaching niches, and what the buyers in each one want
+title: Christian life coaching niches, and what their buyers want
 date: 2026-09-29
-summary: Search for a Christian life coach and you'll find hundreds of people describing themselves that way. Hardly any of them say what they'd actually help you with. We found six markets where faith decides the buying, and the people in them want six different things.
+summary: Six faith-led coaching markets, mapped for what actually drives the purchase. The parent market decides more than the faith does.
 ---
-
 Search for a Christian life coach and you'll get hundreds of people describing themselves exactly that way. Hardly any of them say what they'd actually help you with.
 
-In this article I'm showing you why that costs them, and what to write instead.
+So this is what it costs them, and what belongs on the page instead.
 
 Christian coaching works as a layer over a market rather than as a market of its own. We found that by reading what people buy on Amazon across [117 coaching markets](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller ones underneath. Faith came back as the deciding thing in six of them, and those six sit under six completely different parent markets.
 
@@ -17,7 +16,6 @@ Which matters, because the man in one of them wants nothing like what the woman 
 - Faith decides the buying in six markets, and they've almost nothing else in common.
 - One of those buyers is frightened of the post. Another is answering a calling. Same faith.
 - "Christian life coach" tells a stranger your beliefs and nothing about what you fix.
-- There's a way to word it that says both, and the order matters more than the words.
 
 ## The six faith markets
 

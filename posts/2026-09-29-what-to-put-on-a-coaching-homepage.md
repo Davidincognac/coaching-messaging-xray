@@ -1,12 +1,11 @@
 ---
-title: What to put on a coaching homepage, in the order it should appear
+title: What to put on a coaching homepage, in the right order
 date: 2026-09-29
-summary: Four things, in one order, taken from what separates the 646 coaching websites that scored well from the 6,820 that didn't. Everything else on your homepage is decoration.
+summary: Four things separate a good coaching homepage from a poor one, and the first is worth more than the other three together. The order changes everything.
 ---
-
 Most advice about coaching homepages is somebody's opinion about their own homepage.
 
-This isn't. We scored 10,954 live coaching websites out of 10, split them into the ones that did well and the ones that didn't, and looked at [what the two groups actually do differently](/blog/2026-09-29-website-design-for-life-coaches). In this article I'm showing you the four things that came out, in the order they should appear.
+This isn't. We scored 10,954 live coaching websites out of 10, split them into the ones that did well and the ones that didn't, and looked at [what the two groups actually do differently](/blog/2026-09-29-website-design-for-life-coaches). Four things came out of it. Here they are, in the order they should appear.
 
 ## Things to know
 
@@ -14,6 +13,7 @@ This isn't. We scored 10,954 live coaching websites out of 10, split them into t
 - The first one on its own is worth more than the other three put together.
 - 82% of coaching sites skip the second one entirely.
 - Two thirds skip the third.
+- A third of coaching websites have nothing human on them anywhere. No story, no photo, nobody home.
 
 ## One. Who it's for and what you fix
 

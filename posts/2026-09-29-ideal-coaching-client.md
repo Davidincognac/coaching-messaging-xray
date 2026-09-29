@@ -1,12 +1,11 @@
 ---
-title: What an ideal coaching client actually is, and why the avatar exercise predicts nothing
+title: What an ideal coaching client actually is
 date: 2026-09-29
-summary: We mapped 918 coaching markets and 90.6% of the 117 main niches contain buyers at more than one stage of awareness. Her age, income and favourite podcast don't tell you which one you're talking to. The push that made her open a browser does.
+summary: 90.6% of coaching niches hold buyers at more than one stage of awareness. Her age and income can't tell you which one you're writing to.
 ---
-
 You've probably filled in an ideal client worksheet. Name her, age her, give her a job, an income bracket, a podcast she listens to, a fear she'd never admit. Then you wrote your homepage and it still didn't sound like it was for anybody.
 
-In this article I'm showing you what actually separates one coaching buyer from another, from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote down. Get this wrong and none of [the three jobs that turn a stranger into a client](/blog/2026-09-29-how-to-get-coaching-clients) can be done, because all three depend on knowing who's reading.
+What actually separates one coaching buyer from another is below, taken from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote down. Get this wrong and none of [the three jobs that turn a stranger into a client](/blog/2026-09-29-how-to-get-coaching-clients) can be done, because all three depend on knowing who's reading.
 
 Here's the finding that broke the avatar exercise for me. 90.6% of the 117 main coaching niches contain buyers at more than one stage of awareness. Same subject, same age, same income, completely different conversation.
 
@@ -16,6 +15,7 @@ Here's the finding that broke the avatar exercise for me. 90.6% of the 117 main 
 - 79.8% of the 918 sub-markets we mapped buy differently from the broader niche above them.
 - 49.9% of markets are driven by relief from something that hurts, not by ambition.
 - 38.9% of buyers know what's wrong and have no idea what fixes it. They aren't searching for a coach.
+- 30.6% of sub-markets are at a different stage of awareness from the niche they sit in.
 
 ## What actually separates one buyer from another?
 

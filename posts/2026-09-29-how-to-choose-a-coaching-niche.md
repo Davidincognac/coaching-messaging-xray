@@ -1,12 +1,11 @@
 ---
-title: How to choose a coaching niche when you are good at several things
+title: How to choose a coaching niche when you can do several
 date: 2026-09-29
-summary: You're good at four things and your homepage is trying to say all four at once. Nobody reading it can tell which one you're best at, so they decide you're a generalist. Here's how to pick one without giving the other three up.
+summary: Four things on one homepage and a stranger has to work out which one she is. What the 918 markets we mapped say about picking just one.
 ---
-
 You're good at four things, and your homepage is trying to say all four at once.
 
-In this article I'm showing you how to pick one without giving the other three up.
+Here's how to pick one without giving the other three up.
 
 Plenty of the coaches whose sites I read aren't undecided at all. They know exactly who they help. They just know it about four different groups, so they've written one page trying to serve the lot. Then a woman lands on it, can't work out which of the four you're best at, decides you're a bit of everything, and goes back to Google.
 
@@ -67,7 +66,7 @@ No. This is about what your page says and nothing else. Which clients you take, 
 
 Is the list complete? Probably not. We built it from markets where people are already buying on Amazon, so anything with no publishing behind it won't be on there. That doesn't mean nobody wants it. It means we had nothing to read.
 
-If you want to know whether the choice you already made is landing, you can [have your homepage read the way a stranger reads it](/website).
+If you want to know whether the choice you already made is landing, you can [put your homepage through the same ten checks](/website).
 
 ## FAQ
 

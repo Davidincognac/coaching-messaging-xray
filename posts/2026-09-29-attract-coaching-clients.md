@@ -1,12 +1,11 @@
 ---
-title: Attracting coaching clients instead of chasing them, with the numbers behind it
+title: How to attract life coaching clients, without chasing
 date: 2026-09-29
-summary: Attraction sounds like a mood and it's actually measurable. We mapped 918 coaching markets: urgency and scarcity support the sale in 4.4% of them, while 49.9% are driven by relief from something that hurts. Chasing is asking before she recognises herself. That's the whole difference.
+summary: Urgency supports the sale in 4.4% of the 918 coaching markets we mapped. Social proof does in 92.9%. What attraction looks like measured.
 ---
-
 Every coach has been told to attract clients rather than chase them, usually by someone who then sells them a DM script.
 
-In this article I'm showing you what attraction is when you measure it, from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote, and 10,954 coaching websites we scored on whether a stranger can follow them. It's the order [the three jobs of getting clients](/blog/2026-09-29-how-to-get-coaching-clients) happen in, more than anything else.
+Attraction turns out to be measurable, so here it is measured, from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote, and 10,954 coaching websites we scored on whether a stranger can follow them. It's the order [the three jobs of getting clients](/blog/2026-09-29-how-to-get-coaching-clients) happen in, more than anything else.
 
 Start with the one that surprised me most. Scarcity and urgency, the two-spots-left, the price-goes-up-Friday, support the buying decision in 4.4% of the 918 markets.
 
@@ -83,7 +82,7 @@ Our data covers what buyers respond to and what coaching websites show them. It 
 
 It also can't prove the direction. A site with proof on it might be a site built by a coach who already had clients. All we can say is what the markets turn on and what the pages contain, and the distance between the two is large.
 
-You can [see what your own market's buyers are driven by](/) and read the push, the fear and the awareness stage for it. Or [have your homepage read the way a stranger reads it](/website).
+You can [see what your own market's buyers are driven by](/) and read the push, the fear and the awareness stage for it. Or [score your homepage against the 10,954](/website).
 
 And if you want the full picture, [the three jobs behind getting clients](/blog/2026-09-29-how-to-get-coaching-clients) is the pillar this came from. The [ideal client question](/blog/2026-09-29-ideal-coaching-client) is the one to answer before either.
 
@@ -99,7 +98,7 @@ Rarely. It supports the decision in 4.4% of the 918 markets we mapped, and the o
 
 ### Why is nobody enquiring through my coaching website?
 
-Half of coaching websites score under 5 on whether a stranger can tell what they do, and 66.5% show no proof at all. If both are true of yours, the enquiries were never going to come, however much traffic you send.
+86% of coaching websites fail on whether a stranger can tell what they do, and 66.5% show no proof at all. If both are true of yours, the enquiries were never going to come, however much traffic you send.
 
 ### What's the difference between attraction marketing and just waiting?
 

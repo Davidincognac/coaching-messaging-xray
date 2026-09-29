@@ -1,9 +1,8 @@
 ---
-title: How coaches actually get clients, according to 10,954 websites
+title: How to get coaching clients, according to 10,954 websites
 date: 2026-09-29
-summary: We scored 10,954 live coaching websites and mapped the buying psychology of 918 coaching markets. 94.3% of coaching sites ask a stranger to book something. 66.5% give her nothing to believe first. That's the whole problem in two numbers.
+summary: 94.3% of coaching websites ask a stranger to book a call. 66.5% give her nothing to believe first. What 10,954 sites and 918 markets show.
 ---
-
 You've been told to post more, pick a niche, get on podcasts, run ads, and here you are still checking the calendar on a Monday morning.
 
 In this article I'm showing you what happens on the other side of all that effort, using two sets of our own data: 10,954 live coaching websites scored out of 10, and 918 coaching markets mapped for what makes their buyers say yes.
@@ -16,8 +15,9 @@ Start with the one number that reframes everything else. 94.3% of coaching websi
 
 - 94.3% of coaching websites ask for the booking. 66.5% give a stranger nothing to believe first.
 - Proof decides the sale in 92.9% of the 918 markets we mapped. Urgency shows up in 4.4% of them.
-- Half of all coaching websites can't be understood in five seconds.
+- 86% of coaching websites can't be understood in five seconds by a stranger.
 - In 40.2% of markets the buyer isn't shopping for a coach yet. She's searching for her problem.
+- One site in five asks for a booking with no proof, no price and nothing human on the page.
 
 ## What 10,954 coaching websites are already doing
 
@@ -31,7 +31,7 @@ We scored every one of those 10,954 out of 10 on ten things a stranger needs fro
 | Shows no proof at all | 66.5% |
 | Shows no price at all | 82.3% |
 | Has nothing human on the page | 33.8% |
-| Scores under 5 on the five-second read | 50.0% |
+| Fails the five-second read, which is a score under 7 | 85.7% |
 | Has a next step but no proof | 61.2% |
 | Has a next step, no proof, no price, no story | 20.4% |
 
@@ -76,7 +76,7 @@ Getting clients is three separate jobs and coaches usually work on the third one
 
 **One. Be findable on the problem, in her words.** Not your modality, not your certification. The push that made her open a browser. In 38.9% of markets that's a problem she can name and a solution she can't.
 
-**Two. Be understandable in five seconds.** Half of coaching websites score under 5 on this, and it's the single biggest difference between the sites that work and the ones that don't: 9.25 against 2.92 out of 10. More on [why the five-second read decides so much](/blog/2026-09-29-five-second-test).
+**Two. Be understandable in five seconds.** 86% of coaching websites fail this, and it's the single biggest difference between the sites that work and the ones that don't: 9.25 against 2.92 out of 10. More on [why the five-second read decides so much](/blog/2026-09-29-five-second-test).
 
 **Three. Be believable before you ask.** Proof, a price or something like one, and a human being on the page. Two thirds of the market skips all three and goes straight to the ask.
 
@@ -109,11 +109,15 @@ From people who already trust them, which is why the first few are so hard and t
 
 ### How long does it take to get coaching clients?
 
-Longer than anybody selling you a client-getting course will say. What we can tell you is where the time gets wasted. Half of coaching websites can't be understood in five seconds, so effort spent driving people to one is effort spent twice.
+Longer than anybody selling you a client-getting course will say. What we can tell you is where the time gets wasted. 86% of coaching websites can't be understood in five seconds, so effort spent driving people to one is effort spent twice.
 
 ### Do I need a niche to get coaching clients?
 
 You need to be findable on a problem somebody types, and a niche is the usual way of getting there. Being specific separates good coaching sites from poor ones by 5.03 points out of 10, second only to the five-second read. Our [list of 117 coaching niches and what each one's buyers want](/blog/2026-09-29-coaching-niches) has the full set.
+
+### Why am I not getting any coaching clients from my website?
+
+Two reasons turn up in the data ahead of everything else. 86% of coaching websites can't be understood in five seconds, and 66.5% show a stranger no proof at all. If both are true of yours, more traffic was never going to fix it.
 
 ### What's the fastest way to get a coaching client?
 

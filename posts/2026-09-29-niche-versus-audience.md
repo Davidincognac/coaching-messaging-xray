@@ -1,16 +1,15 @@
 ---
-title: A niche and an audience are not the same thing
+title: A niche and an audience aren't the same thing
 date: 2026-09-29
-summary: Two coaches, same qualification. One says she helps women over 40. The other says she helps women whose sleep fell apart when the menopause started. Only one of those tells me whether to book a call.
+summary: One of these your homepage needs and the other one costs you work. The difference, and which of the two a stranger is actually looking for.
 ---
-
 Two coaches, same qualification, same fee.
 
 One of them says she helps women over 40. The other says she helps women whose sleep fell apart when the menopause started.
 
 The same person could have written either line. Only one of them tells me whether to book a call.
 
-In this article I'm showing you which of the two your homepage needs, and why the other one quietly costs you work.
+One of the two is what your homepage needs. The other one costs you work, and this is why.
 
 An audience is who someone is. A niche is what they want sorting out. Coaches swap those two words constantly, and you can spot it on a homepage: a headline naming a type of person, and nothing anywhere saying what actually gets fixed.
 
@@ -19,7 +18,6 @@ Scan the [117 coaching niches we found](/blog/2026-09-29-coaching-niches) and ha
 ## Things to know
 
 - "Women over 40" keeps everybody eligible and gives nobody a reason to stay.
-- We scored 10,954 coaching homepages and technical health averaged 9 out of 10. The build isn't the problem.
 - Naming a type of person feels careful, right up until you count what it costs you.
 - There's a version that does both, and getting the order wrong wastes it.
 
@@ -63,7 +61,7 @@ No. This is only about what the page says. Who you take on is between you and yo
 
 Is the list of 117 complete? Probably not. We built it from what people buy on Amazon, so it leans towards problems somebody has published a book about. A market can be perfectly real and completely quiet at the same time.
 
-If you want to know which of the two your page is doing at the moment, [have it read the way a stranger reads it](/website).
+If you want to know which of the two your page is doing at the moment, [run it through the scoring](/website).
 
 ## FAQ
 

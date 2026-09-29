@@ -1,9 +1,8 @@
 ---
 title: The average coaching website scores 3.7 out of 10
 date: 2026-09-28
-summary: We scored 10,954 live coaching websites out of 10 and the average came back at 3.7. Thirteen of them were strong. Here's where the marks actually go, and the one check that nearly everybody fails.
+summary: 10,954 live coaching websites, scored out of 10 on ten things a stranger needs. Where every mark goes, and which criterion loses the most.
 ---
-
 We scored 10,954 live coaching websites out of 10. The average came back at 3.7.
 
 Thirteen scored as strong. Out of nearly eleven thousand.

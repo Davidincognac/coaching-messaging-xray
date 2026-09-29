@@ -1,9 +1,8 @@
 ---
-title: Website design for life coaches, and what actually separates the good ones
+title: Website design for life coaches, and what actually counts
 date: 2026-09-29
-summary: We scored 10,954 live coaching websites. The good ones and the bad ones are built to almost exactly the same standard. What separates them is what the page says, and there are four things it has to say.
+summary: We scored 10,954 coaching websites. Good ones and bad ones are built to almost the same standard. Four things separate them, and none is design.
 ---
-
 If you're about to pay somebody to design your coaching website, read this first. It'll save you spending the money on the wrong half of the job.
 
 We scored 10,954 live coaching websites out of 10, on ten things a stranger needs from a homepage. In this article I'm showing you which of those ten actually separate a site that works from one that doesn't.
@@ -20,6 +19,7 @@ So a designer can hand you something faster, prettier and better built than what
 - The real gap is the five-second read: 9.25 against 2.92.
 - 89.5% of the good ones show proof. 18.5% of the poor ones do.
 - 65% of the good ones tell you a price. 7.3% of the poor ones do.
+- 646 sites out of 10,954 came out strong or decent. 6,820 came out poor.
 
 ## What the numbers actually separate on
 
@@ -89,6 +89,10 @@ Less than you'd think. Technical health averages 9 out of 10 across the whole ma
 ### Should I put my prices on my coaching website?
 
 The evidence says yes. 65% of the sites that scored well show a price. 7.3% of the poor ones do. 82% of the whole market hides it entirely.
+
+### What should a life coaching website include?
+
+Four things, in this order: who it's for and what you fix, a price or something like one, proof a stranger could check, and something human. The sites that score well beat the poor ones on all four. On the build the two groups are nearly level.
 
 ### How much should a life coach website cost?
 

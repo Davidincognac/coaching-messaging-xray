@@ -1,12 +1,11 @@
 ---
-title: Getting coaching clients without a website, and what the average one is actually worth
+title: How to get coaching clients without a website
 date: 2026-09-29
-summary: Yes, you can. We scored 10,954 live coaching websites and the market average is 3.65 out of 10, with 47.9% below even that. But whatever you use instead of a site has to do the same three jobs, and an Instagram bio gets judged in the same five seconds.
+summary: The average coaching website scores 3.65 out of 10 and 22.7% score under 3. What you actually have to replace if you decide to skip one.
 ---
-
 A coach asked me last month whether she needed a website before she started selling. She'd been told yes by everybody who sells websites.
 
-In this article I'm showing you what the average coaching website is actually worth, from 10,954 live ones we scored out of 10, and what you have to replace it with if you skip it. Whatever you use instead still has to do [the three jobs a stranger puts you through](/blog/2026-09-29-how-to-get-coaching-clients), and a bio gets the same five seconds a homepage does.
+So I went and checked what the average coaching website is actually worth, from 10,954 live ones we scored out of 10, and what you have to put in its place if you skip it. Whatever you use instead still has to do [the three jobs a stranger puts you through](/blog/2026-09-29-how-to-get-coaching-clients), and a bio gets the same five seconds a homepage does.
 
 The market average is 3.65 out of 10. 47.9% of coaching websites score below even that. 22.7% score under 3.
 
@@ -74,7 +73,7 @@ Does that mean a coach with no site is fine? No. It means the site isn't the thi
 
 Is 10,954 a fair sample? The list was 12,294 domains. 1,156 wouldn't load at all and another 184 loaded with nothing readable on them, so 1,340 are left out rather than scored zero.
 
-If you've got a site already, [have it read the way a stranger reads it](/website) before you decide it's the problem.
+If you've got a site already, [put it through the same ten checks](/website) before you decide it's the problem.
 
 ## FAQ
 
