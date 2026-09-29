@@ -7,6 +7,13 @@ button pulling at the corner of the eye.
 The blog is file-backed. Drop a .md file in posts/ and push, and it is live. There is a
 small markdown reader at the bottom of this file rather than a dependency, because the
 only things a post needs are headings, paragraphs, lists, links, bold and quotes.
+
+Pictures go in posts/images/ and are written `![alt text](filename.png)`. The alt text is
+part of the syntax rather than an option, so a picture cannot go out without one. A line
+that is only a picture becomes a figure at full prose width; one inside a sentence stays
+inside the sentence. Width and height are read off the file and put on the tag, so the
+words below a picture do not jump when it loads. `image:` in a post's front matter names
+the picture it shares itself with, and without one it shares Angelo.
 """
 
 import html
@@ -97,6 +104,14 @@ _PROSE_CSS = """
   .gb-cta .gb-btn:hover{color:var(--cta-ink)}
   @media(max-width:560px){.gb-cta{padding:28px 22px}}
 
+  /* A picture runs the full prose width and keeps its own shape. The aspect-ratio comes
+     from the width and height on the tag, so nothing moves once the file arrives. */
+  .prose figure{margin:30px 0}
+  .prose figure img{display:block;width:100%;height:auto;border-radius:10px;
+    border:1px solid var(--line)}
+  .prose figure figcaption{margin-top:10px;font-size:15px;color:#5a5a5a}
+  .prose p img{max-width:100%;height:auto}
+
   .prose .gb-related{list-style:none;padding:0;margin:0}
   .prose .gb-related li{border-bottom:1px solid var(--line);padding:14px 0;margin:0}
   .prose .gb-related a{font-family:var(--display);font-weight:700;font-size:18px;
@@ -129,11 +144,12 @@ def hero(eyebrow, heading_html, lede="", buttons="", portrait=""):
     return f'<section class="gb-dark gb-hero"><div class="gb-herowrap">{inner}</div></section>'
 
 
-def shell(body, title, desc="", active="", path="/", index=True, hero_html="", extra_head=""):
+def shell(body, title, desc="", active="", path="/", index=True, hero_html="", extra_head="",
+          image=""):
     return (_SHELL
             .replace("__HERO__", hero_html)
             .replace("__EXTRA__", extra_head)
-            .replace("__SEO__", _brand.head_meta(path, title, desc, index))
+            .replace("__SEO__", _brand.head_meta(path, title, desc, index, share_image(image)))
             .replace("__CSS__", _brand.FONT_FACES + _brand.BRAND_TOKENS
                      + _brand.CHROME_CSS + _PROSE_CSS)
             .replace("__NAV__", _brand.nav_html(active))
@@ -269,6 +285,9 @@ def _read_posts():
             "title": title,
             "date": meta.get("date", ""),
             "summary": meta.get("summary", ""),
+            # `image:` in front matter is the picture the post shares itself with. A bare
+            # filename means posts/images/, anything with a slash is taken as written.
+            "image": meta.get("image", ""),
             "body": body,
         })
     out.sort(key=lambda p: (p["date"] or "0000-00-00", p["slug"]), reverse=True)
@@ -419,7 +438,7 @@ def render_post(slug):
         extra = _brand.article_schema(p_["title"], p_["summary"], path, p_["date"],
                                       faqs, trail)
         return shell(body, p_["title"], p_["summary"], active="blog", path=path,
-                     hero_html=hero_html, extra_head=extra)
+                     hero_html=hero_html, extra_head=extra, image=p_.get("image", ""))
     return None
 
 
@@ -575,7 +594,65 @@ Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.<
 
 # ------------------------------------------------------------------- tiny markdown
 
+IMAGE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "posts", "images")
+IMAGE_URL = "/blog/images/"
+_IMG_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+              ".webp": "image/webp", ".gif": "image/gif", ".svg": "image/svg+xml"}
+_SIZES = {}
+
+
+def image_size(name):
+    """Intrinsic pixel size of a post image, read once and remembered.
+
+    The numbers go on the tag as width and height. Without them the browser does not know
+    how tall the picture will be until it arrives, so the text under it jumps when it does,
+    and that jump is the thing Core Web Vitals measures and marks us down for.
+    """
+    if name in _SIZES:
+        return _SIZES[name]
+    size = None
+    try:
+        from PIL import Image
+        with Image.open(os.path.join(IMAGE_DIR, name)) as im:
+            size = im.size
+    except Exception:
+        # An unreadable or vector image simply goes out without dimensions rather than
+        # taking the post down with it.
+        size = None
+    _SIZES[name] = size
+    return size
+
+
+def share_image(name):
+    """Turn a front-matter `image:` into a path the share tags can use.
+
+    A bare filename is one of ours in posts/images. Anything with a slash is taken as
+    written, so a post can point at /angelo.png or at a full address. Empty stays empty
+    and head_meta falls back to Angelo.
+    """
+    if not name:
+        return ""
+    if name.startswith(("http://", "https://", "/")):
+        return name
+    return IMAGE_URL + name
+
+
+def _image_tag(alt, src):
+    """A picture in a post. Alt text is required by the syntax, so it cannot be forgotten."""
+    local = "/" not in src and "\\" not in src
+    url = (IMAGE_URL + src) if local else src
+    dims = ""
+    if local:
+        wh = image_size(src)
+        if wh:
+            dims = f' width="{wh[0]}" height="{wh[1]}"'
+    # Lazy, because a picture below the fold should not hold up the words above it.
+    return (f'<img src="{html.escape(url, quote=True)}" alt="{html.escape(alt, quote=True)}"'
+            f'{dims} loading="lazy" decoding="async">')
+
+
 _INLINE = (
+    (re.compile(r"!\[([^\]]*)\]\(([^)\s]+)\)"), lambda m: _image_tag(m.group(1), m.group(2))),
     (re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)"), r'<a href="\2">\1</a>'),
     (re.compile(r"\*\*([^*]+)\*\*"), r"<strong>\1</strong>"),
     (re.compile(r"(?<![\w*])\*([^*\n]+)\*(?![\w*])"), r"<em>\1</em>"),
@@ -584,18 +661,27 @@ _INLINE = (
 
 
 def _inline(text):
+    # Escaped first, always: a post file is ours, but the rule that nothing reaches the page
+    # as markup unless a rule below puts it there is what makes that safe to keep saying.
     out = html.escape(text)
     for rx, rep in _INLINE:
         out = rx.sub(rep, out)
     return out
 
 
+_ONLY_IMAGE = re.compile(r"^!\[[^\]]*\]\([^)\s]+\)$")
+
+
 def markdown(src):
     """Enough markdown for a blog post and no more.
 
-    Headings, paragraphs, bullet and numbered lists, blockquotes, horizontal rules, and
-    the four inline forms above. Everything is escaped before any tag is inserted, so a
-    post file cannot inject HTML even though only we can write one.
+    Headings, paragraphs, bullet and numbered lists, blockquotes, horizontal rules,
+    pictures, and the inline forms above. Everything is escaped before any tag is
+    inserted, so a post file cannot inject HTML even though only we can write one.
+
+    A line that is nothing but a picture becomes a <figure> rather than a paragraph with
+    an image in it, because the prose column is measured for text and a picture in it
+    comes out the width of a sentence.
     """
     out, lst, quote = [], None, False
 
@@ -638,6 +724,9 @@ def markdown(src):
                 out.append("<blockquote>")
                 quote = True
             out.append(f"<p>{_inline(s[2:])}</p>")
+        elif _ONLY_IMAGE.match(s):
+            close()
+            out.append(f"<figure>{_inline(s)}</figure>")
         else:
             close()
             out.append(f"<p>{_inline(s)}</p>")

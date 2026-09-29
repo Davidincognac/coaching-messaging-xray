@@ -318,7 +318,7 @@ def page_title(title):
     return title + TITLE_SUFFIX if len(title) + len(TITLE_SUFFIX) <= 60 else title
 
 
-def head_meta(path="/", title="", description="", index=True):
+def head_meta(path="/", title="", description="", index=True, image=""):
     """The whole head: title, description, canonical, robots and the social-share tags.
 
     The title and description live here rather than in each page shell because they were in
@@ -354,9 +354,11 @@ def head_meta(path="/", title="", description="", index=True):
     if og_desc:
         tags.append(f'<meta property="og:description" content="{og_desc}">')
         tags.append(f'<meta name="twitter:description" content="{og_desc}">')
-    # Angelo is the only image we have that reads at thumbnail size.
-    tags.append(f'<meta property="og:image" content="{BASE_URL}/angelo.png">')
-    tags.append(f'<meta name="twitter:image" content="{BASE_URL}/angelo.png">')
+    # A post that carries its own picture shares that picture. Angelo is the fallback
+    # because he is the only image we have that still reads at thumbnail size.
+    card = image if image.startswith("http") else (BASE_URL + (image or "/angelo.png"))
+    tags.append(f'<meta property="og:image" content="{html.escape(card, quote=True)}">')
+    tags.append(f'<meta name="twitter:image" content="{html.escape(card, quote=True)}">')
     if GOOGLE_SITE_VERIFICATION:
         tags.append('<meta name="google-site-verification" content="'
                     + html.escape(GOOGLE_SITE_VERIFICATION, quote=True) + '">')

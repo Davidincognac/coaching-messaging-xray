@@ -2922,6 +2922,20 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self.send_response(404); self.end_headers()
             return
+        if path.startswith("/blog/images/"):
+            # Pictures that belong to blog posts. Everything here is a file we committed,
+            # but the name still gets basename()'d and checked against a list of types
+            # rather than trusted, so no request can walk out of the directory.
+            name = os.path.basename(path[len("/blog/images/"):])
+            ext = os.path.splitext(name)[1].lower()
+            fpath = os.path.join(_pages.IMAGE_DIR, name)
+            if name and ext in _pages._IMG_TYPES and os.path.isfile(fpath):
+                with open(fpath, "rb") as f:
+                    self._send_bytes(f.read(), _pages._IMG_TYPES[ext],
+                                     cache="public, max-age=31536000, immutable")
+            else:
+                self.send_response(404); self.end_headers()
+            return
         if path.startswith("/uploads/"):
             # A coach's own uploaded banner. Everything we write here is a .webp we made
             # ourselves and named from the lead token, so the filename is checked against that
