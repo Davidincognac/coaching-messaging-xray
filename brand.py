@@ -641,6 +641,78 @@ def article_schema(title, description, path, date="", faqs=(), trail=(), image="
     return _jsonld({"@context": "https://schema.org", "@graph": graph})
 
 
+# The WordPress site that lived here from 2021 to 2024, and where each page goes now.
+#
+# 490 pages were archived from the old site. Only these have a successor that answers the
+# same question, and only those get a 301. The other ~457 keep their 404 on purpose:
+#
+#   160 coach directory profiles ("life-coaching-by-<name>") — no equivalent page exists,
+#       and pointing them at the blog would be a redirect to something the visitor did not
+#       ask for, which Google reads as a soft 404 and treats the same as the 404 we already
+#       have. A 404 is the honest answer to "that coach's profile is gone".
+#    75 angel-number pages — a different website's subject entirely.
+#   ~222 pricing posts, local landing pages, course funnels and thank-you pages with
+#       nothing on the new site that replaces them.
+#
+# Redirecting those anywhere would buy nothing and would tell a search engine the new blog
+# is about angel numbers. The rule here is one question, one successor, or leave it dead.
+LEGACY_REDIRECTS = {
+    # getting clients
+    "/3-no-cost-ways-to-get-more-coaching-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/create-new-coaching-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/how-can-i-find-coaching-clients-in-2023": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/how-do-life-coaches-get-customers": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/where-do-life-coaches-find-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/how-do-i-sell-myself-as-a-life-coach": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/free-clients-from-google": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/get-clients-free-program": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/how-to-find-clients-as-a-life-coach-using-chatgpt": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/how-to-find-coaching-clients-with-the-law-of-attraction": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/networking-to-find-coaching-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/how-a-life-coach-can-get-referrals": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/client-acquisition-breakdown": "/blog/2026-09-29-how-to-get-coaching-clients",
+    "/how-to-find-coaching-clients-without-a-website": "/blog/2026-09-29-coaching-clients-without-a-website",
+    "/attract-new-clients-with-free-webinars": "/blog/2026-09-29-attract-coaching-clients",
+    "/how-speaking-engagements-can-help-coaches-attract-clients": "/blog/2026-09-29-attract-coaching-clients",
+    "/why-sales-doesnt-work-for-coaches": "/blog/2026-09-29-attract-coaching-clients",
+    "/4-secret-things-your-coaching-clients-really-want": "/blog/2026-09-29-ideal-coaching-client",
+    # niche
+    "/whats-the-difference-between-a-coaching-niche-and-an-avatar": "/blog/2026-09-29-niche-versus-audience",
+    "/how-to-find-a-great-coaching-niche": "/blog/2026-09-29-how-to-choose-a-coaching-niche",
+    "/stuck-at-finding-a-coaching-niche-you-love": "/blog/2026-09-29-how-to-choose-a-coaching-niche",
+    # websites
+    "/how-to-create-a-coaching-website": "/blog/2026-09-29-website-design-for-life-coaches",
+    "/how-to-make-a-coaching-website": "/blog/2026-09-29-website-design-for-life-coaches",
+    "/website-for-a-coaching-business": "/blog/2026-09-29-website-design-for-life-coaches",
+    # marketing
+    "/life-coach-marketing": "/blog/2026-09-29-marketing-for-coaches",
+    "/better-marketing": "/blog/2026-09-29-marketing-for-coaches",
+    "/are-life-coaches-accidentally-investing-in-marketing": "/blog/2026-09-29-marketing-for-coaches",
+    "/the-1-marketing-hack-that-created-70-discovery-calls": "/blog/2026-09-29-marketing-for-coaches",
+    "/what-are-the-needle-movers-in-your-coaching-business": "/blog/2026-09-29-marketing-for-coaches",
+    "/a-marketing-plan-for-coaches": "/blog/2026-09-29-life-coach-marketing-plan",
+    "/5-key-strategies-for-marketing-your-life-coaching-business": "/blog/2026-09-29-life-coach-marketing-plan",
+    "/grow-your-coaching-business-with-social-media": "/blog/2026-09-29-social-media-marketing-for-coaches",
+    "/social-media-for-finding-clients": "/blog/2026-09-29-social-media-marketing-for-coaches",
+    "/how-to-create-a-youtube-channel-for-coaches": "/blog/2026-09-29-social-media-marketing-for-coaches",
+    "/blog-for-coaches": "/blog/2026-09-29-content-marketing-for-coaches",
+    "/blogging-for-coaches": "/blog/2026-09-29-content-marketing-for-coaches",
+    "/how-to-find-coaching-clients-with-blogging": "/blog/2026-09-29-content-marketing-for-coaches",
+    "/branding-coach": "/blog/2026-09-29-branding-coaching-business",
+    "/how-to-make-your-coaching-business-look-amazing-in-5-days": "/blog/2026-09-29-branding-coaching-business",
+}
+
+
+def legacy_target(path):
+    """Where an old WordPress address goes, or None if it is one we let die.
+
+    WordPress served everything with a trailing slash and was case-insensitive in practice,
+    so a link out there in the world could be any of four spellings of the same page.
+    """
+    p = (path or "").rstrip("/").lower()
+    return LEGACY_REDIRECTS.get(p or "/")
+
+
 def rss_xml(posts=()):
     """The blog as a feed.
 

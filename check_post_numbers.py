@@ -162,6 +162,17 @@ CLAIMS += [
      round(100*sum(n for t, n in _titles.items() if n > 1 and t)/_LN, 1), 41.5),
 ]
 
+# The legacy redirects point at posts by slug. Rename a post and they point at nothing, and
+# a 301 into a 404 is worse than the 404 it replaced, so this is checked here too.
+sys.path.insert(0, HERE)
+import brand as _b, pages as _p
+_slugs = {x["slug"] for x in _p._read_posts()}
+_dead = sorted(t for t in _b.LEGACY_REDIRECTS.values() if t.split("/blog/")[-1] not in _slugs)
+CLAIMS += [
+    ("legacy redirects all land on a real post", _dead, []),
+    ("legacy redirect map size",                 len(_b.LEGACY_REDIRECTS), 39),
+]
+
 bad = 0
 for label, got, want in CLAIMS:
     ok = got == want

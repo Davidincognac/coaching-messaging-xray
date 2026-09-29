@@ -3022,6 +3022,18 @@ class Handler(BaseHTTPRequestHandler):
             self._send_bytes(_brand.sitemap_xml(posts).encode("utf-8"),
                              "application/xml; charset=utf-8")
             return
+        # The WordPress site that was here until 2024 left 490 addresses behind, and links
+        # to some of them are still out there. Where a post on the new site answers the same
+        # question, that is a permanent move and gets a 301. Everything else falls through
+        # to the 404 it deserves. See brand.LEGACY_REDIRECTS for why most of them do.
+        _legacy = _brand.legacy_target(path)
+        if _legacy:
+            self.send_response(301)
+            self._safety()
+            self.send_header("Location", _legacy)
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
         if path == "/triggers":
             # The landing page moved to the root. This address is already in sent emails and
             # links, so it redirects rather than 404s, and it is a permanent move.
