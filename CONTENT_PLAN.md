@@ -121,12 +121,28 @@ websites pillar where it talks about saying the niche out loud on a homepage.
 - Links up, down and sideways per the rules above
 - The buying triggers CTA is automatic, do not hand-write another one
 
+## Where this has got to
+
+Fifteen posts are live. Clusters 1, 2 and 3 are written: each is a pillar plus four spokes,
+and every figure in them is asserted by `check_post_numbers.py`, which recomputes from the
+scorecard CSV and `triggers_data.json` and fails if a post and the data ever disagree.
+
+Cluster 3 leans on both datasets at once, which turned out to be the strongest thing we can
+say: the psychology says proof decides the sale in 92.9% of markets, and the corpus says
+66.5% of coaching websites show none. The distance between those two numbers is the argument.
+
 ## What is not done yet
 
-- Posts have no image support, so no diagrams or screenshots yet
-- No post has been written against this plan
+- Cluster 4, marketing for coaches. Still last, still the one with no dataset behind it. It
+  now has fourteen posts to link to, which was the condition for writing it.
+- No post carries an image. Support is built and `posts/images/` is empty apart from its
+  README. The websites cluster wants a chart of where the marks go.
+- Every post is dated 28 or 29 September 2026. Publishing fifteen in two days is honest but
+  it reads like a dump, and the date is one line of front matter if we want to stagger them.
+- The problem-aware phrases Planner would not report on are still unvalidated. That needs
+  Search Console impressions, not more writing.
 
-Search Console is set up as of 29 September 2026, property
-`https://go.goingbeyondtheillusion.com/`, sitemap submitted and read. It reports nothing
-for about a day, and a new property has no history, so the problem-aware phrases Planner
-refused to report on get validated there in a few weeks rather than now.
+Search Console: the Domain property `goingbeyondtheillusion.com` is the one to use, verified
+by DNS TXT on 29 September 2026, sitemap read at 17 pages before this cluster went in. A new
+property has no history, so the phrases Planner refused to report on get checked there in a
+few weeks rather than now.
