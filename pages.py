@@ -753,27 +753,62 @@ def _inline(text):
 _ONLY_IMAGE = re.compile(r"^!\[[^\]]*\]\([^)\s]+\)$")
 
 
+# A pipe table. Four posts shipped with one before anything here could read it, so the rows
+# came out on the page as literal pipes and dashes. The rule row is what makes the row above
+# it headings, and it is the only form a post uses.
+_ROW = re.compile(r"^\|.*\|$")
+_RULE = re.compile(r"^\|[\s:|-]+\|$")
+
+
+def _cells(row):
+    return [c.strip() for c in row.strip().strip("|").split("|")]
+
+
+def table_html(rows):
+    """Rows of a pipe table, in the order they were written.
+
+    Cells go through the inline reader, so a figure in a table can still carry a link, and a
+    ragged row is shown as written rather than padded to match the heading. Padding it would
+    hide a typo in a post instead of showing it.
+    """
+    head, body = [], rows
+    if len(rows) > 1 and _RULE.match(rows[1]):
+        head, body = _cells(rows[0]), rows[2:]
+    out = ["<table>"]
+    if head:
+        out.append("<tr>" + "".join(f"<th>{_inline(c)}</th>" for c in head) + "</tr>")
+    for r in body:
+        if _RULE.match(r):
+            continue
+        out.append("<tr>" + "".join(f"<td>{_inline(c)}</td>" for c in _cells(r)) + "</tr>")
+    out.append("</table>")
+    return "\n".join(out)
+
+
 def markdown(src):
     """Enough markdown for a blog post and no more.
 
-    Headings, paragraphs, bullet and numbered lists, blockquotes, horizontal rules,
-    pictures, and the inline forms above. Everything is escaped before any tag is
+    Headings, paragraphs, bullet and numbered lists, blockquotes, horizontal rules, pipe
+    tables, pictures, and the inline forms above. Everything is escaped before any tag is
     inserted, so a post file cannot inject HTML even though only we can write one.
 
     A line that is nothing but a picture becomes a <figure> rather than a paragraph with
     an image in it, because the prose column is measured for text and a picture in it
     comes out the width of a sentence.
     """
-    out, lst, quote = [], None, False
+    out, lst, quote, table = [], None, False, None
 
     def close():
-        nonlocal lst, quote
+        nonlocal lst, quote, table
         if lst:
             out.append(f"</{lst}>")
             lst = None
         if quote:
             out.append("</blockquote>")
             quote = False
+        if table is not None:
+            out.append(table_html(table))
+            table = None
 
     for line in src.splitlines():
         s = line.strip()
@@ -808,6 +843,11 @@ def markdown(src):
         elif _ONLY_IMAGE.match(s):
             close()
             out.append(f"<figure>{_inline(s)}</figure>")
+        elif _ROW.match(s):
+            if table is None:
+                close()
+                table = []
+            table.append(s)
         else:
             close()
             out.append(f"<p>{_inline(s)}</p>")

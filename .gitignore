@@ -15,3 +15,6 @@ pipeline.db
 # Coaches' uploaded banners. Their material, not ours, and never in the repo.
 uploads/
 *.webp
+
+# Local launch config for the preview. Machine-specific ports, not part of the app.
+.claude/
