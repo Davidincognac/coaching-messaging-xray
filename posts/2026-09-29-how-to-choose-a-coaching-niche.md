@@ -41,7 +41,7 @@ I have read coaches who pick a niche and then write as though they have signed a
 
 ## Does this mean building four websites?
 
-No. It means one page that's specific, and everything else staying where it's.
+No. It means one page that gets specific, and everything else staying where it is.
 
 The version that actually costs you money is the reverse: four things listed on one homepage with equal weight, so a visitor has to work out which one you're best at. Some will bother. The rest close the tab.
 

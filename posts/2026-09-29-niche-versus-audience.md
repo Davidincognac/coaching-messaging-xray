@@ -71,7 +71,7 @@ If you want to know which one your page is currently doing, [have it read the wa
 
 ### Is my niche my target audience?
 
-No. Your audience is who they're, your niche is what they want fixed. A homepage needs the second one and reads better with both.
+No. Your audience is who they are. Your niche is what they want sorting out. A homepage needs the second one, and reads better carrying both.
 
 ### Can my niche be a type of person?
 
@@ -83,4 +83,4 @@ The problem. A reader deciding in five seconds whether to stay is looking for th
 
 ### What if my clients have nothing in common except their age?
 
-Then look again at what they arrive with rather than who they're. Age is usually a proxy for a life event, and the event is the niche.
+Then look again at what they turn up with, rather than who they are. Age is usually a proxy for a life event, and the event is the niche.

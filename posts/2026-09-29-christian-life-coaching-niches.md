@@ -53,7 +53,7 @@ Name the market first and the faith second.
 
 "Christian life coach" says one. And leaves the reader guessing at the other.
 
-I want to be fair about the exception. If you're working in spirituality and meaning itself, the faith is the market, and naming it's naming the job. That's one of the six, not all of them.
+I want to be fair about the exception. If you work in spirituality and meaning itself, the faith is the market, so naming it does say what the job is. That's one of the six, not all of them.
 
 ## Where the evidence stops
 
