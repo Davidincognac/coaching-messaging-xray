@@ -308,6 +308,20 @@ def _pretty_date(iso):
         return iso or ""
 
 
+_MD_LINK = re.compile(r"\[([^\]]+)\]\([^)\s]+\)")
+
+
+def plain(text):
+    """A FAQ answer with its markdown taken back off.
+
+    The page renders an answer as markdown, because an answer that cannot link is an
+    answer that has to repeat itself. Schema wants the sentence a person would read out,
+    so the link keeps its words and loses its brackets.
+    """
+    text = _MD_LINK.sub(r"\1", text)
+    return re.sub(r"[*`]", "", text)
+
+
 def split_faq(body):
     """Separate a post's `## FAQ` section from the rest.
 
@@ -420,7 +434,7 @@ def render_post(slug):
         faq_html = ""
         if faqs:
             items = "".join(
-                f'<div class="gb-faq"><h3>{html.escape(q)}</h3><p>{html.escape(a)}</p></div>'
+                f'<div class="gb-faq"><h3>{html.escape(q)}</h3><p>{_inline(a)}</p></div>'
                 for q, a in faqs)
             faq_html = f'<h2>Questions coaches ask about this</h2>{items}'
 
@@ -436,7 +450,7 @@ def render_post(slug):
                 + _brand.cta_block() + rel_html)
 
         extra = _brand.article_schema(p_["title"], p_["summary"], path, p_["date"],
-                                      faqs, trail)
+                                      [(q, plain(a)) for q, a in faqs], trail)
         return shell(body, p_["title"], p_["summary"], active="blog", path=path,
                      hero_html=hero_html, extra_head=extra, image=p_.get("image", ""))
     return None

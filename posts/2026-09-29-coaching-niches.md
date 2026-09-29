@@ -157,7 +157,7 @@ The list is first, because that is what you came for. The finding underneath it 
 
 ## A niche is not an audience
 
-An audience is who someone is. A niche is what they are trying to get away from, or get to. Different questions.
+An audience is who someone is. A niche is what they are trying to get away from, or get to. Different questions, and [the difference between a niche and an audience](/blog/2026-09-29-niche-versus-audience) decides what your homepage can say.
 
 "Women over 40" is an audience. So is "corporate professionals". Neither one tells you what the person is trying to fix on the morning they start looking for help, and that morning is the only one your homepage has to work on.
 
@@ -196,7 +196,7 @@ Someone who wants out of debt is trying to stop the fear. Someone building passi
 
 ## How do you choose one?
 
-Pick the one where you can already hear the buyer talking.
+Pick the one where you can already hear the buyer talking. If you are good at several things, [choosing between them without throwing the rest away](/blog/2026-09-29-how-to-choose-a-coaching-niche) is its own question.
 
 Not the one with the best search volume. Not the one a coach on Instagram calls lucrative.
 
@@ -224,7 +224,7 @@ We have also [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-avera
 
 ### What is the most profitable coaching niche?
 
-Wrong question, and the list is what invites it. Profit follows whether the buyer recognises their own problem in your words, not which market you picked. And a crowded market where you speak the language beats an empty one where you do not.
+Wrong question, and the list is what invites it. Profit follows whether the buyer recognises their own problem in your words, not which market you picked. The ten markets with the most money already spent in them are also the ten where buyers have heard every claim before, which is the trade [set out with the numbers here](/blog/2026-09-29-most-profitable-coaching-niches).
 
 ### Do I have to pick a niche at all?
 
@@ -233,3 +233,5 @@ No, but the page has to. A coach can work across several markets and still have 
 ### What if my niche is not on this list?
 
 Then we have not read it yet, and I would rather say so than hand you somebody else's market with your name on it. The list grows as the reading does.
+
+One case worth naming: faith is not on the list as a niche, because it is a frame that sits across six of them. [Christian coaching markets](/blog/2026-09-29-christian-life-coaching-niches) are covered separately.
