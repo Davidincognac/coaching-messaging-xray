@@ -14,10 +14,10 @@ Being good at several things is normal. There are [around 117 coaching niches wi
 
 ## Things to know
 
-- Why being good at several things isn't the thing holding you back.
-- The one test for choosing between them, which takes about ten minutes.
-- What happens to the other three afterwards. Nothing.
-- How far down to go once you've picked, and why one level isn't enough.
+- Nobody lands on your page and works out which of your four things you're best at. They just leave.
+- There's a test for choosing between them that takes about ten minutes and needs no grid.
+- Picking one doesn't cost you the other three. They stay in the work, they just leave the page.
+- One level down still isn't far enough, and four out of five markets prove it.
 
 ## Which one do you pick?
 

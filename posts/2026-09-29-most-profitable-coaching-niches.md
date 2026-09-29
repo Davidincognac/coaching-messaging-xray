@@ -29,10 +29,10 @@ The second column is market size. The third is where it gets expensive.
 
 ## Things to know
 
-- The ten markets with the most money already spent in them, counted.
-- What market sophistication means, and why it decides how hard a market is to enter.
-- Why the small quiet markets aren't automatically the better bet.
-- How to work out a market's sophistication yourself, without our data.
+- Mindset has 255 books behind it. That's 255 authors who got to your buyer first.
+- Nine of the ten richest coaching markets are ones where every claim has already been made.
+- A market with 12 books in it is quiet for a reason, and that reason will cost you.
+- You can work out how hard a market is yourself in fifteen minutes, without our numbers.
 
 ## What the third column means
 

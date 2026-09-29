@@ -14,10 +14,10 @@ Which matters, because a Christian buyer in one of them wants nothing like what 
 
 ## Things to know
 
-- The six markets where faith is what decides the buying, and where each one sits.
-- What the buyer in each of the six is actually after.
-- Why the market underneath matters more than the faith on top of it.
-- How to word it on your page so a stranger knows what you do.
+- Faith decides the buying in six markets, and they've almost nothing else in common.
+- One of those buyers is frightened of the post. Another is answering a calling. Same faith.
+- "Christian life coach" tells a stranger your beliefs and nothing about what you fix.
+- There's a way to word it that says both, and the order matters more than the words.
 
 ## The six faith markets
 

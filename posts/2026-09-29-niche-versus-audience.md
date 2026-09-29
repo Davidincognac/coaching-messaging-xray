@@ -16,10 +16,10 @@ Scan the [117 coaching niches we found](/blog/2026-09-29-coaching-niches) and ha
 
 ## Things to know
 
-- The difference between the two, in a line you can test your own headline against.
-- Why naming a type of person feels like the safe choice and costs you more.
-- The version that works, and which half goes first.
-- The wording that costs the most, which a lot of coaching sites use.
+- "Women over 40" keeps everybody eligible and gives nobody a reason to stay.
+- We scored 11,011 coaching homepages and almost none lost marks on design.
+- Naming a type of person feels careful, right up until you count what it costs you.
+- There's a version that does both, and getting the order wrong wastes it.
 
 ## What is the difference, in practice?
 

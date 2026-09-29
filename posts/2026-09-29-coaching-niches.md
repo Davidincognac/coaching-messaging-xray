@@ -22,10 +22,10 @@ The full list is below. Find yours, then keep reading.
 
 ## Things to know
 
-- The 117 main coaching niches, grouped so you can find yours quickly.
-- Why anxiety isn't one market but eight, and what that costs you.
-- The difference between a niche and an audience, and which one your homepage needs.
-- How far down to go once you've found yours.
+- Four out of five sub niches want something the market above them doesn't cover.
+- Seven of the eight people saying they're anxious are after approval, or safety, or winning. Not calm.
+- "Women over 40" loses you clients that "menopause" would have kept.
+- There's a ten minute test for whether you really know your market, or just think you do.
 
 ## The 117 coaching niches
 
