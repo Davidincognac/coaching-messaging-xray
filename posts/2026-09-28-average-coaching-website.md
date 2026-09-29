@@ -8,6 +8,8 @@ We scored 10,954 live coaching websites out of 10. The average came back at 3.7.
 
 Thirteen scored as strong. Out of nearly eleven thousand.
 
+In this article I'm showing you where those marks actually go, because it isn't where most coaches think. If you want the short version, [four things separate the good sites from the poor ones](/blog/2026-09-29-website-design-for-life-coaches) and design isn't one of them.
+
 That isn't a story about lazy coaches. Every one of those sites was built by somebody who knows their subject, and a fair few of them look lovely.
 
 ## Things to know
