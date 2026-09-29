@@ -132,6 +132,36 @@ CLAIMS += [
     ("lead_capture", 4.64), ("credibility", 2.68), ("story", 2.54), ("clear_cta", 5.60),
     ("technical_health", 9.03), ("pricing_shown", 1.77))]
 
+# The third dataset, and the one the content plan said did not exist: 11,377 coaches'
+# LinkedIn headlines, scored the same way a homepage is. It is what cluster 4 stands on.
+_li = list(csv.DictReader(open(os.path.join(
+    ROOT, "coach_site_research/linkedin/output/headline_scores.csv"),
+    encoding="utf-8", errors="replace")))
+_LN = len(_li)
+_T = lambda r, f: str(r.get(f, "")).strip().lower() == "true"
+_lip = lambda f: round(100 * sum(1 for r in _li if _T(r, f)) / _LN, 1)
+_lsc = [float(r["headline_score"]) for r in _li]
+_titles = collections.Counter((r["Title"] or "").strip() for r in _li)
+CLAIMS += [
+    ("11,377 LinkedIn headlines",               _LN, 11377),
+    ("headline mean 2.56 out of 10",            round(statistics.mean(_lsc), 2), 2.56),
+    ("70.1% score 3 or less",                   round(100*sum(1 for x in _lsc if x <= 3)/_LN, 1), 70.1),
+    ("2.2% score 8 or more",                    round(100*sum(1 for x in _lsc if x >= 8)/_LN, 1), 2.2),
+    ("247 coaches score 8 or more",             sum(1 for x in _lsc if x >= 8), 247),
+    ("32.5% are a bare role word",              _lip("bare"), 32.5),
+    ("68.2% name a niche",                      _lip("niche"), 68.2),
+    ("25.2% name an audience",                  _lip("audience"), 25.2),
+    ("7.5% state an outcome",                   _lip("outcome"), 7.5),
+    ("6.9% show a credential",                  _lip("credential"), 6.9),
+    ("33.2% are multi-part",                    _lip("structured"), 33.2),
+    ("4.3% name both audience and outcome",
+     round(100*sum(1 for r in _li if _T(r, "audience") and _T(r, "outcome"))/_LN, 1), 4.3),
+    ("420 share the headline Executive Coach",  _titles["Executive Coach"], 420),
+    ("364 are just Coach",                      _titles["Coach"], 364),
+    ("41.5% share a headline with somebody",
+     round(100*sum(n for t, n in _titles.items() if n > 1 and t)/_LN, 1), 41.5),
+]
+
 bad = 0
 for label, got, want in CLAIMS:
     ok = got == want
