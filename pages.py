@@ -197,10 +197,11 @@ moved, built everything to match it, and ran that for twelve years before I sold
 
 <h2>What the counting says</h2>
 
-<p>So far: {cnt} coaching websites read and scored out of 10, 11,384 LinkedIn profiles,
-and 2,000 books their buyers actually paid for.</p>
+<p>So far: <a href="/website">{cnt} coaching websites read and scored out of 10</a>,
+11,384 LinkedIn profiles, and 2,000 books their buyers actually paid for.</p>
 
-<p>The average website scored {MARKET_AVG_10}.</p>
+<p><a href="/blog/2026-09-28-average-coaching-website">The average website scored
+{MARKET_AVG_10}</a>.</p>
 
 <p>That number is the reason I keep doing this. A coach who knows their subject cold, who
 has done the inner work, who is genuinely good in the room, still ends up with a homepage
@@ -228,7 +229,7 @@ happens unless you want it to.</p>
 """
     return shell(body, "About David Poole", "Who runs Going Beyond The Illusion, and why "
                  "the research comes before the advice.", active="about", path="/about",
-                 hero_html=hero_html)
+                 hero_html=hero_html, extra_head=_brand.person_schema("/about"))
 
 
 # --------------------------------------------------------------------------- blog

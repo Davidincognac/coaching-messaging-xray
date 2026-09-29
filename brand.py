@@ -476,6 +476,86 @@ PERSON = {
 }
 
 
+ORGANISATION = {
+    "@type": "Organization",
+    "@id": BASE_URL + "/#organisation",
+    "name": COMPANY["site"],
+    "legalName": COMPANY["legal"],
+    "url": BASE_URL,
+    "email": COMPANY["email"],
+    "logo": BASE_URL + "/angelo.png",
+    "founder": {"@id": BASE_URL + "/#david"},
+    "address": {
+        "@type": "PostalAddress",
+        "streetAddress": COMPANY["street"],
+        "addressLocality": COMPANY["town"],
+        "postalCode": COMPANY["postcode"],
+        "addressCountry": "FR",
+    },
+    # The registration numbers are the part a search engine can check against a public
+    # register, which is most of what separates a real company from a page claiming to be one.
+    "vatID": COMPANY["vat"],
+    "taxID": COMPANY["siret"],
+}
+
+
+def site_schema():
+    """Who runs this site, on the page that is the site.
+
+    Every page carried a canonical and a title and not one of them said who was behind it.
+    The Organization and the Person are the entities the rest of the markup already points
+    at, so they are declared once here with ids the blog posts can reference rather than
+    repeat.
+    """
+    return _jsonld({"@context": "https://schema.org", "@graph": [
+        ORGANISATION,
+        {**PERSON, "@id": BASE_URL + "/#david"},
+        {
+            "@type": "WebSite",
+            "@id": BASE_URL + "/#website",
+            "url": BASE_URL,
+            "name": COMPANY["site"],
+            "publisher": {"@id": BASE_URL + "/#organisation"},
+        },
+    ]})
+
+
+def person_schema(path="/about"):
+    """The about page is about a person, and saying so is the whole job."""
+    return _jsonld({"@context": "https://schema.org", "@graph": [
+        {
+            "@type": "ProfilePage",
+            "url": BASE_URL + path,
+            "mainEntity": {"@id": BASE_URL + "/#david"},
+        },
+        {**PERSON, "@id": BASE_URL + "/#david",
+         "description": "Reads and scores coaching websites, then builds from what the "
+                        "counting says rather than from what sounds right."},
+        ORGANISATION,
+    ]})
+
+
+def tool_schema(name, description, path):
+    """A free tool is a thing a searcher can use, not an article they can read.
+
+    price 0 is stated rather than left out, because "free" in prose is a claim and an offer
+    with a zero price is a fact a search engine can carry into the result.
+    """
+    return _jsonld({"@context": "https://schema.org", "@graph": [
+        {
+            "@type": "WebApplication",
+            "name": name,
+            "description": description,
+            "url": BASE_URL + path,
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Any",
+            "provider": {"@id": BASE_URL + "/#organisation"},
+            "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+        },
+        ORGANISATION,
+    ]})
+
+
 def article_schema(title, description, path, date="", faqs=(), trail=()):
     """Article + BreadcrumbList + FAQPage in one block.
 

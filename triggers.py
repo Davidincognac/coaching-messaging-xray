@@ -530,7 +530,8 @@ def _shell(body, title_suffix=""):
             .replace("__CSS__", _CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
             .replace("__SEO__", _brand.head_meta("/", _title(title_suffix),
-                     "The reason your clients actually buy, worked out from the books they buy.", True))
+                     "The reason your clients actually buy, worked out from the books they buy.", True)
+                     + "\n" + _brand.site_schema())
             .replace("__NAV__", _brand.nav_html("home"))
             .replace("__FOOTER__", _brand.footer_html())
             .replace("__BODY__", body))

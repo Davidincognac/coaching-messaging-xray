@@ -2841,14 +2841,33 @@ class Handler(BaseHTTPRequestHandler):
         # Never cache the tool's HTML, so a code change always shows on a plain refresh (no more stale pages).
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
         self.send_header("Pragma", "no-cache")
+        data = body.encode("utf-8")
+        self.send_header("Content-Length", str(len(data)))
         self.end_headers()
-        self.wfile.write(body.encode("utf-8"))
+        if self.command != "HEAD":
+            self.wfile.write(data)
 
-    def _send_bytes(self, data, ctype):
+    def _send_bytes(self, data, ctype, cache=""):
         self.send_response(200)
         self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(data)))
+        if cache:
+            self.send_header("Cache-Control", cache)
         self.end_headers()
-        self.wfile.write(data)
+        # A HEAD asks the same question as a GET and wants only the answer's headers, so
+        # everything above runs and the body is the one thing left out.
+        if self.command != "HEAD":
+            self.wfile.write(data)
+
+    def do_HEAD(self):
+        """Same work as a GET, minus the body.
+
+        Left unimplemented this returned 501, which is what a link checker or an uptime
+        monitor sees when it asks politely whether a page is there. _send and _send_bytes
+        drop the body when the method is HEAD, so the headers a caller gets here are the
+        headers a browser would get.
+        """
+        self.do_GET()
 
     def _redirect_to_canonical_host(self, parsed):
         """Send anything arriving on an old hostname to the one address we publish.
@@ -2896,7 +2915,10 @@ class Handler(BaseHTTPRequestHandler):
                 ctype = ("font/woff2" if path.endswith(".woff2")
                          else "image/jpeg" if path.endswith(".jpg") else "image/png")
                 with open(fpath, "rb") as f:
-                    self._send_bytes(f.read(), ctype)
+                    # A year, because these are our own fonts and drawings and they change
+                    # about never. When one does change it needs a new filename, which is
+                    # the price of not making every visitor fetch Angelo twice.
+                    self._send_bytes(f.read(), ctype, cache="public, max-age=31536000, immutable")
             else:
                 self.send_response(404); self.end_headers()
             return
@@ -3265,6 +3287,11 @@ class Handler(BaseHTTPRequestHandler):
             "Have your coaching website read the way a stranger reads it",
             "A free messaging X-ray of your homepage, scored against the market.",
             index=not (url or lead))
+        if not (url or lead):
+            _seo += "\n" + _brand.tool_schema(
+                "The Coaching Website Report Card",
+                "A free messaging X-ray of your homepage, scored against the market.",
+                "/website")
         self._send(page.replace("<!--SEO-->", _seo).replace("<!--PROGRESS-->", PROGRESS_UI))
 
     def do_POST(self):
