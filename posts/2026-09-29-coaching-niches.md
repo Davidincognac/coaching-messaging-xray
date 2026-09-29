@@ -1,25 +1,31 @@
 ---
 title: 117 coaching niches, and what the buyers in each one actually want
 date: 2026-09-29
-summary: Say your homepage offers help with anxiety. Eight different people read that and want eight different things from you. There are around 117 main coaching niches, almost 1,000 smaller markets under them, and four out of five of those smaller ones want something the big one doesn't cover.
+summary: The problem coaches have is they try to talk to too many people. Anxiety is anxiety, but the woman under pressure at work, the man who can't face a date and the parent worried about their child are all after different things. Here are the 117 main coaching niches, and the almost 1,000 sub niches underneath them.
 ---
 
-Say your homepage offers help with anxiety.
+The problem coaches have is they try to talk to too many people. In this article I'm showing you why that slows down your business when it comes to finding new clients.
 
-The woman googling her symptoms at midnight reads that. So does the new mum who can't stop picturing something happening to the baby. So does the bloke who's fine until he has to present to the board. Three people, three completely different problems, and your page has said one word to all of them.
+Let's take anxiety as an example.
 
-Did you know there are around 117 main coaching niches? They expand into almost 1,000 smaller markets underneath. We didn't brainstorm that list. We went and read what people in each one are buying.
+A life coach is helping people overcome anxiety. But a woman at work under pressure from her colleagues has a different experience to the man struggling to go on a date, the learner driver taking their lessons, and the parent worried sick about their child. It's all anxiety, but they're all looking for different solutions.
 
-Four out of five of those smaller markets want something the niche above them doesn't cover.
+They don't want vague help, they want something specific to them. They don't want to work it out for themselves, they want to dial straight into their own experience.
 
-The full list is below. Find yours, then keep going.
+When we examined the coaching industry we found 117 main niches, and almost 1,000 sub niches underneath them. We did it by looking at what people are buying on Amazon.
+
+Could there be 118 main niches? Maybe. What we learned matters more than the number.
+
+Because we read what each of those people is buying, we know why they'll buy from you, once you know their buying triggers.
+
+The full list is below. Find yours, then keep reading.
 
 ## Things to know
 
-- The full list of 117, grouped into eight blocks so you can find yours.
-- Why a niche and an audience are two different things, and which one your homepage needs.
-- What happens when you look inside one niche. Anxiety splits eight ways.
-- How to pick one without guessing, and how far down to go.
+- The 117 main coaching niches, grouped so you can find yours quickly.
+- Why anxiety isn't one market but eight, and what that costs you.
+- The difference between a niche and an audience, and which one your homepage needs.
+- How far down to go once you've found yours.
 
 ## The 117 coaching niches
 
@@ -178,56 +184,48 @@ You can do both, and it's stronger. "Menopause coaching for women in senior role
 
 There's [more on the niche and audience difference](/blog/2026-09-29-niche-versus-audience) if that's the bit you're stuck on.
 
-## The list isn't the useful part
+## Picking one off the list isn't enough
 
-Of the 918 smaller markets, 733 want something the bigger one above them doesn't cover. Four out of five.
+Out of those 918 sub niches, 733 of them want something the bigger market above them doesn't cover. Four out of five.
 
-So the list is a starting point. Not an answer.
+So if you pick a line off that list and write your homepage to it, you're writing to an average of people who all want different things.
 
-Pick a line off it, write your homepage to that line, and you're writing to an average of people who don't want the same thing.
+I'm not knocking the list. Picking one beats telling everybody you help everybody, and it beats a homepage that opens with your certification. It's a real step forward. It's just not where you stop.
 
-I want to be fair to the list. Picking one beats saying you help everybody, and it beats the homepage that opens with the coach's certification. So it's a real step. Just not the last one.
+## Back to anxiety, and what's underneath it
 
-## What that looks like inside one niche
+Anxiety has eight sub niches under it. Seven of them want something other than help with anxiety.
 
-Anxiety has eight subniches. Seven of them want something other than "help with anxiety".
+- **Social anxiety.** What they're after is approval. They want to stop dreading a room full of people.
+- **Health anxiety.** What they're after is survival. They want to stop googling symptoms at midnight.
+- **Postnatal anxiety.** What they're after is keeping their child safe. They want the thoughts about the baby to stop.
+- **High-achiever anxiety.** What they're after is winning. They want to perform under pressure without it wrecking them.
 
-- **Social anxiety.** The drive is social approval. They want to stop dreading a room full of people.
-- **Health anxiety.** The drive is survival. They want to stop googling symptoms at midnight.
-- **Postnatal anxiety.** The drive is protecting a child. They want the intrusive thoughts about the baby to stop.
-- **High-achiever anxiety.** The drive is winning. They want to perform under pressure without it wrecking them.
+Four people, four completely different reasons to get their card out, and your homepage has said one word to all of them.
 
-Four buyers. One word on your homepage. And four different reasons to reach for a card, only one of which is the word you wrote.
+A coach writing "I help people with anxiety" has written something perfectly true. It's also what every other anxiety coach has written, so the reader goes straight past it.
 
-The coach writing "I help people with anxiety" has written something true.
+Money does the same thing. Somebody trying to get out of debt is frightened. Somebody building passive income is trying to get ahead of people they know. Both come under Money and Wealth, and neither one would read the other's page twice.
 
-It's also the sentence every other anxiety coach has written. So the buyer reads it and keeps scrolling.
+## So which one do you pick?
 
-Money splits the same way.
+Pick the one where you can already hear the person talking. Not the one with the best search volume, and not the one somebody on Instagram says is lucrative.
 
-Someone who wants out of debt is trying to stop the fear. Someone building passive income is trying to get ahead of people they know. Both of them come under "Money and Wealth". Neither would read the other's page twice.
+Here's the test. Write down the sentence that was going through their head on the morning they started looking for help. If you can write it out without making it up, you know that market. If you find yourself reaching for adjectives, you don't know it yet.
 
-## How do you choose one?
+Feeling sure and being right aren't the same thing, and this is easy enough to check. Go and read fifteen reviews of the books those people buy. If what comes back is what you'd have guessed, pick it.
 
-Pick the one where you can already hear the buyer talking. If you're good at several things, [choosing between them without throwing the rest away](/blog/2026-09-29-how-to-choose-a-coaching-niche) is its own question.
+Then go one level down. Don't write to anxiety, write to postnatal anxiety, and let the people who have it recognise themselves in your first line.
 
-Not the one with the best search volume. Not the one a coach on Instagram calls lucrative.
+If you're good at several things, [choosing between them without giving the rest up](/blog/2026-09-29-how-to-choose-a-coaching-niche) is its own question.
 
-The test is whether you can write down, without inventing it, the sentence going through someone's head the day they went looking. If you can quote them, you know the market. If you're reaching for adjectives, you don't know it yet.
+## What this list won't tell you
 
-Feeling sure and being right aren't the same thing, and the gap between them is easy to check. Go and read fifteen reviews of the books your market buys. If the words coming back are the words you would have guessed, pick it.
+It only covers markets where people are buying books, because that's what we could count. If nobody's publishing in your market, it won't be on here, and that doesn't mean nobody wants it. It means we had nothing to read.
 
-Then go one level down.
+The sub niche counts came out of that same reading. Seven or eight per market is what the evidence gave us, not a number we were aiming for.
 
-Don't write to "anxiety". Write to postnatal anxiety, or to health anxiety, and let the people who have that thing recognise themselves in the first line.
-
-## Where the evidence stops
-
-This list covers markets where buyers spend money on books, because books are what we could count. So a niche with no publishing behind it won't appear here, and that doesn't mean it has no buyers. It means we had nothing to read.
-
-The subniche counts come from our own reading, not from a keyword tool. Seven or eight per niche is what the evidence supported, not a target we filled.
-
-We've also [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website), and the average came in at 4.5. Niche choice isn't what drags that number down. Saying the niche out loud on the page is. You can [have your own homepage read the way a stranger reads it](/website) if you want to see where yours sits.
+One more thing worth saying. We've [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came in at 4.5. Almost none of those marks were lost on the niche the coach picked. They were lost on never saying it out loud on the page. If you want to know which yours does, you can [have it read the way a stranger reads it](/website).
 
 ## FAQ
 
@@ -245,6 +243,6 @@ No, but the page has to. A coach can work across several markets and still have 
 
 ### What if my niche isn't on this list?
 
-Then we haven't read it yet, and I would rather say so than hand you somebody else's market with your name on it. The list grows as the reading does.
+Then we haven't read it yet. I'd rather tell you that than hand you somebody else's market with your name on it. The list grows as the reading does.
 
-One case worth naming: faith isn't on the list as a niche, because it's a frame that sits across six of them. [Christian coaching markets](/blog/2026-09-29-christian-life-coaching-niches) are covered separately.
+Faith is the one that catches people out. It's not on here as a niche because it turns up across six of them instead, and [Christian coaching markets](/blog/2026-09-29-christian-life-coaching-niches) get their own article.
