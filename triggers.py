@@ -499,8 +499,6 @@ _JS = """
 
 _SHELL = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Buying Triggers __TITLE__</title>
-<meta name="description" content="The reason your clients actually buy, worked out from the books they buy.">
 __SEO__
 <style>__CSS__</style></head><body>
 __NAV__
@@ -512,14 +510,26 @@ __FOOTER__
 </body></html>"""
 
 
+_HOME_TITLE = "The 6 buying triggers that turn a stranger into a client"
+
+
+def _title(suffix=""):
+    """The homepage title, plus whatever a report view wants after it.
+
+    It leads on the triggers rather than on the product name because nobody is searching
+    for "Buying Triggers" yet, and a searcher scanning a results page is looking for their
+    own problem, not for what we called our page.
+    """
+    return f"{_HOME_TITLE}{suffix}" if suffix else _HOME_TITLE
+
+
 def _shell(body, title_suffix=""):
     # The report is injected into the landing page after the progress bar, so its stylesheet has to be
     # on every page, not only on the standalone report URL.
     return (_SHELL
             .replace("__CSS__", _CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
-            .replace("__TITLE__", title_suffix)
-            .replace("__SEO__", _brand.head_meta("/", "Coaches: the 6 buying triggers that turn a stranger into a client",
+            .replace("__SEO__", _brand.head_meta("/", _title(title_suffix),
                      "The reason your clients actually buy, worked out from the books they buy.", True))
             .replace("__NAV__", _brand.nav_html("home"))
             .replace("__FOOTER__", _brand.footer_html())

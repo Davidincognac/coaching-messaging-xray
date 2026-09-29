@@ -107,8 +107,6 @@ _PROSE_CSS = """
 
 _SHELL = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>__TITLE__</title>
-<meta name="description" content="__DESC__">
 __SEO__
 __EXTRA__
 <style>__CSS__</style></head><body>
@@ -140,8 +138,6 @@ def shell(body, title, desc="", active="", path="/", index=True, hero_html="", e
                      + _brand.CHROME_CSS + _PROSE_CSS)
             .replace("__NAV__", _brand.nav_html(active))
             .replace("__FOOTER__", _brand.footer_html())
-            .replace("__TITLE__", html.escape(title))
-            .replace("__DESC__", html.escape(desc))
             .replace("__BODY__", body))
 
 

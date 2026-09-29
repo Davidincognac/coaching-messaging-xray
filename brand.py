@@ -23,6 +23,7 @@ PAGE in app.py is a .format() template, so its CSS braces have to be doubled. Us
 
 import html
 import os
+from datetime import datetime
 
 # --------------------------------------------------------------------------- company
 
@@ -291,9 +292,35 @@ def fmt(css):
 # page names this as its canonical and no two URLs compete for the same content.
 BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000").rstrip("/")
 
+# Search Console and Bing both verify a site by a string they generate. It is not a secret,
+# but it is not ours to invent either, so it comes from the environment and the site simply
+# stops claiming verification if it is absent.
+GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "").strip()
+BING_SITE_VERIFICATION = os.getenv("BING_SITE_VERIFICATION", "").strip()
+
+# Google shows roughly 60 characters of a title. A bare "Blog" wastes that room, so short
+# titles get the company name after them and long ones are left alone: the words that say
+# what the page is worth more than a brand nobody is searching for yet.
+TITLE_SUFFIX = " | " + COMPANY["site"]
+
+
+def page_title(title):
+    """The <title> as a searcher sees it in a result."""
+    title = (title or "").strip()
+    if not title:
+        return COMPANY["site"]
+    if COMPANY["site"].lower() in title.lower():
+        return title
+    return title + TITLE_SUFFIX if len(title) + len(TITLE_SUFFIX) <= 60 else title
+
 
 def head_meta(path="/", title="", description="", index=True):
-    """Canonical, robots and the social-share tags for one page.
+    """The whole head: title, description, canonical, robots and the social-share tags.
+
+    The title and description live here rather than in each page shell because they were in
+    both, and the two drifted. The homepage went out as "Buying Triggers" while the social
+    card carried the sentence we actually wanted, and /website shipped with no description
+    at all. One function owns them now, so they cannot disagree again.
 
     `index=False` is for anything personal: a coach's own report, their salespage, any
     URL carrying their token. Those must never reach a search result. They are thin and
@@ -305,7 +332,12 @@ def head_meta(path="/", title="", description="", index=True):
               else "noindex,nofollow,noarchive")
     og_title = html.escape(title or COMPANY["site"], quote=True)
     og_desc = html.escape(description or "", quote=True)
-    tags = [
+    tags = []
+    if title:
+        tags.append(f'<title>{html.escape(page_title(title))}</title>')
+    if description:
+        tags.append(f'<meta name="description" content="{og_desc}">')
+    tags += [
         f'<link rel="canonical" href="{html.escape(canonical, quote=True)}">',
         f'<meta name="robots" content="{robots}">',
         f'<meta property="og:site_name" content="{html.escape(COMPANY["site"], quote=True)}">',
@@ -321,6 +353,12 @@ def head_meta(path="/", title="", description="", index=True):
     # Angelo is the only image we have that reads at thumbnail size.
     tags.append(f'<meta property="og:image" content="{BASE_URL}/angelo.png">')
     tags.append(f'<meta name="twitter:image" content="{BASE_URL}/angelo.png">')
+    if GOOGLE_SITE_VERIFICATION:
+        tags.append('<meta name="google-site-verification" content="'
+                    + html.escape(GOOGLE_SITE_VERIFICATION, quote=True) + '">')
+    if BING_SITE_VERIFICATION:
+        tags.append('<meta name="msvalidate.01" content="'
+                    + html.escape(BING_SITE_VERIFICATION, quote=True) + '">')
     return "\n".join(tags)
 
 
@@ -363,17 +401,34 @@ def robots_txt():
 
 def sitemap_xml(blog_urls=()):
     """The public pages plus whatever posts exist. No dates we cannot stand behind:
-    a lastmod we invent is worse than no lastmod at all."""
+    a lastmod we invent is worse than no lastmod at all.
+
+    A post is the exception, because its date is written in its own front matter. Passing
+    `blog_urls` as (path, date) pairs reports that date; passing bare paths still works and
+    simply says nothing, which is the same promise as before.
+    """
     out = ['<?xml version="1.0" encoding="UTF-8"?>',
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for path, priority, freq in PUBLIC_PAGES:
         out.append(f"  <url><loc>{BASE_URL}{path}</loc>"
                    f"<changefreq>{freq}</changefreq><priority>{priority}</priority></url>")
-    for path in blog_urls:
-        out.append(f"  <url><loc>{BASE_URL}{path}</loc>"
+    for entry in blog_urls:
+        path, date = entry if isinstance(entry, (tuple, list)) else (entry, "")
+        stamp = f"<lastmod>{date}</lastmod>" if _is_iso_date(date) else ""
+        out.append(f"  <url><loc>{BASE_URL}{path}</loc>{stamp}"
                    f"<changefreq>monthly</changefreq><priority>0.6</priority></url>")
     out.append("</urlset>")
     return "\n".join(out)
+
+
+def _is_iso_date(value):
+    """A malformed date in a post would invalidate the whole sitemap, so it is dropped
+    rather than passed through."""
+    try:
+        datetime.strptime((value or "").strip(), "%Y-%m-%d")
+        return True
+    except (ValueError, TypeError):
+        return False
 
 
 # ------------------------------------------------------------------- blog furniture

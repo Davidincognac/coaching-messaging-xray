@@ -141,7 +141,6 @@ def mascot_img():
 
 PAGE = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Coaching Website Report Card</title>
 <!--SEO-->
 <style>""" + _brand.fmt(_brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS) + """
   *{{box-sizing:border-box}}
@@ -2674,7 +2673,9 @@ def identity_block(lead):
 def inner_page(result, eyebrow=""):
     """A page in the funnel after the first one. Same styling, no second ask for identity."""
     brow = f'<div class="eyebrow">{eyebrow}</div>' if eyebrow else ""
-    return (_HEAD.replace("<!--SEO-->", _brand.head_meta("/social", index=False))
+    return (_HEAD.replace("<!--SEO-->", _brand.head_meta(
+                "/social", "Your coaching social media, read the way a stranger reads it",
+                index=False))
             + '<div class="hero-band slim"><div class="wrap"><div class="hero">'
             + mascot_img()
             + f'<div class="hero-copy">{brow}</div>'
@@ -2925,7 +2926,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/sitemap.xml":
             # Blog posts are files on disk, so the sitemap is built from whatever is
             # actually there rather than a list that drifts out of date.
-            posts = [f"/blog/{p['slug']}" for p in _pages._read_posts()]
+            posts = [(f"/blog/{p['slug']}", p.get("date", "")) for p in _pages._read_posts()]
             self._send_bytes(_brand.sitemap_xml(posts).encode("utf-8"),
                              "application/xml; charset=utf-8")
             return
@@ -2977,7 +2978,8 @@ class Handler(BaseHTTPRequestHandler):
             page = PAGE.format(url_value="", result=frag, identity=IDENTITY_FIELDS,
                                count=f"{websites_read_count():,}", mascot=mascot_img())
             self._send(page.replace("<!--PROGRESS-->", "")
-                           .replace("<!--SEO-->", _brand.head_meta("/website", index=False)))
+                           .replace("<!--SEO-->", _brand.head_meta(
+                               "/mockup/website", "Website report mockup", index=False)))
             return
         if path == "/combined":
             # Order: opening, their triggers, SOCIAL, bridge, WEBSITE, ending. Social first because
