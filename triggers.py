@@ -688,7 +688,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
   <form method="post" action="/triggers" id="trigform" autocomplete="on">
     """ + err_html + """
     <h2 class="gb-display f-head">Tell us who you coach, and we will tell you why they&nbsp;buy</h2>
-    <p class="f-lead">Your report opens on this page in about twenty seconds.
+    <p class="f-lead">Your six triggers open on this page in about twenty seconds.
     <span class="free">Nothing to pay.</span> We built this research for our own work, so it
     costs us nothing to hand you a copy.</p>
     <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
@@ -705,7 +705,12 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
       <div class="sugg" id="nichesugg" role="listbox"></div>
     </div>
     <button type="submit">Show me my buying triggers</button>
-    <p class="hint">One report. No newsletter, nothing to unsubscribe from later.</p>
+    <!-- The line here used to promise no follow-up email, which is not what happens: every
+         address goes to MailerLite and the sequences branch off it. A promise the plumbing
+         contradicts is worse than no promise, and the law wants people told at the point
+         they type it, so this says what actually happens instead. -->
+    <p class="hint">We'll email you about the work we sell, and one click in any email stops
+    that. <a href="/privacy">What we do with your details</a>.</p>
   </form>
 
   <div id="processing">
@@ -722,10 +727,10 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
           <span class="ps-status ps-waiting" id="tp3">[WAITING]</span></li>
       <li><b>Four:</b> Working out what they're really paying for
           <span class="ps-status ps-waiting" id="tp4">[WAITING]</span></li>
-      <li><b>Five:</b> Building your report
+      <li><b>Five:</b> Putting your six triggers together
           <span class="ps-status ps-waiting" id="tp5">[WAITING]</span></li>
     </ul>
-    <p class="p-note">About twenty seconds. Leave this page open. Your report opens here on its own.</p>
+    <p class="p-note">About twenty seconds. Leave this page open. Your triggers open here on their own.</p>
   </div>
   <div id="reportslot"></div>
 
@@ -1001,7 +1006,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
 
     body = """
   <div class="rwrap">
-  <p class="r-eyebrow">Your Buying Triggers report is ready</p>
+  <p class="r-eyebrow">Your buying triggers are ready</p>
   <h1 class="r-title">""" + e(shown) + """</h1>
   <p class="r-for">""" + for_line + """</p>
   """ + ('<p class="r-parent">' + parent_line + "</p>" if parent_line else "") + """
@@ -1020,7 +1025,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
 
   <div class="r-next">
     <h2>Now let's look at you</h2>
-    <p>We built this report in about 20 seconds, and it's an excellent view of your market. But
+    <p>We pulled those six in about 20 seconds, and they're an excellent view of your market. But
     there's more to find, and more you can use to your advantage. So let's look at your social media
     profile, and your website if you have one.</p>
     <p>You've just read the words your buyers use. Next you see your own words the way a stranger

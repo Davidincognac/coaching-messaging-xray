@@ -2991,6 +2991,10 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/robots.txt":
             self._send_bytes(_brand.robots_txt().encode("utf-8"), "text/plain; charset=utf-8")
             return
+        if path in ("/feed.xml", "/rss.xml"):
+            self._send_bytes(_brand.rss_xml(_pages._read_posts()).encode("utf-8"),
+                             "application/rss+xml; charset=utf-8")
+            return
         if path == "/sitemap.xml":
             # Blog posts are files on disk, so the sitemap is built from whatever is
             # actually there rather than a list that drifts out of date.

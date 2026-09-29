@@ -349,6 +349,7 @@ def head_meta(path="/", title="", description="", index=True, image=""):
         f'<meta property="og:type" content="website">',
         f'<meta property="og:title" content="{og_title}">',
         f'<meta property="og:url" content="{html.escape(canonical, quote=True)}">',
+        f'<link rel="alternate" type="application/rss+xml" title="{html.escape(COMPANY["site"], quote=True)}" href="{BASE_URL}/feed.xml">',
         f'<meta name="twitter:card" content="summary_large_image">',
         f'<meta name="twitter:title" content="{og_title}">',
     ]
@@ -638,6 +639,49 @@ def article_schema(title, description, path, date="", faqs=(), trail=(), image="
             ],
         })
     return _jsonld({"@context": "https://schema.org", "@graph": graph})
+
+
+def rss_xml(posts=()):
+    """The blog as a feed.
+
+    A research blog with no feed is one a reader can only keep up with by remembering to
+    come back, which nobody does. Descriptions are the post summaries, so the feed says the
+    same thing the search result says.
+    """
+    import email.utils as _eu
+    from datetime import datetime as _dt
+
+    def rfc822(iso):
+        try:
+            return _eu.format_datetime(_dt.strptime(iso, "%Y-%m-%d"))
+        except (ValueError, TypeError):
+            return ""
+
+    items = []
+    for p in posts:
+        url = f"{BASE_URL}/blog/{p['slug']}"
+        when = rfc822(p.get("date", ""))
+        items.append(
+            "    <item>\n"
+            f"      <title>{html.escape(p['title'])}</title>\n"
+            f"      <link>{html.escape(url)}</link>\n"
+            f"      <guid isPermaLink=\"true\">{html.escape(url)}</guid>\n"
+            + (f"      <pubDate>{when}</pubDate>\n" if when else "")
+            + f"      <description>{html.escape(p.get('summary', ''))}</description>\n"
+            f"      <dc:creator>{html.escape(PERSON['name'])}</dc:creator>\n"
+            "    </item>")
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" '
+            'xmlns:dc="http://purl.org/dc/elements/1.1/">\n'
+            "  <channel>\n"
+            f"    <title>{html.escape(COMPANY['site'])}</title>\n"
+            f"    <link>{BASE_URL}/blog</link>\n"
+            f'    <atom:link href="{BASE_URL}/feed.xml" rel="self" type="application/rss+xml"/>\n'
+            "    <description>What comes out of scoring 10,954 coaching websites and "
+            "mapping 918 coaching markets.</description>\n"
+            "    <language>en</language>\n"
+            + "\n".join(items) + "\n"
+            "  </channel>\n</rss>\n")
 
 
 def llms_txt(posts=()):
