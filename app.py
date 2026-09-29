@@ -2850,9 +2850,41 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _redirect_to_canonical_host(self, parsed):
+        """Send anything arriving on an old hostname to the one address we publish.
+
+        The site answered on go.goingbeyondtheillusion.com before it answered on the apex,
+        so that name is in sent emails, in the sitemap Google already read, and in whatever
+        anybody bookmarked. Serving the same pages on both addresses is two sites competing
+        for one set of words, and a canonical tag only asks a crawler to ignore the copy.
+        A 301 says the copy is gone and moves the link with it.
+
+        Only the host changes. The path and the query string are carried across untouched,
+        because a coach following a link with their token in it must land on their own page
+        and not on the homepage.
+        """
+        canonical = urlparse(_brand.BASE_URL).netloc
+        host = (self.headers.get("Host") or "").split(",")[0].strip()
+        # A missing Host, or one we cannot read, is not a reason to bounce anybody.
+        if not host or not canonical or host.lower() == canonical.lower():
+            return False
+        # Local runs answer on localhost and 127.0.0.1 and must stay where they are.
+        if host.split(":")[0] in ("localhost", "127.0.0.1", "[::1]"):
+            return False
+        target = f"{urlparse(_brand.BASE_URL).scheme}://{canonical}{parsed.path}"
+        if parsed.query:
+            target += "?" + parsed.query
+        self.send_response(301)
+        self.send_header("Location", target)
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        return True
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
+        if self._redirect_to_canonical_host(parsed):
+            return
         if path in ("/angelo.png", "/inter.woff2", "/serif.woff2", "/outfit.woff2", "/angelo_up.png", "/angelo_down.png",
                     "/angelo_unsure.png", "/angelo_reading.png", "/angelo_typing.png", "/angelo_file.png",
                     "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png",
