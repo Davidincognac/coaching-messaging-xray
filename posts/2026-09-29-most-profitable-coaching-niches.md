@@ -6,11 +6,13 @@ summary: Somebody will tell you mindset coaching is where the money is. They're 
 
 Somebody will have told you mindset coaching is where the money is.
 
-They're right. Mindset came top when we counted the books people in these markets buy, with 255 of them. Which also means 255 authors got there first, and the person reading your page has probably read three of them.
+They're right. And in this article I'm showing you why that's exactly the problem.
 
-That's the awkward bit about asking which coaching niche is most profitable. The markets with the most money in them are the markets where everything's already been said.
+We looked at what people are buying on Amazon across [117 coaching markets](/blog/2026-09-29-coaching-niches). Mindset came top with 255 books behind it. So 255 authors got to your buyer before you did, and the woman reading your homepage has probably finished three of them.
 
-Here's the top ten, counted across [117 coaching niches](/blog/2026-09-29-coaching-niches).
+That's the awkward bit about asking which coaching niche is the most profitable. The markets with the most money in them are the markets where everything has already been said.
+
+Here's the top ten.
 
 | Niche | Books behind it | How many times the buyer has heard it |
 |---|---|---|
@@ -36,47 +38,41 @@ The second column is market size. The third is where it gets expensive.
 
 ## What the third column means
 
-It's market sophistication, scored 1 to 5. It counts how many rounds of claims a buyer has already sat through before they get to you.
+It's how many rounds of promises somebody has already sat through before they get to you. We score it 1 to 5.
 
-At 1, you can say what you do and that's enough, because nobody has said it yet.
+At 1 you can say what you do and people take it at face value, because nobody has said it to them yet.
 
-At 5, every straightforward claim has been made, beaten, and made again by someone promising it faster. The buyer's not sceptical of you by then. They're just tired.
+At 5 the man reading your page has tried two apps, a programme his employer paid for, a book his sister gave him at Christmas, and a bloke on YouTube. He isn't doubting you. He's just tired, and he's read your headline somewhere before.
 
-Nine of those top ten sit at 3 or higher. Two of them sit at 5.
-
-Across all 117 niches, 51 sit at 4 or 5. That's nearly half the market, and it isn't spread evenly. The crowded end is where the money already is.
+Nine of the top ten markets are at 3 or higher, and two of them are at 5. Across all 117, that's 51 markets at 4 or 5. Nearly half. The crowded end is where the money already is.
 
 ## So where is the money?
 
-In the market where you can still say something the buyer hasn't heard. That's the whole answer, and it doesn't correlate with size.
+In the market where you can still say something nobody has said to them yet. Which has almost nothing to do with how big it is.
 
-Look at the other end of the list. Empty nest has 12 books behind it and sits at sophistication 2. Caregiving for ageing parents has 19 books and sits at 2. Blended and step-families has 14 books and sits at 3.
+Look at the other end of our list. Empty nest has 12 books behind it, sitting at 2. Caregiving for ageing parents has 19 books, also at 2. Blended and step-families has 14, at 3.
 
-Small markets. Fewer buyers.
+The woman whose last child moved out in June has not read four books about it. Nobody has sold her anything about it. She's probably never typed it into Google.
 
-But a buyer who hasn't already been told the thing you're about to tell them.
-
-I'm not going to pretend that makes them better. A market with 12 books is a market where 12 books were worth publishing, and that's a real limit on how many people are looking. If you need fifty clients this year, a market that size is a bad bet.
+I'm not going to pretend that makes it a better bet. Twelve books means twelve books were worth publishing, and that's a hard limit on how many people are out there looking. If you need fifty clients this year, a market that size will not carry you.
 
 ## How do you actually compare two niches?
 
-Take the book count as the size, take the sophistication as the cost of entry, and ask which one you can still say something true and new in.
+Take the book count as the size of the room and the sophistication as the price of the ticket. Then ask which room you've still got something to say in.
 
-That last part is yours, not the data's. The numbers tell you how loud the room is. But they can't tell you whether you've anything worth saying in it.
+That last bit is yours and the numbers can't help you with it. They'll tell you how loud a room is. They can't tell you whether you've anything worth shouting.
 
-A worked version. Mindset has 255 books and sophistication 4. Walking in with "change your mindset, change your life" means competing with 255 books that said it first. Walking in with a specific mechanism nobody has named, for a specific person, is a different conversation in the same room.
+Try it with mindset. 255 books, sophistication 4. Walk in with "change your mindset, change your life" and you're the 256th person to say it. Walk in with a mechanism nobody has put a name to, for one specific person, and you're having a completely different conversation in the same room.
 
-Sophistication describes what a buyer will need from you before they believe anything. It won't keep you out.
+None of this keeps you out of a crowded market. It tells you what somebody will need from you before they believe a word of it.
 
-## Where the evidence stops
+## Is a book count the same as revenue?
 
-Books are a proxy for spend, not a measure of it. So a market can be commercially strong with very little publishing behind it, and coaching revenue doesn't track book sales one for one.
+No. Plenty of people buy coaching who'd never buy a book, and a market can be busy with almost nothing published in it. What the count tells you is where money is already moving, which was the closest to evidence we could get.
 
-I would rather say that than dress the numbers up.
+Are the sophistication scores exact? No. They came out of reading what people in each market say and buy, so it's judgement on top of evidence rather than a figure off a chart. Treat a 4 and a 5 as the same warning.
 
-The sophistication scores come from our own reading of what each market's buyers already say and buy. They're judgement applied to evidence, not a figure pulled off a chart.
-
-We also [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average was 4.5. Not one of those scores was lost because of the niche the coach picked.
+One more thing. We've also [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came in at 4.5. Not one of those marks was lost over which niche the coach picked.
 
 ## FAQ
 

@@ -4,13 +4,13 @@ date: 2026-09-29
 summary: Search for a Christian life coach and you'll find hundreds of people describing themselves that way. Hardly any of them say what they'd actually help you with. We found six markets where faith decides the buying, and the people in them want six different things.
 ---
 
-Search for a Christian life coach and you'll get hundreds of people describing themselves exactly that way. Hardly any of them tell you what they'd actually help you with.
+Search for a Christian life coach and you'll get hundreds of people describing themselves exactly that way. Hardly any of them say what they'd actually help you with.
 
-That's because Christian coaching works as a layer over a market rather than as a market of its own.
+In this article I'm showing you why that costs them, and what to write instead.
 
-We read what people buy across [around 117 coaching niches](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller markets. Faith came back as the deciding thing in six of them, and those six live under six completely different parent markets.
+Christian coaching works as a layer over a market rather than as a market of its own. We found that by reading what people buy on Amazon across [117 coaching markets](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller ones underneath. Faith came back as the deciding thing in six of them, and those six sit under six completely different parent markets.
 
-Which matters, because a Christian buyer in one of them wants nothing like what a Christian buyer in another wants.
+Which matters, because the man in one of them wants nothing like what the woman in another wants, and they'd both call themselves Christian.
 
 ## Things to know
 
@@ -35,35 +35,31 @@ Which matters, because a Christian buyer in one of them wants nothing like what 
 
 ## Why the parent market matters more than the faith
 
-Because the faith is shared and the job isn't.
+Because they share the faith and they don't share the problem.
 
-Take two of them. The debt-freedom buyer is trying to stop being frightened of the post. The adoption buyer is trying to do a good job of something they chose.
+Take two of them. There's a man who's frightened of the post, who hasn't opened the last three envelopes, and who wants out from under it without borrowing again. And there's a couple who've decided to adopt because they believe they're meant to, and who want to do it properly.
 
-Both are Christian. And both would read a page about "Christian life coaching" and find nothing in it about them.
+Both Christian. Both would read a page saying "Christian life coaching" and find nothing on it about them.
 
-Write "faith-based coaching for Christians" on your homepage and you've named the frame and left the job blank.
-
-Same mistake as "I help women over 40". Different word doing the hiding.
+Write "faith-based coaching for Christians" on your homepage and you've said what you believe and nothing about what you fix. Same hole as "I help women over 40", with a different word sitting in it.
 
 ## What this means for your page
 
 Name the market first and the faith second.
 
-"Getting out of debt, for Christian families who want to do it without going deeper" says both. It tells the reader what the work is, and whose language it will be in.
+"Getting out of debt, for Christian families who want to do it without borrowing again." That tells the man with the unopened envelopes what you do and whose language you'll do it in. He knows from one line whether to carry on reading.
 
-"Christian life coach" says one. And leaves the reader guessing at the other.
+"Christian life coach" tells him half of it and leaves him guessing the rest. He won't guess. He'll go back to the search results.
 
-I want to be fair about the exception. If you work in spirituality and meaning itself, the faith is the market, so naming it does say what the job is. That's one of the six, not all of them.
+One fair exception. If you work in spirituality and meaning itself, then the faith is the market, so naming it does say what the job is. That's one of the six, not all six.
 
-## Where the evidence stops
+## Could there be more than six?
 
-Six is what the reading supported, not a complete map of faith in coaching.
+Almost certainly. Six is what our reading supported, not a full map of faith in coaching. Show me a seventh and I'll add it.
 
-Our evidence is what buyers already spend money on in book form. And faith-based publishing leans towards a handful of traditions, so what came back leans the same way.
+Does it cover other faiths? No, and I'd rather say so than let you assume it does. What we read was what people buy on Amazon, and faith publishing leans heavily towards a handful of traditions, so what came back leans the same way. Everything above is about Christian buyers, because that's who the evidence was about.
 
-Everything here is about Christian buyers specifically, because that's what the evidence covered. I would rather say that than imply it generalises to faiths we didn't read.
-
-You can [see how your own homepage reads to a stranger](/website) if you want to check whether your market or your frame is landing first.
+If you want to check whether your market or your faith is landing first on your own page, you can [see how it reads to a stranger](/website).
 
 ## FAQ
 

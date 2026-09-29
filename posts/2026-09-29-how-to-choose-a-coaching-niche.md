@@ -4,13 +4,13 @@ date: 2026-09-29
 summary: You're good at four things and your homepage is trying to say all four at once. Nobody reading it can tell which one you're best at, so they decide you're a generalist. Here's how to pick one without giving the other three up.
 ---
 
-You're good at four things, and your homepage is trying to say all four.
+You're good at four things, and your homepage is trying to say all four at once.
 
-That's the bit costing you, and it's worth separating from the choosing. Plenty of the coaches whose sites I read aren't undecided at all. They know exactly who they help. They just know it about four groups, and they've written one page trying to serve all four.
+In this article I'm showing you how to pick one without giving the other three up.
 
-So a stranger lands, can't tell which one you're best at, decides you're a generalist, and carries on looking.
+Plenty of the coaches whose sites I read aren't undecided at all. They know exactly who they help. They just know it about four different groups, so they've written one page trying to serve the lot. Then a woman lands on it, can't work out which of the four you're best at, decides you're a bit of everything, and goes back to Google.
 
-Being good at several things is normal. There are [around 117 coaching niches with real buyers behind them](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller markets under those, so nobody sensible picks one and never thinks about the rest again.
+Being good at several things is normal. We found [117 main coaching markets](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller ones underneath them, by reading what people buy on Amazon. Nobody sensible picks one of those and never thinks about anything else again.
 
 ## Things to know
 
@@ -21,39 +21,37 @@ Being good at several things is normal. There are [around 117 coaching niches wi
 
 ## Which one do you pick?
 
-The one where you can quote the buyer without inventing the quote.
+The one where you can quote somebody without making the quote up.
 
-That's the test, and it's faster than any exercise involving a grid. Take each of your four. For each one, write down the sentence that was going through someone's head on the morning they went looking for help. Not what they need. What they were thinking.
+Take your four. For each one, write down what was going through a person's head on the morning they started looking for help. Not what they needed. What they were actually thinking.
 
-For one of the four, you'll write it straight out, because you've heard someone say it. For the others you'll start reaching for adjectives, or you'll write what you think they should be feeling.
+For one of the four it'll come straight out, because you've heard a real person say it. "I've been off work three weeks and I still can't face the car park." For the others you'll find yourself reaching for adjectives, or writing what you reckon they ought to be feeling.
 
-Pick the one you could quote.
+Pick the one you could quote. It takes about ten minutes and it beats any exercise involving a grid.
 
 ## What happens to the other three?
 
-Nothing. They stay in the work.
+Nothing at all. They stay in the work.
 
-A niche is a door, not a fence. It decides what the homepage says, which decides who walks in.
+Your niche decides what the homepage says, and the homepage decides who walks through the door. What happens once she's sat down is between the two of you, and a good chunk of that will be the other three things.
 
-But what happens in the room afterwards is between you and the client, and plenty of that will be the other three things.
-
-I have read coaches who pick a niche and then write as though they have signed a contract never to mention anything else. That isn't what it's for. The page has one job, which is getting the right stranger to believe you understand their particular problem. Once they're a client, the narrowness has done its work.
+I've read coaches who pick a niche and then write as though they've signed something promising never to mention anything else again. The page has one job, which is getting the right stranger to believe you understand her particular problem. Once she's booked, the narrow bit has done what it was for.
 
 ## Does this mean building four websites?
 
-No. It means one page that gets specific, and everything else staying where it is.
+No. One page that gets specific, and everything else stays where it is.
 
-The version that actually costs you money is the reverse: four things listed on one homepage with equal weight, so a visitor has to work out which one you're best at. Some will bother. The rest close the tab.
+The expensive version is the other way round: four things on one homepage, all given the same weight, so whoever lands has to work out for herself which one you're best at. A few will bother. The rest have another tab open already.
 
-If you genuinely serve two markets that never overlap, two pages is reasonable. Four is a business with no front door.
+If you genuinely serve two markets that never meet, two pages is fair enough. By four, nobody can find your front door.
 
 ## What if I pick wrong?
 
-You won't have picked wrong, you'll have picked first.
+Then you change it. This is a test, not a vow.
 
-Feeling sure and being right aren't the same thing, which is why this is worth treating as a test rather than a vow. Write the page to one market. Leave it three months. If nobody in that market recognises themselves, you've learned something you couldn't have reasoned your way to.
+Feeling sure and being right aren't the same thing, and three months of a live page will tell you which one you had. Write it to one market. Leave it alone. If nobody in that market recognises themselves in it, you've learned something you could never have reasoned your way to at the kitchen table.
 
-The cost of changing a homepage is an afternoon. And the cost of not choosing is every visitor who couldn't tell what you do.
+Changing a homepage costs you an afternoon. Not choosing costs you everybody who couldn't tell what you do.
 
 ## Go one level down before you commit
 
@@ -63,13 +61,13 @@ So "anxiety" isn't a choice yet. Postnatal anxiety is. Social anxiety is. They w
 
 Pick the market, then pick the room inside it.
 
-## Where the evidence stops
+## Does this tell me who I'm allowed to work with?
 
-This is about what a page says, not about what you're qualified to do. Nothing here is advice on scope of practice or on which clients you should take.
+No. This is about what your page says and nothing else. Which clients you take, and what you're qualified for, is between you and your professional body.
 
-The 117 and the 918 come from markets where buyers already spend money on books, so a market with no publishing behind it won't appear in them. That doesn't mean it has no buyers. It means we had nothing to read.
+Is the list complete? Probably not. We built it from markets where people are already buying on Amazon, so anything with no publishing behind it won't be on there. That doesn't mean nobody wants it. It means we had nothing to read.
 
-You can [have your homepage read the way a stranger reads it](/website) if you want to see whether the choice you already made is landing.
+If you want to know whether the choice you already made is landing, you can [have your homepage read the way a stranger reads it](/website).
 
 ## FAQ
 

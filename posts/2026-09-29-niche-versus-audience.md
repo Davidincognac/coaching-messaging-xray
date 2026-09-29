@@ -10,6 +10,8 @@ One of them says she helps women over 40. The other says she helps women whose s
 
 The same person could have written either line. Only one of them tells me whether to book a call.
 
+In this article I'm showing you which of the two your homepage needs, and why the other one quietly costs you work.
+
 An audience is who someone is. A niche is what they want sorting out. Coaches swap those two words constantly, and you can spot it on a homepage: a headline naming a type of person, and nothing anywhere saying what actually gets fixed.
 
 Scan the [117 coaching niches we found](/blog/2026-09-29-coaching-niches) and hardly any of them describe a person. They're nearly all problems or things somebody wants. We didn't choose that, it's what came back when we read what people spend money on.
@@ -23,49 +25,45 @@ Scan the [117 coaching niches we found](/blog/2026-09-29-coaching-niches) and ha
 
 ## What is the difference, in practice?
 
-An audience answers "who". A niche answers "what for". A buyer searching at 11pm is typing the second one.
+An audience answers who. A niche answers what for. At eleven at night, with the laptop on her knees, she's typing the second one.
 
-"Women over 40" is an audience. "Menopause and women's hormones" is a niche. The first tells a visitor you might be for them. The second tells them you fix the thing they came about.
+"Women over 40" is an audience. "Menopause and women's hormones" is a niche. One says you might be for her. The other says you fix the thing she came about.
 
-"Corporate professionals" is an audience. "Recovery from redundancy" is a niche. "Men" is an audience. "Modern masculinity and men's work" is a niche.
+Same again with "corporate professionals" against "recovery from redundancy". Or "men" against "modern masculinity and men's work".
 
-Read those pairs out loud and you can hear the difference. One is a category. The other is a Tuesday.
+Say those pairs out loud and you can hear it. One's a category on a form. The other's somebody's Tuesday.
 
 ## Why does the audience version feel safer?
 
-Because it keeps more people in, and keeping people in feels like the cautious choice.
+Because it keeps more people in, and keeping people in feels like the careful thing to do.
 
-I get why. Naming the problem feels like turning business away, and if you aren't busy yet, that's a horrible feeling. The reasoning is sound and the outcome is backwards.
+I get it. Naming the problem feels like turning work away, and when you've got three clients and a mortgage that's a horrible feeling. The reasoning's sound. It just comes out backwards.
 
-A page naming a person keeps everyone technically eligible and gives nobody a reason to stay.
-
-But a page naming a problem loses the people who don't have it, who were never going to buy, and holds the ones who do.
+Name a type of person and everybody stays technically eligible, and nobody has a reason to stop scrolling. Name a problem and you lose the people who haven't got it, who were never going to book anyway, and you keep the woman who has.
 
 ## So is an audience useless?
 
-No. It's the second half of a good sentence, not the first.
+Not at all. It's the second half of a good sentence.
 
-"Menopause coaching for women in senior roles" is a niche with an audience attached, and it's better than either alone. The problem does the work of getting the right reader to stop. The audience does the work of making them feel it's specifically for them.
+"Menopause coaching for women in senior roles." That's a niche with an audience hung off it, and it beats either one on its own. The problem gets her to stop. The audience makes her feel you meant her specifically.
 
-The order matters. Problem first, person second.
-
-So reversed, the reader has to hold on through a whole sentence before finding out whether it concerns them.
+Put the problem first though. Written the other way round she has to hang on through the whole sentence before she finds out whether any of it concerns her, and she won't.
 
 ## The version that costs the most
 
-Naming the person and then naming your method instead of their problem.
+Naming the person, and then naming your method instead of her problem.
 
-"I help women over 40 through my signature five-step framework" names an audience and a process, and leaves the reader to guess what it's for. That page can be on the internet for two years without one stranger understanding what it does.
+"I help women over 40 through my signature five-step framework." There's an audience and there's a process, and nowhere on that line does anybody find out what it's actually for. A page like that can sit on the internet for two years while not one stranger works out what it does.
 
-We scored 11,011 coaching homepages out of 10 and [the average came in at 4.5](/blog/2026-09-28-average-coaching-website). Hardly any of those marks went on design. They went on a stranger being unable to say what the page was for.
+We scored 11,011 coaching homepages out of 10 and [the average came in at 4.5](/blog/2026-09-28-average-coaching-website). Hardly any of those marks went on design. They went on somebody landing and not being able to say what the page was for.
 
-## Where the evidence stops
+## Am I telling you who to work with?
 
-This is about what a homepage says, not about who you should take on. Nothing here is a view on scope of practice.
+No. This is only about what the page says. Who you take on is between you and your professional body.
 
-And the 117 come from markets with books behind them to count, so the list leans towards problems that get published about. A market can be real and quiet at the same time.
+Is the list of 117 complete? Probably not. We built it from what people buy on Amazon, so it leans towards problems somebody has published a book about. A market can be perfectly real and completely quiet at the same time.
 
-If you want to know which one your page is currently doing, [have it read the way a stranger reads it](/website).
+If you want to know which of the two your page is doing at the moment, [have it read the way a stranger reads it](/website).
 
 ## FAQ
 
