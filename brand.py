@@ -292,10 +292,14 @@ def fmt(css):
 # page names this as its canonical and no two URLs compete for the same content.
 BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000").rstrip("/")
 
-# Search Console and Bing both verify a site by a string they generate. It is not a secret,
-# but it is not ours to invent either, so it comes from the environment and the site simply
-# stops claiming verification if it is absent.
-GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "").strip()
+# Search Console and Bing both verify a site by a string they generate. It is not a secret:
+# it sits in the source of every page we serve, which is the whole point of it. Google's is
+# here as the default so that deploying is the only step, with the environment able to
+# override it the day the property is rebuilt or the token rotated.
+GOOGLE_SITE_VERIFICATION = os.getenv(
+    "GOOGLE_SITE_VERIFICATION",
+    "vBTi2DXa4Mg6QLj1HI4el391T6tfWBkrxT0oYDHCS4E",   # property: https://go.goingbeyondtheillusion.com/
+).strip()
 BING_SITE_VERIFICATION = os.getenv("BING_SITE_VERIFICATION", "").strip()
 
 # Google shows roughly 60 characters of a title. A bare "Blog" wastes that room, so short
