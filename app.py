@@ -2835,8 +2835,8 @@ class Handler(BaseHTTPRequestHandler):
             buf.extend(chunk)
         return bytes(buf)
 
-    def _send(self, body):
-        self.send_response(200)
+    def _send(self, body, code=200):
+        self.send_response(code)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         # Never cache the tool's HTML, so a code change always shows on a plain refresh (no more stale pages).
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
@@ -3026,10 +3026,10 @@ class Handler(BaseHTTPRequestHandler):
             if post:
                 self._send(post)
             else:
-                self.send_response(302)
-                self.send_header("Location", "/blog")
-                self.send_header("Cache-Control", "no-store")
-                self.end_headers()
+                # A post that does not exist gets a 404, not a redirect to the index. A
+                # redirect tells a search engine the page moved, so it keeps the dead URL
+                # alive and reads the whole thing as a soft 404.
+                self._send(_pages.render_missing_post(), code=404)
             return
         if path == "/mockup/website":
             # NOT a mockup. This re-renders a REAL stored audit, so David is looking at what the
@@ -3300,7 +3300,8 @@ class Handler(BaseHTTPRequestHandler):
         _seo = _brand.head_meta(
             "/website",
             "Have your coaching website read the way a stranger reads it",
-            "A free messaging X-ray of your homepage, scored against the market.",
+            "Your homepage read the way a stranger reads it, scored out of 10 on the same "
+            "ten checks we ran across 10,954 live coaching websites. Free, no signup.",
             index=not (url or lead))
         if not (url or lead):
             _seo += "\n" + _brand.tool_schema(

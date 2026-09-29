@@ -58,6 +58,10 @@ _PROSE_CSS = """
   .prose .lede{font-size:19px;color:var(--muted);margin:0 0 30px}
   .prose .stamp{font-size:13px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--muted);font-weight:700;margin:0 0 10px}
+  /* A table of sentences cannot fold down to a phone, so it scrolls inside its own box
+     rather than taking the whole page sideways with it. */
+  .prose .gb-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 20px}
+  .prose .gb-scroll table{margin:0;min-width:min(100%,460px)}
   .prose table{border-collapse:collapse;width:100%;margin:0 0 20px;font-size:15px}
   .prose td,.prose th{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;
     vertical-align:top}
@@ -104,7 +108,16 @@ _PROSE_CSS = """
   /* the prose column underlines every link; a button is not a link in that sense */
   .gb-cta .gb-btn{text-decoration:none;color:var(--cta-ink)}
   .gb-cta .gb-btn:hover{color:var(--cta-ink)}
+  .gb-cta .gb-ctalist{margin:0 0 20px;padding-left:20px;max-width:48ch}
+  .gb-cta .gb-ctalist li{color:var(--ivory-dim);font-size:16px;margin-bottom:7px}
+  .gb-cta .gb-ctafoot{font-size:15px;margin-bottom:22px}
   @media(max-width:560px){.gb-cta{padding:28px 22px}}
+
+  /* The same offer, halfway down, for a reader who will not reach the bottom. Quiet on
+     purpose: it interrupts an argument, so it reads as an aside rather than a second sell. */
+  .prose .gb-midcta{background:var(--soft);border-left:3px solid var(--accent);
+    border-radius:0 10px 10px 0;padding:18px 22px;margin:38px 0}
+  .prose .gb-midcta p{font-size:16px;margin:0}
 
   /* A picture runs the full prose width and keeps its own shape. The aspect-ratio comes
      from the width and height on the tag, so nothing moves once the file arrives. */
@@ -253,8 +266,9 @@ happens unless you want it to.</p>
 <p>If you would rather just talk, I am at
 <a href="mailto:{_brand.COMPANY['email']}">{_brand.COMPANY['email']}</a>.</p>
 """
-    return shell(body, "About David Poole", "Who runs Going Beyond The Illusion, and why "
-                 "the research comes before the advice.", active="about", path="/about",
+    return shell(body, "About David Poole", "David Poole: twelve years building a driving-instructor "
+                 "market, sold in 2019, now counting coaching websites. Why the research comes "
+                 "before the advice.", active="about", path="/about",
                  hero_html=hero_html, extra_head=_brand.person_schema("/about"))
 
 
@@ -468,7 +482,7 @@ def render_blog_index():
 <p>The useful thing is <a href="/">the buying triggers page</a>. It takes a couple of
 minutes and it tells you what your market is already responding to.</p>
 """
-        return shell(body, "Blog", "Research notes from reading coaching websites.",
+        return shell(body, "Blog", "What comes out of scoring 10,954 coaching websites and mapping 918 coaching markets. Research notes, with the numbers behind them.",
                      active="blog", path="/blog", hero_html=hero_html)
 
     items = []
@@ -481,7 +495,7 @@ minutes and it tells you what your market is already responding to.</p>
             + (f'<span class="when">{meta}</span>' if meta else "")
             + summ + "</li>")
     body = '<ul class="postlist">' + "".join(items) + "</ul>"
-    return shell(body, "Blog", "Research notes from reading coaching websites.",
+    return shell(body, "Blog", "What comes out of scoring 10,954 coaching websites and mapping 918 coaching markets. Research notes, with the numbers behind them.",
                  active="blog", path="/blog", hero_html=hero_html)
 
 
@@ -551,7 +565,12 @@ def render_post(slug):
                        '10,954 scored coaching websites and 918 mapped coaching markets. '
                        '<a href="/methodology">How we built and scored it</a>.</p>')
 
-        body = ((know_html or short) + markdown(rest) + faq_html + source_html
+        # The offer goes in twice: once halfway down for the reader who leaves at sixty
+        # percent, once at the end for the one who finishes. Halfway is measured in
+        # headings rather than characters, so it never lands mid-argument.
+        prose = _mid_cta(markdown(rest))
+
+        body = ((know_html or short) + prose + faq_html + source_html
                 + _brand.cta_block() + rel_html)
 
         extra = _brand.article_schema(p_["title"], p_["summary"], path, p_["date"],
@@ -633,7 +652,7 @@ the address and we will remove it.</p>
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Privacy", "What this site collects and who else sees it.", path="/privacy")
+    return shell(body, "Privacy", "What this site collects, why, how long we keep it and which companies see it. Written to match what the code actually does.", path="/privacy")
 
 
 def render_terms():
@@ -677,13 +696,20 @@ Do not resell it, publish it, or pass it to another coach as their own research.
 <p>We are not liable for business losses, lost profit, or decisions you take on the back
 of the research. Nothing here limits liability that cannot lawfully be limited.</p>
 
+<h2>Who hosts this site</h2>
+
+<p>French law asks a site to name its host as well as its publisher. This site is hosted by
+Render Services, Inc., 525 Brannan Street, Suite&nbsp;300, San Francisco, CA&nbsp;94107,
+United States, at <a href="https://render.com" rel="nofollow">render.com</a>. The publisher
+and the person responsible for what is on it is David Poole, at the address above.</p>
+
 <h2>Law</h2>
 <p>French law applies, and the French courts have jurisdiction. If you are a consumer,
 this does not remove the protections of your own country's law.</p>
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Terms", "The terms covering the free tools and the paid file.", path="/terms")
+    return shell(body, "Terms", "The terms covering the free tools and the paid research file, including refunds, what you may do with it, and who you are dealing with.", path="/terms")
 
 
 def render_cookies():
@@ -709,7 +735,50 @@ Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.<
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Cookies", "This site sets no cookies.", path="/cookies")
+    return shell(body, "Cookies", "This site sets no cookies, runs no analytics and shows no consent banner, because there is nothing to consent to. What that means in practice.", path="/cookies")
+
+
+_H2 = re.compile(r"<h2>")
+
+
+def _mid_cta(prose_html, after=3):
+    """Put the inline offer before the `after`-th h2, or nowhere if the post is short.
+
+    A post with four sections or fewer already ends soon enough that a second ask is just
+    an interruption, so it gets one offer rather than two.
+    """
+    marks = [m.start() for m in _H2.finditer(prose_html)]
+    if len(marks) <= after + 1:
+        return prose_html
+    at = marks[after]
+    return prose_html[:at] + _brand.cta_inline() + prose_html[at:]
+
+
+def render_missing_post():
+    """The page behind a 404 on a blog address that is not a post.
+
+    It used to redirect to the index, which tells a search engine the page moved rather
+    than that it never existed, and leaves the dead address in the index as a soft 404.
+    """
+    posts = _read_posts()[:6]
+    links = "".join(
+        f'<li><a href="/blog/{html.escape(p["slug"])}">{html.escape(p["title"])}</a></li>'
+        for p in posts)
+    body = f"""
+<h1>That post isn't here</h1>
+<p class="lede">Either the address is wrong or it never existed. Nothing has been taken
+down, so a typo is the likely culprit.</p>
+
+<p>The newest ones:</p>
+<ul>{links}</ul>
+
+<p><a href="/blog">Everything on the blog</a>, or
+<a href="/methodology">how the 10,954 websites behind it were scored</a>.</p>
+"""
+    return shell(body, "That post isn't here",
+                 "The blog address you asked for does not exist. The newest research "
+                 "notes, and the rest of the blog, are linked from here.",
+                 active="blog", path="/blog", index=False)
 
 
 def render_methodology():
@@ -906,14 +975,14 @@ def table_html(rows):
     head, body = [], rows
     if len(rows) > 1 and _RULE.match(rows[1]):
         head, body = _cells(rows[0]), rows[2:]
-    out = ["<table>"]
+    out = ['<div class="gb-scroll"><table>']
     if head:
         out.append("<tr>" + "".join(f"<th>{_inline(c)}</th>" for c in head) + "</tr>")
     for r in body:
         if _RULE.match(r):
             continue
         out.append("<tr>" + "".join(f"<td>{_inline(c)}</td>" for c in _cells(r)) + "</tr>")
-    out.append("</table>")
+    out.append("</table></div>")
     return "\n".join(out)
 
 

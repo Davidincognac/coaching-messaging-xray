@@ -530,7 +530,7 @@ def _shell(body, title_suffix=""):
             .replace("__CSS__", _CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
             .replace("__SEO__", _brand.head_meta("/", _title(title_suffix),
-                     "The reason your clients actually buy, worked out from the books they buy.", True)
+                     "Why your coaching market actually buys, worked out from 2,004 books they paid for and 1,547 things real buyers wrote. Free, and takes about twenty seconds.", True)
                      + "\n" + _brand.site_schema())
             .replace("__NAV__", _brand.nav_html("home"))
             .replace("__FOOTER__", _brand.footer_html())
@@ -677,7 +677,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
       <p class="gb-eyebrow">Buying triggers</p>
       <h1 class="gb-display">The 6 <span class="gb-grad">buying triggers</span> that turn a
         stranger into a client</h1>
-      <p class="gb-lede"><b>Your client buys for a reason, and they will not tell you what it
+      <p class="gb-lede"><b>Your client buys for a reason, and they won't tell you what it
       is.</b> So we went and worked out what your market already buys, and why.</p>
     </div>
     <img class="mascot heromascot" src="/angelo.png"

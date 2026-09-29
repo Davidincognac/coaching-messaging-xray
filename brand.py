@@ -253,6 +253,7 @@ def footer_html():
         <li><a href="/">Buying triggers</a></li>
         <li><a href="/about">About</a></li>
         <li><a href="/blog">Blog</a></li>
+        <li><a href="/methodology">How we score</a></li>
         <li><a href="mailto:{c['email']}">{c['email']}</a></li>
       </ul>
     </div>
@@ -444,12 +445,42 @@ def _is_iso_date(value):
 def cta_block(heading="Want to know why your market buys?"):
     """The one thing every blog post is for. Same trade as the homepage heading, because
     a reader who meets the offer twice in two different wordings is being sold to twice;
-    meeting the same sentence twice is being told the same thing."""
+    meeting the same sentence twice is being told the same thing.
+
+    It used to be a heading, a sentence and a button, which is a link wearing a box. A
+    reader who has just read two thousand words of evidence gets told what is in the thing
+    and what it was built from, because by our own scoring a page that names the free thing
+    beats one that just points at it.
+    """
     return f"""<aside class="gb-cta">
   <h2 class="gb-display">{html.escape(heading)}</h2>
-  <p>Tell us who you coach and we will tell you why they&nbsp;buy. Your report opens in
-     about twenty seconds. Nothing to pay, and no newsletter to unsubscribe from later.</p>
+  <p>Tell us who you coach and Angelo pulls the six things that decide it, from the research
+     behind this article: 918 coaching markets, 2,004 books those buyers paid for, and 1,547
+     things real buyers wrote about their own situation.</p>
+  <ul class="gb-ctalist">
+    <li>What they are really buying, under the thing they say they want</li>
+    <li>The moment it got too much and they started looking</li>
+    <li>What they picture once it is sorted</li>
+    <li>The fear that keeps their card in their pocket</li>
+    <li>The promises they have stopped believing</li>
+    <li>Why they pick one coach over the next one</li>
+  </ul>
+  <p class="gb-ctafoot">It opens on the page in about twenty seconds. Nothing to pay.</p>
   <a class="gb-btn primary" href="/">Show me my buying triggers</a>
+</aside>"""
+
+
+def cta_inline():
+    """The same offer, halfway down, for the reader who will not reach the end.
+
+    Two thousand words is a long way to carry somebody before asking them anything, and the
+    posts themselves say a page with one ask and no other way to stay in touch loses the
+    people who are not ready today.
+    """
+    return """<aside class="gb-midcta">
+  <p><b>Reading this because your enquiries are thin?</b> The same research behind these
+     numbers will tell you what your own market buys and why, market by market.
+     <a href="/">See your buying triggers</a>, free, about twenty seconds.</p>
 </aside>"""
 
 
