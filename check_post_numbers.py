@@ -59,7 +59,10 @@ CLAIMS = [
     ("66.5% show no proof at all",              share(lambda r: f(r, "proof") == 0), 66.5),
     ("82.3% show no price at all",              share(lambda r: f(r, "pricing_shown") == 0), 82.3),
     ("33.8% nothing human on the page",         share(lambda r: f(r, "story") == 0), 33.8),
-    ("50.0% score under 5 on five-second read", share(lambda r: f(r, "clarity_5sec") < 5), 50.0),
+    # The five-second read is scored 0/2/4/6/8/10 and 7 or better is the pass, so "under 7" and
+    # "under 8" are the same set. Posts say 86% fail; this is where that comes from.
+    ("85.7% fail the five-second read",          share(lambda r: f(r, "clarity_5sec") < 7), 85.7),
+    ("50.0% score 4 or lower on it",             share(lambda r: f(r, "clarity_5sec") < 5), 50.0),
     ("61.2% next step but no proof",            share(lambda r: f(r, "clear_cta") > 0 and f(r, "proof") == 0), 61.2),
     ("20.4% next step, no proof/price/story",   share(lambda r: f(r, "clear_cta") > 0 and f(r, "proof") == 0
                                                        and f(r, "pricing_shown") == 0 and f(r, "story") == 0), 20.4),
@@ -104,6 +107,30 @@ CLAIMS = [
     # and the subtraction did not work; this is here so it cannot drift back.
     ("1,340 attempted but not scored",           12294 - N, 1340),
 ]
+
+# The weights the /methodology page publishes. They are not written down anywhere that still
+# runs: the corpus was scored by versions/v1.0/deps/score_all.py and the research repo's own
+# scorer has since moved on. These reproduce all 10,954 published totals exactly, which is the
+# only proof available that the published table is the one that made the numbers.
+CORPUS_WEIGHTS = {
+    "clarity_5sec": 2.0, "specificity": 2.0, "offer_clarity": 1.5, "proof": 1.5,
+    "lead_capture": 1.0, "credibility": 1.0, "story": 1.0,
+    "clear_cta": 0.5, "technical_health": 0.3, "pricing_shown": 0.2,
+}
+_wsum = sum(CORPUS_WEIGHTS.values())
+_off = sum(1 for r in rows
+           if abs(round(10 * sum(CORPUS_WEIGHTS[k] * f(r, k) for k in CORPUS_WEIGHTS) / _wsum, 1)
+                  - float(r["total_100"])) > 0.051)
+CLAIMS += [
+    ("published weights sum to 11",              _wsum, 11.0),
+    ("weights reproduce every published total",  _off, 0),
+    ("13 strong",  sum(1 for r in rows if r["tier"] == "strong"), 13),
+    ("633 decent", sum(1 for r in rows if r["tier"] == "decent"), 633),
+    ("3,488 weak", sum(1 for r in rows if r["tier"] == "weak"), 3488),
+] + [(f"per-criterion mean {c}", mean(c), v) for c, v in (
+    ("clarity_5sec", 4.49), ("specificity", 4.38), ("offer_clarity", 2.89), ("proof", 1.51),
+    ("lead_capture", 4.64), ("credibility", 2.68), ("story", 2.54), ("clear_cta", 5.60),
+    ("technical_health", 9.03), ("pricing_shown", 1.77))]
 
 bad = 0
 for label, got, want in CLAIMS:

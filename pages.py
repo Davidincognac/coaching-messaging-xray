@@ -62,6 +62,8 @@ _PROSE_CSS = """
   .prose td,.prose th{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;
     vertical-align:top}
   .prose th{font-weight:700;color:#111111}
+  .prose .gb-source{font-size:15px;color:var(--muted);border-top:1px solid var(--line);
+    padding-top:18px;margin:34px 0 0}
   .prose .note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:0 8px 8px 0;padding:16px 20px;margin:0 0 22px;font-size:15.5px}
   .prose .postlist{list-style:none;padding:0;margin:0}
@@ -219,8 +221,10 @@ moved, built everything to match it, and ran that for twelve years before I sold
 
 <h2>What the counting says</h2>
 
-<p>So far: <a href="/website">{cnt} coaching websites read and scored out of 10</a>,
-11,384 LinkedIn profiles, and 2,000 books their buyers actually paid for.</p>
+<p>So far: <a href="/website">{cnt} coaching websites read</a>, 11,384 LinkedIn profiles,
+and 2,000 books their buyers actually paid for. 10,954 of those websites are the scored
+corpus every figure on the blog comes from, and
+<a href="/methodology">here is how they were scored</a>.</p>
 
 <p><a href="/blog/2026-09-28-average-coaching-website">The average website scored
 {MARKET_AVG_10}</a>.</p>
@@ -413,8 +417,34 @@ def split_faq(body):
     return rest, [(a, b) for a, b in faqs if a and b]
 
 
+_POST_LINK = re.compile(r"\]\(/blog/([a-z0-9-]+)\)")
+
+
 def related(posts, slug, limit=3):
-    return [p for p in posts if p["slug"] != slug][:limit]
+    """What to read next, taken from the links the posts already make.
+
+    This used to be the first three posts by date, which meant every post on the site
+    pointed at the same three and a getting-clients post sent you to a homepage checklist.
+    A post that links to another one has said they belong together, so that is what this
+    reads: the ones this post links to first, then the ones that link back to it, then
+    whatever is newest to make up the number.
+    """
+    by_slug = {p["slug"]: p for p in posts if p["slug"] != slug}
+    me = next((p for p in posts if p["slug"] == slug), None)
+    order = []
+
+    def add(s):
+        if s in by_slug and s not in order:
+            order.append(s)
+
+    for s in _POST_LINK.findall(me["body"] if me else ""):
+        add(s)
+    for p in posts:
+        if p["slug"] != slug and slug in _POST_LINK.findall(p["body"]):
+            add(p["slug"])
+    for p in posts:
+        add(p["slug"])
+    return [by_slug[s] for s in order[:limit]]
 
 
 def render_blog_index():
@@ -468,7 +498,9 @@ def render_post(slug):
             '<div class="gb-byline">'
             + ('<img src="/david.jpg" alt="">' if os.path.exists(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "david.jpg")) else "")
-            + "<span>By <b>David Poole</b>"
+            # The byline names the author; without a link to who that is, a reader who wants
+            # to know who counted the websites has to go looking for the about page.
+            + '<span>By <a href="/about"><b>David Poole</b></a>'
             + (f" · {html.escape(when)}" if when else "")
             + f" · {reading_time(p_['body'])} minute read"
             + "</span></div>")
@@ -513,11 +545,18 @@ def render_post(slug):
 
         # Two callouts stacked is clutter, and "the short answer" answers a question the page
         # never asked. When a post carries its own points, they replace the summary box.
-        body = ((know_html or short) + markdown(rest) + faq_html
+        # A post full of percentages with no way to check what was counted is a post asking
+        # to be taken on trust. This is the link that stops that, and it goes on every one.
+        source_html = ('<p class="gb-source">The figures here come from our own corpus of '
+                       '10,954 scored coaching websites and 918 mapped coaching markets. '
+                       '<a href="/methodology">How we built and scored it</a>.</p>')
+
+        body = ((know_html or short) + markdown(rest) + faq_html + source_html
                 + _brand.cta_block() + rel_html)
 
         extra = _brand.article_schema(p_["title"], p_["summary"], path, p_["date"],
-                                      [(q, plain(a)) for q, a in faqs], trail)
+                                      [(q, plain(a)) for q, a in faqs], trail,
+                                      image=p_.get("image", ""))
         return shell(body, p_["title"], p_["summary"], active="blog", path=path,
                      hero_html=hero_html, extra_head=extra, image=p_.get("image", ""))
     return None
@@ -671,6 +710,99 @@ Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.<
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
     return shell(body, "Cookies", "This site sets no cookies.", path="/cookies")
+
+
+def render_methodology():
+    """How the corpus was built and scored.
+
+    Every post quotes this corpus, and until this page existed a reader had no way to check
+    what "scored out of 10 on ten things" meant. The weights below are the ones that produced
+    scorecard_FULL.csv: they reproduce all 10,954 published totals exactly.
+    """
+    body = """
+<h1>How we scored 10,954 coaching websites</h1>
+<p class="lede">Every figure on this blog comes from one of two datasets we built ourselves.
+This page is what is in them, how they were made, and what they cannot tell you.</p>
+
+<h2>The websites</h2>
+
+<p>We started with a list of 12,294 coaching domains. 10,954 of them loaded with readable
+text on the homepage and those are the ones in every number we publish. 1,156 would not
+load at all. Another 184 loaded with nothing readable on them. We left all 1,340 out
+rather than scoring them zero, which would have flattered the average.</p>
+
+<p>One page per site, the homepage, because that is the page a stranger arriving from a
+search actually meets. Nothing behind a click is scored.</p>
+
+<h2>The ten things we scored</h2>
+
+<p>Each one is scored 0 to 10 by a program reading the text of the homepage: the headline,
+the subheadings, the body copy, the buttons, any testimonial text, any price. The overall
+score is a weighted average, because a stranger deciding whether to book a call is not
+weighing the SSL certificate against the headline equally, and neither do we.</p>
+
+<table>
+  <tr><th>What we check</th><th>Weight</th><th>Market average</th></tr>
+  <tr><td>Five-second read: can a stranger tell who it is for and what changes</td><td>2.0</td><td>4.49</td></tr>
+  <tr><td>Being specific: is the person and the problem named, or could it be anyone</td><td>2.0</td><td>4.38</td></tr>
+  <tr><td>Offer clarity: is there a defined thing to buy and a reason it is worth it</td><td>1.5</td><td>2.89</td></tr>
+  <tr><td>Proof: testimonials, named results, case studies, anything checkable</td><td>1.5</td><td>1.51</td></tr>
+  <tr><td>Lead capture: a way to stay in touch short of booking a call</td><td>1.0</td><td>4.64</td></tr>
+  <tr><td>Credibility: qualifications, affiliations, the things you say about yourself</td><td>1.0</td><td>2.68</td></tr>
+  <tr><td>Story: is there a human on the page, and does the copy reach the reader</td><td>1.0</td><td>2.54</td></tr>
+  <tr><td>Clear next step: one obvious action rather than none or seven</td><td>0.5</td><td>5.60</td></tr>
+  <tr><td>Technical health: loads, works on a phone, secure</td><td>0.3</td><td>9.03</td></tr>
+  <tr><td>Pricing shown: is there a number, a range, or anything at all</td><td>0.2</td><td>1.77</td></tr>
+</table>
+
+<p>Weights add up to 11. The weighted average is multiplied by 10 to give a score out of
+100, and that is rounded to the score out of 10 you see in a post. A site scoring 80 or
+more is strong, 60 or more is decent, 40 or more is weak, below that is poor.</p>
+
+<h2>What that produced</h2>
+
+<p>The average live coaching website scores 3.65 out of 10. Of the 10,954: 13 are strong,
+633 decent, 3,488 weak and 6,820 poor. Two thirds show no proof of any kind and 82.3% show
+no price. Technical health averages 9 out of 10, which is why we keep saying the build is
+not the problem.</p>
+
+<h2>The buying triggers</h2>
+
+<p>The second dataset is 117 coaching niches and 918 sub-markets inside them, built from
+2,004 books those buyers actually paid for and 1,547 things real buyers wrote about their
+own situation. Each market is tagged for what drives the purchase, how aware the buyer is
+of her problem and of the solutions, how many times she has heard the claims before, and
+which forms of persuasion the evidence supports for that market.</p>
+
+<p>Books and buyer quotes are the source because they are what people spent money and
+time on, rather than what they told a survey they wanted.</p>
+
+<h2>What none of this can tell you</h2>
+
+<ul>
+  <li>It is one page. Your about page, your booking flow and your first call are outside it.</li>
+  <li>It is a program reading text, not a person forming an impression. It is consistent
+      rather than sensitive, and on any single site a human would disagree with it somewhere.</li>
+  <li>It is a snapshot. A site scored in 2026 may have been rebuilt since.</li>
+  <li>It says nothing about whether a coach is any good. It measures what a stranger meets.</li>
+  <li>Referrals, DMs, stages and reputation are all invisible to it, and plenty of coaches
+      fill a practice on those alone.</li>
+</ul>
+
+<h2>How the numbers get into a post</h2>
+
+<p>They are recomputed from source rather than typed in. A script in the site's own repo
+holds every figure the blog asserts, recalculates each one from the scorecard file and the
+triggers dataset, and fails if a post and the data disagree. It has caught us out once
+already, which is the only reason it is worth having.</p>
+
+<p>If you want to see the scoring run on your own homepage, the
+<a href="/website">website X-ray</a> uses the same ten checks against the same corpus.</p>
+"""
+    return shell(body, "How we scored 10,954 coaching websites",
+                 "The corpus behind every figure on this blog: 12,294 domains attempted, "
+                 "10,954 scored on ten things, and what the scoring cannot see.",
+                 path="/methodology")
 
 
 # ------------------------------------------------------------------- tiny markdown

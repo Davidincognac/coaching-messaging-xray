@@ -3008,10 +3008,11 @@ class Handler(BaseHTTPRequestHandler):
             return
         # The pages that are not the funnel. Flat routes, no query strings, nothing
         # stored: these are the ones a stranger or a regulator reads.
-        if path in ("/about", "/blog", "/privacy", "/terms", "/cookies"):
+        if path in ("/about", "/blog", "/methodology", "/privacy", "/terms", "/cookies"):
             self._send({
                 "/about": _pages.render_about,
                 "/blog": _pages.render_blog_index,
+                "/methodology": _pages.render_methodology,
                 "/privacy": _pages.render_privacy,
                 "/terms": _pages.render_terms,
                 "/cookies": _pages.render_cookies,

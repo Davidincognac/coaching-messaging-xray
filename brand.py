@@ -374,6 +374,8 @@ PUBLIC_PAGES = [
     ("/", "1.0", "weekly"),
     ("/about", "0.8", "monthly"),
     ("/blog", "0.7", "weekly"),
+    # Every post cites the corpus; this is the page that says what the corpus is.
+    ("/methodology", "0.6", "yearly"),
     ("/website", "0.6", "monthly"),
     ("/privacy", "0.2", "yearly"),
     ("/terms", "0.2", "yearly"),
@@ -558,13 +560,18 @@ def tool_schema(name, description, path):
     ]})
 
 
-def article_schema(title, description, path, date="", faqs=(), trail=()):
-    """Article + BreadcrumbList + FAQPage in one block.
+def article_schema(title, description, path, date="", faqs=(), trail=(), image=""):
+    """Article + BreadcrumbList + FAQPage in one block, plus the author and publisher entities.
 
     The Person entity is what ties a claim to David rather than to an anonymous site, and
-    it is the half most blogs leave out. FAQPage is only emitted when the post actually
-    has questions, because claiming a structure the page does not have is the kind of
-    thing that gets a site ignored rather than rewarded.
+    it is the half most blogs leave out. It carries the same @id as the one on /about, and
+    the full node ships with every post, so a post read on its own still resolves to the
+    person with the address, the company number and the biography behind it. The publisher
+    is the same organisation entity rather than a name and a URL retyped.
+
+    FAQPage is only emitted when the post actually has questions, because claiming a
+    structure the page does not have is the kind of thing that gets a site ignored rather
+    than rewarded.
     """
     graph = [
         {
@@ -573,11 +580,13 @@ def article_schema(title, description, path, date="", faqs=(), trail=()):
             "description": description,
             "url": BASE_URL + path,
             "mainEntityOfPage": BASE_URL + path,
-            "author": PERSON,
-            "publisher": {"@type": "Organization", "name": COMPANY["site"],
-                          "url": BASE_URL},
+            "author": {"@id": BASE_URL + "/#david"},
+            "publisher": {"@id": BASE_URL + "/#organisation"},
+            "image": image if image.startswith("http") else BASE_URL + (image or "/angelo.png"),
             **({"datePublished": date, "dateModified": date} if date else {}),
-        }
+        },
+        {**PERSON, "@id": BASE_URL + "/#david"},
+        ORGANISATION,
     ]
     if trail:
         graph.append({
@@ -604,8 +613,10 @@ def llms_txt(posts=()):
     """A plain-language file telling a model what this site is and which facts are ours.
 
     The point is not to rank. It is that the numbers below exist nowhere else, so a model
-    that cites them has to cite us.
+    that cites them has to cite us. Which is exactly why they cannot be a second copy of
+    the corpus figures: audit.py owns them, this reads them.
     """
+    import audit as _a          # imported here, not at module load, to keep brand.py standalone
     lines = [
         f"# {COMPANY['site']}",
         "",
@@ -618,10 +629,14 @@ def llms_txt(posts=()):
         "",
         "## Original findings you can cite",
         "",
-        "- The average coaching homepage scores 4.5 out of 10 across eleven criteria (n=10,954).",
-        "- The top 10% score 5.7 or higher.",
-        "- 83% fail the five-second test: a stranger cannot say what the coach does.",
-        "- About 1 in 14 use their buyer's own language. The other 93% use the coach's language.",
+        # These were typed out here as 4.5 / 5.7 / 83, the same figures that had drifted in
+        # audit.py and were corrected there against the corpus. This file is the one a model
+        # quotes, so it reads the constants now rather than carrying its own copy.
+        f"- The average coaching homepage scores {_a.MARKET_AVG_10} out of 10 across eleven "
+        f"criteria (n=10,954).",
+        f"- The top 10% score {_a.TOP10_10} or higher.",
+        f"- {_a.PCT_FAIL_5SEC}% fail the five-second test: a stranger cannot say what the coach does.",
+        f"- About 1 in {_a.BUYER_VOICE_1_IN} use their buyer's own language. The rest use their own.",
         "",
         "Source: our own corpus, scored by the tool at " + BASE_URL + "/website",
         "",
