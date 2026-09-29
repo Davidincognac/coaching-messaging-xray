@@ -2754,6 +2754,7 @@ class Handler(BaseHTTPRequestHandler):
         lead = get_trigger_lead(_mp.text(fields, "token", 64))
         if not lead:
             self.send_response(302)
+            self._safety()
             self.send_header("Location", "/")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
@@ -2835,8 +2836,23 @@ class Handler(BaseHTTPRequestHandler):
             buf.extend(chunk)
         return bytes(buf)
 
+    # Sent on every response. A site that takes names and email addresses and has none of
+    # these is relying on nothing going wrong. HSTS has no preload: preloading is a one-way
+    # door and this does not need it.
+    SAFETY_HEADERS = (
+        ("Strict-Transport-Security", "max-age=31536000; includeSubDomains"),
+        ("X-Content-Type-Options", "nosniff"),
+        ("Referrer-Policy", "strict-origin-when-cross-origin"),
+        ("X-Frame-Options", "SAMEORIGIN"),
+    )
+
+    def _safety(self):
+        for k, v in self.SAFETY_HEADERS:
+            self.send_header(k, v)
+
     def _send(self, body, code=200):
         self.send_response(code)
+        self._safety()
         self.send_header("Content-Type", "text/html; charset=utf-8")
         # Never cache the tool's HTML, so a code change always shows on a plain refresh (no more stale pages).
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
@@ -2849,6 +2865,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _send_bytes(self, data, ctype, cache=""):
         self.send_response(200)
+        self._safety()
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
         if cache:
@@ -2894,6 +2911,7 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.query:
             target += "?" + parsed.query
         self.send_response(301)
+        self._safety()
         self.send_header("Location", target)
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
@@ -2958,6 +2976,7 @@ class Handler(BaseHTTPRequestHandler):
             _dom = (parse_qs(parsed.query).get("domain", [""])[0]).strip()
             _to = "/salespage?domain=" + _url_quote(_dom, safe="") if _dom else "/salespage"
             self.send_response(302)
+            self._safety()
             self.send_header("Location", _to)
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
@@ -2970,6 +2989,7 @@ class Handler(BaseHTTPRequestHandler):
             lead = get_trigger_lead((parse_qs(parsed.query).get("lead", [""])[0]).strip())
             if not lead:
                 self.send_response(302)
+                self._safety()
                 self.send_header("Location", "/")
                 self.send_header("Cache-Control", "no-store")
                 self.end_headers()
@@ -3006,6 +3026,7 @@ class Handler(BaseHTTPRequestHandler):
             # The landing page moved to the root. This address is already in sent emails and
             # links, so it redirects rather than 404s, and it is a permanent move.
             self.send_response(301)
+            self._safety()
             self.send_header("Location", "/")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
@@ -3038,6 +3059,15 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/mockup/website":
             # NOT a mockup. This re-renders a REAL stored audit, so David is looking at what the
             # product actually produces today rather than something I drew.
+            #
+            # Which is exactly why it cannot be open on the live site. It takes a domain off the
+            # query string, looks the audit up with no token, and renders it with the coach's
+            # first name on it. Every real report is gated by a lead token; this route walked
+            # round that gate. It now answers only where DEV_TOOLS is set, which is nowhere on
+            # Render unless David turns it on deliberately.
+            if not os.getenv("DEV_TOOLS"):
+                self._send(_pages.render_missing_post(), code=404)
+                return
             qs = parse_qs(parsed.query)
             dom = (qs.get("domain", [""])[0]).strip() or "reachingbetteralternatives.com"
             row = get_audit(dom)
