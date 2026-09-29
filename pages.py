@@ -112,6 +112,12 @@ _PROSE_CSS = """
   .prose figure figcaption{margin-top:10px;font-size:15px;color:#5a5a5a}
   .prose p img{max-width:100%;height:auto}
 
+  .prose .gb-know{background:#f6f6f4;border-left:3px solid var(--cta);
+    border-radius:0 10px 10px 0;padding:22px 26px;margin:0 0 34px}
+  .prose .gb-know ul{margin:10px 0 0;padding-left:20px}
+  .prose .gb-know li{margin:0 0 8px;font-size:17px}
+  .prose .gb-know li:last-child{margin-bottom:0}
+
   .prose .gb-related{list-style:none;padding:0;margin:0}
   .prose .gb-related li{border-bottom:1px solid var(--line);padding:14px 0;margin:0}
   .prose .gb-related a{font-family:var(--display);font-weight:700;font-size:18px;
@@ -322,6 +328,55 @@ def plain(text):
     return re.sub(r"[*`]", "", text)
 
 
+WORDS_PER_MINUTE = 300
+
+
+def reading_time(text):
+    """Minutes, counting only what somebody actually reads.
+
+    Two things were wrong with the obvious version. It counted a bulleted list at the same
+    rate as prose, and a list of 117 niches is scanned rather than read, which turned a post
+    that feels like three minutes into a promise of nine. And 220 words a minute is a book
+    on a sofa. Somebody skimming a page on a phone goes a good deal faster.
+
+    So list lines are left out of the count and the rate is 300. Rounded to nearest rather
+    than up, because a number that consistently overshoots is the same lie in the other
+    direction.
+    """
+    lines = (text or "").splitlines()
+    prose = " ".join(l for l in lines if not l.strip().startswith(("- ", "* ", "#", "|")))
+    words = len(re.sub(r"[*`>\[\]()]", " ", prose).split())
+    return max(1, round(words / WORDS_PER_MINUTE))
+
+
+def split_takeaways(body):
+    """Lift a `## Things to know` list out of a post.
+
+    Same convention as the FAQ: write an ordinary markdown list under the heading and it
+    becomes the box at the top, rather than being kept in a second place that drifts out of
+    step with the post. The heading counts its own bullets, so nothing claims four points
+    and then shows three.
+
+    Returns (body_without_the_section, [point, ...]).
+    """
+    lines = body.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if re.match(r"^##\s+(Things to know|Key points|What to know)\s*$", line.strip(), re.I):
+            start = i
+            break
+    if start is None:
+        return body, []
+    end = len(lines)
+    for j in range(start + 1, len(lines)):
+        if lines[j].startswith("## "):
+            end = j
+            break
+    points = [l.strip()[2:].strip() for l in lines[start + 1:end]
+              if l.strip().startswith(("- ", "* "))]
+    return "\n".join(lines[:start] + lines[end:]), points
+
+
 def split_faq(body):
     """Separate a post's `## FAQ` section from the rest.
 
@@ -415,6 +470,7 @@ def render_post(slug):
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), "david.jpg")) else "")
             + "<span>By <b>David Poole</b>"
             + (f" · {html.escape(when)}" if when else "")
+            + f" · {reading_time(p_['body'])} minute read"
             + "</span></div>")
 
         hero_html = hero(
@@ -425,11 +481,20 @@ def render_post(slug):
                   ).replace("</div></section>", byline + "</div></section>")
 
         rest, faqs = split_faq(p_["body"])
+        rest, points = split_takeaways(rest)
 
         # The summary doubles as the answer-first paragraph. A model lifting one passage
         # from this page should be able to lift this one and be right.
-        short = (f'<div class="gb-callout"><p class="gb-eyebrow">The short answer</p>'
+        short = (f'<div class="gb-callout"><p class="gb-eyebrow">In short</p>'
                  f'<p>{html.escape(p_["summary"])}</p></div>') if p_["summary"] else ""
+
+        # The box counts its own bullets, so the heading can never promise four and show three.
+        know_html = ""
+        if points:
+            items = "".join(f"<li>{_inline(pt)}</li>" for pt in points)
+            know_html = (f'<div class="gb-know"><p class="gb-eyebrow">'
+                         f'{len(points)} things to know from this article</p>'
+                         f'<ul>{items}</ul></div>')
 
         faq_html = ""
         if faqs:
@@ -446,7 +511,9 @@ def render_post(slug):
                 for r in rel)
             rel_html = f'<h2>Read next</h2><ul class="gb-related">{links}</ul>'
 
-        body = (short + markdown(rest) + faq_html
+        # Two callouts stacked is clutter, and "the short answer" answers a question the page
+        # never asked. When a post carries its own points, they replace the summary box.
+        body = ((know_html or short) + markdown(rest) + faq_html
                 + _brand.cta_block() + rel_html)
 
         extra = _brand.article_schema(p_["title"], p_["summary"], path, p_["date"],

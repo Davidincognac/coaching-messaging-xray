@@ -1,14 +1,25 @@
 ---
 title: A niche and an audience are not the same thing
 date: 2026-09-29
-summary: Women over 40 is an audience. Menopause is a niche. One names the person and leaves the problem blank, and a stranger on your homepage cannot fill it in for you.
+summary: Two coaches, same qualification. One says she helps women over 40. The other says she helps women whose sleep fell apart when the menopause started. Only one of those tells me whether to book a call.
 ---
 
-An audience is who someone is. A niche is what they are trying to get away from, or get to.
+Two coaches, same qualification, same fee.
 
-Coaches use the two words as though they swap, and the swap is where homepages go quiet. You can see it on the page: a headline naming a kind of person, and no sentence anywhere saying what gets fixed.
+One of them says she helps women over 40. The other says she helps women whose sleep fell apart when the menopause started.
 
-Of the [117 coaching niches we mapped](/blog/2026-09-29-coaching-niches), almost every one is a problem or a goal. Very few are a description of a person. That is not a stylistic preference. It is what came back when we read what buyers actually spend money on.
+The same person could have written either line. Only one of them tells me whether to book a call.
+
+An audience is who someone is. A niche is what they want sorting out. Coaches swap those two words constantly, and you can spot it on a homepage: a headline naming a type of person, and nothing anywhere saying what actually gets fixed.
+
+Scan the [117 coaching niches we found](/blog/2026-09-29-coaching-niches) and hardly any of them describe a person. They're nearly all problems or things somebody wants. We didn't choose that, it's what came back when we read what people spend money on.
+
+## Things to know
+
+- The difference between the two, in a line you can test your own headline against.
+- Why naming a type of person feels like the safe choice and costs you more.
+- The version that works, and which half goes first.
+- The wording that costs the most, which a lot of coaching sites use.
 
 ## What is the difference, in practice?
 
@@ -24,17 +35,17 @@ Read those pairs out loud and you can hear the difference. One is a category. Th
 
 Because it keeps more people in, and keeping people in feels like the cautious choice.
 
-I get why. Naming the problem feels like turning business away, and if you are not busy yet, that is a horrible feeling. The reasoning is sound and the outcome is backwards.
+I get why. Naming the problem feels like turning business away, and if you aren't busy yet, that's a horrible feeling. The reasoning is sound and the outcome is backwards.
 
 A page naming a person keeps everyone technically eligible and gives nobody a reason to stay.
 
-But a page naming a problem loses the people who do not have it, who were never going to buy, and holds the ones who do.
+But a page naming a problem loses the people who don't have it, who were never going to buy, and holds the ones who do.
 
 ## So is an audience useless?
 
-No. It is the second half of a good sentence, not the first.
+No. It's the second half of a good sentence, not the first.
 
-"Menopause coaching for women in senior roles" is a niche with an audience attached, and it is better than either alone. The problem does the work of getting the right reader to stop. The audience does the work of making them feel it is specifically for them.
+"Menopause coaching for women in senior roles" is a niche with an audience attached, and it's better than either alone. The problem does the work of getting the right reader to stop. The audience does the work of making them feel it's specifically for them.
 
 The order matters. Problem first, person second.
 
@@ -44,9 +55,9 @@ So reversed, the reader has to hold on through a whole sentence before finding o
 
 Naming the person and then naming your method instead of their problem.
 
-"I help women over 40 through my signature five-step framework" names an audience and a process, and leaves the reader to guess what it is for. That page can be on the internet for two years without one stranger understanding what it does.
+"I help women over 40 through my signature five-step framework" names an audience and a process, and leaves the reader to guess what it's for. That page can be on the internet for two years without one stranger understanding what it does.
 
-We scored 11,011 coaching homepages out of 10 and [the average came in at 4.5](/blog/2026-09-28-average-coaching-website). The marks are not lost on design. They are lost on a stranger being unable to say what the page is for.
+We scored 11,011 coaching homepages out of 10 and [the average came in at 4.5](/blog/2026-09-28-average-coaching-website). Hardly any of those marks went on design. They went on a stranger being unable to say what the page was for.
 
 ## Where the evidence stops
 
@@ -60,11 +71,11 @@ If you want to know which one your page is currently doing, [have it read the wa
 
 ### Is my niche my target audience?
 
-No. Your audience is who they are, your niche is what they want fixed. A homepage needs the second one and reads better with both.
+No. Your audience is who they're, your niche is what they want fixed. A homepage needs the second one and reads better with both.
 
 ### Can my niche be a type of person?
 
-It can, and it works when the person implies the problem. "New fathers" carries a situation with it. "Professionals" does not.
+It can, and it works when the person implies the problem. "New fathers" carries a situation with it. "Professionals" doesn't.
 
 ### Which should go first in my headline?
 
@@ -72,4 +83,4 @@ The problem. A reader deciding in five seconds whether to stay is looking for th
 
 ### What if my clients have nothing in common except their age?
 
-Then look again at what they arrive with rather than who they are. Age is usually a proxy for a life event, and the event is the niche.
+Then look again at what they arrive with rather than who they're. Age is usually a proxy for a life event, and the event is the niche.

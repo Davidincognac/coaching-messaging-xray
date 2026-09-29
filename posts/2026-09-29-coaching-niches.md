@@ -1,16 +1,25 @@
 ---
 title: 117 coaching niches, and what the buyers in each one actually want
 date: 2026-09-29
-summary: The full list of coaching niches, grouped, built from what buyers in each market already pay for. Plus the finding underneath the list: 733 of 918 subniches want something different from the niche they sit inside.
+summary: Say your homepage offers help with anxiety. Eight different people read that and want eight different things from you. There are around 117 main coaching niches, almost 1,000 smaller markets under them, and four out of five of those smaller ones want something the big one doesn't cover.
 ---
 
-There are 117 coaching niches worth naming. Inside them sit 918 subniches.
+Say your homepage offers help with anxiety.
 
-We did not brainstorm that list. It came out of what buyers in each market already spend money on, which is 2,004 books, crossed against 1,547 pieces of writing where a buyer described their own problem in their own words.
+The woman googling her symptoms at midnight reads that. So does the new mum who can't stop picturing something happening to the baby. So does the bloke who's fine until he has to present to the board. Three people, three completely different problems, and your page has said one word to all of them.
 
-Every niche below is one we have read.
+Did you know there are around 117 main coaching niches? They expand into almost 1,000 smaller markets underneath. We didn't brainstorm that list. We went and read what people in each one are buying.
 
-The list is first, because that is what you came for. The finding underneath it is worth more than the list.
+Four out of five of those smaller markets want something the niche above them doesn't cover.
+
+The full list is below. Find yours, then keep going.
+
+## Things to know
+
+- The full list of 117, grouped into eight blocks so you can find yours.
+- Why a niche and an audience are two different things, and which one your homepage needs.
+- What happens when you look inside one niche. Anxiety splits eight ways.
+- How to pick one without guessing, and how far down to go.
 
 ## The 117 coaching niches
 
@@ -155,25 +164,29 @@ The list is first, because that is what you came for. The finding underneath it 
 - Women's empowerment (8 subniches)
 - Writing & authorship (8 subniches)
 
-## A niche is not an audience
+## A niche isn't an audience
 
-An audience is who someone is. A niche is what they are trying to get away from, or get to. Different questions, and [the difference between a niche and an audience](/blog/2026-09-29-niche-versus-audience) decides what your homepage can say.
+Take "women over 40". It tells me who you want. It doesn't tell me what you'd do for me.
 
-"Women over 40" is an audience. So is "corporate professionals". Neither one tells you what the person is trying to fix on the morning they start looking for help, and that morning is the only one your homepage has to work on.
+I could be a woman over 40 who wants out of a job she's done for twenty years. I could be one who hasn't slept properly since the menopause started. You've said nothing to either of us, and we both have to guess.
 
-Read the list again. Almost every line is a problem or a goal, not a demographic. "Menopause and women's hormones" names the thing. "Women over 40" names the person and leaves the thing blank.
+"Menopause coaching" I understand straight away. Two words and I know whether to carry on reading.
 
-You can have both. Plenty of good coaches do. But with only the audience, a stranger on your site has to work out for themselves whether you fix what they came to fix. Some will. The rest have another tab open.
+Scan the list above and you'll see hardly any of them are a type of person. They're problems, or they're things somebody wants. That wasn't a decision we made, it's what came back when we read what people buy.
 
-## The list is not the useful part
+You can do both, and it's stronger. "Menopause coaching for women in senior roles." Put the problem first though, because somebody skimming wants to know what you fix before they care who you fix it for.
 
-Of the 918 subniches, 733 want something different from the niche they sit inside. Four in five.
+There's [more on the niche and audience difference](/blog/2026-09-29-niche-versus-audience) if that's the bit you're stuck on.
+
+## The list isn't the useful part
+
+Of the 918 smaller markets, 733 want something the bigger one above them doesn't cover. Four out of five.
 
 So the list is a starting point. Not an answer.
 
-Pick a line off it, write your homepage to that line, and you are writing to an average of people who do not want the same thing.
+Pick a line off it, write your homepage to that line, and you're writing to an average of people who don't want the same thing.
 
-I want to be fair to the list. Picking one beats saying you help everybody, and it beats the homepage that opens with the coach's certification. So it is a real step. Just not the last one.
+I want to be fair to the list. Picking one beats saying you help everybody, and it beats the homepage that opens with the coach's certification. So it's a real step. Just not the last one.
 
 ## What that looks like inside one niche
 
@@ -188,39 +201,39 @@ Four buyers. One word on your homepage. And four different reasons to reach for 
 
 The coach writing "I help people with anxiety" has written something true.
 
-It is also the sentence every other anxiety coach has written. So the buyer reads it and keeps scrolling.
+It's also the sentence every other anxiety coach has written. So the buyer reads it and keeps scrolling.
 
 Money splits the same way.
 
-Someone who wants out of debt is trying to stop the fear. Someone building passive income is trying to get ahead of people they know. Both sit under "Money and Wealth". Neither reads the other's page twice.
+Someone who wants out of debt is trying to stop the fear. Someone building passive income is trying to get ahead of people they know. Both of them come under "Money and Wealth". Neither would read the other's page twice.
 
 ## How do you choose one?
 
-Pick the one where you can already hear the buyer talking. If you are good at several things, [choosing between them without throwing the rest away](/blog/2026-09-29-how-to-choose-a-coaching-niche) is its own question.
+Pick the one where you can already hear the buyer talking. If you're good at several things, [choosing between them without throwing the rest away](/blog/2026-09-29-how-to-choose-a-coaching-niche) is its own question.
 
 Not the one with the best search volume. Not the one a coach on Instagram calls lucrative.
 
-The test is whether you can write down, without inventing it, the sentence going through someone's head the day they went looking. If you can quote them, you know the market. If you are reaching for adjectives, you do not know it yet.
+The test is whether you can write down, without inventing it, the sentence going through someone's head the day they went looking. If you can quote them, you know the market. If you're reaching for adjectives, you don't know it yet.
 
-Feeling sure and being right are not the same thing, and the gap between them is easy to check. Go and read fifteen reviews of the books your market buys. If the words coming back are the words you would have guessed, pick it.
+Feeling sure and being right aren't the same thing, and the gap between them is easy to check. Go and read fifteen reviews of the books your market buys. If the words coming back are the words you would have guessed, pick it.
 
 Then go one level down.
 
-Do not write to "anxiety". Write to postnatal anxiety, or to health anxiety, and let the people who have that thing recognise themselves in the first line.
+Don't write to "anxiety". Write to postnatal anxiety, or to health anxiety, and let the people who have that thing recognise themselves in the first line.
 
 ## Where the evidence stops
 
-This list covers markets where buyers spend money on books, because books are what we could count. So a niche with no publishing behind it will not appear here, and that does not mean it has no buyers. It means we had nothing to read.
+This list covers markets where buyers spend money on books, because books are what we could count. So a niche with no publishing behind it won't appear here, and that doesn't mean it has no buyers. It means we had nothing to read.
 
 The subniche counts come from our own reading, not from a keyword tool. Seven or eight per niche is what the evidence supported, not a target we filled.
 
-We have also [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website), and the average came in at 4.5. Niche choice is not what drags that number down. Saying the niche out loud on the page is. You can [have your own homepage read the way a stranger reads it](/website) if you want to see where yours sits.
+We've also [scored 11,011 coaching homepages out of 10](/blog/2026-09-28-average-coaching-website), and the average came in at 4.5. Niche choice isn't what drags that number down. Saying the niche out loud on the page is. You can [have your own homepage read the way a stranger reads it](/website) if you want to see where yours sits.
 
 ## FAQ
 
 ### How many coaching niches are there?
 
-117 with enough buyer evidence behind them to be worth naming, and 918 subniches inside those. That count comes from markets where buyers are already spending money, so it is a floor rather than a ceiling.
+117 with enough buyer evidence behind them to be worth naming, and 918 subniches inside those. That count comes from markets where buyers are already spending money, so it's a floor rather than a ceiling.
 
 ### What is the most profitable coaching niche?
 
@@ -228,10 +241,10 @@ Wrong question, and the list is what invites it. Profit follows whether the buye
 
 ### Do I have to pick a niche at all?
 
-No, but the page has to. A coach can work across several markets and still have a homepage that speaks to one of them. What does not work is a page that averages them, because the average is a sentence nobody recognises as theirs.
+No, but the page has to. A coach can work across several markets and still have a homepage that speaks to one of them. What doesn't work is a page that averages them, because the average is a sentence nobody recognises as theirs.
 
-### What if my niche is not on this list?
+### What if my niche isn't on this list?
 
-Then we have not read it yet, and I would rather say so than hand you somebody else's market with your name on it. The list grows as the reading does.
+Then we haven't read it yet, and I would rather say so than hand you somebody else's market with your name on it. The list grows as the reading does.
 
-One case worth naming: faith is not on the list as a niche, because it is a frame that sits across six of them. [Christian coaching markets](/blog/2026-09-29-christian-life-coaching-niches) are covered separately.
+One case worth naming: faith isn't on the list as a niche, because it's a frame that sits across six of them. [Christian coaching markets](/blog/2026-09-29-christian-life-coaching-niches) are covered separately.
