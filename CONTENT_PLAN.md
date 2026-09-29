@@ -123,6 +123,10 @@ websites pillar where it talks about saying the niche out loud on a homepage.
 
 ## What is not done yet
 
-- Search Console is not set up, so we cannot see which queries we already surface for
 - Posts have no image support, so no diagrams or screenshots yet
 - No post has been written against this plan
+
+Search Console is set up as of 29 September 2026, property
+`https://go.goingbeyondtheillusion.com/`, sitemap submitted and read. It reports nothing
+for about a day, and a new property has no history, so the problem-aware phrases Planner
+refused to report on get validated there in a few weeks rather than now.
