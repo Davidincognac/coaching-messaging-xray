@@ -66,7 +66,7 @@ So the average coaching homepage tells you what the coach does, doesn't show you
 
 No, and I'd say so if it was. We're scoring one page against ten things a stranger needs from it, and most sites do about four of them.
 
-Is the sample fair? It's 10,954 live sites out of a list of 12,294. The other 1,156 wouldn't load at all, and we left those out rather than scoring them zero and flattering the average.
+Is the sample fair? It's 10,954 live sites out of a list of 12,294. Of the 1,340 that aren't in the score, 1,156 wouldn't load at all and 184 loaded with nothing readable on them. We left those out rather than scoring them zero and flattering the average.
 
 Does a low score mean you're a bad coach? Not remotely. We only read the homepage. It says nothing about what happens once somebody's in the room with you, and the two aren't related.
 

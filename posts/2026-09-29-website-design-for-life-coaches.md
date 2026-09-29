@@ -72,7 +72,7 @@ Is a 1.3 point gap on technical health nothing? No, it's real, it's just small n
 
 It's ten criteria on one page, the homepage, and nothing else. Your about page, your booking flow and what happens in a first call are all outside it.
 
-Is the sample fair? It's 10,954 live sites from a list of 12,294. The other 1,156 wouldn't load, and we left them out rather than scoring them zero and flattering the average.
+Is the sample fair? It's 10,954 live sites from a list of 12,294. Of the 1,340 missing, 1,156 wouldn't load at all and 184 loaded with nothing readable on them. We left those out rather than scoring them zero and flattering the average.
 
 You can [read the full scorecard and where every mark goes](/blog/2026-09-28-average-coaching-website), see how [health and nutrition coaches score against everybody else](/blog/2026-09-29-health-coach-websites-scored), or [have your own homepage read the way a stranger reads it](/website) and find out which of the four you're missing.
 
