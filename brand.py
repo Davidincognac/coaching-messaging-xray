@@ -466,7 +466,7 @@ def cta_block(heading="Want to know why your market buys?"):
     <li>The promises they have stopped believing</li>
     <li>Why they pick one coach over the next one</li>
   </ul>
-  <p class="gb-ctafoot">It opens on the page in about twenty seconds. Nothing to pay.</p>
+  <p class="gb-ctafoot">It opens on the page in about 20 seconds. Nothing to pay.</p>
   <a class="gb-btn primary" href="/">Show me my buying triggers</a>
 </aside>"""
 
@@ -481,7 +481,7 @@ def cta_inline():
     return """<aside class="gb-midcta">
   <p><b>Reading this because your enquiries are thin?</b> The same research behind these
      numbers will tell you what your own market buys and why, market by market.
-     <a href="/">See your buying triggers</a>, free, about twenty seconds.</p>
+     <a href="/">See your buying triggers</a>, free, about 20 seconds.</p>
 </aside>"""
 
 
