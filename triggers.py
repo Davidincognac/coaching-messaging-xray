@@ -403,7 +403,7 @@ _JS = """
   });
 })();
 
-// The submit. Angelo works for twenty seconds while the report is fetched behind him, then the
+// The submit. Angelo works for 20 seconds while the report is fetched behind him, then the
 // report opens on this page. Without JavaScript the plain POST still returns the report, so nobody
 // is left staring at a dead form.
 (function(){
@@ -510,7 +510,7 @@ __FOOTER__
 </body></html>"""
 
 
-_HOME_TITLE = "The 6 buying triggers that turn a stranger into a client"
+_HOME_TITLE = "The 6 buying triggers that turn a stranger into a coaching client"
 
 
 def _title(suffix=""):
@@ -530,7 +530,7 @@ def _shell(body, title_suffix=""):
             .replace("__CSS__", _CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
             .replace("__SEO__", _brand.head_meta("/", _title(title_suffix),
-                     "Why your coaching market actually buys, worked out from 2,004 books they paid for and 1,547 things real buyers wrote. Free, and takes about twenty seconds.", True)
+                     "Why your coaching market actually buys, worked out from 2,004 books they paid for and 1,547 things real buyers wrote. Free, and takes about 20 seconds.", True)
                      + "\n" + _brand.site_schema())
             .replace("__NAV__", _brand.nav_html("home"))
             .replace("__FOOTER__", _brand.footer_html())
@@ -647,7 +647,7 @@ def _plain(mapping, key, fallback=""):
 def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     """The landing page.
 
-    The form sits high, because the whole promise is that the report arrives in twenty seconds and
+    The form sits high, because the whole promise is that the report arrives in 20 seconds and
     nothing has to be read first. Everything under the form is there for the coach who wants to know
     who we are before handing over an address.
 
@@ -676,7 +676,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     <div class="gb-copy">
       <p class="gb-eyebrow">Buying triggers</p>
       <h1 class="gb-display">The 6 <span class="gb-grad">buying triggers</span> that turn a
-        stranger into a client</h1>
+        stranger into a coaching client</h1>
       <p class="gb-lede"><b>Your client buys for a reason, and they won't tell you what it
       is.</b> So we went and worked out what your market already buys, and why.</p>
     </div>
@@ -688,7 +688,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
   <form method="post" action="/triggers" id="trigform" autocomplete="on">
     """ + err_html + """
     <h2 class="gb-display f-head">Tell us who you coach, and we will tell you why they&nbsp;buy</h2>
-    <p class="f-lead">Your six triggers open on this page in about twenty seconds.
+    <p class="f-lead">Your six triggers open on this page in about 20 seconds.
     <span class="free">Nothing to pay.</span> We built this research for our own work, so it
     costs us nothing to hand you a copy.</p>
     <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
@@ -730,14 +730,14 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
       <li><b>Five:</b> Putting your six triggers together
           <span class="ps-status ps-waiting" id="tp5">[WAITING]</span></li>
     </ul>
-    <p class="p-note">About twenty seconds. Leave this page open. Your triggers open here on their own.</p>
+    <p class="p-note">About 20 seconds. Leave this page open. Your triggers open here on their own.</p>
   </div>
   <div id="reportslot"></div>
 
   <div id="belowfold">
   <div class="whats">
     <h2>The six triggers Angelo pulls for your market</h2>
-    <p class="rl">He does it on this page while you watch. Takes about twenty seconds.</p>
+    <p class="rl">He does it on this page while you watch. Takes about 20 seconds.</p>
     <ol>""" + gets + """</ol>
   </div>
 
