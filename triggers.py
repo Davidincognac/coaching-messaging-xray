@@ -1053,5 +1053,5 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
 """
     if fragment:
         return body
-    page = _shell(body, title_suffix="&mdash; " + e(shown))
+    page = _shell(body, title_suffix=" — " + shown)
     return page.replace("</style>", _REPORT_CSS + "</style>")
