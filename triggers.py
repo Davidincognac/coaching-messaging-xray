@@ -174,6 +174,20 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   .whats .rl{font-size:15.5px;line-height:1.7;color:var(--ivory);margin:0 0 14px;max-width:64ch}
   .whats .rl:last-child{margin-bottom:0}
   .whats h2 + .rl{margin-top:-4px;margin-bottom:18px;color:var(--ivory-dim)}
+  /* The six triggers as cards, title on its own line, so the eye takes them one at a time. */
+  .whats:not(.real) ol{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:22px}
+  .whats:not(.real) li{margin:0;padding:18px;background:rgba(255,255,255,.03);border:1px solid var(--navy-line);
+    border-radius:10px;font-size:15px;line-height:1.55;color:rgba(244,245,247,.72)}
+  .whats:not(.real) li:before{position:static;margin-bottom:12px;width:32px;height:32px;font-size:15px}
+  .whats:not(.real) li b{display:block;color:var(--ivory);font-size:16.5px;font-weight:600;margin-bottom:6px;line-height:1.35}
+  .whats h2{font-family:Outfit,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-weight:700;font-size:30px;letter-spacing:-.01em;color:#fff}
+  .whats h2 + .rl{color:rgba(244,245,247,.85)}
+  /* The form needs to stand out from the page behind it. */
+  #trigform{border:2px solid rgba(255,255,255,.7);box-shadow:0 0 0 6px rgba(255,255,255,.04),0 10px 40px rgba(0,0,0,.4)}
+  #trigform input{border:1px solid rgba(255,255,255,.28)}
+  #trigform input:focus{border-color:#fff}
+  #trigform a{color:var(--ivory);text-decoration:underline}
   .closer{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--cta);
     border-radius:12px;padding:30px}
   .closer h2{font-family:var(--serif);font-size:24px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
@@ -660,7 +674,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     # What each trigger gives them. Paired with the real headings, in the report's own order.
     PROMISE = [
         "The deep thing your market is trying to get, or trying to get away from.",
-        "The moment it got too much for them, and they started looking for help.",
+        "The moment it got too much for them.",
         "The picture in their head of what life looks like once this is sorted.",
         "The fear that keeps their card in their pocket, and what they do instead of buying.",
         "The promises they have heard so often they no longer believe them.",
@@ -688,7 +702,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
   <form method="post" action="/triggers" id="trigform" autocomplete="on">
     """ + err_html + """
     <h2 class="gb-display f-head">Tell us who you coach, and we will tell you why they&nbsp;buy</h2>
-    <p class="f-lead">Your six triggers open on this page in about 20 seconds.
+    <p class="f-lead">Your 6 triggers open on this page in about 20 seconds.
     <span class="free">Nothing to pay.</span> We built this research for our own work, so it
     costs us nothing to hand you a copy.</p>
     <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
@@ -736,7 +750,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
 
   <div id="belowfold">
   <div class="whats">
-    <h2>The six triggers Angelo pulls for your market</h2>
+    <h2>The <span class="gb-grad">6 triggers</span> Angelo pulls for your market</h2>
     <p class="rl">He does it on this page while you watch. Takes about 20 seconds.</p>
     <ol>""" + gets + """</ol>
   </div>
@@ -1017,7 +1031,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
   competitors don't have this.</div>
 
   <p class="r-what">A trigger is anything that pushes your buyer towards you, or holds them back. Here
-  are the six in your market.</p>
+  are the 6 in your market.</p>
 
   """ + s1 + s2 + s3 + s4 + s5 + s6 + voice_section + """
 
