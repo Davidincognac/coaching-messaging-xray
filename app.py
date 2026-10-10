@@ -29,7 +29,8 @@ except ImportError:
     pass
 
 from audit import (audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count,   # the engine we built
-                   PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH)   # market stats: single source of truth in audit.py
+                   PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH,
+                   COACH_WORDS)   # market stats: single source of truth in audit.py
 # "1 in 14 speak their buyer's language" => the other 93%. Derived, so the pair can never disagree.
 PCT_NOT_BUYER_VOICE = 100 - round(100 / BUYER_VOICE_1_IN)
 from storage import (save_audit, get_audit, save_trigger_lead, get_trigger_lead,
@@ -1996,6 +1997,77 @@ _SALES_CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   .guarantee{font-size:13px;color:var(--ivory-dim);margin-top:14px;text-align:center;line-height:1.5}
   .btnwrap{text-align:center;margin-top:22px}
   .cta-btn.mid{width:auto;margin-top:0;padding:14px 26px}
+
+  /* ================= the dark funnel look =================
+     Same colours, type and pieces as the triggers, profile and website pages. The light tokens are
+     pointed at the dark ones on body, and the few hard-coded light tints are replaced below. */
+""" + _brand.FUNNEL_CSS + """
+  body{--paper:var(--navy);--surface:var(--navy-card);--ink:var(--ivory);--muted:var(--ivory-dim);
+    --line:var(--navy-line);--soft:rgba(111,174,217,.10);--accent-ink:var(--glow);--accent:#4F8FCB;
+    --critical:#F0707E;--warn-ink:#E4B456;background:var(--navy)}
+  body::before{content:"";position:fixed;inset:0;background:var(--halo);pointer-events:none;z-index:0}
+  .site-nav{z-index:100}
+  .first-fold-section,.wrap,.gb-foot{position:relative;z-index:1}
+  .first-fold-section{background:transparent}
+  .ff-header .gb-steps{margin-bottom:26px}
+  .ff-eyebrow{color:var(--cta-soft);letter-spacing:.16em;font-weight:700}
+  .ff-h1{font-family:var(--display);letter-spacing:-.03em;line-height:1.08}
+  .ff-body strong{color:#fff}
+  .hero-banner{display:block;width:100%;height:auto}
+  /* No website screenshot: Angelo with the file, centred, and no big empty frame around him. */
+  .screenshot-container.no-shot{min-height:0;background:transparent;border:0;box-shadow:none}
+  .screenshot-container.no-shot .sc-placeholder{display:flex;align-items:center;justify-content:center;
+    background:transparent;padding:0}
+  .screenshot-container.no-shot img{width:min(320px,80%);height:auto;object-fit:contain;border:0;box-shadow:none}
+  @media(max-width:800px){.screenshot-container.no-shot img{width:180px}}
+  h2,.area-h,.protocol-h,.protocol-container h3,.pitch-gate h2,.choice-block h3,.assumption h3,
+  .checkout-section h2,.voice h4{font-family:var(--display);font-weight:700;letter-spacing:-.02em;color:#fff}
+  .card,.crit-block,.protocol-container,.payoff-tile,.assumption,.narrative-bridge,.choice-block,
+  .next-section,.roots-map,.video-block,.voice,.product-reveal{border-radius:16px;
+    box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  .chip.good{background:rgba(92,184,140,.15);color:var(--good-glow)}
+  .chip.warn{background:rgba(201,150,47,.16);color:var(--warn-ink)}
+  .chip.crit{background:rgba(240,112,126,.14);color:var(--critical)}
+  .xray-panel.before{border-color:rgba(240,112,126,.4)}
+  .xray-panel.after{border-color:rgba(111,174,217,.4)}
+  .xray-panel.before .xray-screen{background:rgba(240,112,126,.10)}
+  .xray-panel.after .xray-screen{background:rgba(111,174,217,.10)}
+  .voice .statpane,.crit-fallback,.rm-pill,.cost-note,.guarantee-block{border-color:rgba(111,174,217,.30)}
+  .reveal-meta{border-top-color:var(--navy-line)}
+  .rm-missing{background:rgba(240,112,126,.08);border-color:rgba(240,112,126,.35)}
+  .rm-page,.rm-buyer{background:var(--navy-deep);color:#fff}
+  .step-lbl.dim{color:#7d8394}
+  .a-art{background:#fff;border-radius:12px;padding:6px}
+  .angelo-relax{box-shadow:none}
+  .choice-block:last-child{border-color:var(--cta-soft);
+    background:linear-gradient(160deg,rgba(200,16,46,.14),transparent 55%),var(--navy-card)}
+  .cta-btn{border-radius:var(--pill)}
+
+  /* ---------- everything we've looked at ---------- */
+  .know-section{margin:0 0 48px}
+  .know-card{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:16px;padding:24px 22px;
+    margin:0 0 14px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  .know-h{margin:0 0 16px}
+  .know-h .kn{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--glow);border:1px solid rgba(111,174,217,.55);border-radius:var(--pill);padding:3px 10px;margin:0 0 10px}
+  .know-h h3{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em;color:#fff;margin:0;line-height:1.25}
+  .know-card .gb-six .gb-sixc{background:var(--navy-deep)}
+  .know-banner,.know-shot{display:block;width:100%;border-radius:10px;border:1px solid var(--navy-line);margin:0 0 14px}
+  .know-shot{max-height:300px;object-fit:cover;object-position:top}
+  .know-k{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory-dim);
+    margin:14px 0 6px}
+  .know-q{font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.5;color:#fff;background:var(--navy-deep);
+    border-left:3px solid var(--cta);border-radius:0 8px 8px 0;padding:14px 18px;white-space:pre-line}
+  .know-q.sm{font-size:16px}
+  .know-score{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .ks-num{font-family:var(--serif);font-size:52px;font-weight:650;line-height:1;color:var(--warn-ink)}
+  .ks-den{color:var(--ivory-dim);font-size:15px}
+  .ks-lbl{color:var(--ivory-dim);font-size:14.5px;margin-left:8px}
+  .know-card p{font-size:16px;line-height:1.65}
+  .know-join{margin:18px 0 0;padding:18px 20px;border-radius:12px;border:1px dashed rgba(255,255,255,.25);
+    background:var(--navy-deep);font-size:16px;line-height:1.65;color:var(--ivory)}
+  .know-join b{color:#fff}
+  @media(max-width:560px){.know-card{padding:20px 16px}.ks-lbl{margin-left:0;flex-basis:100%}}
 """
 
 # The Stripe Payment Link the checkout button points at. Until it is set, the button stays
@@ -2131,11 +2203,31 @@ def _build_criteria_html(data, hero_quote):
         return _fallback
 
 
-def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_json=""):
+def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_json="", lead=None):
+    """The Marketing Intelligence File sales page. One page for every route through the funnel.
+
+    It shows whatever we actually hold on this coach and nothing we don't:
+      - their market (six buying triggers), when they came through the triggers page
+      - their profile (banner, bio, last post), when they did the social step
+      - their website (screenshot, score, weakest areas), when their site was read
+    A coach with no website never sees a website section, or a line about not having one. A coach
+    who came straight to the website tool, with no lead behind them, gets the website version alone.
+    """
     fn = html.escape(first_name)
-    fn_up = html.escape(first_name.upper())
     shot = html.escape(screenshot, quote=True)
     cnt = f"{websites_read_count():,}"
+    lead = lead or {}
+    has_site = bool(raw_json or screenshot)
+    rec = _triggers.report_data(lead.get("niche_match") or "") if lead.get("niche_match") else {}
+    if rec and not _triggers.is_complete(lead.get("niche_match") or ""):
+        rec = {}
+    audience = html.escape((rec or {}).get("audience", "") or "")
+    trigs = ([(_triggers.SECTION_CATS[k], _triggers._heading(k, rec)) for k in range(6)] if rec else [])
+    banner = lead.get("banner_path") or ""
+    banner_url = html.escape(f"/uploads/{banner}", quote=True) if banner else ""
+    bio = (lead.get("bio") or "").strip()
+    post = (lead.get("last_post") or "").strip()
+    has_profile = bool(banner_url or bio or post)
 
     # Parse the stored audit once. Every personalised block below degrades cleanly without it,
     # so the param-only fallback URL still renders a complete page.
@@ -2149,21 +2241,37 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     voice = (data or {}).get("voice") or {}
     critique = (data or {}).get("critique") or {}
 
-    # RULEBOOK §0: never claim "homepage" when a subpage was audited.
-    page_word = "homepage" if (data or {}).get("is_home", True) else "page"
+    # RULEBOOK §0: never claim "homepage" when a subpage was audited. With no website at all, the
+    # thing we read was their profile, so that is the word.
+    if has_site:
+        page_word = "homepage" if (data or {}).get("is_home", True) else "page"
+    else:
+        page_word = "profile"
+    # Where their writing lives, for the lines about using the file everywhere.
+    surface = "homepage" if has_site else "bio"
     # Prefer the stored 1-decimal score over the coarse URL param.
     sc = html.escape(str((data or {}).get("score_10_display") or score))
     # The coach's actual words from the voice sweep beat the old generic-tokens param.
     _terms = [t for t in voice.get("coach_terms", []) if t]
-    tok = html.escape(tokens or ", ".join(_terms) or "generic coaching terms")
+    if not has_site and (bio or post):
+        # No website, so the coach words come from what they pasted on the social step, checked
+        # against the same list the website audit uses.
+        _low = (bio + " " + post).lower()
+        _terms = sorted({w.strip() for w in COACH_WORDS if w in _low})[:6]
+    tok = html.escape(tokens or ", ".join(_terms) or "")
+    if not tok:
+        # Nothing on the list. Show the opening of their own bio instead, which is still their words.
+        tok = html.escape(social_section.first_line(bio or post, 90)) if (bio or post) else "generic coaching terms"
+    # The niche from the triggers page beats the one the website audit guessed.
     # Niche → "life coaching clients" (raw niche words don't work as an adjective on their own).
     _niche = ev.get("niche")
-    niche_word = f"{html.escape(_niche)} coaching clients " if _niche else "clients "
+    niche_word = (f"{audience} " if audience else
+                  f"{html.escape(_niche)} coaching clients " if _niche else "clients ")
 
-    hook_html = _sales_hook(data, page_word, niche_word)
-    voice_html = _sales_voice(voice, page_word, cnt)
-    cost_html = _sales_cost(critique)
-    criteria_html = _build_criteria_html(data, headline)
+    hook_html = _sales_hook(data, page_word, niche_word) if has_site else ""
+    voice_html = _sales_voice(voice, page_word, cnt) if has_site else ""
+    cost_html = _sales_cost(critique) if has_site else ""
+    criteria_html = _build_criteria_html(data, headline) if has_site else ""
 
     # Softer opener for low scorers (David's rule + his copy): under 5 there is no "brutal",
     # the average is framed as within reach, and the low score as easier to improve. 5 and up
@@ -2210,6 +2318,15 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             f'For context: across the {cnt} coaching homepages we have read, the average score is {MARKET_AVG_10} '
             f'out of 10, and the top 10% score {TOP10_10} or higher.</p>')
 
+    if not has_site:
+        _who = f"the six buying triggers for {audience}" if audience else "your six buying triggers"
+        opener_html = (
+            f'<p class="ff-body">Hi {fn}. You&rsquo;ve read {_who}, and you&rsquo;ve seen your profile the '
+            f'way a stranger sees it.</p>'
+            f'<p class="ff-body">Those two things have one question in common. Your buyer already has the '
+            f'words for their problem. <strong>Do yours match them?</strong></p>')
+        stranger_html = ""
+
     # Benefit-first headline (David + Ogilvy panel): name the prize, never the product the
     # reader hasn't met yet. The coach's name leads when we have it.
     h1_line = (f'{fn}, here&rsquo;s what your buyers actually want, and the exact words that bring them to you.'
@@ -2227,7 +2344,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     # The stranger story must not contradict a top-tier opener ("you are one of them"):
     # strong pages get the same scene with a true ending, everyone else keeps the original.
-    if _sc_num >= TOP10_10:
+    if not has_site:
+        stranger_html = (
+            '<p class="ff-body">Someone found your profile yesterday. They&rsquo;d seen one of your posts '
+            'and clicked your name. They read your bio. If it didn&rsquo;t describe their problem, they '
+            'moved on. You never knew they were there.</p>')
+    elif _sc_num >= TOP10_10:
         stranger_html = (
             '<p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. '
             'They gave it five seconds. The closer your words sit to the ones already in their head, the '
@@ -2237,6 +2359,70 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             '<p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. '
             'They gave it five seconds. Your words did not describe their problem. They left. You never knew '
             'they were there.</p>')
+
+    # Everything we have looked at, in one place. Each part appears only when we hold it.
+    _parts = []
+    if trigs:
+        _parts.append(
+            '<div class="know-card"><div class="know-h"><span class="kn">Your market</span>'
+            f'<h3>What {audience or "your buyers"} buy on</h3></div>'
+            + _brand.six_cards(trigs) + '</div>')
+    if has_profile:
+        _p = ""
+        if banner_url:
+            _p += f'<img class="know-banner" src="{banner_url}" alt="Your banner">'
+        if bio:
+            _p += f'<div class="know-k">Your bio</div><div class="know-q">{html.escape(bio)}</div>'
+        if post:
+            _p += (f'<div class="know-k">How your last post opens</div>'
+                   f'<div class="know-q sm">{html.escape(social_section.first_line(post))}</div>')
+        _parts.append(
+            '<div class="know-card"><div class="know-h"><span class="kn">Your profile</span>'
+            '<h3>What a stranger sees when they click your name</h3></div>' + _p + '</div>')
+    if has_site:
+        _w = ""   # the screenshot itself is already at the top of the page
+        _big = _first_sentence((critique or {}).get("headline_problem", ""))
+        _w += (f'<div class="know-score"><span class="ks-num">{sc}</span><span class="ks-den">/10</span>'
+               f'<span class="ks-lbl">Your {page_word} score. The average is {MARKET_AVG_10}.</span></div>')
+        if _big:
+            _w += f'<div class="know-k">The biggest thing in the way</div><p>{html.escape(_big)}</p>'
+        _parts.append(
+            '<div class="know-card"><div class="know-h"><span class="kn">Your website</span>'
+            f'<h3>What a stranger sees when they land on your {page_word}</h3></div>' + _w + '</div>')
+    _seen = [n for n, ok in (("your market", trigs), ("your profile", has_profile),
+                             ("your website", has_site)) if ok]
+    if len(_seen) > 1:
+        _seen_txt = ", ".join(_seen[:-1]) + " and " + _seen[-1]
+        _join = (f'<div class="know-join"><b>You&rsquo;ve now seen {_seen_txt}.</b> They should all be '
+                 'saying the same thing, in your buyer&rsquo;s words. Right now each one is written in '
+                 'yours. The rest of this page is about closing that gap.</div>')
+    else:
+        _join = ""
+    # A coach with only a website (no triggers, no profile) already has all of it in the hero above.
+    know_html = ("" if not (_parts and lead) else
+                 '<div class="know-section"><div class="section-eyebrow">Everything we&rsquo;ve looked at, '
+                 'in one place</div>' + "".join(_parts) + _join + '</div>')
+
+    # The hero picture: their website if we have it, otherwise Angelo with the file. Their banner
+    # sits in the section below, so it is not shown twice.
+    if shot:
+        hero_pic = f'<img src="{shot}" alt="Your coaching website homepage" loading="eager">'
+    else:
+        hero_pic = ('<div class="sc-placeholder"><img src="/angelo_file.png" alt="Angelo with your '
+                    'Marketing Intelligence File"></div>')
+
+    # Where they are in the funnel. A coach with no website skipped step 3.
+    _skipped = () if (has_site or not lead) else (3,)
+    steps_bar = _brand.steps_html(4, skipped=_skipped) if lead else ""
+    eyebrow = f"Prepared for {fn}" if first_name and first_name.lower() != "coach" else "Your Marketing Intelligence File"
+    if has_site:
+        bridge = ('So here is the plan. First, the areas that will grow your business fastest, the ones we '
+                  'found when we read your page. Then, why this happens to almost every coach. Once you can '
+                  'see the why, you can make a sound decision about what to do next.')
+    else:
+        bridge = ('So here is the plan. First, everything we&rsquo;ve looked at so far, in one place. Then, '
+                  'why this happens to almost every coach. Once you can see the why, you can make a sound '
+                  'decision about what to do next.')
 
     # Customer-safe checkout: a live Stripe link when configured, an honest note when not.
     if STRIPE_PAYMENT_LINK:
@@ -2265,7 +2451,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <div class="first-fold-section">
     <div class="ff-header">
-      <div class="ff-eyebrow">Prepared for {fn_up}</div>
+      {steps_bar}
+      <div class="ff-eyebrow">{eyebrow}</div>
       <h1 class="ff-h1">{h1_line}</h1>
     </div>
     <div class="first-fold-inner">
@@ -2274,15 +2461,14 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         {stranger_html}
       </div>
       <div class="ff-right">
-        <div class="screenshot-container">
-          {"" if not shot else f'<img src="{shot}" alt="Your coaching website homepage" loading="eager">'}
-          {"" if shot else '<div class="sc-placeholder"><img src="/angelo.png" alt="Angelo" style="width:72px;height:auto;opacity:.55"></div>'}
+        <div class="screenshot-container{'' if shot else ' no-shot'}">
+          {hero_pic}
         </div>
       </div>
     </div>
     {hook_html}
     <div class="ff-bridge">
-      <p>So here is the plan. First, the areas that will grow your business fastest, the ones we found when we read your page. Then, why this happens to almost every coach. Once you can see the why, you can make a sound decision about what to do next.</p>
+      <p>{bridge}</p>
     </div>
     <div class="steps-wrap">
       <img class="steps-img" src="/angelo_steps.png" alt="Angelo pointing up the three steps of this page">
@@ -2294,12 +2480,15 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <div class="wrap">
 
-  <!-- SECTION 2: THE AREAS — their own evidence, growth-framed heading (David's pick) -->
-  <div class="evidence-section">
+  {know_html}
+
+  <!-- SECTION 2: THE AREAS — their own evidence, growth-framed heading (David's pick).
+       Website only: these are the weakest of their website scores. -->
+  {"" if not has_site else f'''<div class="evidence-section">
     <h2 class="area-h">The areas that will grow your business fastest</h2>
     {criteria_html}
     {cost_html}
-  </div>
+  </div>'''}
 
   <!-- SECTION 3: THE WHY — the report said WHAT is wrong; this chapter explains WHY it happens.
        Thesis + their own words as live evidence, then the four roots. -->
@@ -2461,7 +2650,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <li><b>The one thing your buyer wants that you have never put into words.</b> It is the reason they pick one coach over another.</li>
       <li><b>Who is actually spending money in your market right now,</b> built from evidence, not an avatar exercise.</li>
       <li><b>The fears they do not say out loud,</b> and the outcome they picture when they imagine the problem gone.</li>
-      <li><b>The raw material for everything you write, from your homepage to your emails.</b> Load the file into any AI tool and what comes out stops sounding like every other coach alive.</li>
+      <li><b>The raw material for everything you write, from your {surface} to your emails.</b> Load the file into any AI tool and what comes out stops sounding like every other coach alive.</li>
     </ul>
     <p class="fasc-close">There is no template here and nothing to fill in yourself. This is real
     research into your specific market, built on {cnt} coaching websites read and 2,000 books your market
@@ -2487,7 +2676,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="pt-icon">&#9997;&#65039;</div>
         <div class="pt-title">Writing stops being the hard part</div>
         <div class="pt-body">
-          <p>The file gives you the words for everything you write, from your homepage to your emails. No more staring at a blank page wondering what to say.</p>
+          <p>The file gives you the words for everything you write, from your {surface} to your emails. No more staring at a blank page wondering what to say.</p>
           <p>You read what your buyer says, and you answer it.</p>
         </div>
       </div>
@@ -2678,7 +2867,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <li><b>We run the research.</b> The engine reads the evidence for your specific market, and a
       person checks every file before it goes out.</li>
       <li><b>Your Marketing Intelligence File arrives in your inbox,</b> within 5 working days.</li>
-      <li><b>You put it to work everywhere.</b> Your homepage, your posts, your emails, your next offer.
+      <li><b>You put it to work everywhere.</b> Your {surface}, your posts, your emails, your next offer.
       One file, every surface, all of it pulling toward the same buyers.</li>
     </ol>
   </div>
@@ -2719,7 +2908,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <div class="narrative-bridge">
     <div class="nb-label">So what now?</div>
     <h2>You cannot write your way out of this.</h2>
-    <p>You can rewrite your homepage. You can hire a copywriter. You can ask AI to help. None of it
+    <p>You can rewrite your {page_word}. You can hire a copywriter. You can ask AI to help. None of it
     changes what your buyer is already thinking before they arrive.</p>
     <p>The only fix is finding out what they think, in their words. That is what the Marketing
     Intelligence File gives you.</p>
@@ -2739,7 +2928,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="choice-block">
       <div class="cb-num">Option 2</div>
       <h3>Rewrite it yourself</h3>
-      <p>Rewrite your homepage using the same instinct that wrote the current version.
+      <p>Rewrite your {page_word} using the same instinct that wrote the current version.
       The words will change. The facts behind them will not.</p>
     </div>
 
@@ -3324,6 +3513,23 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/salespage":
             qs = parse_qs(parsed.query)
             domain = (qs.get("domain", [""])[0]).strip()
+            # A coach who came through the funnel carries a token. That gives us their market and
+            # their profile, and their website when it was read, so the page can show all of it.
+            lead = get_trigger_lead((qs.get("lead", [""])[0]).strip())
+            if lead:
+                mark_step(lead["token"], "sales")
+                site = domain or ((lead.get("website") or "").strip() if lead.get("website_at") else "")
+                row = get_audit(site) if site else None
+                self._send(_render_salespage(
+                    first_name = usable_name(lead.get("first_name", "")),
+                    headline   = (row or {}).get("headline", "") or "your website text",
+                    tokens     = (row or {}).get("tokens", ""),
+                    score      = (row or {}).get("score", "") or "0.0",
+                    screenshot = (row or {}).get("screenshot_path", "") or "",
+                    raw_json   = (row or {}).get("raw_json", "") or "",
+                    lead       = lead,
+                ))
+                return
             if domain:
                 row = get_audit(domain)
                 if row:

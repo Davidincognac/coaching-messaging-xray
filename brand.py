@@ -224,6 +224,7 @@ FUNNEL_CSS = """
   .gb-steps li.is-done .sn{background:var(--good)}
   .gb-steps li.is-now{color:#fff;border-color:var(--cta-soft);background:rgba(200,16,46,.14)}
   .gb-steps li.is-now .sn{background:var(--cta)}
+  .gb-steps li.is-skip{opacity:.55}
   @media(max-width:480px){.gb-steps li{font-size:12px;padding:5px 10px 5px 6px}}
 
   /* ---------- Angelo in a frame, for the hero of an inner page ---------- */
@@ -293,15 +294,25 @@ FUNNEL_CSS = """
     .gb-work-head h3{font-size:22px}}
 """
 
-STEP_NAMES = ("Your buying triggers", "Your profile", "Your website")
+STEP_NAMES = ("Your buying triggers", "Your profile", "Your website", "Your file")
 
 
-def steps_html(current):
-    """The three steps of the funnel. `current` is 1, 2 or 3; anything before it shows ticked."""
+def steps_html(current, skipped=()):
+    """The steps of the funnel. `current` is 1 to 4; anything before it shows ticked.
+
+    `skipped` holds step numbers the coach went past without doing, such as the website step for a
+    coach with no website. Those show a dash, not a tick, so we never claim they did something.
+    """
     out = []
     for i, name in enumerate(STEP_NAMES, start=1):
-        cls = "is-done" if i < current else ("is-now" if i == current else "")
-        mark = "&#10003;" if i < current else str(i)
+        if i in skipped:
+            cls, mark = "is-skip", "&ndash;"
+        elif i < current:
+            cls, mark = "is-done", "&#10003;"
+        elif i == current:
+            cls, mark = "is-now", str(i)
+        else:
+            cls, mark = "", str(i)
         cur = ' aria-current="step"' if i == current else ""
         out.append(f'<li class="{cls}"{cur}><span class="sn">{mark}</span>{name}</li>')
     return '<ol class="gb-steps" aria-label="Your progress">' + "".join(out) + "</ol>"
