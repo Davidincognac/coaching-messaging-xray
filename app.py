@@ -226,6 +226,38 @@ _WEB_CSS = """
   #result img[style*="#ddd"]{border-color:var(--navy-line)!important}
   #result .dead{color:var(--cta-soft)}
   #result .again{margin:18px 0 0}
+
+  /* Easier reading. Bigger type, more air between lines and paragraphs, shorter lines, and bold
+     phrases in plain white rather than blue, so they no longer look like links. */
+  #result .analysed p,#result .reframe p,#result .voice p,#result .diag .row p,#result .barnote p,
+  #result .sum-row p,#result .cta p,#result .steplist li{font-size:16.5px;line-height:1.75;max-width:62ch}
+  #result .voice p,#result .reframe p,#result .diag .row p{margin:0 0 18px}
+  #result .voice b,#result .reframe b,#result .analysed b,#result .diag b,#result .steplist li b,
+  #result .gap,#result .ben{color:#fff}
+  #result .ev .meta{font-size:14.5px;line-height:1.65}
+  #result .def{font-size:14px}
+  #result .gap{font-weight:500;font-size:14.5px;line-height:1.65}
+  #result .sum-next{margin:22px 0 0;padding:14px 16px;border-radius:10px;background:var(--navy-deep);
+    border:1px dashed rgba(255,255,255,.22);font-size:15px;line-height:1.6;color:var(--ivory)}
+  #result .sum-next b{color:#fff}
+  #result .verdict-card .secnum{margin-bottom:12px}
+  #result .gap{max-width:62ch}
+  #result .reveal .grade{flex-wrap:nowrap;align-items:flex-start}
+  #result .reveal .grade > div:not(.num){flex:1;min-width:0}
+  @media(max-width:560px){#result .reveal .grade{flex-wrap:wrap}}
+
+  /* The hand-over between parts: a short red rule, where you are, what comes next. */
+  #result .rnext{max-width:760px;margin:52px auto 18px;padding:0 4px;display:flex;flex-direction:column;
+    align-items:flex-start;gap:4px}
+  #result .rnext::before{content:"";width:44px;height:3px;border-radius:2px;background:var(--grad);margin:0 0 10px}
+  #result .rn-l{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--cta-soft)}
+  #result .rn-t{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em;color:#fff;line-height:1.2}
+  #result .report > .rnext + *{margin-top:0}
+
+  /* The ask between sections: outline, with room to breathe above and below. */
+  #result .cta-inline.mid{margin:40px auto 0}
+  #result .cta-btn.ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35)}
+  #result .cta-btn.ghost:hover{border-color:#fff;background:rgba(255,255,255,.06)}
   @media(max-width:560px){#result:not(:empty){padding:30px 16px 64px}}
 """
 
@@ -381,8 +413,6 @@ PAGE = """<!doctype html><html lang="en"><head>
   .verdict-note{{background:var(--soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
     padding:16px 20px;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.6}}
   .verdict-note p{{margin:0 0 10px}} .verdict-note p:last-child{{margin:0}}
-  .diag h3+.row p:first-of-type::first-letter,.voice h4+p::first-letter{{font-family:var(--serif);
-    float:left;font-size:52px;line-height:.85;padding:4px 8px 0 0;font-weight:600;color:var(--accent-ink)}}
   .qchip{{display:inline-block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600}}
   .voice .statpane{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}}
@@ -1319,6 +1349,16 @@ def render_result(res, first_name="", lead_token=""):
     def _cta_block():
         return f'<div class="cta-inline"><a class="cta-btn" href="{_offer_href}">{_mid_btn}</a></div>'
 
+    def _mid_cta():
+        """The same ask between sections, as an outline button with room around it, so it does not
+        shout over the section underneath. The filled red stays for the summary and the close."""
+        return f'<div class="cta-inline mid"><a class="cta-btn ghost" href="{_offer_href}">{_mid_btn}</a></div>'
+
+    def _next(label, title):
+        """The hand-over between two parts of the report: a rule, where you are, and what is next."""
+        return (f'<div class="rnext"><span class="rn-l">{label}</span>'
+                f'<span class="rn-t">{title}</span></div>')
+
     # PART 1 — THE VERDICT. The whole report in one card for skim readers, in David's
     # bad / good / bad order, with the first CTA inside it. The score is stated here rather than
     # saved for the end: a reader who skims must still leave knowing the number and the next step.
@@ -1330,10 +1370,10 @@ def render_result(res, first_name="", lead_token=""):
     _report_head = (f'{_fn}, your report is ready.' if _fn else 'Your report is ready.')
     summary_html = (
         f'<div class="sec verdict-card {g}">'
+        f'<span class="secnum">Part 1 of 3: the quick summary</span>'
         f'<h2 class="sum-h">{_report_head}</h2>'
-        f'<p class="sec-lede">It comes in three parts. This is the quick summary, so if you read nothing else, '
-        f'read this. Below it is the deep dive, where we show you what we read on your {_page_word} and the '
-        f'reason behind every score. Then a closing statement, with what to do about it.</p>'
+        f'<p class="sec-lede">This is the quick summary. If you read nothing else, read this. The full version '
+        f'comes straight after it.</p>'
         f'{_sum_shot}'
         f'<div class="grade">'
         f'<div class="num {g}">{_score_disp}<span class="den">/10</span></div>'
@@ -1345,6 +1385,8 @@ def render_result(res, first_name="", lead_token=""):
         f'<div class="sum-good">{possibility_note(res)}</div>'
         f'<div class="sum-row"><div class="k">What it&rsquo;s costing you</div>'
         f'<p>{html.escape(_first_sentence(cr["why_it_costs_clients"]))}</p></div>'
+        f'<div class="sum-next"><b>That\'s the quick version.</b> The full report is below: what we read on '
+        f'your {_page_word}, every score with the reason behind it, then what to do about it.</div>'
         f'{_cta_block()}'
         f'</div>'
     )
@@ -1365,26 +1407,33 @@ def render_result(res, first_name="", lead_token=""):
             f'is the whole game.</div>'
         )
 
+    _n1 = _next("Next", f"Section 1 of 4: what we read on your {_page_word}") if evidence_html else ""
+    _n3 = _next("Next", "Section 3 of 4: whose words are these?") if voice_html else ""
     return f"""<div class="report" data-sites="{cnt}">
       {summary_html}
+      {_next("Part 2 of 3", "The full report")}
       <div class="sec">
       {opener}
       {reframe}
       {checklist_html}
       </div>
+      {_n1}
       {scope}
       {media}
       {popup}
       {evidence_html}
+      {_next("Next", "Section 2 of 4: your scores, one by one")}
       <div class="sec">
       <h3 class="scores-h"><span class="secnum">Section 2 of 4</span>Your scores, one by one</h3>
       <p class="sec-lede">Here is every score, with the reason behind it. A green tick means it's working for you. A red cross means it's costing you clients.</p>
       <div>{''.join(rows)}</div>
       </div>
-      {_cta_block()}
+      {_mid_cta()}
       {strength_html}
       {pricing_html}
+      {_n3}
       {voice_html}
+      {_next("Next", "Section 4 of 4: what a visitor sees")}
       <div class="diag">
         <h3><span class="secnum">Section 4 of 4</span>What a visitor sees{ai}</h3>
         <div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr['headline_problem']))}</div>
@@ -1392,7 +1441,8 @@ def render_result(res, first_name="", lead_token=""):
         <div class="row"><div class="k">The obvious fixes</div><ol class="fixlist">{fixes}</ol>{FIXES_CAVEAT}</div>
         <div class="row"><div class="k">Bottom line</div><div class="verdict-note">{para_split(cr['money_left_on_table'])}</div></div>
       </div>
-      {_cta_block()}
+      {_mid_cta()}
+      {_next("Part 3 of 3", "Where that leaves you, and what to do about it")}
       {score_reveal}
       <div class="taste">
         <div class="th">Here's the whole game, in two examples from the coaching world:</div>
