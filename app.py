@@ -3383,6 +3383,16 @@ class Handler(BaseHTTPRequestHandler):
             # The slug comes off the filename of a post WE wrote, so anything that is not
             # a plain slug is a probe rather than a reader. Send it back to the index.
             slug = path[len("/blog/"):].strip("/")
+            # Posts used to live at /blog/2026-09-29-slug. Those addresses are in Google and in
+            # sent emails, so a dated slug is a permanent move to the undated one.
+            _m = re.fullmatch(r"\d{4}-\d{2}-\d{2}-([a-z0-9-]{1,80})", slug)
+            if _m and any(p_["slug"] == _m.group(1) for p_ in _pages._read_posts()):
+                self.send_response(301)
+                self._safety()
+                self.send_header("Location", "/blog/" + _m.group(1))
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                return
             post = _pages.render_post(slug) if re.fullmatch(r"[a-z0-9-]{1,80}", slug) else None
             if post:
                 self._send(post)

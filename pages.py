@@ -239,7 +239,7 @@ and 2,000 books their buyers actually paid for. 10,954 of those websites are the
 corpus every figure on the blog comes from, and
 <a href="/methodology">here is how they were scored</a>.</p>
 
-<p><a href="/blog/2026-09-28-average-coaching-website">The average website scored
+<p><a href="/blog/average-coaching-website">The average website scored
 {MARKET_AVG_10}</a>.</p>
 
 <p>That number is the reason I keep doing this. A coach who knows their subject cold, who
@@ -277,6 +277,9 @@ happens unless you want it to.</p>
 _FRONT = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 
 
+_DATED = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
+
+
 def _read_posts():
     """Every .md file in posts/, newest first.
 
@@ -305,9 +308,12 @@ def _read_posts():
                     meta[k.strip().lower()] = v.strip()
         title = meta.get("title") or _first_heading(body) or name[:-3].replace("-", " ")
         out.append({
-            "slug": meta.get("slug") or name[:-3],
+            # The date lives in the filename so posts sort on disk, but not in the address.
+            # A dated URL looks stale a year on and ties the page to the day it was written.
+            # The old dated addresses 301 to these in app.py.
+            "slug": meta.get("slug") or _DATED.sub("", name[:-3]),
             "title": title,
-            "date": meta.get("date", ""),
+            "date": meta.get("date", "") or (_DATED.match(name).group(1) if _DATED.match(name) else ""),
             "summary": meta.get("summary", ""),
             # `image:` in front matter is the picture the post shares itself with. A bare
             # filename means posts/images/, anything with a slash is taken as written.
