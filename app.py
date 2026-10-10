@@ -2704,8 +2704,12 @@ class Handler(BaseHTTPRequestHandler):
     timeout = 25
 
     def _social_page(self, frag):
-        """Wrap a fragment in the funnel shell. Styling shared with the audit, form not."""
-        return inner_page(frag, eyebrow=f"{websites_read_count():,} coaching websites read, and counting")
+        """Wrap a fragment in the social pages' own dark shell, the same look as the triggers pages.
+
+        It used to go through inner_page, the audit's light shell, which also printed a stray
+        "11,009 coaching websites read" line above everything.
+        """
+        return _social.page(frag)
 
     def _social_report(self, lead):
         """Their profile read back to them, then the two exits. No audit runs here.
@@ -2724,8 +2728,8 @@ class Handler(BaseHTTPRequestHandler):
             section_label = "Your profile",
         )
         trigs = [(_triggers.SECTION_CATS[k], _triggers._heading(k, rec)) for k in range(6)] if rec else []
-        return (combined_parts.opening(lead.get("first_name", "") or "", audience, True, False)
-                + (combined_parts.trigger_reminder(audience, trigs) if trigs else "")
+        return (_social.report_head(lead.get("first_name", "") or "", audience)
+                + (_social.reminder(audience, trigs) if trigs else "")
                 + frag
                 + _social.exits(lead.get("token", "") or "", lead.get("website") or "",
                                 f"{websites_read_count():,}"))

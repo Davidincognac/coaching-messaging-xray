@@ -203,34 +203,21 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
     .hero{gap:16px}
     .mascot{width:76px;height:76px}
   }
+  /* Angelo standing up beside the headline. Two classes, so this beats .mascot above, which used to
+     win and squash him into a small circle. */
+  .mascot.heromascot{width:250px;height:auto;aspect-ratio:auto;object-fit:contain;border-radius:0;
+    border:0;box-shadow:none}
+  @media(max-width:820px){.mascot.heromascot{width:150px}}
+  /* The way back up to the form is a real button now, not a small blue link. */
+  .backup a.gb-btn{color:var(--cta-ink);text-decoration:none;font-size:16px}
+  .backup a.gb-btn:hover{color:var(--cta-ink)}
 
   /* Angelo pulling the market. Same shape as the audit's progress panel, so the two pages feel
      like one product. */
-  #processing{display:none;margin:32px 0 0;padding:32px;border-radius:12px;
-    background:var(--navy-card);border:1px solid var(--navy-line)}
+  #processing{display:none}
   #processing.on{display:block}
   .angelo-loader{display:block;width:150px;aspect-ratio:1;object-fit:cover;margin:0 auto 20px;
     border-radius:50%;border:2px solid var(--glow);box-shadow:0 0 0 5px rgba(127,169,221,.18)}
-  #processing h3{font-size:21px;margin:0 0 8px;color:var(--ivory);text-align:center;font-weight:600}
-  .pbar{height:6px;background:var(--navy-deep);border:1px solid var(--navy-line);border-radius:4px;
-    overflow:hidden;margin:0 0 20px}
-  .pbar i{display:block;height:100%;width:0;background:var(--cta);border-radius:4px;
-    transition:width .6s linear}
-  #processing ul{list-style:none;margin:0 0 18px;padding:0}
-  #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;
-    line-height:1.5;color:var(--ivory);display:flex;gap:8px;align-items:baseline}
-  #processing li .ps-status{margin-left:auto}
-  #processing li:last-child{border-bottom:0}
-  #processing li b{color:#fff;font-weight:600}
-  .ps-status{font-weight:700;font-size:13px;white-space:nowrap}
-  .ps-done{color:#5CB88C}
-  .ps-progress{color:var(--glow)}
-  .ps-waiting{color:var(--ivory-dim)}
-  #processing .p-note{font-size:13px;color:var(--ivory-dim);line-height:1.6;margin:0;text-align:center}
-  @media(max-width:640px){
-    #processing{padding:22px 18px}
-    #processing li{flex-direction:column;gap:3px}
-  }
 """
 
 _REPORT_CSS = """
@@ -304,14 +291,27 @@ _REPORT_CSS = """
     line-height:1.5;color:var(--ivory)}
   .books li:last-child{border-bottom:0}
   .books .au{display:block;font-size:13px;color:var(--ivory-dim);margin-top:2px}
-  .r-next{background:var(--navy-card);border:1px solid var(--cta);border-radius:12px;
-    padding:28px;margin:48px 0 0}
-  .r-next h2{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
+  .r-head{display:flex;gap:26px;align-items:center;justify-content:space-between;margin:0 0 26px}
+  .r-headcopy{flex:1;min-width:0}
+  .r-head .r-eyebrow{color:var(--cta-soft)}
+  .r-head h1.r-title{font-family:var(--display);font-weight:700;letter-spacing:-.03em;color:#fff}
+  .r-head .r-for{margin:0}
+  .r-glance{margin:0 0 48px}
+  section.r{scroll-margin-top:20px}
+  .r-next{background:linear-gradient(160deg,rgba(200,16,46,.16),transparent 45%),var(--navy-card);
+    border:1px solid var(--cta-soft);border-radius:16px;padding:28px;margin:48px 0 0;
+    box-shadow:0 18px 50px rgba(0,0,0,.4)}
+  .r-next h2{font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:-.025em;
+    margin:0 0 12px;color:#fff}
+  .r-next .nextbtn{border-radius:var(--pill);padding:16px 30px;font-size:17px;margin-top:6px}
   .r-next p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:64ch}
   .r-foot{margin:36px 0 0;padding-top:18px;border-top:1px solid var(--navy-line);
     font-size:13px;line-height:1.7;color:var(--ivory-dim)}
   @media(max-width:640px){
     .rwrap{padding:32px 18px 56px}
+    .r-head{flex-direction:column-reverse;align-items:flex-start;gap:16px}
+    .r-next{padding:22px 18px}
+    .r-next h2{font-size:25px}
     .jt div{grid-template-columns:1fr;gap:3px}
     /* The rail becomes a single line above the trigger. A 66px column is 66px a phone cannot spare,
        and the numeral still has to arrive before the words it belongs to. */
@@ -446,9 +446,9 @@ _JS = """
   function setStep(n, state){
     var el = document.getElementById('tp' + n);
     if(!el) return;
-    el.textContent = '[' + state + ']';
-    el.className = 'ps-status ' + (state === 'DONE' ? 'ps-done'
-                 : state === 'WORKING' ? 'ps-progress' : 'ps-waiting');
+    el.className = state === 'DONE' ? 'is-done' : state === 'WORKING' ? 'is-working' : '';
+    var st = el.querySelector('.st');
+    if(st) st.textContent = state === 'DONE' ? 'Done' : state === 'WORKING' ? 'Working' : 'Waiting';
   }
 
   form.addEventListener('submit', function(ev){
@@ -459,10 +459,14 @@ _JS = """
 
     form.style.display = 'none';
     if(whats) whats.style.display = 'none';
+    ['heroblock','belowfold'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.style.display = 'none';
+    });
     slot.innerHTML = '';
-    proc.className = 'on';
+    proc.className = 'gb-work on';
     bar = proc.querySelector('.pbar i');
-    proc.scrollIntoView({behavior:'smooth', block:'center'});
+    window.scrollTo(0, 0);
 
     for(var i = 1; i <= STEPS; i++) setStep(i, i === 1 ? 'WORKING' : 'WAITING');
     var step = 1;
@@ -488,12 +492,8 @@ _JS = """
         for(var i = 1; i <= STEPS; i++) setStep(i, 'DONE');
         if(bar) bar.style.width = '100%';
         setTimeout(function(){
-          proc.className = '';
+          proc.className = 'gb-work';
           // The pitch has done its job. From here the report IS the page.
-          ['heroblock','belowfold'].forEach(function(id){
-            var el = document.getElementById(id);
-            if(el) el.style.display = 'none';
-          });
           slot.innerHTML = htmlText;
           window.scrollTo({top: 0, behavior: 'smooth'});
           busy = false;
@@ -504,7 +504,7 @@ _JS = """
       clearInterval(tick);
       busy = false;
       form.style.display = '';
-      proc.className = '';
+      proc.className = 'gb-work';
       form.submit();
     });
   });
@@ -541,7 +541,7 @@ def _shell(body, title_suffix=""):
     # The report is injected into the landing page after the progress bar, so its stylesheet has to be
     # on every page, not only on the standalone report URL.
     return (_SHELL
-            .replace("__CSS__", _CSS + _REPORT_CSS)
+            .replace("__CSS__", _CSS + _brand.FUNNEL_CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
             .replace("__SEO__", _brand.head_meta("/", _title(title_suffix),
                      "Why your coaching market actually buys, worked out from 2,004 books they paid for and 1,547 things real buyers wrote. Free, and takes about 20 seconds.", True)
@@ -727,24 +727,23 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     that. <a href="/privacy">What we do with your details</a>.</p>
   </form>
 
-  <div id="processing">
-    <img class="angelo-loader" src="/angelo_reading.png"
-         alt="Angelo reading your market">
-    <h3>Angelo is pulling your market</h3>
+  <div id="processing" class="gb-work" aria-live="polite">
+    <div class="gb-work-head">
+      <img src="/angelo_reading.png" alt="Angelo at his desk, reading your market">
+      <div>
+        <p class="gb-eyebrow">Working on it</p>
+        <h3>Angelo is pulling your market</h3>
+        <p>About 20 seconds. Leave this page open. Your triggers open here on their own.</p>
+      </div>
+    </div>
     <div class="pbar"><i></i></div>
     <ul>
-      <li><b>One:</b> Finding your market in the research
-          <span class="ps-status ps-progress" id="tp1">[WORKING]</span></li>
-      <li><b>Two:</b> Pulling what your buyers already spend money on
-          <span class="ps-status ps-waiting" id="tp2">[WAITING]</span></li>
-      <li><b>Three:</b> Reading what they say is wrong, in their words
-          <span class="ps-status ps-waiting" id="tp3">[WAITING]</span></li>
-      <li><b>Four:</b> Working out what they're really paying for
-          <span class="ps-status ps-waiting" id="tp4">[WAITING]</span></li>
-      <li><b>Five:</b> Putting your six triggers together
-          <span class="ps-status ps-waiting" id="tp5">[WAITING]</span></li>
+      <li id="tp1" class="is-working"><span class="ic"></span>Finding your market in the research<span class="st">Working</span></li>
+      <li id="tp2"><span class="ic"></span>Pulling what your buyers already spend money on<span class="st">Waiting</span></li>
+      <li id="tp3"><span class="ic"></span>Reading what they say is wrong, in their words<span class="st">Waiting</span></li>
+      <li id="tp4"><span class="ic"></span>Working out what they're really paying for<span class="st">Waiting</span></li>
+      <li id="tp5"><span class="ic"></span>Putting your six triggers together<span class="st">Waiting</span></li>
     </ul>
-    <p class="p-note">About 20 seconds. Leave this page open. Your triggers open here on their own.</p>
   </div>
   <div id="reportslot"></div>
 
@@ -769,7 +768,7 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     <h2>Your buyer already told us why they buy</h2>
     <p>They wrote it down. We went and read it. Costs you nothing to see, and the coaches you're up
     against are working without it.</p>
-    <p class="backup"><a href="#trigform" id="cta2">Take me back up to the form</a></p>
+    <p class="backup"><a href="#trigform" id="cta2" class="gb-btn primary">Take me back up to the form</a></p>
   </div>
 
   <p class="base" id="baseline">Buying Triggers comes from what your market already buys, and from your
@@ -901,7 +900,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
         # A numbered rail on the left, the trigger beside it. The six ARE a sequence, so numbering
         # them states something true rather than decorating. It also gives the page a steady beat
         # down the left edge, which is what stops wildly uneven block lengths reading as a lurch.
-        out = ('<section class="r">'
+        out = ('<section class="r" id="t' + str(i + 1) + '">'
                '<div class="r-rail"><span class="r-n">' + str(i + 1) + '</span>'
                '<span class="r-lab">Buying Trigger</span></div>'
                '<div class="r-main">'
@@ -1015,14 +1014,20 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
 
     # Built here, not inside the body string. A quote escaped next to the triple-quote terminator
     # silently produced "href= + e(audit_url) +" as literal text, and the button had no link at all.
+    glance = _brand.six_cards([(SECTION_CATS[i], H[i]) for i in range(6)], link=True)
     cta_link = ('<a class="nextbtn" href="' + e(audit_url, quote=True)
                 + '">Show me what a potential client sees</a>')
 
     body = """
   <div class="rwrap">
-  <p class="r-eyebrow">Your buying triggers are ready</p>
-  <h1 class="r-title">""" + e(shown) + """</h1>
-  <p class="r-for">""" + for_line + """</p>
+  <div class="r-head">
+    <div class="r-headcopy">
+      <p class="r-eyebrow">Your buying triggers are ready</p>
+      <h1 class="r-title">""" + e(shown) + """</h1>
+      <p class="r-for">""" + for_line + """</p>
+    </div>
+    <img class="gb-angelo" src="/angelo_up.png" alt="Angelo giving you a thumbs up">
+  </div>
   """ + ('<p class="r-parent">' + parent_line + "</p>" if parent_line else "") + """
 
   <div class="r-base"><b>We didn't guess at these triggers.</b> They're real. This isn't an AI making
@@ -1033,11 +1038,14 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
   <p class="r-what">A trigger is anything that pushes your buyer towards you, or holds them back. Here
   are the 6 in your market.</p>
 
+  <nav class="r-glance" aria-label="The six at a glance">""" + glance + """</nav>
+
   """ + s1 + s2 + s3 + s4 + s5 + s6 + voice_section + """
 
 
 
   <div class="r-next">
+    """ + _brand.steps_html(2) + """
     <h2>Now let's look at you</h2>
     <p>We pulled those six in about 20 seconds, and they're an excellent view of your market. But
     there's more to find, and more you can use to your advantage. So let's look at your social media

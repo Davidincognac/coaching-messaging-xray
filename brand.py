@@ -207,6 +207,121 @@ CHROME_CSS = """
 """
 
 
+# ------------------------------------------------------------ the funnel's shared pieces
+
+# Three things the triggers pages and the social pages both use, kept here so the two halves of the
+# funnel cannot drift apart: the step tracker, Angelo in a framed card, and the six triggers as cards.
+FUNNEL_CSS = """
+  /* ---------- step tracker: where the coach is, out of three ---------- */
+  .gb-steps{display:flex;flex-wrap:wrap;align-items:center;gap:8px;list-style:none;margin:0 0 22px;padding:0}
+  /* is-done / is-now, not done / now: triggers.py already has a .done box with 30px of padding. */
+  .gb-steps li{margin:0;display:flex;align-items:center;gap:8px;padding:6px 13px 6px 7px;border-radius:var(--pill);
+    background:var(--navy-card);border:1px solid var(--navy-line);font-size:13px;font-weight:600;
+    color:var(--ivory-dim);line-height:1.2}
+  .gb-steps .sn{width:20px;height:20px;border-radius:50%;background:var(--navy-line);color:var(--ivory);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+  .gb-steps li.is-done{color:var(--ivory)}
+  .gb-steps li.is-done .sn{background:var(--good)}
+  .gb-steps li.is-now{color:#fff;border-color:var(--cta-soft);background:rgba(200,16,46,.14)}
+  .gb-steps li.is-now .sn{background:var(--cta)}
+  @media(max-width:480px){.gb-steps li{font-size:12px;padding:5px 10px 5px 6px}}
+
+  /* ---------- Angelo in a frame, for the hero of an inner page ---------- */
+  .gb-angelo{width:155px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;flex-shrink:0;
+    border:1px solid var(--navy-line);box-shadow:0 12px 30px rgba(0,0,0,.45);background:#fff}
+  .gb-ihero{display:flex;gap:26px;align-items:center;justify-content:space-between;margin:0 0 26px}
+  .gb-ihero .gb-icopy{flex:1;min-width:0}
+  .gb-ihero h1{font-family:var(--display);font-weight:700;letter-spacing:-.03em;line-height:1.06;
+    font-size:clamp(30px,4.6vw,42px);margin:0 0 12px;color:#fff;text-wrap:balance}
+  .gb-ihero .gb-eyebrow{margin-bottom:10px}
+  .gb-ihero .gb-ilede{font-size:16px;line-height:1.65;color:var(--ivory-dim);margin:0;max-width:56ch}
+  @media(max-width:600px){
+    .gb-ihero{flex-direction:column-reverse;align-items:flex-start;gap:16px}
+    .gb-angelo{width:120px}}
+
+  /* ---------- the six triggers as cards ---------- */
+  .gb-six{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none}
+  .gb-six li{margin:0}
+  .gb-six a,.gb-six .gb-sixc{display:block;height:100%;background:var(--navy-card);border:1px solid var(--navy-line);
+    border-radius:10px;padding:14px 13px;text-decoration:none;color:var(--ivory)}
+  .gb-six a:hover{border-color:var(--cta-soft)}
+  .gb-six .n{width:22px;height:22px;border-radius:50%;background:var(--cta);color:#fff;font-size:11.5px;
+    font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 0 10px}
+  .gb-six .c{display:block;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ivory-dim);
+    font-weight:700;line-height:1.4;margin:0 0 5px}
+  .gb-six .t{display:block;font-family:var(--serif);font-size:16px;font-weight:600;line-height:1.3;color:#fff}
+  @media(max-width:700px){.gb-six{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:420px){.gb-six{grid-template-columns:1fr}}
+
+  /* ---------- Angelo working: one panel, used by both working screens ---------- */
+  .gb-work{max-width:760px;margin:20px auto 0;background:var(--navy-card);border:1px solid var(--navy-line);
+    border-radius:16px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  .gb-work-head{display:flex;gap:22px;align-items:center;margin:0 0 22px}
+  .gb-work-head img{width:180px;aspect-ratio:3/2;object-fit:cover;border-radius:12px;flex-shrink:0;
+    background:#fff;border:1px solid var(--navy-line);animation:gb-bob 2.6s ease-in-out infinite}
+  .gb-work-head .gb-eyebrow{font-size:11px;margin:0 0 6px}
+  .gb-work-head h3{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.025em;
+    line-height:1.12;margin:0 0 8px;color:#fff;text-align:left}
+  .gb-work-head p{font-size:14px;line-height:1.55;color:var(--ivory-dim);margin:0}
+  .gb-work-head p.gb-eyebrow{color:var(--cta-soft)}
+  .gb-work .pbar{height:8px;background:var(--navy-deep);border:1px solid var(--navy-line);border-radius:6px;
+    overflow:hidden;margin:0 0 10px}
+  .gb-work .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cta),var(--cta-soft));
+    border-radius:6px;transition:width .6s linear}
+  .gb-work ul{list-style:none;margin:0;padding:0}
+  .gb-work li{margin:0;display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--navy-line);
+    font-size:14.5px;line-height:1.45;color:var(--ivory-dim)}
+  .gb-work li:last-child{border-bottom:0}
+  .gb-work li .ic{width:20px;height:20px;border-radius:50%;border:2px solid var(--navy-line);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+  .gb-work li .st{margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    padding:4px 9px;border-radius:var(--pill);background:rgba(255,255,255,.06);color:var(--ivory-dim);white-space:nowrap}
+  .gb-work li.is-working{color:#fff;font-weight:600}
+  .gb-work li.is-working .ic{border-color:var(--navy-line);border-top-color:var(--cta-soft);animation:gb-spin .8s linear infinite}
+  .gb-work li.is-working .st{background:rgba(200,16,46,.18);color:var(--cta-soft)}
+  .gb-work li.is-done{color:var(--ivory)}
+  .gb-work li.is-done .ic{background:var(--good);border-color:var(--good)}
+  .gb-work li.is-done .ic::after{content:"\\2713"}
+  .gb-work li.is-done .st{background:rgba(42,123,86,.22);color:var(--good-glow)}
+  @keyframes gb-spin{to{transform:rotate(360deg)}}
+  @keyframes gb-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @media(prefers-reduced-motion:reduce){.gb-work-head img,.gb-work li.is-working .ic{animation:none}}
+  @media(max-width:560px){
+    .gb-work{padding:20px 16px}
+    .gb-work-head{flex-direction:column;align-items:flex-start;gap:14px}
+    .gb-work-head img{width:130px}
+    .gb-work-head h3{font-size:22px}}
+"""
+
+STEP_NAMES = ("Your buying triggers", "Your profile", "Your website")
+
+
+def steps_html(current):
+    """The three steps of the funnel. `current` is 1, 2 or 3; anything before it shows ticked."""
+    out = []
+    for i, name in enumerate(STEP_NAMES, start=1):
+        cls = "is-done" if i < current else ("is-now" if i == current else "")
+        mark = "&#10003;" if i < current else str(i)
+        cur = ' aria-current="step"' if i == current else ""
+        out.append(f'<li class="{cls}"{cur}><span class="sn">{mark}</span>{name}</li>')
+    return '<ol class="gb-steps" aria-label="Your progress">' + "".join(out) + "</ol>"
+
+
+def six_cards(items, link=False):
+    """The six triggers at a glance. `items` is [(category, name), ...] in trigger order.
+
+    With link=True each card jumps to that trigger further down the page (#t1 to #t6).
+    """
+    e = html.escape
+    out = []
+    for i, (cat, name) in enumerate(items, start=1):
+        inner = (f'<span class="n">{i}</span><span class="c">{e(cat)}</span>'
+                 f'<span class="t">{e(name)}</span>')
+        out.append(f'<li><a href="#t{i}">{inner}</a></li>' if link
+                   else f'<li><div class="gb-sixc">{inner}</div></li>')
+    return '<ul class="gb-six">' + "".join(out) + "</ul>"
+
+
 def nav_html(active="", links=True):
     """The top bar. `active` is one of home, about, blog and just bolds that link.
 
