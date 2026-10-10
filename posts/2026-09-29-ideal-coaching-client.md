@@ -5,7 +5,7 @@ summary: 90.6% of coaching niches hold buyers at more than one stage of awarenes
 ---
 You've probably filled in an ideal client worksheet. Name her, age her, give her a job, an income bracket, a podcast she listens to, a fear she'd never admit. Then you wrote your homepage and it still didn't sound like it was for anybody.
 
-What actually separates one coaching buyer from another is below, taken from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote down. Get this wrong and none of [the three jobs that turn a stranger into a client](/blog/2026-09-29-how-to-get-coaching-clients) can be done, because all three depend on knowing who's reading.
+What actually separates one coaching buyer from another is below, taken from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote down. Get this wrong and none of [the three jobs that turn a stranger into a client](/blog/how-to-get-coaching-clients) can be done, because all three depend on knowing who's reading.
 
 Here's the finding that broke the avatar exercise for me. 90.6% of the 117 main coaching niches contain buyers at more than one stage of awareness. Same subject, same age, same income, completely different conversation.
 
@@ -43,7 +43,7 @@ No, and this is where "ideal" does real damage.
 
 The useful definition is the one where all three of these are true at once: she has the push, she can name the problem, and you've solved that exact thing before. Not highest budget. Not easiest to work with.
 
-A coach who chases the highest-paying version of her market usually ends up at level 4 or 5 sophistication, where buyers have heard every claim already. 47.7% of the markets we mapped are at that level, and they're the hardest rooms to walk into new. The quieter sub-market one level down has the same money in it and a fraction of the noise. There's more on that in [why profitable is the wrong question](/blog/2026-09-29-most-profitable-coaching-niches).
+A coach who chases the highest-paying version of her market usually ends up at level 4 or 5 sophistication, where buyers have heard every claim already. 47.7% of the markets we mapped are at that level, and they're the hardest rooms to walk into new. The quieter sub-market one level down has the same money in it and a fraction of the noise. There's more on that in [why profitable is the wrong question](/blog/most-profitable-coaching-niches).
 
 ## So what do you write down instead?
 
@@ -56,7 +56,7 @@ Four lines, and they're all things she'd recognise.
 
 Fill those in and the homepage writes itself, because every one of them is a sentence she can recognise herself in. Fill in her age and her podcast and you've got a character sketch nobody can recognise anything in.
 
-If you're not sure which market you're even describing, [a niche and an audience aren't the same thing](/blog/2026-09-29-niche-versus-audience) sorts that out first. Then [the three jobs a stranger puts you through](/blog/2026-09-29-how-to-get-coaching-clients) tells you what to do with it.
+If you're not sure which market you're even describing, [a niche and an audience aren't the same thing](/blog/niche-versus-audience) sorts that out first. Then [the three jobs a stranger puts you through](/blog/how-to-get-coaching-clients) tells you what to do with it.
 
 ## Where our data runs out
 
@@ -67,6 +67,8 @@ Could your market behave differently from what we found? Yes. If you've had twen
 Are 117 niches and 918 sub-markets the real number? Maybe there are more. What we learned about how they split is worth more than the count.
 
 You can [look up what your own market's buyers are driven by](/) and see the push, the anxiety and the awareness stage for it.
+
+If you want to keep reading on this, start with [the full list of 117 coaching niches](/blog/coaching-niches) and [how to choose a coaching niche](/blog/how-to-choose-a-coaching-niche).
 
 ## FAQ
 

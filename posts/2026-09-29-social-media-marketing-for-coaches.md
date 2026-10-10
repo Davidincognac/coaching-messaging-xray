@@ -5,7 +5,7 @@ summary: We scored 11,377 coaches' LinkedIn headlines out of 10. The average is 
 ---
 Every coach has been told to show up consistently. Nobody gets told to fix the one line that appears above every single thing they post.
 
-So we scored it. 11,377 coaches' LinkedIn headlines, out of 10, on four checks: does it name a niche, does it name an audience, does it state an outcome, does it show a credential. It's one piece of [what the counting says about marketing for coaches](/blog/2026-09-29-marketing-for-coaches), and it's the cheapest piece to fix.
+So we scored it. 11,377 coaches' LinkedIn headlines, out of 10, on four checks: does it name a niche, does it name an audience, does it state an outcome, does it show a credential. It's one piece of [what the counting says about marketing for coaches](/blog/marketing-for-coaches), and it's the cheapest piece to fix.
 
 The average is 2.56 out of 10.
 
@@ -69,7 +69,7 @@ Not a formula to copy. The shape is: who, what changes, and only then what you c
 
 The test is the same five seconds we use on a homepage. A stranger reads the line and either recognises herself or scrolls. 70.1% of coaching headlines give her nothing to recognise, which is why posting harder underneath one doesn't move anything.
 
-If you're not sure what to put in the "who" slot, that's [a niche question rather than a social media one](/blog/2026-09-29-coaching-niches). And the same sentence has to work on your homepage, where [86% of coaching websites fail the same check](/blog/2026-09-29-five-second-test).
+If you're not sure what to put in the "who" slot, that's [a niche question rather than a social media one](/blog/coaching-niches). And the same sentence has to work on your homepage, where [86% of coaching websites fail the same check](/blog/five-second-test).
 
 ## What this doesn't cover
 
@@ -80,6 +80,8 @@ So this says nothing about whether posting works, which platform is better, or h
 Is a headline score a fair thing to measure? It's four checks on one line of text and on any given coach a human would argue with it. Across 11,377 it's consistent, and it's the same four things a stranger is actually looking for.
 
 Are these all coaches? They're people whose LinkedIn title says they coach, which includes therapists and consultants who use the word. That's the market as it presents itself, which is the market a buyer scrolls past.
+
+If you want to keep reading on this, start with [a life coach marketing plan](/blog/life-coach-marketing-plan) and [content marketing for coaches](/blog/content-marketing-for-coaches).
 
 ## FAQ
 

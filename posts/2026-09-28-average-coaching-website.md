@@ -7,7 +7,7 @@ We scored 10,954 live coaching websites out of 10. The average came back at 3.7.
 
 Thirteen scored as strong. Out of nearly eleven thousand.
 
-In this article I'm showing you where those marks actually go, because it isn't where most coaches think. If you want the short version, [four things separate the good sites from the poor ones](/blog/2026-09-29-website-design-for-life-coaches) and design isn't one of them.
+In this article I'm showing you where those marks actually go, because it isn't where most coaches think. If you want the short version, [four things separate the good sites from the poor ones](/blog/website-design-for-life-coaches) and design isn't one of them.
 
 That isn't a story about lazy coaches. Every one of those sites was built by somebody who knows their subject, and a fair few of them look lovely.
 
@@ -68,6 +68,8 @@ No, and I'd say so if it was. We're scoring one page against ten things a strang
 Is the sample fair? It's 10,954 live sites out of a list of 12,294. Of the 1,340 that aren't in the score, 1,156 wouldn't load at all and 184 loaded with nothing readable on them. We left those out rather than scoring them zero and flattering the average.
 
 Does a low score mean you're a bad coach? Not remotely. We only read the homepage. It says nothing about what happens once somebody's in the room with you, and the two aren't related.
+
+If you want to keep reading on this, start with [what to put on a coaching homepage](/blog/what-to-put-on-a-coaching-homepage) and [how health coach websites score](/blog/health-coach-websites-scored).
 
 ## FAQ
 

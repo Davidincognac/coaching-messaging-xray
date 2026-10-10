@@ -5,7 +5,7 @@ summary: The average coaching website scores 3.65 out of 10 and 22.7% score unde
 ---
 A coach asked me last month whether she needed a website before she started selling. She'd been told yes by everybody who sells websites.
 
-So I went and checked what the average coaching website is actually worth, from 10,954 live ones we scored out of 10, and what you have to put in its place if you skip it. Whatever you use instead still has to do [the three jobs a stranger puts you through](/blog/2026-09-29-how-to-get-coaching-clients), and a bio gets the same five seconds a homepage does.
+So I went and checked what the average coaching website is actually worth, from 10,954 live ones we scored out of 10, and what you have to put in its place if you skip it. Whatever you use instead still has to do [the three jobs a stranger puts you through](/blog/how-to-get-coaching-clients), and a bio gets the same five seconds a homepage does.
 
 The market average is 3.65 out of 10. 47.9% of coaching websites score below even that. 22.7% score under 3.
 
@@ -49,7 +49,7 @@ A well-run Instagram account beats that. At least there she can follow you and d
 
 Whatever the front door is, it gets judged on the same three things a stranger judges a homepage on.
 
-**Can she tell what you do, for whom, in five seconds?** Only 14.3% of coaching websites manage it, and the sites that do score 9.25 against 2.92 for the ones that don't. Your bio gets the same five seconds. Probably fewer. There's [more on the five-second read here](/blog/2026-09-29-five-second-test).
+**Can she tell what you do, for whom, in five seconds?** Only 14.3% of coaching websites manage it, and the sites that do score 9.25 against 2.92 for the ones that don't. Your bio gets the same five seconds. Probably fewer. There's [more on the five-second read here](/blog/five-second-test).
 
 **Is there anything to believe?** 66.5% of coaching websites show no proof. A screenshot of a message from a client, posted where people can see it, is proof. It doesn't need a testimonials page.
 
@@ -63,7 +63,7 @@ Who you help and what you fix, in words a stranger uses about herself. That sent
 
 Then pick the front door you'll actually keep up. A neglected website and a neglected Instagram are worth about the same.
 
-If you do build one, [what to put on a coaching homepage and in what order](/blog/2026-09-29-what-to-put-on-a-coaching-homepage) is the short version. If the first client is the problem rather than the platform, [start with the proof question instead](/blog/2026-09-29-first-coaching-client). And [the three jobs behind all of this](/blog/2026-09-29-how-to-get-coaching-clients) sit in the pillar.
+If you do build one, [what to put on a coaching homepage and in what order](/blog/what-to-put-on-a-coaching-homepage) is the short version. If the first client is the problem rather than the platform, [start with the proof question instead](/blog/first-coaching-client). And [the three jobs behind all of this](/blog/how-to-get-coaching-clients) sit in the pillar.
 
 ## Where this stops being useful
 
@@ -74,6 +74,8 @@ Does that mean a coach with no site is fine? No. It means the site isn't the thi
 Is 10,954 a fair sample? The list was 12,294 domains. 1,156 wouldn't load at all and another 184 loaded with nothing readable on them, so 1,340 are left out rather than scored zero.
 
 If you've got a site already, [put it through the same ten checks](/website) before you decide it's the problem.
+
+If you want to keep reading on this, start with [how to attract coaching clients without chasing](/blog/attract-coaching-clients).
 
 ## FAQ
 

@@ -48,9 +48,9 @@ Technical health is second from bottom. That's the thing you'd be paying a desig
 
 Four things, in this order.
 
-**Who it's for and what you fix, in the first thing anybody reads.** Good sites average 9.25 on [the five-second read](/blog/2026-09-29-five-second-test). Poor ones average 2.92. Nothing else on this list comes close to that gap.
+**Who it's for and what you fix, in the first thing anybody reads.** Good sites average 9.25 on [the five-second read](/blog/five-second-test). Poor ones average 2.92. Nothing else on this list comes close to that gap.
 
-If you're not sure who yours is for yet, that's [a niche question rather than a website one](/blog/2026-09-29-coaching-niches).
+If you're not sure who yours is for yet, that's [a niche question rather than a website one](/blog/coaching-niches).
 
 **A price, or something like one.** 65% of the good sites show one. 7.3% of the poor ones do. I know why coaches hide it. A woman who can't tell whether you're £60 or £600 assumes the worst and closes the tab, and you never hear from her.
 
@@ -58,7 +58,7 @@ If you're not sure who yours is for yet, that's [a niche question rather than a 
 
 **Something of you on the page.** 90.7% of good sites tell a story. A third of the market has nothing human on it anywhere.
 
-Those four have an order, and [the order matters more than the list](/blog/2026-09-29-what-to-put-on-a-coaching-homepage).
+Those four have an order, and [the order matters more than the list](/blog/what-to-put-on-a-coaching-homepage).
 
 ## Should I not bother with a designer then?
 
@@ -74,7 +74,9 @@ It's ten criteria on one page, the homepage, and nothing else. Your about page, 
 
 Is the sample fair? It's 10,954 live sites from a list of 12,294. Of the 1,340 missing, 1,156 wouldn't load at all and 184 loaded with nothing readable on them. We left those out rather than scoring them zero and flattering the average.
 
-You can [read the full scorecard and where every mark goes](/blog/2026-09-28-average-coaching-website), see how [health and nutrition coaches score against everybody else](/blog/2026-09-29-health-coach-websites-scored), or [have your own homepage read the way a stranger reads it](/website) and find out which of the four you're missing.
+You can [read the full scorecard and where every mark goes](/blog/average-coaching-website), see how [health and nutrition coaches score against everybody else](/blog/health-coach-websites-scored), or [have your own homepage read the way a stranger reads it](/website) and find out which of the four you're missing.
+
+If you want to keep reading on this, start with [how to get coaching clients](/blog/how-to-get-coaching-clients) and [marketing for coaches](/blog/marketing-for-coaches).
 
 ## FAQ
 

@@ -5,7 +5,7 @@ summary: Health and nutrition coaches score 3.55 against a market average of 3.6
 ---
 Health coaching is one of the most crowded corners of the whole industry, and the websites in it are quietly worse than average at the one thing that decides whether anybody stays.
 
-We scored 10,954 live coaching websites out of 10, against [the ten things a coaching homepage is marked on](/blog/2026-09-29-website-design-for-life-coaches). 622 of them are health, nutrition, wellness or fitness coaches, and in this article I'm showing you how that group compares with everybody else.
+We scored 10,954 live coaching websites out of 10, against [the ten things a coaching homepage is marked on](/blog/website-design-for-life-coaches). 622 of them are health, nutrition, wellness or fitness coaches, and in this article I'm showing you how that group compares with everybody else.
 
 Not one of the 622 scored strong. Twenty-four came out decent. The other 598 were weak or poor.
 
@@ -63,6 +63,8 @@ It's enough to be worth showing you, and I'd rather say how we got it than have 
 Does that skew it? Probably a little, and in a direction that makes health coaches look better rather than worse, because a coach who put their niche in the domain is already thinking about specificity.
 
 Zero strong out of 622 is the number I'd be looking at. In the wider market it's 13 out of 10,954, so nobody's doing brilliantly. It's just that in health coaching, nobody's doing brilliantly at all.
+
+If you want to keep reading on this, start with [what to put on a coaching homepage](/blog/what-to-put-on-a-coaching-homepage) and [how the average coaching website scores](/blog/average-coaching-website).
 
 ## FAQ
 

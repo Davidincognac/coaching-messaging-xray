@@ -5,7 +5,7 @@ summary: Proof decides the sale in 92.9% of coaching markets, and on day one you
 ---
 Your first client is hard for one reason and it isn't skill. It's that the thing people need most before they hire a coach is evidence other people already did, and on day one you haven't got any.
 
-Here's how big that problem really is, measured two ways: 918 coaching markets we mapped for what the buying decision turns on, and 10,954 live coaching websites we scored on whether they show any evidence at all. It's one piece of [the three jobs that get a stranger to book a call](/blog/2026-09-29-how-to-get-coaching-clients), and it's the piece that hurts on day one.
+Here's how big that problem really is, measured two ways: 918 coaching markets we mapped for what the buying decision turns on, and 10,954 live coaching websites we scored on whether they show any evidence at all. It's one piece of [the three jobs that get a stranger to book a call](/blog/how-to-get-coaching-clients), and it's the piece that hurts on day one.
 
 Proof comes up in 92.9% of the 918 markets. It's the most common thing a buying decision hangs on, ahead of qualifications, ahead of price, ahead of everything.
 
@@ -53,7 +53,7 @@ Less than the training provider implies, and it's not useless either.
 
 Across the whole market, the thing we score as credibility, which covers qualifications and affiliations, averages 2.68 out of 10 and separates good sites from poor ones by 1.43 points. Proof separates them by 3.78. Being clear about who you help separates them by 6.33.
 
-So the certificate is worth having and it won't get you the first client. What gets you the first client is being the obvious person for one specific problem, in front of somebody who has it. If you haven't settled that yet, that's [a niche question rather than a marketing one](/blog/2026-09-29-coaching-niches).
+So the certificate is worth having and it won't get you the first client. What gets you the first client is being the obvious person for one specific problem, in front of somebody who has it. If you haven't settled that yet, that's [a niche question rather than a marketing one](/blog/coaching-niches).
 
 ## Where does the first one actually come from?
 
@@ -61,7 +61,7 @@ Somebody who already knows you, almost always.
 
 I'm not going to dress that up. The first client comes from a warm list: people you've worked with, trained with, sat next to. Not because cold marketing can't work, but because warm people skip the proof step entirely. They already have their evidence, which is you.
 
-The slower job, the one that keeps working after your contacts run out, is [the three things a stranger needs before she books anything](/blog/2026-09-29-how-to-get-coaching-clients). And if you're wondering whether you need a site up before any of this, [the answer is more interesting than yes or no](/blog/2026-09-29-coaching-clients-without-a-website).
+The slower job, the one that keeps working after your contacts run out, is [the three things a stranger needs before she books anything](/blog/how-to-get-coaching-clients). And if you're wondering whether you need a site up before any of this, [the answer is more interesting than yes or no](/blog/coaching-clients-without-a-website).
 
 ## What this doesn't cover
 
@@ -70,6 +70,8 @@ Our data says what makes a stranger believe you. It says nothing about whether y
 Is it possible to get a first client with no proof at all? Yes, constantly. Somebody takes a chance on you because you were in the room. The point of the numbers above is that you can stop treating the empty testimonial page as a reason to wait.
 
 You can [have your homepage read the way a stranger reads it](/website) and see what it shows somebody who's never heard of you.
+
+If you want to keep reading on this, start with [how to attract coaching clients without chasing](/blog/attract-coaching-clients).
 
 ## FAQ
 

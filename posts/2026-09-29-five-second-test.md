@@ -9,7 +9,7 @@ In that time she's answering one question. Is this for me?
 
 We scored 10,954 live coaching websites on whether a stranger could answer that. 86% couldn't, and in this article I'm showing you what the ones that pass do differently.
 
-It's the widest gap in [everything we scored a coaching website on](/blog/2026-09-29-website-design-for-life-coaches), by some distance.
+It's the widest gap in [everything we scored a coaching website on](/blog/website-design-for-life-coaches), by some distance.
 
 ## Things to know
 
@@ -53,7 +53,9 @@ It's roughly what you get. Somebody scanning search results has three tabs open 
 
 Is 7 out of 10 a fair pass mark? It's a judgement, and a defensible one. At 6 the failure rate is 50% rather than 86%, so the picture is less dramatic and still not good. I'd rather show you both numbers than pick the scarier one and hide the other.
 
-Does passing it guarantee enquiries? No. It gets her past the first five seconds, which is where 86% of coaching sites lose her. What happens next is [everything else on the scorecard](/blog/2026-09-29-website-design-for-life-coaches).
+Does passing it guarantee enquiries? No. It gets her past the first five seconds, which is where 86% of coaching sites lose her. What happens next is [everything else on the scorecard](/blog/website-design-for-life-coaches).
+
+If you want to keep reading on this, start with [what to put on a coaching homepage](/blog/what-to-put-on-a-coaching-homepage) and [how the average coaching website scores](/blog/average-coaching-website).
 
 ## FAQ
 

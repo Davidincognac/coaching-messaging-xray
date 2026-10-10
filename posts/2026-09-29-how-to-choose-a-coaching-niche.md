@@ -9,7 +9,7 @@ Here's how to pick one without giving the other three up.
 
 Plenty of the coaches whose sites I read aren't undecided at all. They know exactly who they help. They just know it about four different groups, so they've written one page trying to serve the lot. Then a woman lands on it, can't work out which of the four you're best at, decides you're a bit of everything, and goes back to Google.
 
-Being good at several things is normal. We found [117 main coaching markets](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller ones underneath them, by reading what people buy on Amazon. Nobody sensible picks one of those and never thinks about anything else again.
+Being good at several things is normal. We found [117 main coaching markets](/blog/coaching-niches) and almost 1,000 smaller ones underneath them, by reading what people buy on Amazon. Nobody sensible picks one of those and never thinks about anything else again.
 
 ## Things to know
 
@@ -67,6 +67,8 @@ No. This is about what your page says and nothing else. Which clients you take, 
 Is the list complete? Probably not. We built it from markets where people are already buying on Amazon, so anything with no publishing behind it won't be on there. That doesn't mean nobody wants it. It means we had nothing to read.
 
 If you want to know whether the choice you already made is landing, you can [put your homepage through the same ten checks](/website).
+
+If you want to keep reading on this, start with [the most profitable coaching niches](/blog/most-profitable-coaching-niches) and [Christian life coaching niches](/blog/christian-life-coaching-niches).
 
 ## FAQ
 

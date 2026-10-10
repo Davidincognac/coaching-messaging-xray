@@ -5,7 +5,7 @@ summary: Most plans open with channels. This one opens with the two steps that c
 ---
 A marketing plan that opens with "choose your platforms" has already skipped the part that decides whether any platform works.
 
-So here's the order the evidence puts things in, from three datasets: 10,954 coaching websites scored out of 10, 11,377 coaches' LinkedIn headlines scored the same way, and 918 coaching markets mapped for what the buying decision turns on. It's the practical version of [what the counting says about marketing for coaches](/blog/2026-09-29-marketing-for-coaches).
+So here's the order the evidence puts things in, from three datasets: 10,954 coaching websites scored out of 10, 11,377 coaches' LinkedIn headlines scored the same way, and 918 coaching markets mapped for what the buying decision turns on. It's the practical version of [what the counting says about marketing for coaches](/blog/marketing-for-coaches).
 
 Five steps. The first two take a week and cost nothing. The last three are where everybody starts.
 
@@ -23,7 +23,7 @@ This is first because everything else carries it. Your homepage, your headline, 
 
 The bar is low and almost nobody clears it. 86% of coaching websites can't be answered in five seconds by a stranger. 70.1% of coaching LinkedIn headlines score 3 or less out of 10. 4.3% of coaches name both who they help and what changes.
 
-If the "who" isn't settled, that's not a marketing problem, it's [a niche one](/blog/2026-09-29-coaching-niches), and it comes before this.
+If the "who" isn't settled, that's not a marketing problem, it's [a niche one](/blog/coaching-niches), and it comes before this.
 
 ## Step two: get something checkable on the page
 
@@ -31,7 +31,7 @@ Proof is the second thing because it's the thing a stranger needs and the thing 
 
 Across 918 coaching markets, social proof supports the decision in 92.9% and authority in 87.9%. Across 10,954 coaching websites, 66.5% show no proof of any kind and 82.3% won't tell you a price.
 
-The bar here is low too. The coaching sites that score well average 4.56 out of 10 on proof, which in practice is two or three named quotes and something a stranger could check. [If you haven't got a client yet](/blog/2026-09-29-first-coaching-client), that post covers what counts instead.
+The bar here is low too. The coaching sites that score well average 4.56 out of 10 on proof, which in practice is two or three named quotes and something a stranger could check. [If you haven't got a client yet](/blog/first-coaching-client), that post covers what counts instead.
 
 ## Step three: pick one place to be found
 
@@ -51,7 +51,7 @@ So she's either ready today or she's gone, and most people aren't ready today. I
 
 Because until the first four are done, paid traffic is a multiplier on a page that doesn't convert.
 
-Coaching websites already average 9.03 out of 10 on being well built. If enquiries are thin, the build is the least likely culprit and it's the easiest thing to be sold. [Branding sits in the same trap](/blog/2026-09-29-branding-coaching-business).
+Coaching websites already average 9.03 out of 10 on being well built. If enquiries are thin, the build is the least likely culprit and it's the easiest thing to be sold. [Branding sits in the same trap](/blog/branding-coaching-business).
 
 ## Why is this order the opposite of every plan I've read?
 
@@ -65,7 +65,9 @@ It's an order of operations, not a forecast. Nothing here says how long it takes
 
 Should everybody follow it? No. A coach with a full practice from referrals is doing something this plan doesn't measure and shouldn't stop. This is for the coach whose enquiries come from strangers, or don't come at all.
 
-Is step one really worth putting above everything? The five-second read separates coaching sites that work from ones that don't by 6.33 points out of 10, wider than any other check we run. That's the argument, and [the evidence for it is here](/blog/2026-09-29-five-second-test).
+Is step one really worth putting above everything? The five-second read separates coaching sites that work from ones that don't by 6.33 points out of 10, wider than any other check we run. That's the argument, and [the evidence for it is here](/blog/five-second-test).
+
+If you want to keep reading on this, start with [content marketing for coaches](/blog/content-marketing-for-coaches) and [social media marketing for coaches](/blog/social-media-marketing-for-coaches).
 
 ## FAQ
 

@@ -181,7 +181,7 @@ Scan the list above and you'll see hardly any of them are a type of person. They
 
 You can do both, and it's stronger. "Menopause coaching for women in senior roles." Put the problem first though, because somebody skimming wants to know what you fix before they care who you fix it for.
 
-There's [more on the niche and audience difference](/blog/2026-09-29-niche-versus-audience) if that's the bit you're stuck on.
+There's [more on the niche and audience difference](/blog/niche-versus-audience) if that's the bit you're stuck on.
 
 ## Picking one off the list isn't enough
 
@@ -216,7 +216,7 @@ Feeling sure and being right aren't the same thing, and this is easy enough to c
 
 Then go one level down. Don't write to anxiety, write to postnatal anxiety, and let the people who have it recognise themselves in your first line.
 
-If you're good at several things, [choosing between them without giving the rest up](/blog/2026-09-29-how-to-choose-a-coaching-niche) is its own question.
+If you're good at several things, [choosing between them without giving the rest up](/blog/how-to-choose-a-coaching-niche) is its own question.
 
 ## What this list won't tell you
 
@@ -224,7 +224,9 @@ It only covers markets where people are buying books, because that's what we cou
 
 The sub niche counts came out of that same reading. Seven or eight per market is what the evidence gave us, not a number we were aiming for.
 
-One more thing worth saying. We've [scored 10,954 live coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came back at 3.7. Almost none of those marks were lost on the niche the coach picked. They were lost on never saying it out loud on the page. If you want to know which yours does, you can [have it read the way a stranger reads it](/website).
+One more thing worth saying. We've [scored 10,954 live coaching homepages out of 10](/blog/average-coaching-website) and the average came back at 3.7. Almost none of those marks were lost on the niche the coach picked. They were lost on never saying it out loud on the page. If you want to know which yours does, you can [have it read the way a stranger reads it](/website).
+
+If you want to keep reading on this, start with [what an ideal coaching client actually is](/blog/ideal-coaching-client), [how to get coaching clients](/blog/how-to-get-coaching-clients), [marketing for coaches](/blog/marketing-for-coaches) and [website design for life coaches](/blog/website-design-for-life-coaches).
 
 ## FAQ
 
@@ -234,7 +236,7 @@ One more thing worth saying. We've [scored 10,954 live coaching homepages out of
 
 ### What is the most profitable coaching niche?
 
-Wrong question, and the list is what invites it. Profit follows whether the buyer recognises their own problem in your words, not which market you picked. The ten markets with the most money already spent in them are also the ten where buyers have heard every claim before, which is the trade [set out with the numbers here](/blog/2026-09-29-most-profitable-coaching-niches).
+Wrong question, and the list is what invites it. Profit follows whether the buyer recognises their own problem in your words, not which market you picked. The ten markets with the most money already spent in them are also the ten where buyers have heard every claim before, which is the trade [set out with the numbers here](/blog/most-profitable-coaching-niches).
 
 ### Do I have to pick a niche at all?
 
@@ -248,4 +250,4 @@ Specific enough that the sub-market is the thing you name, not the niche above i
 
 Then we haven't read it yet. I'd rather tell you that than hand you somebody else's market with your name on it. The list grows as the reading does.
 
-Faith is the one that catches people out. It's not on here as a niche because it turns up across six of them instead, and [Christian coaching markets](/blog/2026-09-29-christian-life-coaching-niches) get their own article.
+Faith is the one that catches people out. It's not on here as a niche because it turns up across six of them instead, and [Christian coaching markets](/blog/christian-life-coaching-niches) get their own article.

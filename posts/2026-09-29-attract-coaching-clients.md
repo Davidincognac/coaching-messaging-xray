@@ -5,7 +5,7 @@ summary: Urgency supports the sale in 4.4% of the 918 coaching markets we mapped
 ---
 Every coach has been told to attract clients rather than chase them, usually by someone who then sells them a DM script.
 
-Attraction turns out to be measurable, so here it is measured, from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote, and 10,954 coaching websites we scored on whether a stranger can follow them. It's the order [the three jobs of getting clients](/blog/2026-09-29-how-to-get-coaching-clients) happen in, more than anything else.
+Attraction turns out to be measurable, so here it is measured, from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote, and 10,954 coaching websites we scored on whether a stranger can follow them. It's the order [the three jobs of getting clients](/blog/how-to-get-coaching-clients) happen in, more than anything else.
 
 Start with the one that surprised me most. Scarcity and urgency, the two-spots-left, the price-goes-up-Friday, support the buying decision in 4.4% of the 918 markets.
 
@@ -62,7 +62,7 @@ Recognition can't happen before comprehension. If she can't work out what you do
 
 Three things do the work, in this order.
 
-**The problem, in her language, above anything about you.** [Why the five-second read decides so much](/blog/2026-09-29-five-second-test) has the evidence.
+**The problem, in her language, above anything about you.** [Why the five-second read decides so much](/blog/five-second-test) has the evidence.
 
 **Proof she can check without talking to you.** 66.5% of coaching websites show none, in a market where proof supports the decision 92.9% of the time.
 
@@ -84,7 +84,9 @@ It also can't prove the direction. A site with proof on it might be a site built
 
 You can [see what your own market's buyers are driven by](/) and read the push, the fear and the awareness stage for it. Or [score your homepage against the 10,954](/website).
 
-And if you want the full picture, [the three jobs behind getting clients](/blog/2026-09-29-how-to-get-coaching-clients) is the pillar this came from. The [ideal client question](/blog/2026-09-29-ideal-coaching-client) is the one to answer before either.
+And if you want the full picture, [the three jobs behind getting clients](/blog/how-to-get-coaching-clients) is the pillar this came from. The [ideal client question](/blog/ideal-coaching-client) is the one to answer before either.
+
+If you want to keep reading on this, start with [getting your first coaching client](/blog/first-coaching-client) and [getting clients without a website](/blog/coaching-clients-without-a-website).
 
 ## FAQ
 

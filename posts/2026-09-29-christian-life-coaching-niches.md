@@ -7,7 +7,7 @@ Search for a Christian life coach and you'll get hundreds of people describing t
 
 So this is what it costs them, and what belongs on the page instead.
 
-Christian coaching works as a layer over a market rather than as a market of its own. We found that by reading what people buy on Amazon across [117 coaching markets](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller ones underneath. Faith came back as the deciding thing in six of them, and those six sit under six completely different parent markets.
+Christian coaching works as a layer over a market rather than as a market of its own. We found that by reading what people buy on Amazon across [117 coaching markets](/blog/coaching-niches) and almost 1,000 smaller ones underneath. Faith came back as the deciding thing in six of them, and those six sit under six completely different parent markets.
 
 Which matters, because the man in one of them wants nothing like what the woman in another wants, and they'd both call themselves Christian.
 
@@ -58,6 +58,8 @@ Almost certainly. Six is what our reading supported, not a full map of faith in 
 Does it cover other faiths? No, and I'd rather say so than let you assume it does. What we read was what people buy on Amazon, and faith publishing leans heavily towards a handful of traditions, so what came back leans the same way. Everything above is about Christian buyers, because that's who the evidence was about.
 
 If you want to check whether your market or your faith is landing first on your own page, you can [see how it reads to a stranger](/website).
+
+If you want to keep reading on this, start with [how to choose a coaching niche](/blog/how-to-choose-a-coaching-niche) and [the most profitable coaching niches](/blog/most-profitable-coaching-niches).
 
 ## FAQ
 

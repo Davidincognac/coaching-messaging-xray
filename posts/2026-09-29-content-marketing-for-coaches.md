@@ -5,7 +5,7 @@ summary: In 40.2% of coaching markets the buyer isn't looking for a coach yet. S
 ---
 The reason a coach's blog gets no traffic usually isn't the writing. It's that every post is about coaching, and the person you want has never typed that word.
 
-We mapped 918 coaching markets from 2,004 books those buyers paid for and 1,547 things real buyers wrote about their own situation, and tagged each market for how far along the buyer is. It's the topic half of [what the counting says about marketing for coaches](/blog/2026-09-29-marketing-for-coaches).
+We mapped 918 coaching markets from 2,004 books those buyers paid for and 1,547 things real buyers wrote about their own situation, and tagged each market for how far along the buyer is. It's the topic half of [what the counting says about marketing for coaches](/blog/marketing-for-coaches).
 
 In 38.9% of markets she knows exactly what's wrong and has no idea what fixes it. In another 1.3% she doesn't know there's a problem.
 
@@ -50,7 +50,7 @@ More specific than the niche you'd put on a business card.
 
 79.8% of the 918 sub-markets we mapped want something the broader market above them doesn't cover, and 30.6% sit at a different stage of awareness from the niche they belong to. So "anxiety" and "social anxiety at work" are two different articles for two different people, and a post trying to serve both serves neither.
 
-That's the same reason a homepage trying to cover four things covers none of them, which [the niche and audience post](/blog/2026-09-29-niche-versus-audience) goes into.
+That's the same reason a homepage trying to cover four things covers none of them, which [the niche and audience post](/blog/niche-versus-audience) goes into.
 
 ## Does this actually bring anybody in?
 
@@ -58,7 +58,7 @@ Slowly, and it compounds, and I'm not going to put a number on it because we hav
 
 What we can say is where the effort gets wasted. A post that reaches the right person and sends her to a homepage that fails the five-second read, as 86% do, has spent the traffic and kept nothing. Content is the cheapest way to arrive at a conversion problem at scale.
 
-So [the page it points at](/blog/2026-09-29-what-to-put-on-a-coaching-homepage) comes first.
+So [the page it points at](/blog/what-to-put-on-a-coaching-homepage) comes first.
 
 ## What this can't tell you
 
@@ -67,6 +67,8 @@ We mapped what buyers in 918 markets are driven by and how aware they are. We ha
 So nothing here says how often to post, how long a post should be, or what any of it returns. It says which person is out there to be reached and what she's typing, which is the part a content plan usually skips.
 
 Could your market be different? Yes, and twenty sales conversations will tell you more about your own buyers than any of this. Our data is the starting point for somebody who hasn't had those yet.
+
+If you want to keep reading on this, start with [a life coach marketing plan](/blog/life-coach-marketing-plan) and [social media marketing for coaches](/blog/social-media-marketing-for-coaches).
 
 ## FAQ
 

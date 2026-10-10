@@ -5,7 +5,7 @@ summary: Four things separate a good coaching homepage from a poor one, and the 
 ---
 Most advice about coaching homepages is somebody's opinion about their own homepage.
 
-This isn't. We scored 10,954 live coaching websites out of 10, split them into the ones that did well and the ones that didn't, and looked at [what the two groups actually do differently](/blog/2026-09-29-website-design-for-life-coaches). Four things came out of it. Here they are, in the order they should appear.
+This isn't. We scored 10,954 live coaching websites out of 10, split them into the ones that did well and the ones that didn't, and looked at [what the two groups actually do differently](/blog/website-design-for-life-coaches). Four things came out of it. Here they are, in the order they should appear.
 
 ## Things to know
 
@@ -57,7 +57,7 @@ It goes fourth because it's the one that turns a page you believe into a person 
 
 Have a clear next step, but stop worrying about it. Good sites score 5.90 on that and poor ones score 5.39. Everybody's already got a button.
 
-The same goes for how the site's built. Technical health averages 9 out of 10 across the market and separates good from poor by 1.3 points. It's [the half of the job most coaches spend the money on](/blog/2026-09-29-website-design-for-life-coaches), and it's close to solved already.
+The same goes for how the site's built. Technical health averages 9 out of 10 across the market and separates good from poor by 1.3 points. It's [the half of the job most coaches spend the money on](/blog/website-design-for-life-coaches), and it's close to solved already.
 
 ## Does the order actually matter?
 
@@ -67,7 +67,9 @@ She reads top to bottom and leaves whenever she stops recognising herself. Put t
 
 Is four too few? It's what the data separates on. I'd rather give you four things that showed up in 10,954 sites than twelve that sound sensible.
 
-Does this work for every niche? Mostly, though [health coaches have their own version of the clarity problem](/blog/2026-09-29-health-coach-websites-scored). The order holds either way.
+Does this work for every niche? Mostly, though [health coaches have their own version of the clarity problem](/blog/health-coach-websites-scored). The order holds either way.
+
+If you want to keep reading on this, start with [how the average coaching website scores](/blog/average-coaching-website).
 
 ## FAQ
 

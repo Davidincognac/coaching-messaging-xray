@@ -7,7 +7,7 @@ Somebody will have told you mindset coaching is where the money is.
 
 They're right. And in this article I'm showing you why that's exactly the problem.
 
-We looked at what people are buying on Amazon across [117 coaching markets](/blog/2026-09-29-coaching-niches). Mindset came top with 255 books behind it. So 255 authors got to your buyer before you did, and the woman reading your homepage has probably finished three of them.
+We looked at what people are buying on Amazon across [117 coaching markets](/blog/coaching-niches). Mindset came top with 255 books behind it. So 255 authors got to your buyer before you did, and the woman reading your homepage has probably finished three of them.
 
 That's the awkward bit about asking which coaching niche is the most profitable. The markets with the most money in them are the markets where everything has already been said.
 
@@ -70,7 +70,9 @@ No. Plenty of people buy coaching who'd never buy a book, and a market can be bu
 
 Are the sophistication scores exact? No. They came out of reading what people in each market say and buy, so it's judgement on top of evidence rather than a figure off a chart. Treat a 4 and a 5 as the same warning.
 
-One more thing. We've also [scored 10,954 live coaching homepages out of 10](/blog/2026-09-28-average-coaching-website) and the average came back at 3.7. Not one of those marks was lost over which niche the coach picked.
+One more thing. We've also [scored 10,954 live coaching homepages out of 10](/blog/average-coaching-website) and the average came back at 3.7. Not one of those marks was lost over which niche the coach picked.
+
+If you want to keep reading on this, start with [how to choose a coaching niche](/blog/how-to-choose-a-coaching-niche) and [Christian life coaching niches](/blog/christian-life-coaching-niches).
 
 ## FAQ
 

@@ -13,7 +13,7 @@ One of the two is what your homepage needs. The other one costs you work, and th
 
 An audience is who someone is. A niche is what they want sorting out. Coaches swap those two words constantly, and you can spot it on a homepage: a headline naming a type of person, and nothing anywhere saying what actually gets fixed.
 
-Scan the [117 coaching niches we found](/blog/2026-09-29-coaching-niches) and hardly any of them describe a person. They're nearly all problems or things somebody wants. We didn't choose that, it's what came back when we read what people spend money on.
+Scan the [117 coaching niches we found](/blog/coaching-niches) and hardly any of them describe a person. They're nearly all problems or things somebody wants. We didn't choose that, it's what came back when we read what people spend money on.
 
 ## Things to know
 
@@ -53,7 +53,7 @@ Naming the person, and then naming your method instead of her problem.
 
 "I help women over 40 through my signature five-step framework." There's an audience and there's a process, and nowhere on that line does anybody find out what it's actually for. A page like that can sit on the internet for two years while not one stranger works out what it does.
 
-We scored 10,954 coaching homepages out of 10 and [the average came back at 3.7](/blog/2026-09-28-average-coaching-website). Technical health averaged 9, so hardly any of those marks went on the build. They went on somebody landing and not being able to say what the page was for.
+We scored 10,954 coaching homepages out of 10 and [the average came back at 3.7](/blog/average-coaching-website). Technical health averaged 9, so hardly any of those marks went on the build. They went on somebody landing and not being able to say what the page was for.
 
 ## Am I telling you who to work with?
 
@@ -62,6 +62,8 @@ No. This is only about what the page says. Who you take on is between you and yo
 Is the list of 117 complete? Probably not. We built it from what people buy on Amazon, so it leans towards problems somebody has published a book about. A market can be perfectly real and completely quiet at the same time.
 
 If you want to know which of the two your page is doing at the moment, [run it through the scoring](/website).
+
+If you want to keep reading on this, start with [how to choose a coaching niche](/blog/how-to-choose-a-coaching-niche) and [the most profitable coaching niches](/blog/most-profitable-coaching-niches).
 
 ## FAQ
 

@@ -76,18 +76,18 @@ Getting clients is three separate jobs and coaches usually work on the third one
 
 **One. Be findable on the problem, in her words.** Not your modality, not your certification. The push that made her open a browser. In 38.9% of markets that's a problem she can name and a solution she can't.
 
-**Two. Be understandable in five seconds.** 86% of coaching websites fail this, and it's the single biggest difference between the sites that work and the ones that don't: 9.25 against 2.92 out of 10. More on [why the five-second read decides so much](/blog/2026-09-29-five-second-test).
+**Two. Be understandable in five seconds.** 86% of coaching websites fail this, and it's the single biggest difference between the sites that work and the ones that don't: 9.25 against 2.92 out of 10. More on [why the five-second read decides so much](/blog/five-second-test).
 
 **Three. Be believable before you ask.** Proof, a price or something like one, and a human being on the page. Two thirds of the market skips all three and goes straight to the ask.
 
 The four posts below take one piece of that each.
 
-- [How to get your first coaching client](/blog/2026-09-29-first-coaching-client), when the proof is the thing you haven't got yet.
-- [Getting coaching clients without a website](/blog/2026-09-29-coaching-clients-without-a-website), and what the average coaching site is actually worth.
-- [What an ideal coaching client is](/blog/2026-09-29-ideal-coaching-client), and why the avatar exercise predicts nothing.
-- [Attracting clients instead of chasing them](/blog/2026-09-29-attract-coaching-clients), which turns out to be a measurable thing rather than a mood.
+- [How to get your first coaching client](/blog/first-coaching-client), when the proof is the thing you haven't got yet.
+- [Getting coaching clients without a website](/blog/coaching-clients-without-a-website), and what the average coaching site is actually worth.
+- [What an ideal coaching client is](/blog/ideal-coaching-client), and why the avatar exercise predicts nothing.
+- [Attracting clients instead of chasing them](/blog/attract-coaching-clients), which turns out to be a measurable thing rather than a mood.
 
-If it's the page itself you're worried about, [what 10,954 coaching websites score and where the marks go](/blog/2026-09-29-website-design-for-life-coaches) covers the build.
+If it's the page itself you're worried about, [what 10,954 coaching websites score and where the marks go](/blog/website-design-for-life-coaches) covers the build.
 
 ## What this can't tell you
 
@@ -101,6 +101,8 @@ Is 10,954 enough? The list was 12,294 domains. 1,156 wouldn't load at all, anoth
 
 You can [have your own homepage read the way a stranger reads it](/website) and find out which of the three jobs yours is failing.
 
+If you want to keep reading on this, start with [marketing for coaches](/blog/marketing-for-coaches).
+
 ## FAQ
 
 ### How do coaches get most of their clients?
@@ -113,7 +115,7 @@ Longer than anybody selling you a client-getting course will say. What we can te
 
 ### Do I need a niche to get coaching clients?
 
-You need to be findable on a problem somebody types, and a niche is the usual way of getting there. Being specific separates good coaching sites from poor ones by 5.03 points out of 10, second only to the five-second read. Our [list of 117 coaching niches and what each one's buyers want](/blog/2026-09-29-coaching-niches) has the full set.
+You need to be findable on a problem somebody types, and a niche is the usual way of getting there. Being specific separates good coaching sites from poor ones by 5.03 points out of 10, second only to the five-second read. Our [list of 117 coaching niches and what each one's buyers want](/blog/coaching-niches) has the full set.
 
 ### Why am I not getting any coaching clients from my website?
 
