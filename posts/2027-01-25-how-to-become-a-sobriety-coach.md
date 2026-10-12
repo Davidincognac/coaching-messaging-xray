@@ -81,7 +81,7 @@ That section doesn't put people off. It does the opposite. The people who'd be r
 
 **Dan** doesn't really have a plan for it. When a client drinks again, they feel embarrassed, stop replying to his messages, and he never hears from them again. He tells himself they weren't ready.
 
-**Kerry** expects it, because her clients told her to. "I do fine the first few days, but I always end up slipping up" came up again and again in what people wrote. So on day one she tells every client: if you drink, message me within 24 hours, and we'll work out what happened. No telling off. A slip isn't the end of the programme, it's the best information you'll get all month, because it shows exactly which moment needs more work.
+**Kerry** expects it, because she knows it happens to nearly everyone. "I do fine the first few days, but I always end up slipping up" came up again and again in what people wrote. So on day one she tells every client: if you drink, message me within 24 hours, and we'll work out what happened. No telling off. A slip isn't the end of the programme, it's the best information you'll get all month, because it shows exactly which moment needs more work.
 
 Her clients stay. And the ones who slipped and came back often write the best testimonials, because they're the stories the next nervous person needs to hear.
 
