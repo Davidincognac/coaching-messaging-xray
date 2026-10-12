@@ -1,6 +1,7 @@
 ---
 title: How to become a relationship coach people trust
 date: 2026-12-07
+image: relationship-coach-session.jpg
 summary: Relationship coaching is personal, private and often bought in a crisis. In this article we cover what nobody tells you before you become a relationship coach, and how to win people's trust.
 ---
 Relationship coaching is one of those jobs people come to because they've been through something themselves. A divorce that nearly flattened them. A marriage they fought for and saved. Years of being single while everyone else paired off, and then working out how to be happy anyway. They come out the other side and think, I could help people with this. I think that's a great reason, and it'll make you better at the job than any course will.
@@ -9,7 +10,9 @@ But there are things about relationship coaching that the courses don't really p
 
 So rather than another list of training providers, here are six things I'd want someone to tell me before I became a relationship coach. They come from two pieces of my own research: what people actually buy and write about their relationships, and what 10,954 coaching websites do when they're trying to win clients.
 
-## 1. "Relationship coaching" is at least a dozen different jobs
+![A relationship coach listening to a client in a quiet sitting room](relationship-coach-session.jpg)
+
+## 1. "Relationship coaching" is at least fourteen different jobs
 
 Say "relationship coach" and you'd think it's one thing. It isn't. When we looked at the books people buy about their relationships and what they write about them, we found at least fourteen different reasons people go looking for help. And the person in one of them wants something completely different from the person in the next.
 
