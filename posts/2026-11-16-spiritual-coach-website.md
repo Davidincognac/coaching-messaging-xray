@@ -1,6 +1,7 @@
 ---
 title: Spiritual coach website: say what you do in plain words
 date: 2026-11-16
+image: spiritual-coach-session.jpg
 summary: Spiritual coaching websites are often the hardest to understand. In this article we show you how to say what you do in the words your clients actually use.
 ---
 I want to start by saying I've got a lot of respect for spiritual coaches. You're working with the part of people's lives that's hardest to put into words, and plenty of your clients turn up not even sure what they're looking for. That's a hard job.
@@ -14,6 +15,8 @@ Because your clients often can't name what they need yet. A career coach's clien
 We looked at the books people buy and what they write about them across 117 different reasons people hire a coach. Spirituality and meaning was one of the biggest subjects, with 207 of the 2,004 books we looked at. And it stood out for one reason. Of all the people we looked at, these were among the least likely to know there's even a name for what they need. They don't search for "spiritual coach". They write things like "the world feels chaotic and overwhelming", or that their awakening has left them feeling "peaceful but also lonely, weird, and sad".
 
 So if your website opens with "Awaken to your soul's purpose", you're using the words of someone who's already found the answer, to talk to someone who hasn't found the question yet. They don't recognise themselves in it, so they leave.
+
+![A coach listening to a client talk in a calm, sunny room](spiritual-coach-session.jpg)
 
 ## What does the research say about coaching websites?
 
@@ -66,7 +69,7 @@ The same things any coaching website needs, with a slightly different weight on 
 
 ## Isn't plain language a bit unspiritual?
 
-I'd say the opposite. Meeting someone where they are is about as spiritual as it gets. If the person who needs you can't understand your website, it doesn't matter how beautiful the words are, because they'll never get as far as the first session.
+I'd say the opposite. Meeting someone where they are is about as spiritual as it gets. If the person who needs you can't understand your website, it makes no difference how beautiful the words are, because they'll never get as far as the first session.
 
 And if your work is rooted in a particular faith, [the Christian life coaching post](/blog/christian-life-coaching-niches) goes into how faith fits across the different reasons people come to a coach.
 
