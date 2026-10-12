@@ -1,6 +1,7 @@
 ---
 title: How to become a health coach that people actually pay
 date: 2026-11-30
+image: health-coach-kitchen-table.jpg
 summary: Health coaching is crowded, and the websites in it struggle. In this article we cover what to decide before you start, so you become a health coach people actually pay.
 ---
 Plenty of people come to health coaching because something changed their own life. They sorted out their own gut, lost the weight and kept it off, got through the menopause without losing their mind, or came back from burnout. They want to help other people do the same. I think that's a brilliant reason to do it, and it's also one of the best things you'll have going for you.
@@ -8,6 +9,8 @@ Plenty of people come to health coaching because something changed their own lif
 But I'll be honest with you from the start. Health coaching is one of the busiest areas in the whole of coaching, and the people already in it aren't doing a great job of standing out. When we looked at 10,954 live coaching websites, 622 of them belonged to health, nutrition, wellness or fitness coaches. We checked each homepage for 10 things a stranger needs before they'll get in touch, and not one of those 622 did well enough to count as strong. Not one.
 
 That's not a reason to give up. It's a reason to do it differently from the start. So rather than tell you which course to take, which plenty of other people will do, here are the five questions I'd want answered before I became a health coach.
+
+![A health coach listening to a client at a kitchen table, notebook open](health-coach-kitchen-table.jpg)
 
 ## Is health coaching worth getting into?
 

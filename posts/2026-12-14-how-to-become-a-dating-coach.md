@@ -1,6 +1,7 @@
 ---
 title: How to become a dating coach people actually believe
 date: 2026-12-14
+image: dating-coach-sofa.jpg
 summary: People looking for a dating coach are tired, a bit embarrassed and sick of being sold to. In this article we cover how to become a dating coach they'll trust, and what to put in front of them.
 ---
 Let me start with a made-up person, because she'll explain this better than I can.
@@ -12,6 +13,8 @@ The first one has a bloke in a sharp suit promising to teach her "the psychology
 The third one says, at the top: "Fed up with the apps and starting to wonder if it's you? It isn't." Underneath there's a woman about her age saying she met her partner six months after starting coaching, without going back on the apps. Sam reads the whole page.
 
 That's the whole job of a dating coach's marketing, really. If you want to become a dating coach, you need to be the third website. Here's how.
+
+![A woman on her sofa on a Sunday evening, looking fed up at her phone](dating-coach-sofa.jpg)
 
 ## Who actually hires a dating coach?
 
@@ -84,7 +87,7 @@ Here's the top of a homepage for a made-up dating coach who works with women don
 
 Run through that as Sam. Is it for me? Yes, straight away. Has it worked for someone like me? Yes. What would we actually do? It says. What does it cost? Roughly. What do I do if I'm not ready to talk to anyone? There's a free guide. That's everything she needs to stay on the page.
 
-Two things to notice. It doesn't promise she'll meet someone, because nobody honest can. And it talks about not using the apps, because the people in our research kept saying they wanted to "meet a significant other without going on dating sites". If that's what they want, say you can help with it.
+Two things to notice. It doesn't promise she'll meet someone, because nobody honest can. And it talks about not using the apps, because people in our research said they wanted to "meet a significant other without going on dating sites". If that's what they want, say you can help with it.
 
 ## How should a dating coach price things?
 
