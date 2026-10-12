@@ -118,7 +118,7 @@ The full list is below. Find yours, then keep reading.
 
 **Career and work**
 
-- Career & Purpose (8 subniches)
+- Career & Purpose (8 subniches, and [what a career coach website needs](/blog/career-coach-website))
 - Expat & relocation (8 subniches)
 - Getting promoted (8 subniches)
 - Job search & interviewing (8 subniches)
