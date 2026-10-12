@@ -1,6 +1,7 @@
 ---
 title: Coaching offer: what to say so people want to buy it
 date: 2026-11-02
+image: coaching-offer-four-questions.jpg
 summary: Coaching websites are bad at saying what they actually sell. In this article we show you how to write an offer a stranger understands, with a full before and after example.
 ---
 Try this before you read any further. Open your own homepage, and pretend you've never met yourself. Then answer three questions using only what's on the screen. What does this person sell? What will be different for me afterwards? And what do I actually get if I say yes?
@@ -32,6 +33,8 @@ So if your offer is a bit woolly, you're not alone, but it's also one of the eas
 ## How do you write a coaching offer people understand?
 
 You answer four questions, in this order, in plain words.
+
+![A coach writing out her offer on a big sheet under four headings: who is it for, what changes, what do they get, what next](coaching-offer-four-questions.jpg)
 
 **1. Who is it for?** One type of person, described the way they'd describe themselves. Not "busy professionals". Something like "managers who've been running on empty for months and can't take time off". If you're not sure who that is, [the niche and audience post](/blog/niche-versus-audience) will help.
 
