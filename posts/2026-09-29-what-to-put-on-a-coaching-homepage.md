@@ -33,7 +33,7 @@ Across the whole market, 82.3% show nothing at all. It's the single most-skipped
 
 I understand why. Pricing feels like something to discuss on a call, and you're worried about scaring people off. But the man reading your page is going to guess, and he'll guess badly in whichever direction stops him enquiring.
 
-It doesn't have to be a number. "Most clients work with me for three months, from £X" does it. A range does it. Anything that stops him guessing does it.
+It doesn't have to be a number. "Most clients work with me for three months, from £X" does it. A range does it. Anything that stops him guessing does it. And if you'd rather not show a price at all, [there's a way to make that work too](/blog/coaching-pricing).
 
 ## Three. Proof a stranger could check
 

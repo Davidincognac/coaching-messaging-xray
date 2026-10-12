@@ -53,7 +53,7 @@ That's the biggest single hole in the market, and it's got nothing to do with ho
 
 ## Nobody will tell anybody what it costs
 
-82% of coaching websites don't show a price anywhere.
+82% of coaching websites don't show a price anywhere. [Whether yours should](/blog/coaching-pricing) is a question with two right answers, as long as you've got a plan for the one you pick.
 
 Two thirds show no proof at all. No testimonial, no result, no number, nothing a stranger could check.
 
