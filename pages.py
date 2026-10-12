@@ -280,8 +280,36 @@ _FRONT = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 _DATED = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
 
 
-def _read_posts():
-    """Every .md file in posts/, newest first.
+_BLOG_LINK = re.compile(r"\[([^\]]+)\]\(/blog/([a-z0-9-]+)\)")
+
+
+def _read_posts(today=None):
+    """Every post that is live today, newest first.
+
+    A post dated in the future is written and pushed but not published yet. It stays off
+    the blog page, the sitemap, the feed and "Read next", and its address is a 404, until
+    its date comes round. The site reads posts on every request, so it appears that
+    morning with no deploy.
+
+    Links can be written to posts that are not out yet. Until the post is live, the link
+    is shown as its plain words so nobody lands on a 404. On the day it goes live, every
+    link pointing at it becomes a real link, on every page at once.
+    """
+    today = today or datetime.utcnow().strftime("%Y-%m-%d")
+    every = _read_all_posts()
+    live = [p for p in every if not p["date"] or p["date"] <= today]
+    live_slugs = {p["slug"] for p in live}
+
+    def unlink(m):
+        return m.group(0) if m.group(2) in live_slugs else m.group(1)
+
+    for p in live:
+        p["body"] = _BLOG_LINK.sub(unlink, p["body"])
+    return live
+
+
+def _read_all_posts():
+    """Every .md file in posts/, newest first, including ones dated in the future.
 
     Front matter is optional. Without it the filename becomes the slug and the title is
     the first heading, so a post can be published by saving a file and pushing.
