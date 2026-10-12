@@ -1,6 +1,7 @@
 ---
 title: How to become a fitness coach people stick with
 date: 2027-01-04
+image: fitness-coach-park.jpg
 summary: People who start getting fit tend to give up at the same few points. In this article we cover how to become a fitness coach who's there at exactly those moments, and what to say when they get there.
 ---
 It's the first week of January. The gyms are rammed, the running apps are being downloaded by the million and everyone's bought new trainers. By February, plenty of those people will have stopped. Not because they're lazy, whatever they tell themselves, but because they hit a wall nobody warned them about.
@@ -8,6 +9,8 @@ It's the first week of January. The gyms are rammed, the running apps are being 
 If you want to become a fitness coach, that wall is your business. Anyone can write a training plan. There are thousands of free ones online. What people can't get for free is someone who's there when it gets hard, and who knows what to say when they want to give up.
 
 So this post isn't a list of courses. It's about the moments people go looking for help, what they're thinking when they do, and how to make sure it's you they find.
+
+![A fitness coach chatting with a client as he stretches against a railing in a park on a grey morning](fitness-coach-park.jpg)
 
 ## Personal trainer or fitness coach?
 
