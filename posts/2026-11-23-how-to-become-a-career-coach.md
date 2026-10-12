@@ -1,6 +1,7 @@
 ---
 title: How to become a career coach, and actually get clients
 date: 2026-11-23
+image: career-coach-cv.jpg
 summary: Training teaches you how to coach, but not who to coach or how to find them. In this article we cover the steps to becoming a career coach who actually gets clients.
 ---
 If you search for how to become a career coach, you'll find page after page telling you which course to take. Some of them are good. But a course teaches you how to coach. It doesn't tell you who to coach, what they're actually worried about, or how they'll ever find you. And that's the bit that decides whether you end up with a business or an expensive certificate on the wall.
@@ -8,6 +9,8 @@ If you search for how to become a career coach, you'll find page after page tell
 So this isn't another list of courses. It's the part the courses skip, built from two things I've spent a long time on: what people actually buy and write when they're unhappy at work, and what 10,954 coaching websites do when they're trying to win clients.
 
 I'll take it in the order you'd actually need it.
+
+![A career coach going through a client's CV with him at a desk](career-coach-cv.jpg)
 
 ## Do you need a qualification to become a career coach?
 
