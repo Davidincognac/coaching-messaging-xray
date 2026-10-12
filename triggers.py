@@ -524,7 +524,7 @@ __FOOTER__
 </body></html>"""
 
 
-_HOME_TITLE = "The 6 buying triggers that turn a stranger into a coaching client"
+_HOME_TITLE = "6 buying triggers that turn strangers into coaching clients"
 
 
 def _title(suffix=""):
