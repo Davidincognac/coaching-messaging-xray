@@ -27,7 +27,7 @@ Which matters, because the man in one of them wants nothing like what the woman 
 
 **Faith and reconciling sexuality.** Under LGBTQ and coming out. The conflict here is reconciling a faith and a sexuality without losing God, the community, or themselves. Telling people is the easy half. That's a different job. And a coach who treats it as coming out will lose them.
 
-**Religious and scrupulosity OCD.** Under OCD and intrusive thoughts. They want relief from religious and moral obsessions without losing their faith in the process, which is the fear that keeps them out of ordinary therapy.
+**Religious and [scrupulosity](https://en.wikipedia.org/wiki/Scrupulosity) OCD.** Under OCD and intrusive thoughts. They want relief from religious and moral obsessions without losing their faith in the process, which is the fear that keeps them out of ordinary therapy.
 
 **Faith and recovery.** Under bipolar disorder. Faith is added to a clinical picture rather than replacing it. They want meaning and stability alongside managing the condition.
 
