@@ -32,7 +32,7 @@ This is the part that surprised me. When we looked at how nutrition coaches desc
 - "Heal Your Gut: A 4 Step Plan"
 - "Restore microbiome diversity and target the root causes"
 
-Now put those next to what the person with the stomach problem actually wrote. "My stomach is getting worse every day and I don't know where it's coming from." "This started once I started eating healthier."
+Now put those next to what the person with the stomach problem actually wrote. "My stomach is getting worse every day and I don't know where it's coming from." "This started once I started working out and trying to eat healthier."
 
 Do you see the problem? The coach is talking about resets and restoration and root causes. The person is talking about a sore stomach and being confused about what went wrong. They're not even in the same conversation. And to someone who's already been let down by "healthy" advice, a "Total Gut Restoration" programme sounds like one more promise that might not work.
 
