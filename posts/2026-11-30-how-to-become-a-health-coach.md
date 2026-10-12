@@ -21,9 +21,9 @@ The catch is that a lot of your future clients have tried things already. Diets,
 
 **The crowded ones.** Weight and fitness had 151 books in our research, more than any other health subject. And you can hear how tired people are. They write things like "eating less but can't lose" and "tired of suffering to keep it off". Chronic illness and chronic pain had 63 books, and the people in it are worried this will be one more thing that doesn't believe them. Longevity and healthy ageing had 57.
 
-**The middle ones.** Gut health and nutrition had 50 books, from people writing "my stomach is getting worse every day and I don't know the cause". The menopause had 40, from women dealing with "exhaustion, brain fog, rage" and worried their doctor won't take them seriously. Sleep had 32, from people who are "exhausted all day" and wake up just as tired.
+**The middle ones.** Gut health and nutrition had 50 books, from people writing "my stomach is getting worse every day and I don't know the cause". The menopause had 40, from women dealing with "exhaustion, brain fog, rage" and worried their doctor won't take them seriously.
 
-**The quieter ones.** Men's health had 28 books, from men who feel tired, low and "old" even though their test results came back normal. Life after cancer had 33, from people stuck in the "what happens after chemo" limbo. Caring for ageing parents had 19, from people for whom caring has cost them their marriage, their home or their sense of who they are.
+**The quieter ones.** Life after cancer had 33 books, from people stuck in the "what happens after chemo" limbo. Sleep had 32, from people who are "exhausted all day" and wake up just as tired. Men's health had 28, from men who feel tired, low and "old" even though their test results came back normal. Caring for ageing parents had 19, from people for whom caring has cost them their marriage, their home or their sense of who they are.
 
 A crowded subject means plenty of people want help, but they've heard everything before, so you need a real reason to be picked. A quiet subject means fewer people looking, but less competition and often far less help aimed at them. Neither is better on its own. The question is which group you understand best, and where you've got something to say that they haven't already heard.
 
