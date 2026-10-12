@@ -1,7 +1,7 @@
 ---
 title: Career coach website: what to put on it to get clients
 date: 2026-10-26
-summary: People hire a career coach for at least seven different reasons. What your website needs to say to get clients, the pages you need, and a full example.
+summary: People hire a career coach for at least seven different reasons. In this article we share what your website needs to say to get clients, the pages you need, and a full example.
 ---
 If you're a career coach, you already know how long a recruiter spends on a CV before it goes on the yes pile or the no pile. Seconds. You've probably told clients that a hundred times. Well, your website gets exactly the same treatment. The question is whether you've given it the same advice you give your clients.
 
