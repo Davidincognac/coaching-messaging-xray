@@ -85,4 +85,4 @@ Nobody can answer that from website data, so I won't pretend to. What the data d
 
 ### Do I need to be on every platform?
 
-One you keep up beats four you don't. The line at the top of all of them counts for more than how many there are: the average coaching LinkedIn headline scores 2.56 out of 10, and that line goes wherever you do.
+One you keep up beats four you don't. The line at the top of all of them counts for more than how many there are: the average coaching LinkedIn headline scores 2.56 out of 10, and that line goes wherever you do. [Here's what the data says about social media for coaches](/blog/social-media-marketing-for-coaches).

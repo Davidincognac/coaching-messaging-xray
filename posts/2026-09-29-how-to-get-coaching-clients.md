@@ -66,7 +66,7 @@ We tagged all 918 markets for how aware the buyer is. 1.3% have no idea they've 
 
 A woman who's been signed off work with stress, a man whose business has eaten every weekend since March, a mother whose son stopped answering her calls, a manager promoted past what he knows how to do. Not one of them typed "life coach" into anything.
 
-In 49.9% of the markets we mapped, the drive underneath the purchase is relief from something that hurts. Not growth, not potential. Getting out of what they're in.
+In 49.9% of the markets we mapped, the drive underneath the purchase is relief from something that hurts. Not growth, not potential. Getting out of what they're in, which changes [how you attract them](/blog/attract-coaching-clients).
 
 So a post about your coaching philosophy reaches nobody, because nobody was looking for it. A post about being signed off work with stress reaches the woman who's living it.
 

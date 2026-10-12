@@ -7,7 +7,7 @@ You're good at four things, and your homepage is trying to say all four at once.
 
 Here's how to pick one without giving the other three up.
 
-Plenty of the coaches whose sites I read aren't undecided at all. They know exactly who they help. They just know it about four different groups, so they've written one page trying to serve the lot. Then a woman lands on it, can't work out which of the four you're best at, decides you're a bit of everything, and goes back to Google.
+Plenty of the coaches whose sites I read aren't undecided at all. They know exactly [who they help](/blog/niche-versus-audience). They just know it about four different groups, so they've written one page trying to serve the lot. Then a woman lands on it, can't work out which of the four you're best at, decides you're a bit of everything, and goes back to Google.
 
 Being good at several things is normal. We found [117 main coaching markets](/blog/coaching-niches) and almost 1,000 smaller ones underneath them, by reading what people buy on Amazon. Nobody sensible picks one of those and never thinks about anything else again.
 

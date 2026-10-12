@@ -3,7 +3,7 @@ title: Website design for life coaches, and what actually counts
 date: 2026-09-29
 summary: We scored 10,954 coaching websites. Good ones and bad ones are built to almost the same standard. Four things separate them, and none is design.
 ---
-If you're about to pay somebody to design your coaching website, read this first. It'll save you spending the money on the wrong half of the job.
+If you're about to pay somebody to design your coaching website, read this first. It'll save you spending the money on the wrong half of the job. (Not sure you need a website yet? [Start here instead](/blog/coaching-clients-without-a-website).)
 
 We scored 10,954 live coaching websites out of 10, on ten things a stranger needs from a homepage. In this article I'm showing you which of those ten actually separate a site that works from one that doesn't.
 
@@ -11,7 +11,7 @@ Here's the bit that surprised me. Technical health, which covers whether the sit
 
 Nearly every coaching website is well built. The good ones score 9.91 on it. The poor ones score 8.60.
 
-So a designer can hand you something faster, prettier and better built than what you've got, and it'll score about the same as the site you replaced.
+So a designer can hand you something faster, prettier and better built than what you've got, and it'll score about the same as the site you replaced. Same goes for [spending on a logo and a palette](/blog/branding-coaching-business).
 
 ## Things to know
 

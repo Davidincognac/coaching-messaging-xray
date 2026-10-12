@@ -7,7 +7,7 @@ You've probably filled in an ideal client worksheet. Name her, age her, give her
 
 What actually separates one coaching buyer from another is below, taken from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote down. Get this wrong and none of [the three jobs that turn a stranger into a client](/blog/how-to-get-coaching-clients) can be done, because all three depend on knowing who's reading.
 
-Here's the finding that broke the avatar exercise for me. 90.6% of the 117 main coaching niches contain buyers at more than one stage of awareness. Same subject, same age, same income, completely different conversation.
+Here's the finding that broke the avatar exercise for me. 90.6% of the 117 main coaching niches contain buyers at more than one stage of awareness. Same subject, same age, same income, completely different conversation. The stages idea isn't mine, by the way. It comes from Eugene Schwartz's [Breakthrough Advertising](https://www.breakthroughadvertisingbook.com/), written in 1966.
 
 ## Things to know
 

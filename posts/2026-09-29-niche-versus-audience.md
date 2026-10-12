@@ -27,7 +27,7 @@ An audience answers who. A niche answers what for. At eleven at night, with the 
 
 "Women over 40" is an audience. "Menopause and women's hormones" is a niche. One says you might be for her. The other says you fix the thing she came about.
 
-Same again with "corporate professionals" against "recovery from redundancy". Or "men" against "modern masculinity and men's work".
+Same again with "corporate professionals" against "recovery from redundancy". Or "men" against "modern masculinity and men's work". "Christian life coach" is the same mistake, and [it splits into six different markets](/blog/christian-life-coaching-niches).
 
 Say those pairs out loud and you can hear it. One's a category on a form. The other's somebody's Tuesday.
 

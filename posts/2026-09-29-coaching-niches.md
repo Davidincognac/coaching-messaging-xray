@@ -95,7 +95,7 @@ The full list is below. Find yours, then keep reading.
 - Caregiving for ageing parents (8 subniches)
 - Chronic illness & chronic pain (8 subniches)
 - Gut health & nutrition (8 subniches)
-- Health, Weight & Fitness (8 subniches)
+- Health, Weight & Fitness (8 subniches, and [how health coach websites score](/blog/health-coach-websites-scored))
 - Longevity & healthy ageing (8 subniches)
 - Men's health & vitality (8 subniches)
 - Menopause & women's hormones (8 subniches)
@@ -165,13 +165,13 @@ The full list is below. Find yours, then keep reading.
 - Manifestation / law of attraction (7 subniches)
 - Memory & speed reading (8 subniches)
 - Modern masculinity / men's work (8 subniches)
-- Spirituality & Meaning (8 subniches)
+- Spirituality & Meaning (8 subniches, and [where faith fits across the list](/blog/christian-life-coaching-niches))
 - Women's empowerment (8 subniches)
 - Writing & authorship (8 subniches)
 
 ## A niche isn't an audience
 
-Take "women over 40". It tells me who you want. It doesn't tell me what you'd do for me.
+Take "women over 40". It tells me who you want. It doesn't tell me [what you'd do for me](/blog/niche-versus-audience).
 
 I could be a woman over 40 who wants out of a job she's done for twenty years. I could be one who hasn't slept properly since the menopause started. You've said nothing to either of us, and we both have to guess.
 

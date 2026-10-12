@@ -67,7 +67,7 @@ It names a person and a change, in that order, with the role in there somewhere.
 
 Not a formula to copy. The shape is: who, what changes, and only then what you call yourself. "Executive Coach" names the third thing and stops. The 2.2% that score 8 or more get all three into one line.
 
-The test is the same five seconds we use on a homepage. A stranger reads the line and either recognises herself or scrolls. 70.1% of coaching headlines give her nothing to recognise, which is why posting harder underneath one doesn't move anything.
+The test is the same five seconds we use on a homepage. A stranger reads the line and either recognises herself or scrolls. 70.1% of coaching headlines give her [nothing to recognise](/blog/attract-coaching-clients), which is why posting harder underneath one doesn't move anything.
 
 If you're not sure what to put in the "who" slot, that's [a niche question rather than a social media one](/blog/coaching-niches). And the same sentence has to work on your homepage, where [86% of coaching websites fail the same check](/blog/five-second-test).
 

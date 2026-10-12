@@ -59,7 +59,7 @@ So the certificate is worth having and it won't get you the first client. What g
 
 Somebody who already knows you, almost always.
 
-I'm not going to dress that up. The first client comes from a warm list: people you've worked with, trained with, sat next to. Not because cold marketing can't work, but because warm people skip the proof step entirely. They already have their evidence, which is you.
+I'm not going to dress that up. The first client comes from a warm list: people you've worked with, trained with, sat next to. Not because [cold marketing can't work](/blog/attract-coaching-clients), but because warm people skip the proof step entirely. They already have their evidence, which is you.
 
 The slower job, the one that keeps working after your contacts run out, is [the three things a stranger needs before she books anything](/blog/how-to-get-coaching-clients). And if you're wondering whether you need a site up before any of this, [the answer is more interesting than yes or no](/blog/coaching-clients-without-a-website).
 

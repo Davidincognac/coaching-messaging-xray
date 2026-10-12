@@ -32,7 +32,7 @@ Three different people, and a post can only really serve one.
 
 A post called "how coaching can help you" is written for the fourth row. That's four percent of the market, and they already know who you are.
 
-The 38.9% in row two is the biggest group you can actually reach cold, and she is searching her own symptom. Not the diagnosis. Not the treatment. What it feels like at eleven at night.
+The 38.9% in row two is [the biggest group you can actually reach cold](/blog/ideal-coaching-client), and she is searching her own symptom. Not the diagnosis. Not the treatment. What it feels like at eleven at night.
 
 ## So what do you write instead?
 

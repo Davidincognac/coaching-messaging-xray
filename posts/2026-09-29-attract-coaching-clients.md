@@ -16,7 +16,7 @@ It's the most taught tactic in coaching and it's the one the evidence backs leas
 - Urgency supports the sale in 4.4% of the 918 markets we mapped. Social proof does in 92.9%.
 - 49.9% of markets are driven by relief from something that hurts. Not ambition.
 - Only 14.3% of coaching websites can be understood in five seconds. Recognition can't happen before understanding.
-- 38.9% of buyers can name their problem and can't name the solution. Anything that sounds like selling arrives too early for them.
+- 38.9% of buyers [can name their problem and can't name the solution](/blog/ideal-coaching-client). Anything that sounds like selling arrives too early for them.
 
 ## What's the actual difference between attracting and chasing?
 

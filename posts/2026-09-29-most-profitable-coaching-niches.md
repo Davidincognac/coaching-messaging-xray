@@ -78,7 +78,7 @@ If you want to keep reading on this, start with [how to choose a coaching niche]
 
 ### Which coaching niche makes the most money?
 
-Nobody can tell you that honestly, because coaching income isn't reported anywhere you could count. What can be counted is where buyers already spend, and that's mindset, confidence, spirituality, money and self-compassion, in that order.
+Nobody can tell you that honestly, because coaching income isn't reported anywhere you could count. What can be counted is where buyers already spend, and that's mindset, confidence, [spirituality](/blog/christian-life-coaching-niches), money and self-compassion, in that order.
 
 ### Is a crowded niche a bad idea?
 

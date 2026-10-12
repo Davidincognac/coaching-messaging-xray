@@ -59,9 +59,9 @@ Whatever the front door is, it gets judged on the same three things a stranger j
 
 Get the sentence right before you build anything.
 
-Who you help and what you fix, in words a stranger uses about herself. That sentence goes on a homepage, a bio, a profile, a business card and the top of an email, so writing it isn't wasted whichever route you take. And it's the single biggest difference between coaching sites that work and ones that don't.
+Who you help and what you fix, in words a stranger uses about herself. That sentence goes on a homepage, a bio, a profile, a business card and the top of an email, so writing it isn't wasted whichever route you take. It's also [the part of branding that actually counts](/blog/branding-coaching-business). And it's the single biggest difference between coaching sites that work and ones that don't.
 
-Then pick the front door you'll actually keep up. A neglected website and a neglected Instagram are worth about the same.
+Then pick the front door you'll actually keep up. A neglected website and [a neglected Instagram](/blog/social-media-marketing-for-coaches) are worth about the same.
 
 If you do build one, [what to put on a coaching homepage and in what order](/blog/what-to-put-on-a-coaching-homepage) is the short version. If the first client is the problem rather than the platform, [start with the proof question instead](/blog/first-coaching-client). And [the three jobs behind all of this](/blog/how-to-get-coaching-clients) sit in the pillar.
 
