@@ -1,7 +1,7 @@
 ---
-title: Career coach website: what to put on it, and in what order
+title: Career coach website: what to put on it to get clients
 date: 2026-10-26
-summary: Career coaching is at least seven different markets. What a career coach website needs to say, in what order, from 10,954 coaching sites we looked at.
+summary: Career coaching is at least seven markets. What your website needs to say to get clients, the pages you need, and a homepage written out in full.
 ---
 If you're a career coach, you already know how long a recruiter spends on a CV before it goes on the yes pile or the no pile. Seconds. You've probably told clients that a hundred times. Well, your website gets exactly the same treatment. The question is whether you've given it the same advice you give your clients.
 
@@ -57,6 +57,39 @@ Give them one. 94.3% of the coaching sites we looked at ask a stranger to book s
 
 So have the booking button for the ready ones, and something useful they can take away with just an email address for everyone else. For a career coach that could be a checklist for the week after redundancy, or the five questions to answer before you decide to leave. Then you can stay in touch until they're ready.
 
+## What does that look like on a real page?
+
+Here's a homepage written out top to bottom for one of the seven: the manager who keeps getting passed over. The names, prices and quotes are made up to show you the shape. Yours have to be real.
+
+**The headline:** For managers who keep getting passed over for promotion.
+
+**The line under it:** You do the work, you hit the numbers, and the job still goes to someone else. I help you get seen by the people who decide, so the next one is yours.
+
+**The first button:** Book a 20-minute call.
+
+**The proof:** "I'd been passed over twice in three years. Four months after we started working together I got the promotion." *Sarah, Operations Manager.* Then two or three more like it, each with a name and a job title.
+
+**The price:** Six sessions over three months, from £X. Every programme is built around where you are now, so I'll give you an exact price once we've talked.
+
+**The story:** I spent twelve years on the other side of the table, deciding who got promoted. I know what the people making that call notice, and I know what gets missed. That's what we work on.
+
+**Two ways forward:** Book a call if you're ready to go for the next promotion. If you're not there yet, get my free checklist, *"Why you got passed over: the 7 things decision-makers look for"*, and I'll send it straight over.
+
+That's it. Someone who's been passed over reads that headline and knows within five seconds the page is for them. Everything under it answers the next question they'd ask, in the order they'd ask it: can you do it, what does it cost, who are you, and what do I do now.
+
+## What other pages does a career coach website need?
+
+Fewer than you think. For me, four does the job:
+
+- **The homepage**, built like the example above. It does the heavy lifting.
+- **An about page** with the longer version of your story. Keep it about why you understand the reader, not a list of every course you've been on.
+- **A page for how you work and what it costs.** The sessions, the length, what's included, the price or what the price depends on, and who it isn't for.
+- **A way to book or get in touch**, on every page, not just one.
+
+If you work with two or three of the seven groups, give each one its own page that talks to them in their words, the same way the homepage talks to your main group. That's far better than one services page trying to cover everyone.
+
+A blog is a bonus, not a must. If you write one, write it for the people you've picked, about the problems they've told you about.
+
 ## Does a career coach website need to look amazing?
 
 No. Nearly every coaching website is well built already. They load, they work on a phone and they're secure. Paying a designer to make yours prettier won't fix a headline that doesn't say who it's for. [Website design for life coaches](/blog/website-design-for-life-coaches) goes into why the look is the half that's already done.
@@ -65,7 +98,11 @@ No. Nearly every coaching website is well built already. They load, they work on
 
 ### What should a career coach put on their homepage?
 
-Who they help and what they fix in the headline, then proof a stranger could check, then a price or a starting price, then their own story, and finally a next step for people who are ready and one for people who aren't.
+Who they help and what they fix in the headline, then proof a stranger could check, then a price or a starting price, then their own story, and finally a next step for people who are ready and one for people who aren't. There's a full example further up this page.
+
+### How many pages does a career coach website need?
+
+Four is enough to start: a homepage, an about page, a page for how you work and what it costs, and a way to book on every page. Add a page for each extra group you work with.
 
 ### Should a career coach niche down?
 
