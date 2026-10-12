@@ -1,9 +1,12 @@
 ---
 title: Business coach website: what owners check before they call
 date: 2026-11-09
+image: business-coach-website-owner.jpg
 summary: Business owners check a coach very carefully. In this article we show you what they look for on your website before they call, with a full example homepage.
 ---
 Business owners are some of the most suspicious buyers a coach will ever have. And I don't blame them. Every one of them has been sold something that didn't work, whether it was an agency, a course, a piece of software, or a consultant who turned out to know less than they did. So when they land on a business coach's website, they're not browsing. They're checking.
+
+![A joinery business owner in his workshop, reading a business coach's website on his laptop](business-coach-website-owner.jpg)
 
 I'll be straight with you about where I'm coming from on this. I've been approached by plenty of people who want to be business coaches. I always ask them the same thing: what businesses have you owned, and what success have you had? Quite often the answer is none and none yet, but they'd like to be a business coach. Now if we're talking purely about coaching, where your skill is asking the right questions and the client finds their own answers, then sure, that can work. But business owners don't usually see it that way. They want to know you've been where they are.
 
