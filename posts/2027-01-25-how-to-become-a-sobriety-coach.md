@@ -25,9 +25,9 @@ The same goes for drugs. A coach isn't a detox service or a rehab. You're there 
 
 **Kerry** helps women in their 40s who drink a bottle of wine nearly every night, don't think of themselves as alcoholics, and want to stop before it gets worse.
 
-Kerry's choice comes straight out of the research. When we looked at the books people buy about addiction and recovery and what they write about it, we found 40 books, and they split into very different groups. Alcohol addiction and sobriety had 12. Smoking had 9. Grey-area drinking had 6, from people who want to cut down or stop without calling themselves an alcoholic. Drug addiction had 5. Gambling, porn, food and sugar each had a few more.
+Kerry's choice comes straight out of the research. When we looked at the books people buy about addiction and recovery and what they write about it, we found 40 books, and they split into very different groups. Alcohol addiction and sobriety had 12. Smoking had 9. Grey-area drinking had 6, from people who want to cut down or stop without calling themselves an alcoholic. Drug addiction had 5. The rest were spread across gambling, porn, food, and families of people with an addiction.
 
-Those groups want completely different things. Someone who nearly went to prison because of their drinking and someone who's worried about their nightly glass of wine aren't going to recognise themselves in the same website. Dan's "anyone" means nobody reads his page and thinks, that's me. Kerry picked the group she came from, and every one of them who lands on her page does.
+Those groups want completely different things. Someone who nearly went to prison because of their drinking and someone who's worried about their nightly glass of wine aren't going to recognise themselves in the same website. Dan's "anyone" means nobody reads his page and thinks, that's me. Kerry picked the group she came from, and every one of them who finds her page does.
 
 ## Decision 2: the words on the front page
 
