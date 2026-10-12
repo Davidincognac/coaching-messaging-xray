@@ -151,7 +151,7 @@ The full list is below. Find yours, then keep reading.
 - Personal branding (7 subniches)
 - Project management & Agile (8 subniches)
 - Sales (8 subniches)
-- Small business & solopreneurs (8 subniches)
+- Small business & solopreneurs (8 subniches, and [what a business coach website needs](/blog/business-coach-website))
 - Social media & content creation (8 subniches)
 - Startup founders / entrepreneurship (8 subniches)
 
