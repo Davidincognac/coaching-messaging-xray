@@ -1,7 +1,7 @@
 ---
 title: Career coach website: what to put on it to get clients
 date: 2026-10-26
-summary: Career coaching is at least seven markets. What your website needs to say to get clients, the pages you need, and a homepage written out in full.
+summary: People hire a career coach for at least seven different reasons. What your website needs to say to get clients, the pages you need, and a full example.
 ---
 If you're a career coach, you already know how long a recruiter spends on a CV before it goes on the yes pile or the no pile. Seconds. You've probably told clients that a hundred times. Well, your website gets exactly the same treatment. The question is whether you've given it the same advice you give your clients.
 
@@ -11,7 +11,7 @@ We looked at 10,954 live coaching websites and checked each homepage for 10 thin
 
 ## Who is actually looking for a career coach?
 
-Not one person. "Career coaching" sounds like one market, but when we mapped what people buy and what they write about their working lives, it splits into at least seven, and they want very different things. In their own words:
+Not one type of person. People come to a career coach for very different reasons. We looked at the books people buy about their working lives and what they write about them, and found at least seven different reasons, each wanting something different from a coach. Here they are, in the buyers' own words:
 
 - **The one who's stuck.** "Stuck in a career rut, becoming more miserable by the day." They've done the personality tests and read the books, and they still can't decide.
 - **The one who got passed over.** "Passed over for a promotion that went to a less qualified person. I am livid!" They don't want a new career, they want what they've earned.
@@ -106,7 +106,7 @@ Four is enough to start: a homepage, an about page, a page for how you work and 
 
 ### Should a career coach niche down?
 
-You don't have to turn people away, but your homepage has to lead with one group. "Career coaching" covers at least seven different buyers, from someone made redundant to someone who keeps getting passed over. Pick the one you're best with and talk to them first.
+You don't have to turn people away, but your homepage has to lead with one group. People come to a career coach for at least seven different reasons, from being made redundant to being passed over for promotion. Pick the one you're best with and talk to them first.
 
 ### Can I check my own career coach website?
 
