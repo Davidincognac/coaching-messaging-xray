@@ -2,7 +2,7 @@
 title: Relationship coach website: fixing one, section by section
 date: 2027-02-01
 image: relationship-coach-website-laptop.jpg
-summary: Relationship coaching websites tend to make the same mistakes, and a few of them are special to relationships. In this article we fix one made-up relationship coach website from top to bottom.
+summary: Relationship coaching websites make the same mistakes as other coaching websites, plus a few mistakes only relationship coaches make. In this article we fix one made-up relationship coach website from top to bottom.
 ---
 I look at a lot of coaching websites. And relationship coaching websites tend to look the same as each other. A couple laughing on a beach. A headline about love. A grid of four services. A contact form that wants to know everything about you before you've even said hello.
 
