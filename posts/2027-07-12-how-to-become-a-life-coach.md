@@ -1,9 +1,12 @@
 ---
 title: How to become a life coach: six yes or no questions
 date: 2027-07-12
+image: how-to-become-a-life-coach.jpg
 summary: You want to become a life coach but don't know where to start, and every course seller says step one is buying theirs. In this article we give you six yes or no questions that show your next step.
 ---
 There's no licence or exam you have to pass to call yourself a life coach in the UK or the US, because coaching isn't regulated in either. What you do need is a group of people and a problem you can help them with, real training with plenty of practice, insurance and the basic admin sorted, a clear idea of where coaching stops and therapy starts, and then your first paying clients. The order you do those things in depends on you, your money and who you already know, and that's why a single checklist doesn't work for everyone.
+
+![A woman on a park bench in autumn with a notebook, thinking](how-to-become-a-life-coach.jpg)
 
 So instead of one list for everyone, I've put six yes or no questions below. Answer each one honestly and it tells you what to do next: carry on, pick a group first, train first, or learn the limits of coaching first.
 

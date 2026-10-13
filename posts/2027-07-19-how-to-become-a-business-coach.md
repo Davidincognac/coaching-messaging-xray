@@ -1,9 +1,12 @@
 ---
 title: How to become a business coach: five ways in
 date: 2027-07-19
+image: how-to-become-a-business-coach.jpg
 summary: Plenty of business owners will want to know if you've run a business, and a vague answer loses them. In this article we look at five routes into business coaching and how to make each one work.
 ---
 To become a business coach, you work out which background you're coming from, you pick the kind of owner that background really fits, you're straight about the experience you haven't got, and then you go and talk to those owners. You don't need a licence, because coaching isn't regulated in the UK or the US, and a coaching course is optional. What you can't skip is a good answer to "have you ever run a business?". Plenty of owners will ask it, and the ones who don't are usually thinking it. How you answer depends on where you're coming from, and there are five common starting points.
+
+![A business coach at a whiteboard with two business partners listening](how-to-become-a-business-coach.jpg)
 
 ## Why owners care where you've come from
 
