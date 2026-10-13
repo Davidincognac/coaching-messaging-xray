@@ -1,9 +1,12 @@
 ---
 title: How to get coaching testimonials people believe
 date: 2027-03-29
+image: coaching-testimonials-phone.jpg
 summary: Plenty of coaching websites show no testimonials at all, or only vague ones nobody believes. In this article we give you the exact messages and questions to get specific ones.
 ---
 If you want coaching testimonials that actually help you get clients, ask at the right moment, send a short message with five specific questions, then shape the answer into a few plain sentences that say what was wrong before and what changed after. Below are the words to use at each step, ready to copy.
+
+![A coach on the phone with a client, smiling and writing in a notebook](coaching-testimonials-phone.jpg)
 
 Here's what usually happens. A coach finishes with a client who's really pleased, thinks "I must ask them for a testimonial", and then doesn't, because it feels awkward. Or they do ask, and they get back "Hayley is amazing, highly recommend!" which is lovely to read and does nothing on a website.
 
