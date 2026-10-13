@@ -1,6 +1,7 @@
 ---
 title: How to become a sobriety coach people trust with day one
 date: 2027-01-25
+image: sobriety-coach-beach-walk.jpg
 summary: Two sobriety coaches with the same story and the same training can end up with very different businesses. In this article we cover how to become a sobriety coach, by comparing what each one does.
 ---
 Nearly every sobriety coach I've come across is sober themselves. They had their rock bottom, or their slow realisation that the wine every night had got out of hand, and they came through it. Then they looked back and thought, I know exactly how hard that first month is, and I could help someone through it.
@@ -10,6 +11,8 @@ That lived experience is the best thing you've got. But it's not enough on its o
 Below are two made-up sobriety coaches, Dan and Kerry. They're both four years sober. They did the same coaching course in the same month. They're both kind, both good listeners, and both completely serious about helping people. A year after starting, Dan has two clients and is thinking about giving up. Kerry has a waiting list.
 
 The difference isn't talent or luck. It's a handful of decisions, and you can make the same ones Kerry did.
+
+![Two men walking and talking on a coastal path next to a beach](sobriety-coach-beach-walk.jpg)
 
 ## Before anything else: the one thing you must know
 
