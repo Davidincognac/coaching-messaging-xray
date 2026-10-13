@@ -1,14 +1,14 @@
 ---
 title: Dating coach website: the same homepage, written three ways
 date: 2027-02-22
-image: dating-coach-cafe.jpg
+image: dating-coach-cafe-man.jpg
 summary: Small changes in wording can turn a dating coach website from one people close into one they read to the end. In this article we write the same dating coach homepage three times, and show what changes each time.
 ---
 I could give you a list of rules for a dating coach website. Say who you help. Show proof. Put a price on it. You've probably read lists like that before, and they're right, but they're hard to picture.
 
 So I'm going to do something different. I'm going to write the same homepage three times, for the same made-up dating coach. The first version is the kind you'll find all over the internet. The second is better. The third is the one I'd actually put live. After each one, I'll say what's wrong with it, or what's working, so you can see exactly what changed.
 
-![A woman in a café with a coffee, smiling and talking to someone off camera](dating-coach-cafe.jpg)
+![A man in his 40s at a café table with a coffee, talking to someone across the table](dating-coach-cafe-man.jpg)
 
 ## Meet the coach
 

@@ -1,6 +1,7 @@
 ---
 title: Career coach website: what to put on it to get clients
 date: 2026-10-26
+image: career-coach-website-evening.jpg
 summary: People hire a career coach for at least seven different reasons. In this article we share what your website needs to say to get clients, the pages you need, and a full example.
 ---
 If you're a career coach, you already know how long a recruiter spends on a CV before it goes on the yes pile or the no pile. Seconds. You've probably told clients that a hundred times. Well, your website gets exactly the same treatment. The question is whether you've given it the same advice you give your clients.
@@ -8,6 +9,8 @@ If you're a career coach, you already know how long a recruiter spends on a CV b
 I'm not having a go. Writing about yourself is hard, and it's harder when you can help with a lot of things. But the person landing on your site is doing what a recruiter does. They're scanning for one thing, and if they don't find it fast, they're off.
 
 We looked at 10,954 live coaching websites and checked each homepage for 10 things a stranger needs before they'll get in touch. Things like whether you can tell who it's for, whether there's any proof, and whether there's a price. Only 14.3% of them could be understood by a stranger within five seconds. So the bar is low, which is good news if you're willing to clear it.
+
+![A woman at her kitchen table in the evening, reading her CV with a laptop open](career-coach-website-evening.jpg)
 
 ## Who is actually looking for a career coach?
 

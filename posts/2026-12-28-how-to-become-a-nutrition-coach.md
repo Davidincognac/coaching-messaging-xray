@@ -1,6 +1,7 @@
 ---
 title: How to become a nutrition coach when everyone is an expert
 date: 2026-12-28
+image: nutrition-coach-food-label.jpg
 summary: Your future clients have heard every bit of food advice going, and some of it made things worse. In this article we cover how to become a nutrition coach they actually believe.
 ---
 Everybody's a nutrition expert. The bloke at the gym who swears by chicken and rice. Your auntie who's been on every diet since 1985. The influencer with the perfect kitchen and the discount code. The back of the cereal box. The person you're hoping to coach has heard from every one of them, and plenty of them have contradicted each other.
@@ -8,6 +9,8 @@ Everybody's a nutrition expert. The bloke at the gym who swears by chicken and r
 So if you want to become a nutrition coach, the hard part isn't knowing about food. You probably know plenty already, or you'll learn it on your course. The hard part is getting someone to believe you, when they've been told so many different things that they've stopped believing anyone.
 
 That's what this post is about. Not which qualification to get, but how to be the one person in all that noise that they actually trust. And with January round the corner, when half the country decides to sort their eating out, it's worth thinking about now.
+
+![A man in his kitchen reading the label on a food packet, looking unsure, with the fridge open behind him](nutrition-coach-food-label.jpg)
 
 ## Two people, two very different problems
 
