@@ -51,7 +51,7 @@ An owner who's terrible at sales will get more from someone who properly knows s
 
 The danger is that you end up thinking your subject is the answer to everything. The sales specialist thinks every business needs more sales calls, when sometimes the owner's real problem is that they're losing money on every job. If you're from finance, coaching an owner to understand their numbers is fine, but tax and accounts advice belongs with a qualified accountant, so check the rules where you live.
 
-Lead with the thing you know. Selling is the part of business I know best. I've sold double glazing, cars, event tickets, book publishing and retreats. If you're a specialist too, call yourself something an owner would understand, like a sales coach for small business owners, rather than a general business coach. An owner will understand "I help owners who hate selling" far faster than "all areas of growth". [How to sell coaching without feeling pushy](/blog/how-to-sell-coaching) shows what selling coaching involves.
+Lead with the thing you know. I've sold double glazing, cars, event tickets, book publishing and retreats, so if I were going down this route, selling is what I'd lead with. If you're a specialist, call yourself something an owner would understand, like a sales coach for small business owners, rather than a general business coach. An owner will understand "I help owners who hate selling" far faster than "all areas of growth". [How to sell coaching without feeling pushy](/blog/how-to-sell-coaching) shows what selling coaching involves.
 
 For your first clients, think about the owners who were your customers or suppliers when you were doing the job. They've already seen you do your one thing well.
 
