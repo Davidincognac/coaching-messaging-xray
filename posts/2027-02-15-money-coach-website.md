@@ -1,6 +1,7 @@
 ---
 title: Money coach website: answer what they won't ask out loud
 date: 2027-02-15
+image: money-coach-sofa-bills.jpg
 summary: People looking at a money coach's website have questions they'd never say out loud. In this article we go through each one, and show what to put on your money coach website to answer it.
 ---
 Somebody on a money coach's website is in an odd position. They've got a problem with money, and you're asking them to spend money to fix it. They're embarrassed, because money problems feel like a personal failure in a way other problems often don't. And there's a good chance the person they share a bank account with doesn't know they're looking.
@@ -8,6 +9,8 @@ Somebody on a money coach's website is in an odd position. They've got a problem
 So they don't ask you anything. They read your website, in silence, with a list of questions running through their head that they'd never say out loud. If the page answers them, they get in touch. If it doesn't, they close it and carry on worrying.
 
 Here are the seven questions I think are going through their head, in roughly the order they'd think them, and what to put on your money coach website to answer each one. I'll use "money coach" here, but the same goes if you call yourself a financial coach.
+
+![A man on his sofa in the evening with a laptop and a pile of bills, looking worried](money-coach-sofa-bills.jpg)
 
 ## Question 1: "Is this for someone in my mess?"
 

@@ -1,6 +1,7 @@
 ---
 title: Fitness coach website: what people see on their phone
 date: 2027-02-08
+image: fitness-coach-phone-gym.jpg
 summary: Plenty of people will only ever see a fitness coach's website on their phone, usually after tapping a link in an Instagram bio. In this article we go through a fitness coach website one phone screen at a time.
 ---
 Here's how people find a fitness coach. They're on Instagram on the bus, or lying on the sofa after a day of telling themselves they'll start on Monday. They see a post that makes sense to them, tap your name, tap the link in your bio, and your website opens. On their phone. With their thumb.
@@ -8,6 +9,8 @@ Here's how people find a fitness coach. They're on Instagram on the bus, or lyin
 They're not sitting at a desk with a cup of tea, reading your website the way you built it on your laptop. They're going to give it a few seconds, a couple of flicks of the thumb, and then decide.
 
 So in this post I'm going to look at a fitness coach website the way it's actually seen. One phone screen at a time, from the top. If you've built yours on a laptop and never really looked at it on a phone, this is the post for you.
+
+![A woman sitting on a gym bench looking at her phone](fitness-coach-phone-gym.jpg)
 
 ## Before the first screen: where they came from
 
@@ -62,7 +65,7 @@ Short numbered steps work brilliantly on a phone. They're easy to read with your
 
 Third screen, and now they're thinking: has this actually worked for someone like me?
 
-Two thirds of the coaching websites we looked at showed no proof at all. Fitness coaches do better here, because everyone in fitness knows about before-and-after photos. But on a phone, a grid of tiny before-and-after photos is hard to see, and people have seen thousands of them anyway.
+Two thirds of the coaching websites we looked at showed no proof at all. Plenty of fitness coaches lean on before-and-after photos to fill that hole. But on a phone, a grid of tiny before-and-after photos is hard to see, and people have seen thousands of them anyway.
 
 What reads well on a phone is a short quote, in big enough text, with a first name and an age:
 

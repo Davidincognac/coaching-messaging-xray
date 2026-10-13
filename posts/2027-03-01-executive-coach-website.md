@@ -1,6 +1,7 @@
 ---
 title: Executive coach website: two people read it on the same day
 date: 2027-03-01
+image: executive-coach-meeting-room.jpg
 summary: An executive coach's website usually gets read by two different people, the leader and whoever's paying. In this article we follow both through one day, and show what each one needs to see.
 ---
 Here's something a lot of executive coaches don't think about. Your website usually has two completely different readers, and they want different things.
@@ -8,6 +9,8 @@ Here's something a lot of executive coaches don't think about. Your website usua
 One is the leader who'd actually be coached. The other is the person who'd sign it off and pay for it, often someone in HR or learning and development, sometimes a CEO or a board. If your website only talks to one of them, the other one crosses you off the list without telling you.
 
 So rather than give you a checklist, I'm going to follow both of them through one ordinary Tuesday. Both people and the company are made up, but you'll recognise the day. Watch what each one looks for, and when they give up.
+
+![An executive coach and a senior leader talking in a glass-walled meeting room](executive-coach-meeting-room.jpg)
 
 ## 7:40am, in the back of a taxi
 
@@ -46,11 +49,11 @@ She looks for three things:
 
 **What do other leaders say?** She finds two testimonials. One is from a "Finance Director, FTSE 250 company", the other from a "Founder and CEO, healthcare technology". No full names, which she understands, because she wouldn't want her name on there either. But they're specific about what changed, so she believes them.
 
-She sends the link to her HR director with one line: "This one looks right. Can we do this?"
+She sends the link to Mark, who runs learning and development, with one line: "This one looks right. Can we do this?"
 
 ## 2:30pm, a different desk, with a different job
 
-**Mark** is Head of Learning and Development at the same company. He's got Priya's email, and two other coaches the CEO suggested. He's got to recommend one, and he'll need to justify the cost to the finance director.
+**Mark** is Head of Learning and Development. He's got Priya's email, and two other coaches the CEO suggested. He's got to recommend one, and he'll need to justify the cost to the finance director.
 
 Mark reads the same website completely differently. He's not looking for empathy. He's looking for reasons it's a safe decision.
 

@@ -1,11 +1,14 @@
 ---
 title: Dating coach website: the same homepage, written three ways
 date: 2027-02-22
+image: dating-coach-cafe.jpg
 summary: Small changes in wording can turn a dating coach website from one people close into one they read to the end. In this article we write the same dating coach homepage three times, and show what changes each time.
 ---
 I could give you a list of rules for a dating coach website. Say who you help. Show proof. Put a price on it. You've probably read lists like that before, and they're right, but they're hard to picture.
 
 So I'm going to do something different. I'm going to write the same homepage three times, for the same made-up dating coach. The first version is the kind you'll find all over the internet. The second is better. The third is the one I'd actually put live. After each one, I'll say what's wrong with it, or what's working, so you can see exactly what changed.
+
+![A woman in a café with a coffee, smiling and talking to someone off camera](dating-coach-cafe.jpg)
 
 ## Meet the coach
 
@@ -31,7 +34,7 @@ That embarrassment is the thing Rob's website has to get past. Let's see how eac
 
 Pretty much everything, if I'm honest, but let's be specific.
 
-**The headline says nothing.** "Unlock your dating potential" could be a dating app, a book or a hair product. We looked at 10,954 coaching websites, and only 14.3% could be understood by a stranger within five seconds. This isn't one of them.
+**The headline says nothing.** "Unlock your dating potential" could be a dating app, a book or a hair product. A stranger would have no idea what Rob does within five seconds, or fifty.
 
 **"High-value" puts off the very people Rob wants.** It's language from the pick-up world. A nervous man who's embarrassed to be looking at a dating coach reads "high-value" and thinks either "that's not me" or "I don't want to be that guy". Either way, he leaves.
 
@@ -39,7 +42,7 @@ Pretty much everything, if I'm honest, but let's be specific.
 
 **Four services and no explanation.** Which one is for him? What's a "VIP Intensive"? He's not going to click four links to find out.
 
-**No proof, no price, and the only option is a call.** Two thirds of coaching websites show no proof at all, and 82.3% don't show a price. Version 1 does neither. And "Book a Discovery Call" asks a nervous man to talk to a stranger about the thing that embarrasses him more than anything, with nothing in between.
+**No proof, no price, and the only option is a call.** And "Book a Discovery Call" asks a nervous man to talk to a stranger about the thing that embarrasses him more than anything, with nothing in between.
 
 ## Version 2: better, but not there yet
 
@@ -99,7 +102,7 @@ Plenty. The headline says who it's for and roughly what it's about. "Do you get 
 
 **There's a price.** He knows what he's getting into. No guessing, no "investment on request".
 
-**There are two ways in.** The man who's ready can book a chat. The man who's embarrassed and not ready to talk can download a guide on his own, at midnight, without anyone knowing. That second button is the one I see missing on dating coach websites more than anything else, and it's the one embarrassed people need.
+**There are two ways in.** The man who's ready can book a chat. The man who's embarrassed and not ready to talk can download a guide on his own, at midnight, without anyone knowing. That second button is often missing on dating coach websites, and it's the one embarrassed people need.
 
 ## The rest of the website
 
