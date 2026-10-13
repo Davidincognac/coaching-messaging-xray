@@ -8,6 +8,8 @@ To start a coaching business, you decide who you help and what with, you put tog
 
 ![A woman at her kitchen table late at night, planning in a notebook with a laptop open](how-to-start-a-coaching-business.jpg)
 
+Before the plan, one thing I wish I'd done myself. When I started out on my own, I thought my experience and my degree were enough. They weren't, because I didn't have anyone asking me the right questions. I should have put some help on a credit card. In my opinion it would have saved me a year. So if you can find someone who's done it, and who'll ask you awkward questions, it's often worth paying for.
+
 Here's how I'd spend those 90 days if I were starting from nothing.
 
 ## Why people start in the wrong place
@@ -63,7 +65,7 @@ Go back to your list from week one. Pick the people who either have the problem 
 
 It's just telling people what you're doing and asking if they know anyone. When someone's interested, have a proper conversation. Ask what's going on for them, listen, and if you can help, tell them what you offer and what it costs.
 
-When I sold book publishing, masterminds and retreats in the coaching world, I spoke directly to the majority of the people who bought. In my opinion, sales like that start with a conversation, not a nice-looking brochure, and your coaching is no different.
+When I sold book publishing, masterminds and retreats in the coaching world, I spoke directly to the majority of the people who bought. These days, my best clients still come from taking people offline and having a proper conversation, often before there's any talk of a discovery call. Let people get to know you first. You don't want them feeling like they've been put into a process.
 
 Why people you know? Because strangers need proof before they'll trust you, and you haven't got any yet. Our research found that proof from other people helps the buying decision for more than 9 in 10 of the types of coaching buyer we mapped. People who already know you don't need that proof, because they've seen what you're like for years. [Getting your first coaching client](/blog/first-coaching-client) goes into this in more detail.
 

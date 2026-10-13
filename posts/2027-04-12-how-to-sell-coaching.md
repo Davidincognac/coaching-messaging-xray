@@ -20,6 +20,10 @@ Double glazing has a bad name for pushy selling, and some of that is earned.
 
 The thing double glazing really teaches you is that the customer decides. You can do everything right and they still might not want new windows this year. It's their house and their money. Once you really accept that it's their choice, the pushy feeling goes, because you're not trying to win anything. You're just helping them make a good decision, and "no" is one of the good decisions.
 
+The other thing double glazing taught me is that people buy the same thing for completely different reasons. With windows there are four: maintenance, warmth, security, and making the house look nice. Two neighbours can buy identical windows, one because the old frames are rotting and the other because they're scared of being burgled. If you go on about how warm the house will be to the person who's worried about burglars, you've lost them. So my job was to find out which of the four was top of the list for the person in front of me, and talk about that.
+
+Coaching works the same way. Two people can want the same confidence coaching for completely different reasons. One wants to speak up at work, and the other wants to stop feeling like a fraud at the school gate. Find out which it is before you say a word about your programme.
+
 That changes how you start a sales conversation. If the decision is theirs, your job is to help them see their own situation clearly, and the way you do that is by asking, not telling. It's easy to jump on a call and start explaining your programme in the first five minutes. Don't. Start with three questions:
 
 - "What made you want to talk now, rather than six months ago?"
@@ -89,6 +93,8 @@ In my opinion, people are more likely to get back to you when you make it easy f
 Selling book publishing, masterminds and international retreats is a different thing from selling windows. People are spending real money, often on something abroad, with a group of strangers. In my opinion, they want to know two things before anything else. Has this worked for people like me? And does the person running it know what they're doing?
 
 That's why, in my opinion, proof does more than promises. A short, specific story from a past client does more than any clever line you could write. If you haven't got good testimonials yet, [how to get coaching testimonials people believe](/blog/coaching-testimonials) shows you exactly how to ask for them. And make sure what you're selling is clear before you sell it. If you can't explain your offer in a couple of plain sentences, the sales call will feel pushy because you'll be making it up as you go. [How to put together a coaching offer](/blog/coaching-offer) helps with that.
+
+Saying no isn't only about who you let in. It's also about protecting the people who are already there. On one of the masterminds I ran, there was a woman who tried to take over. She'd talk about her own problems in depth, go off the subject, and run everybody else out of time. I had several private chats with her about respecting the group's time. A mastermind isn't talk therapy, and everyone else had paid for their share of the room too. If you run groups, you'll meet someone like her sooner or later, and the rest of the group is watching to see whether you deal with it.
 
 With something as expensive as a mastermind or a retreat abroad, you need to know when to say no. When you're selling something this big, the worst thing you can do is talk the wrong person into it. They'll be unhappy, and they'll tell people.
 

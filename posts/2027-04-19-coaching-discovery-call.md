@@ -48,6 +48,8 @@ She writes down the exact words Martin uses. When he says "I just sit in meeting
 
 **What Martin is thinking.** "I've never said this out loud to anyone. Is she judging me? Does she think this is a bit pathetic?"
 
+Notice what's not on that list. No "what's your biggest challenge?" and no "what keeps you up at 3am?". I can't stand those questions. When a coach asks me one, I know they're reading from a script, and I make my exit, because that's not coaching. Your questions should come from what the person has just told you, so they feel listened to rather than processed.
+
 This is where people either open up or close down, and it depends on you. Don't jump in with advice, just ask the next question. If they go quiet, wait, because they're usually working out how to say what's really bothering them.
 
 ## 12 to 18 minutes: what they've tried and what they want

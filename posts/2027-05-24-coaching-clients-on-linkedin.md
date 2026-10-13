@@ -67,6 +67,8 @@ So under your coaching business, write two or three lines about who you coach an
 
 Here's where a lot of coaches go wrong. They connect with someone and send a sales message within the hour. You've probably had one yourself. "Hi, I help leaders become the best version of themselves. Do you have 15 minutes this week for a call?" You didn't reply, did you?
 
+There's a newer version that's even worse. The message drops in my name, my town and what I do, all scraped from my profile by a tool. The sender thinks it's personalised. It isn't, and it's ugly. Anybody can see a machine filled in the blanks.
+
 Think about meeting someone at a work do. You don't walk up, shake their hand and ask them to buy something, and LinkedIn is no different.
 
 So when you send a connection request, add a short note that's about them and asks for nothing. Here's a made-up one you can change to suit you:
