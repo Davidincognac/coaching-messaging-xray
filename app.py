@@ -3174,7 +3174,31 @@ class Handler(BaseHTTPRequestHandler):
         for k, v in self.SAFETY_HEADERS:
             self.send_header(k, v)
 
+    # One-line cookie banner and Microsoft Clarity (heatmaps and recordings). Clarity only
+    # loads after the visitor clicks OK. Personal pages (noindex) get neither: a coach's
+    # own report is theirs and is never recorded.
+    CONSENT_BAR = (
+        '<div id="ck" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;'
+        'background:#111;color:#fff;font:14px/1.4 system-ui,sans-serif;padding:10px 16px;'
+        'text-align:center">This site uses cookies to see how pages are used. '
+        '<a href="/cookies" style="color:#fff">More</a> '
+        '<button id="ck-ok" style="margin-left:8px;padding:4px 12px;cursor:pointer">OK</button> '
+        '<button id="ck-no" style="margin-left:4px;padding:4px 12px;cursor:pointer">No thanks</button></div>'
+        '<script>(function(){var k="gbti_ck",v=null;try{v=localStorage.getItem(k)}catch(e){}'
+        'function go(){(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};'
+        't=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];'
+        'y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yxrw0ubway");}'
+        'if(v==="yes"){go();return}if(v==="no")return;var b=document.getElementById("ck");b.style.display="block";'
+        'function set(x){try{localStorage.setItem(k,x)}catch(e){}b.style.display="none";if(x==="yes")go()}'
+        'document.getElementById("ck-ok").onclick=function(){set("yes")};'
+        'document.getElementById("ck-no").onclick=function(){set("no")};})();</script>'
+    )
+
     def _send(self, body, code=200):
+        if (code == 200 and "</body>" in body and "noindex" not in body
+                and 'id="ck"' not in body):
+            i = body.rfind("</body>")
+            body = body[:i] + self.CONSENT_BAR + body[i:]
         self.send_response(code)
         self._safety()
         self.send_header("Content-Type", "text/html; charset=utf-8")

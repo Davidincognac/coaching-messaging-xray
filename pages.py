@@ -693,8 +693,9 @@ def render_privacy():
 <p class="lede">What this site collects, why, and who else sees it. Written to match what
 the code actually does.</p>
 
-<div class="note">We set no cookies and run no analytics or advertising tags. There is no
-consent banner on this site because there is nothing to consent to.</div>
+<div class="note">We run no advertising tags. We use Microsoft Clarity to see how people
+use the site (where they click and scroll), but only if you click OK on the banner at the
+bottom of the page.</div>
 
 <h2>Who is responsible</h2>
 <p>{c['legal']}, {c['street']}, {c['town']} {c['postcode']}, {c['country']}.
@@ -729,6 +730,9 @@ unsubscribe link in any email.</p>
     sends the emails.</li>
   <li><strong>Stripe</strong> handles payment.</li>
   <li><strong>Render</strong> hosts the site and therefore stores the database.</li>
+  <li><strong>Microsoft Clarity</strong> records how pages are used (clicks, scrolling,
+    page visits) if you click OK on the cookie banner. Text you type into forms is hidden
+    from it. It never runs on your own report pages.</li>
   <li><strong>Google Workspace</strong> carries the mail sent to and from
     {c['email']}.</li>
 </ul>
@@ -819,10 +823,17 @@ def render_cookies():
     c = _brand.COMPANY
     body = f"""
 <h1>Cookies</h1>
-<p class="lede">This site sets none.</p>
+<p class="lede">One, and only if you say yes.</p>
 
-<p>No analytics, no advertising tags, no session cookies, nothing dropped in your browser
-by us. That is why there is no consent banner: there is nothing to ask you about.</p>
+<p>We use Microsoft Clarity to see how people use the site: which pages they visit, where
+they click and how far they scroll. It sets cookies to do that, so it only runs if you click
+OK on the line at the bottom of the page. Click "No thanks" and it never loads. Your own
+report pages never run it either way.</p>
+
+<p>We remember your answer in your browser so we don't ask on every page. To change it,
+clear this site's data in your browser and the question comes back.</p>
+
+<p>No advertising tags, ever.</p>
 
 <p>Two things worth knowing anyway.</p>
 
@@ -833,12 +844,11 @@ advertising data and we cannot read anything from it.</p>
 <p>When you buy, the payment page is Stripe's, and Stripe sets what it needs to take a
 payment safely. Their policy covers that page, not this one.</p>
 
-<p>If we ever add a tracking tag, this page changes first and a banner appears with it.
-Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.</p>
+<p>Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.</p>
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Cookies", "This site sets no cookies, runs no analytics and shows no consent banner, because there is nothing to consent to. What that means in practice.", path="/cookies")
+    return shell(body, "Cookies", "The one tool on this site that sets cookies, Microsoft Clarity, and how it only runs if you click OK.", path="/cookies")
 
 
 _H2 = re.compile(r"<h2>")
