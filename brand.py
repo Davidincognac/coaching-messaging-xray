@@ -334,7 +334,7 @@ def six_cards(items, link=False):
 
 
 def nav_html(active="", links=True):
-    """The top bar. `active` is one of home, about, blog and just bolds that link.
+    """The top bar. `active` is one of home, about, blog, book and just bolds that link.
 
     links=False gives the brand bar with nothing to click, which is what the salespage
     and the report want: once somebody is reading their own result we are not offering
@@ -342,7 +342,8 @@ def nav_html(active="", links=True):
     """
     items = ""
     if links:
-        pages = [("home", "/", "Home"), ("about", "/about", "About"), ("blog", "/blog", "Blog")]
+        pages = [("home", "/", "Home"), ("about", "/about", "About"), ("blog", "/blog", "Blog"),
+                 ("book", "/book-a-call", "Book a call")]
         parts = []
         for key, href, label in pages:
             on = ' class="on"' if key == active else ""
@@ -380,6 +381,7 @@ def footer_html():
         <li><a href="/about">About</a></li>
         <li><a href="/blog">Blog</a></li>
         <li><a href="/methodology">How we score</a></li>
+        <li><a href="/book-a-call">Book a call</a></li>
         <li><a href="mailto:{c['email']}">{c['email']}</a></li>
       </ul>
     </div>
@@ -502,6 +504,7 @@ PUBLIC_PAGES = [
     ("/", "1.0", "weekly"),
     ("/about", "0.8", "monthly"),
     ("/blog", "0.7", "weekly"),
+    ("/book-a-call", "0.6", "monthly"),
     # Every post cites the corpus; this is the page that says what the corpus is.
     ("/methodology", "0.6", "yearly"),
     ("/website", "0.6", "monthly"),

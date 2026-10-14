@@ -178,6 +178,75 @@ def shell(body, title, desc="", active="", path="/", index=True, hero_html="", e
             .replace("__BODY__", body))
 
 
+# --------------------------------------------------------------------------- book a call
+
+# David's Google Calendar booking page. Google draws the calendar inside the frame and
+# we cannot style it, so the page crops off Google's own header (name, title, duration
+# repeated) and sits the rest in our own card.
+BOOKING_URL = ("https://calendar.google.com/calendar/appointments/schedules/"
+               "AcZssZ0tEQGA39O77oirvaB9qO0UQjl0QyUugvGJszyKAqBjXLI67IoN2-JbZiTZuIntFA7uBieFJn5C?gv=true")
+
+_BOOK_CSS = """<style>
+main.prose{display:none}
+.gb-hero.bk-hero{padding:0}
+.bk-wrap{max-width:1180px;margin:0 auto;padding:48px 24px 96px;display:grid;
+  grid-template-columns:1fr 1.25fr;gap:56px;align-items:start}
+.bk-wrap .gb-display{font-size:clamp(40px,5vw,64px)}
+.bk-list{list-style:none;padding:0;margin:28px 0 32px}
+.bk-list li{position:relative;padding:14px 0 14px 34px;border-top:1px solid var(--card-dark-line);
+  color:var(--ivory-dim);line-height:1.55}
+.bk-list li:last-child{border-bottom:1px solid var(--card-dark-line)}
+.bk-list li b{color:var(--ivory)}
+.bk-list li:before{content:"";position:absolute;left:4px;top:22px;width:10px;height:10px;
+  border-radius:50%;background:var(--cta)}
+.bk-me{display:flex;gap:14px;align-items:center;color:var(--ivory-dim);font-size:15px}
+.bk-me img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--cta-soft)}
+.bk-me strong{display:block;color:var(--ivory);font-size:16px}
+.bk-card{background:#fff;border-radius:18px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px var(--card-dark-line)}
+.bk-cardhead{background:var(--navy-card);padding:18px 24px;display:flex;justify-content:space-between;
+  align-items:center;color:var(--ivory);font-family:var(--display);font-weight:600;font-size:18px;
+  border-bottom:3px solid var(--cta)}
+.bk-cardhead span{font-weight:400;font-size:14px;color:var(--ivory-dim)}
+.bk-crop{height:860px;overflow:hidden}
+.bk-crop iframe{border:0;width:100%;height:1100px;display:block;margin-top:-238px}
+.bk-fallback{margin:14px 0 0;font-size:14px;color:var(--ivory-dim)}
+.bk-fallback a{color:var(--cta-soft)}
+@media(max-width:900px){.bk-wrap{grid-template-columns:1fr;gap:36px;padding-top:32px}}
+</style>"""
+
+
+def render_book_call():
+    e = html.escape(BOOKING_URL, quote=True)
+    hero_html = f"""<section class="gb-dark gb-hero bk-hero"><div class="bk-wrap">
+<div>
+  <p class="gb-eyebrow">Book a call</p>
+  <h1 class="gb-display">A <span class="gb-grad">free 30 minute call</span> with me</h1>
+  <p class="gb-lede">Tell me who you coach and what is going on with getting clients. If there
+     is a fit, I will tell you. If there isn't, I will tell you that too.</p>
+  <ul class="bk-list">
+    <li><b>Who you coach</b> and who is actually buying from you right now</li>
+    <li><b>Where the enquiries stop.</b> We look at what your market responds to, and what it ignores</li>
+    <li><b>A straight answer</b> on what I would change first. Yours to keep, whether we work together or not</li>
+  </ul>
+  <div class="bk-me"><img src="/david.jpg" alt="David Poole">
+    <div><strong>David Poole</strong>On Google Meet. You get the link when you book.</div></div>
+</div>
+<div>
+  <div class="bk-card">
+    <div class="bk-cardhead">Pick a time<span>30 minutes &middot; free</span></div>
+    <div class="bk-crop"><iframe src="{e}" title="Book a free 30 minute call with David Poole"
+         loading="lazy"></iframe></div>
+  </div>
+  <p class="bk-fallback">Calendar not loading? <a href="{e}" target="_blank" rel="noopener">Open it in a new tab</a>.</p>
+</div>
+</div></section>"""
+    return shell("", "Book a free 30 minute call",
+                 "Book a free 30 minute call with David Poole. Tell him who you coach and what is "
+                 "going on with getting clients, and get a straight answer on what to change first.",
+                 active="book", path="/book-a-call", hero_html=hero_html, extra_head=_BOOK_CSS)
+
+
 # --------------------------------------------------------------------------- about
 
 def render_about():
