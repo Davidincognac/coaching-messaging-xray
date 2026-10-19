@@ -809,7 +809,7 @@ def render_triggers(values=None, error=""):
     """ + steps + """
     <section class="step" data-step="4">
       <p class="q">Where do we send them?</p>
-      <p class="q-note">Your six triggers open here, and a copy goes to your inbox.
+      <p class="q-note">Your six triggers open on this page the moment you press the button.
       <span class="free">Nothing to pay.</span> We built this research for our own work, so it
       costs us nothing to hand you a copy.</p>
       <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
