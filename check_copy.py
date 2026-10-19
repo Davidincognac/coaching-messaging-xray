@@ -200,7 +200,9 @@ def check(label, page_html, hits):
             hits.append((label, f"{why}: {m.group(0)!r}"))
     for pat, why in ADVICE:
         m = re.search(pat, txt, re.I)
-        if m:
+        # The first question asks the coach to say it "like you would to a friend, not how your
+        # website says it". That is a question about how they talk, not a line about what to write.
+        if m and "how your website says it" not in txt[max(0, m.start() - 10):m.end() + 12].lower():
             hits.append((label, f"{why}: {m.group(0)!r}"))
     for phrase in HOUSE_PHRASES:
         i = low.find(phrase)
@@ -233,7 +235,8 @@ def check_structure(label, page_html, hits):
         tag = img.group(0)
         if not re.search(r'src="[^"]+"', tag):
             bad("an image with no src")
-        if not re.search(r'alt="[^"]+"', tag):
+        # alt="" is the right thing on a decorative image (the nav's Angelo). A missing alt is not.
+        if not re.search(r'alt="[^"]*"', tag):
             bad("an image with no alt text")
 
     if re.search(r"<(p|h1|h2|h3|li)[^>]*>\s*</\1>", page_html):
@@ -270,11 +273,29 @@ def main():
     check("landing page", land, hits)
     check_structure("landing page", land, hits)
     check("landing page (error state)", t.render_triggers(error="Test"), hits)
-    for field in ("first_name", "last_name", "email", "niche"):
+    for field in ("first_name", "email", "q_who", "q_problem", "q_fix"):
         if 'name="' + field + '"' not in land:
             hits.append(("landing page", "STRUCTURE: the form has no " + field + " field"))
     if 'id="processing"' not in land or 'class="pbar"' not in land:
         hits.append(("landing page", "STRUCTURE: Angelo's progress panel is missing"))
+    if "nichesugg" in land or "niches.json" in land:
+        hits.append(("landing page", "STRUCTURE: the old typed-search box is still on the page"))
+
+    # The cards, with a real market on each, and the two ends of the "none of these" path.
+    import matcher as mm
+    sample = [dict(m, why="They are people who have stopped sleeping and want it back.")
+              for m in mm.markets()[:4]]
+    for label, page in (("cards", t.render_cards("tok", sample, "David", fragment=True)),
+                        ("cards (asked again)", t.render_cards("tok", sample, "David", asked_again=True)),
+                        ("no market page", t.render_none("David", "people like me"))):
+        check(label, page, hits)
+        check_structure(label, page, hits)
+    # The fixed text the model is told to write in. If a banned word is in the instructions, the
+    # model will copy it.
+    for label, text in (("reflect prompt", mm._REFLECT_SYSTEM), ("match prompt", mm._MATCH_SYSTEM)):
+        for w in ("—", " matter"):
+            if w in text:
+                hits.append((label, f"banned in the prompt itself: {w!r}"))
 
     markets = [e["n"] for e in t.niche_list()]
     if not every:

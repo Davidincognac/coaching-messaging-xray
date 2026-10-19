@@ -121,21 +121,56 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   .hint{font-size:13px;color:var(--ivory-dim);margin:14px 0 0;line-height:1.6}
   .err{color:var(--coral);font-size:14px;line-height:1.6;margin:0 0 4px}
 
-  /* The niche box and its suggestions. */
-  .nichebox{position:relative}
-  .nichelab{font-size:14px;color:var(--ivory);margin:6px 0 8px;line-height:1.6}
-  .sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:var(--navy-deep);
-    border:1px solid var(--navy-line);border-radius:8px;max-height:290px;overflow-y:auto;display:none;
-    box-shadow:0 12px 30px rgba(0,0,0,.45)}
-  .sugg.open{display:block}
-  .sugg li{list-style:none;padding:11px 14px;font-size:15px;cursor:pointer;color:var(--ivory);
-    border-bottom:1px solid var(--navy-line);line-height:1.4}
-  .sugg li:last-child{border-bottom:0}
-  .sugg li:hover,.sugg li[aria-selected=true]{background:var(--navy-card)}
-  .sugg ul{margin:0;padding:0}
-  .sugg .par{display:block;font-size:12px;color:var(--ivory-dim);margin-top:3px}
-  .sugg mark{background:transparent;color:var(--cta-soft);font-weight:700}
-  .sugg .none{padding:12px 14px;font-size:14px;color:var(--ivory-dim);line-height:1.5}
+  /* The three questions. One screen each when JavaScript is running, stacked when it is not,
+     so a plain POST still works. The html element gets a "js" class from the first script. */
+  textarea{border:1px solid var(--navy-line);border-radius:6px;padding:14px 16px;font-size:16px;
+    color:var(--ivory);background:var(--navy-deep);width:100%;font-family:inherit;line-height:1.5;
+    resize:vertical;min-height:96px}
+  textarea::placeholder{color:var(--ivory-dim)}
+  textarea:focus{outline:2px solid var(--glow);outline-offset:1px}
+  .prog{display:none;height:6px;background:var(--navy-deep);border:1px solid var(--navy-line);
+    border-radius:4px;overflow:hidden;margin:4px 0 2px}
+  .prog i{display:block;height:100%;width:8%;background:var(--cta);border-radius:4px;
+    transition:width .5s ease}
+  .prog-lab{display:none;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ivory-dim);font-weight:700;margin:0 0 10px}
+  .js .prog,.js .prog-lab{display:block}
+  .step{display:flex;flex-direction:column;gap:12px;padding:6px 0 18px;
+    border-bottom:1px solid var(--navy-line)}
+  .step:last-of-type{border-bottom:0;padding-bottom:0}
+  .js .step{display:none;border-bottom:0;padding:0}
+  .js .step.on{display:flex}
+  .q{font-family:var(--serif);font-size:clamp(21px,2.4vw,26px);font-weight:600;line-height:1.25;
+    color:#fff;margin:0}
+  .q-note{font-size:15px;line-height:1.6;color:var(--ivory-dim);margin:-4px 0 0}
+  .next{display:none;align-self:flex-start}
+  .js .next{display:inline-block}
+  .reflect{margin:0;padding:14px 18px;border-left:3px solid var(--glow);background:var(--navy-deep);
+    border-radius:0 8px 8px 0;font-size:16px;line-height:1.6;color:var(--ivory)}
+  .nudge{margin:0;padding:12px 16px;border-radius:8px;background:rgba(245,185,66,.12);
+    border:1px solid rgba(245,185,66,.55);color:#F5C86A;font-size:15px;line-height:1.55}
+  [hidden]{display:none !important}
+
+  /* The cards: the three or four closest markets, each one a button. */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0 0}
+  @media(max-width:640px){.cards{grid-template-columns:1fr}}
+  .card{display:block;width:100%;text-align:left;background:var(--navy-deep);
+    border:1px solid var(--navy-line);border-radius:12px;padding:20px 22px;color:var(--ivory);
+    font-family:inherit;cursor:pointer;font-weight:400;font-size:15px;line-height:1.55}
+  .card:hover,.card:focus{border-color:var(--glow);background:var(--navy-deep);outline:0;
+    box-shadow:0 0 0 3px rgba(111,174,217,.25)}
+  .card .cn{display:block;font-family:var(--serif);font-size:21px;font-weight:600;color:#fff;
+    line-height:1.25;margin:0 0 4px}
+  .card .ca{display:block;font-size:13px;color:var(--cta-soft);font-weight:600;margin:0 0 10px}
+  .card .cw{display:block;color:var(--ivory)}
+  .card .go{display:block;margin-top:14px;color:var(--glow);font-weight:700;font-size:14px}
+  .cards form{display:contents;margin:0;padding:0;border:0;background:none}
+  .none{margin:22px 0 0;font-size:15px;line-height:1.6;color:var(--ivory-dim)}
+  .none button.lnk{background:none;border:0;padding:0;color:var(--glow);font-size:15px;
+    text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-weight:600}
+  .none button.lnk:hover{color:var(--cta-soft);background:none}
+  .again{margin:14px 0 0;padding:0;border:0;background:none;display:flex;flex-direction:column;gap:12px}
+  .js .again[hidden]{display:none}
 
   .whats{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--navy-line);
     border-radius:12px;padding:26px}
@@ -202,7 +237,12 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
     overflow:hidden;margin:0 0 20px}
   .pbar i{display:block;height:100%;width:0;background:var(--cta);border-radius:4px;
     transition:width .6s linear}
-  #processing ul{list-style:none;margin:0 0 18px;padding:0}
+  /* Two lists and two headings live in the panel, one for the match and one for the report.
+     The panel's data-mode picks which pair shows. */
+  #processing ul{list-style:none;margin:0 0 18px;padding:0;display:none}
+  #processing h3{display:none}
+  #processing[data-mode=match] [data-mode=match],
+  #processing[data-mode=report] [data-mode=report]{display:block}
   #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;
     line-height:1.5;color:var(--ivory);display:flex;gap:8px;align-items:baseline}
   #processing li .ps-status{margin-left:auto}
@@ -315,187 +355,201 @@ _REPORT_CSS = """
 
 
 _JS = """
+// Marks the page as scripted. Without this class every question shows at once and the plain POST
+// does the whole job, which is the no-JavaScript path.
+document.documentElement.className += ' js';
+
 (function(){
-  var input = document.getElementById('nicheinput');
-  var box   = document.getElementById('nichesugg');
-  if(!input || !box) return;
-  var LIST = [], cur = -1, items = [];
+  var form = document.getElementById('trigform');
+  if(!form) return;
+  var steps = [].slice.call(form.querySelectorAll('.step'));
+  var bar = document.getElementById('qbar');
+  var lab = document.getElementById('qlab');
+  var answers = {}, nudged = {}, cur = 1;
+  var LABELS = ['Question 1 of 3', 'Question 2 of 3', 'Question 3 of 3', 'Last step'];
 
-  fetch('/triggers/niches.json').then(function(r){return r.json();}).then(function(d){ LIST = d; });
-
-  function esc(s){ return s.replace(/[&<>"]/g, function(c){
-    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
-
-  function mark(name, q){
-    var i = name.toLowerCase().indexOf(q);
-    if(i < 0) return esc(name);
-    return esc(name.slice(0,i)) + '<mark>' + esc(name.slice(i, i+q.length)) + '</mark>' + esc(name.slice(i+q.length));
+  function show(n){
+    cur = n;
+    steps.forEach(function(s){ s.classList.toggle('on', parseInt(s.getAttribute('data-step'), 10) === n); });
+    if(bar) bar.style.width = (8 + (n - 1) * 30) + '%';
+    if(lab) lab.textContent = LABELS[n - 1] || '';
+    var s = steps[n - 1];
+    var box = s && s.querySelector('textarea, input');
+    if(box) setTimeout(function(){ box.focus({preventScroll:true}); }, 80);
   }
 
-  function close(){ box.classList.remove('open'); box.innerHTML = ''; cur = -1; items = []; }
+  function next(n){
+    var s = steps[n - 1];
+    var ta = s.querySelector('textarea');
+    var btn = s.querySelector('.next');
+    var ref = s.querySelector('.reflect');
+    var nud = s.querySelector('.nudge');
+    var v = ta.value.trim();
+    if(!v){ ta.focus(); return; }
+    if(btn.getAttribute('data-ready') === '1'){ show(n + 1); return; }
+    btn.disabled = true;
+    btn.textContent = 'Reading that\\u2026';
+    fetch('/triggers/reflect', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({step: n, answers: answers, answer: v})
+    }).then(function(r){ return r.json(); })
+      .catch(function(){ return {reflection: '', thin: false, ask: ''}; })
+      .then(function(d){
+        btn.disabled = false;
+        // One nudge per question. If the second answer is still thin we take it and carry on.
+        if(d.thin && d.ask && !nudged[n]){
+          nudged[n] = true;
+          nud.textContent = d.ask;
+          nud.hidden = false;
+          btn.textContent = 'Next';
+          ta.focus();
+          return;
+        }
+        nud.hidden = true;
+        answers[ta.name] = v;
+        if(d.reflection){
+          ref.textContent = d.reflection;
+          ref.hidden = false;
+          btn.setAttribute('data-ready', '1');
+          btn.textContent = n < 3 ? 'Next question' : 'Last step';
+        } else {
+          show(n + 1);
+        }
+      });
+  }
 
-  function choose(name){ input.value = name; close(); input.focus(); }
-
-  function render(q){
-    // A word-start match first (typing "div" should offer Divorce before it offers anything that
-    // merely contains those letters), then anything else that contains what they typed.
-    // Three tiers. A word-start in the market NAME beats a match anywhere in the name, and both beat
-    // a match on the audience label, so typing "divorce" still leads with the divorce market rather
-    // than every market whose people happen to be described as divorced.
-    var starts = [], has = [], aud = [];
-    for(var i=0; i<LIST.length && starts.length + has.length + aud.length < 200; i++){
-      var low = LIST[i].n.toLowerCase();
-      var at = low.indexOf(q);
-      if(at < 0){
-        if((LIST[i].a || '').toLowerCase().indexOf(q) >= 0) aud.push(LIST[i]);
-        continue;
-      }
-      if(at === 0 || /[^a-z0-9]/.test(low.charAt(at-1))) starts.push(LIST[i]); else has.push(LIST[i]);
-    }
-    var hits = starts.concat(has).concat(aud).slice(0, 8);
-    if(!hits.length){
-      box.innerHTML = '<div class="none">Not on our list yet. Type it in your own words and we will '
-                    + 'tell you straight whether we have read the books for it.</div>';
-      box.classList.add('open'); items = []; cur = -1; return;
-    }
-    var ul = document.createElement('ul');
-    hits.forEach(function(h){
-      var li = document.createElement('li');
-      li.setAttribute('role','option');
-      li.dataset.name = h.n;          // the real name, so Enter never has to read it back off the label
-      var under = h.a ? 'for ' + esc(h.a) : (h.p ? 'part of ' + esc(h.p) : '');
-      li.innerHTML = mark(h.n, q) + (under ? '<span class="par">' + under + '</span>' : '');
-      li.addEventListener('mousedown', function(e){ e.preventDefault(); choose(h.n); });
-      ul.appendChild(li);
+  steps.forEach(function(s, i){
+    var btn = s.querySelector('.next');
+    var ta = s.querySelector('textarea');
+    if(!btn || !ta) return;
+    btn.addEventListener('click', function(){ next(i + 1); });
+    // A changed answer gets read back again rather than carried forward on an old reflection.
+    ta.addEventListener('input', function(){
+      btn.removeAttribute('data-ready');
+      btn.textContent = 'Next';
+      var ref = s.querySelector('.reflect');
+      if(ref && !ref.hidden) ref.hidden = true;
     });
-    box.innerHTML = '';
-    box.appendChild(ul);
-    box.classList.add('open');
-    items = Array.prototype.slice.call(ul.children);
-    cur = -1;
-  }
+    ta.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); next(i + 1); }
+    });
+  });
 
-  function move(step){
-    if(!items.length) return;
-    if(cur > -1) items[cur].setAttribute('aria-selected','false');
-    cur = (cur + step + items.length) % items.length;
-    items[cur].setAttribute('aria-selected','true');
-    items[cur].scrollIntoView({block:'nearest'});
+  var start = parseInt(form.getAttribute('data-start') || '1', 10);
+  // A page re-rendered with an error already holds the three answers. Keep them for the match
+  // call and start the coach on the screen that needs fixing.
+  if(start > 1){
+    steps.slice(0, 3).forEach(function(s){
+      var ta = s.querySelector('textarea');
+      if(ta && ta.value.trim()) answers[ta.name] = ta.value.trim();
+    });
   }
-
-  input.addEventListener('input', function(){
-    var q = input.value.trim().toLowerCase();
-    if(q.length < 2){ close(); return; }
-    render(q);
-  });
-  input.addEventListener('keydown', function(e){
-    if(e.key === 'ArrowDown'){ e.preventDefault(); move(1); }
-    else if(e.key === 'ArrowUp'){ e.preventDefault(); move(-1); }
-    else if(e.key === 'Enter'){
-      if(cur > -1 && items[cur]){ e.preventDefault(); choose(items[cur].dataset.name); }
-    }
-    else if(e.key === 'Escape'){ close(); }
-  });
-  input.addEventListener('blur', function(){ setTimeout(close, 120); });
-  input.addEventListener('focus', function(){
-    var q = input.value.trim().toLowerCase();
-    if(q.length >= 2) render(q);
-  });
+  show(start);
 })();
 
-// The submit. Angelo works for twenty seconds while the report is fetched behind him, then the
-// report opens on this page. Without JavaScript the plain POST still returns the report, so nobody
-// is left staring at a dead form.
+// The back-to-the-form link at the bottom of the page.
 (function(){
   var cta = document.getElementById('cta2');
   if(cta) cta.addEventListener('click', function(ev){
     ev.preventDefault();
     var form = document.getElementById('trigform');
-    form.scrollIntoView({behavior:'smooth', block:'center'});
-    // Put them in the first box they have not filled, so the button does the whole job.
-    var first = ['fnameinput','lnameinput','emailinput','nicheinput']
-                  .map(function(id){ return document.getElementById(id); })
-                  .filter(function(el){ return el && !el.value.trim(); })[0];
-    if(first) setTimeout(function(){ first.focus({preventScroll:true}); }, 400);
+    if(form) form.scrollIntoView({behavior:'smooth', block:'center'});
   });
 })();
 
+// Angelo works while the server matches or builds the report, then the result opens on this page.
+// Any fetch failure hands the form back to the browser, whose plain POST returns the same thing.
 (function(){
-  var form = document.getElementById('trigform');
-  if(!form) return;
   var proc = document.getElementById('processing');
   var slot = document.getElementById('reportslot');
-  var whats = document.getElementById('whatsin');
-  var bar, busy = false;
-  var STEPS = 5, HOLD = 20000;
+  if(!proc || !slot) return;
+  var busy = false;
 
-  function setStep(n, state){
-    var el = document.getElementById('tp' + n);
-    if(!el) return;
+  function setStep(el, state){
     el.textContent = '[' + state + ']';
     el.className = 'ps-status ' + (state === 'DONE' ? 'ps-done'
                  : state === 'WORKING' ? 'ps-progress' : 'ps-waiting');
   }
 
-  form.addEventListener('submit', function(ev){
-    if(!form.checkValidity()) return;             // let the browser show its own message
-    ev.preventDefault();
+  function run(form, mode, hold){
     if(busy) return;
     busy = true;
-
-    form.style.display = 'none';
-    if(whats) whats.style.display = 'none';
+    var hide = ['trigform', 'whatsin', 'heroblock', 'belowfold'];
+    hide.forEach(function(id){ var el = document.getElementById(id); if(el) el.style.display = 'none'; });
     slot.innerHTML = '';
+    proc.setAttribute('data-mode', mode);
     proc.className = 'on';
-    bar = proc.querySelector('.pbar i');
-    proc.scrollIntoView({behavior:'smooth', block:'center'});
-
-    for(var i = 1; i <= STEPS; i++) setStep(i, i === 1 ? 'WORKING' : 'WAITING');
-    var step = 1;
+    var list = proc.querySelector('ul[data-mode="' + mode + '"]');
+    var items = list ? [].slice.call(list.querySelectorAll('.ps-status')) : [];
+    var bar = proc.querySelector('.pbar i');
+    var n = items.length;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    items.forEach(function(el, i){ setStep(el, i === 0 ? 'WORKING' : 'WAITING'); });
+    if(bar){ bar.style.width = '0%'; setTimeout(function(){ bar.style.width = '4%'; }, 60); }
+    var step = 0;
     var tick = setInterval(function(){
-      setStep(step, 'DONE');
+      if(step < n) setStep(items[step], 'DONE');
       step++;
-      if(step <= STEPS) setStep(step, 'WORKING');
-      if(bar) bar.style.width = Math.round((step - 1) / STEPS * 100) + '%';
-      if(step > STEPS) clearInterval(tick);
-    }, HOLD / STEPS);
-    if(bar) setTimeout(function(){ bar.style.width = '4%'; }, 60);
+      if(step < n) setStep(items[step], 'WORKING');
+      if(bar) bar.style.width = Math.round(Math.min(step, n) / n * 96) + '%';
+      if(step >= n) clearInterval(tick);
+    }, hold / n);
 
     var started = Date.now();
     var body = new URLSearchParams(new FormData(form)).toString() + '&fragment=1';
-    fetch('/triggers', {
+    fetch(form.getAttribute('action') || '/triggers', {
       method: 'POST',
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: body
-    }).then(function(r){ return r.text(); }).then(function(htmlText){
-      var wait = Math.max(0, HOLD - (Date.now() - started));
-      setTimeout(function(){
-        clearInterval(tick);
-        for(var i = 1; i <= STEPS; i++) setStep(i, 'DONE');
-        if(bar) bar.style.width = '100%';
+    }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function(htmlText){
+        var wait = Math.max(0, hold - (Date.now() - started));
         setTimeout(function(){
-          proc.className = '';
-          // The pitch has done its job. From here the report IS the page.
-          ['heroblock','belowfold'].forEach(function(id){
-            var el = document.getElementById(id);
-            if(el) el.style.display = 'none';
-          });
-          slot.innerHTML = htmlText;
-          window.scrollTo({top: 0, behavior: 'smooth'});
-          busy = false;
-        }, 450);
-      }, wait);
-    }).catch(function(){
-      // Anything goes wrong and the plain form submit takes over, which returns the same report.
-      clearInterval(tick);
-      busy = false;
-      form.style.display = '';
-      proc.className = '';
-      form.submit();
-    });
+          clearInterval(tick);
+          items.forEach(function(el){ setStep(el, 'DONE'); });
+          if(bar) bar.style.width = '100%';
+          setTimeout(function(){
+            proc.className = '';
+            slot.innerHTML = htmlText;
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            busy = false;
+          }, 450);
+        }, wait);
+      }).catch(function(){
+        clearInterval(tick);
+        busy = false;
+        proc.className = '';
+        form.submit();
+      });
+  }
+
+  var trig = document.getElementById('trigform');
+  if(trig) trig.addEventListener('submit', function(ev){
+    if(!trig.checkValidity()) return;          // the browser shows its own message
+    ev.preventDefault();
+    run(trig, 'match', 7000);
+  });
+
+  // The cards and the "none of these" form arrive inside the slot, so their events are delegated.
+  slot.addEventListener('submit', function(ev){
+    var f = ev.target;
+    if(f.classList.contains('pick')){ ev.preventDefault(); run(f, 'report', 12000); }
+    else if(f.classList.contains('again')){
+      if(!f.checkValidity()) return;
+      ev.preventDefault(); run(f, 'match', 7000);
+    }
+  });
+  slot.addEventListener('click', function(ev){
+    var b = ev.target.closest && ev.target.closest('button.lnk');
+    if(!b) return;
+    var f = document.getElementById('noneform');
+    if(f){ f.hidden = false; var ta = f.querySelector('textarea'); if(ta) ta.focus(); }
+    b.parentNode.style.display = 'none';
   });
 })();
 """
+
 
 _SHELL = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -644,17 +698,59 @@ VOICE_LABELS = [
 def _plain(mapping, key, fallback=""):
     return mapping.get((key or "").strip().lower(), fallback)
 
-def render_triggers(first_name="", last_name="", email="", niche="", error=""):
+# The three questions and the lead's answers come from the matcher, so the page and the prompts can
+# never disagree about what was asked.
+import matcher as _matcher
+
+# What Angelo is doing while the server works. Two lists: the match and the report.
+_PROCESSING = """
+  <div id="processing">
+    <img class="angelo-loader" src="/angelo_reading.png"
+         alt="Angelo reading your market">
+    <h3 data-mode="match">Angelo is reading your answers</h3>
+    <h3 data-mode="report">Angelo is pulling your market</h3>
+    <div class="pbar"><i></i></div>
+    <ul data-mode="match">
+      <li><b>One:</b> Reading your three answers
+          <span class="ps-status ps-progress">[WORKING]</span></li>
+      <li><b>Two:</b> Looking for your buyer in the markets we&rsquo;ve read
+          <span class="ps-status ps-waiting">[WAITING]</span></li>
+      <li><b>Three:</b> Lining up the closest ones
+          <span class="ps-status ps-waiting">[WAITING]</span></li>
+    </ul>
+    <ul data-mode="report">
+      <li><b>One:</b> Finding your market in the research
+          <span class="ps-status ps-progress">[WORKING]</span></li>
+      <li><b>Two:</b> Pulling what your buyers already spend money on
+          <span class="ps-status ps-waiting">[WAITING]</span></li>
+      <li><b>Three:</b> Reading what they say is wrong, in their words
+          <span class="ps-status ps-waiting">[WAITING]</span></li>
+      <li><b>Four:</b> Working out what they&rsquo;re really paying for
+          <span class="ps-status ps-waiting">[WAITING]</span></li>
+      <li><b>Five:</b> Putting your six triggers together
+          <span class="ps-status ps-waiting">[WAITING]</span></li>
+    </ul>
+    <p class="p-note">A few seconds. Leave this page open. It opens here on its own.</p>
+  </div>
+  <div id="reportslot"></div>
+"""
+
+
+def render_triggers(values=None, error=""):
     """The landing page.
 
-    The form sits high, because the whole promise is that the report arrives in twenty seconds and
-    nothing has to be read first. Everything under the form is there for the coach who wants to know
-    who we are before handing over an address.
+    Three questions, one screen each, then the name and the email. The form sits high because the
+    whole promise is that nothing has to be read first. Everything under the form is there for the
+    coach who wants to know who we are before handing over an address.
+
+    `values` holds what the coach already typed when the page is re-rendered with an error, so
+    nothing is lost. Without JavaScript the four screens stack and the plain POST does the same job.
 
     The "what you get" list is generated from SECTION_HEADINGS, so the page can never promise a
     section the report does not have.
     """
     e = html.escape
+    v = values or {}
     err_html = '<p class="err">' + e(error) + '</p>' if error else ""
 
     # What each trigger gives them. Paired with the real headings, in the report's own order.
@@ -669,6 +765,24 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     gets = ""
     for i, why in enumerate(PROMISE):
         gets += ('<li><b>' + e(SECTION_HEADINGS[i]["plain"]) + '.</b> ' + why + '</li>')
+
+    steps = ""
+    for i, q in enumerate(_matcher.QUESTIONS):
+        n = i + 1
+        steps += (
+            '<section class="step" data-step="' + str(n) + '">'
+            '<label class="q" for="' + q["key"] + '">' + e(q["ask"]) + '</label>'
+            '<p class="q-note">' + e(q["note"]) + '</p>'
+            '<textarea name="' + q["key"] + '" id="' + q["key"] + '" rows="3" required '
+            'maxlength="' + str(_matcher.ANSWER_LIMIT) + '" placeholder="' + e(q["hint"], quote=True) + '">'
+            + e(v.get(q["key"], "")) + '</textarea>'
+            '<div class="nudge" role="status" hidden></div>'
+            '<div class="reflect" role="status" hidden></div>'
+            '<button type="button" class="next">Next</button>'
+            '</section>')
+
+    # An error puts the coach straight on the screen that needs fixing.
+    start = "4" if error and all(v.get(k) for k in _matcher.KEYS) else "1"
 
     body = """
   <div id="heroblock">
@@ -685,59 +799,35 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
   </div>
   </div>
 
-  <form method="post" action="/triggers" id="trigform" autocomplete="on">
+  <form method="post" action="/triggers/match" id="trigform" autocomplete="on" data-start=\"""" + start + """\">
     """ + err_html + """
     <h2 class="gb-display f-head">Tell us who you coach, and we will tell you why they&nbsp;buy</h2>
-    <p class="f-lead">Your six triggers open on this page in about twenty seconds.
-    <span class="free">Nothing to pay.</span> We built this research for our own work, so it
-    costs us nothing to hand you a copy.</p>
-    <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
-           autocomplete="given-name" value=\"""" + e(first_name, quote=True) + """\" required>
-    <input type="text"  name="last_name"  id="lnameinput" placeholder="Your last name"
-           autocomplete="family-name" value=\"""" + e(last_name, quote=True) + """\">
-    <input type="email" name="email"      id="emailinput" placeholder="Your best email address"
-           autocomplete="email" value=\"""" + e(email, quote=True) + """\" required>
-    <div class="nichebox">
-      <p class="nichelab">Start typing and pick yours from the list.</p>
-      <input type="text" name="niche" id="nicheinput" placeholder="divorce, ADHD, first-time managers&hellip;"
-             autocomplete="off" role="combobox" aria-expanded="false" aria-controls="nichesugg"
-             value=\"""" + e(niche, quote=True) + """\" required>
-      <div class="sugg" id="nichesugg" role="listbox"></div>
-    </div>
-    <button type="submit">Show me my buying triggers</button>
-    <!-- The line here used to promise no follow-up email, which is not what happens: every
-         address goes to MailerLite and the sequences branch off it. A promise the plumbing
-         contradicts is worse than no promise, and the law wants people told at the point
-         they type it, so this says what actually happens instead. -->
-    <p class="hint">We'll email you about the work we sell, and one click in any email stops
-    that. <a href="/privacy">What we do with your details</a>.</p>
+    <p class="f-lead">Three questions, answered in your own words. Then your six triggers open on
+    this page. <span class="free">Nothing to pay.</span></p>
+    <div class="prog"><i id="qbar"></i></div>
+    <p class="prog-lab" id="qlab">Question 1 of 3</p>
+    """ + steps + """
+    <section class="step" data-step="4">
+      <p class="q">Where do we send them?</p>
+      <p class="q-note">Your six triggers open here, and a copy goes to your inbox.
+      <span class="free">Nothing to pay.</span> We built this research for our own work, so it
+      costs us nothing to hand you a copy.</p>
+      <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
+             autocomplete="given-name" value=\"""" + e(v.get("first_name", ""), quote=True) + """\" required>
+      <input type="email" name="email"      id="emailinput" placeholder="Your best email address"
+             autocomplete="email" value=\"""" + e(v.get("email", ""), quote=True) + """\" required>
+      <button type="submit">Show me my buying triggers</button>
+      <!-- Says what actually happens to the address. The law wants people told at the point
+           they type it. -->
+      <p class="hint">We'll email you about the work we sell, and one click in any email stops
+      that. <a href="/privacy">What we do with your details</a>.</p>
+    </section>
   </form>
-
-  <div id="processing">
-    <img class="angelo-loader" src="/angelo_reading.png"
-         alt="Angelo reading your market">
-    <h3>Angelo is pulling your market</h3>
-    <div class="pbar"><i></i></div>
-    <ul>
-      <li><b>One:</b> Finding your market in the research
-          <span class="ps-status ps-progress" id="tp1">[WORKING]</span></li>
-      <li><b>Two:</b> Pulling what your buyers already spend money on
-          <span class="ps-status ps-waiting" id="tp2">[WAITING]</span></li>
-      <li><b>Three:</b> Reading what they say is wrong, in their words
-          <span class="ps-status ps-waiting" id="tp3">[WAITING]</span></li>
-      <li><b>Four:</b> Working out what they're really paying for
-          <span class="ps-status ps-waiting" id="tp4">[WAITING]</span></li>
-      <li><b>Five:</b> Putting your six triggers together
-          <span class="ps-status ps-waiting" id="tp5">[WAITING]</span></li>
-    </ul>
-    <p class="p-note">About twenty seconds. Leave this page open. Your triggers open here on their own.</p>
-  </div>
-  <div id="reportslot"></div>
-
+""" + _PROCESSING + """
   <div id="belowfold">
-  <div class="whats">
+  <div class="whats" id="whatsin">
     <h2>The six triggers Angelo pulls for your market</h2>
-    <p class="rl">He does it on this page while you watch. Takes about twenty seconds.</p>
+    <p class="rl">He does it on this page while you watch.</p>
     <ol>""" + gets + """</ol>
   </div>
 
@@ -746,22 +836,90 @@ def render_triggers(first_name="", last_name="", email="", niche="", error=""):
     <p class="rl">We didn't guess these, and we didn't ask an AI what it reckons. We went to what your
     market already spends money on. Then we got the words your buyers use about their own problem,
     written by them, not by a coach.</p>
-    <p class="rl">Check it yourself before you type anything. Start typing your niche in the box above.
-    Every market it offers you is one we've already read. If yours isn't in there, we'll say so, rather
-    than send you somebody else's market with your name on it.</p>
+    <p class="rl">Answer the three questions above and we show you the closest markets we've already
+    read, so you can pick the one that's yours. If none of them is, we'll say so, rather than send you
+    somebody else's market with your name on it.</p>
   </div>
 
   <div class="closer">
     <h2>Your buyer already told us why they buy</h2>
     <p>They wrote it down. We went and read it. Costs you nothing to see, and the coaches you're up
     against are working without it.</p>
-    <p class="backup"><a href="#trigform" id="cta2">Take me back up to the form</a></p>
+    <p class="backup"><a href="#trigform" id="cta2">Take me back up to the questions</a></p>
   </div>
 
   <p class="base" id="baseline">Buying Triggers comes from what your market already buys, and from your
   buyers describing the problem in their own words. <b>Going Beyond The Illusion.</b></p>
   </div>
 """
+    return _shell(body)
+
+
+def render_cards(token, matches, first_name="", asked_again=False, fragment=False):
+    """The three or four closest markets, each one a button. Tapping one runs the report.
+
+    `asked_again` is True once the coach has already said "none of these" and answered the extra
+    question. The second time round, "none of these" goes to the honest page that says we have not
+    read their market, rather than asking them to type it a third time.
+    """
+    e = html.escape
+    fn = first_name.strip().split(" ")[0] if first_name.strip() else ""
+    if fn.islower():
+        fn = fn.capitalize()
+    lede = ((e(fn) + ", we") if fn else "We") + \
+        " read your three answers against the markets we hold. These are the closest. Tap the one " \
+        "that's yours, and your six triggers open here."
+    cards = ""
+    for m in matches:
+        where = (' <span class="ca">inside ' + e(m["parent"]) + '</span>') if m.get("parent") else \
+                ('<span class="ca">for ' + e(m["audience"]) + '</span>' if m.get("audience") else "")
+        cards += (
+            '<form method="post" action="/triggers" class="pick">'
+            '<input type="hidden" name="token" value="' + e(token, quote=True) + '">'
+            '<input type="hidden" name="niche" value="' + e(m["name"], quote=True) + '">'
+            '<button type="submit" class="card">'
+            '<span class="cn">' + e(m["name"]) + '</span>' + where
+            + ('<span class="cw">' + e(m["why"]) + '</span>' if m.get("why") else "")
+            + '<span class="go">Show me these triggers &rarr;</span>'
+            '</button></form>')
+    if asked_again:
+        none = ('<p class="none">Still not yours? '
+                '<a href="/triggers/none?lead=' + e(token, quote=True) + '">Tell us, and we’ll say '
+                'so straight</a>.</p>')
+    else:
+        none = ('<p class="none">None of these? <button type="button" class="lnk">Say it another way'
+                '</button>, and we’ll look again.</p>'
+                '<form method="post" action="/triggers" class="again" id="noneform" hidden>'
+                '<input type="hidden" name="token" value="' + e(token, quote=True) + '">'
+                '<label class="q" for="moreinput">What would you call your market, in your own words?</label>'
+                '<p class="q-note">Who they are and what’s going on for them. A line is plenty.</p>'
+                '<textarea name="more" id="moreinput" rows="2" required maxlength="'
+                + str(_matcher.ANSWER_LIMIT) + '" placeholder="people who…"></textarea>'
+                '<button type="submit">Look again</button>'
+                '</form>')
+    body = """
+  <div class="rwrap">
+  <p class="r-eyebrow">Nearly there</p>
+  <h1 class="r-title">Is it one of these?</h1>
+  <p class="r-for">""" + lede + """</p>
+  <div class="cards">""" + cards + """</div>
+  """ + none + """
+  </div>
+"""
+    return body if fragment else _shell(body, title_suffix="&mdash; Is it one of these?")
+
+
+def render_none(first_name="", market_words=""):
+    """The honest page for a coach whose market is not one we have read."""
+    e = html.escape
+    said = (' You called it &ldquo;' + e(market_words) + '&rdquo;.') if market_words else ""
+    body = ('<div class="done"><h2>We haven’t read your market yet.</h2>'
+            '<p>We hold a long list of markets, and the smaller ones inside them, and none of them is '
+            'yours.' + said + ' We’d rather tell you straight than hand you somebody else’s '
+            'market with your name typed over the top.</p>'
+            '<p>We’ve kept your answers and put your market on the list to read. When it’s '
+            'done, the email you gave us is where it goes.</p>'
+            '<a class="nextbtn" href="/">Back to the start</a></div>')
     return _shell(body)
 
 

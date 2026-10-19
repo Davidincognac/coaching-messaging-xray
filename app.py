@@ -39,6 +39,8 @@ import banner_image as _banner          # turns an upload into a safe, small Web
 import social_page as _social           # the form and the two exits
 import social_section, combined_parts   # the report itself, already built and checked
 import triggers as _triggers            # the Buying Triggers page (book + Cashvertising research)
+import matcher as _matcher              # the three-question market matcher behind it
+import hubspot as _hubspot              # the contact and the note, once a coach signs up
 import brand as _brand                  # palette, nav and footer: one source for all three stylesheets
 import pages as _pages                  # about, blog and the legal pages
 
@@ -686,93 +688,74 @@ def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_fo
 
 
 
-# MailerLite fires its "new subscriber" notification when somebody joins a GROUP, so a
-# subscriber pushed with no group is invisible to it. It is also how the stage-gated
-# sequences will branch later, so every push names its group from here on.
-#
-# The id is looked up (and the group created if missing) on first use and cached, rather
-# than held in another env var David has to keep in step with MailerLite.
-_ML_GROUPS = {}
+# HubSpot is the database and the sender for the Buying Triggers leads. Two writes, both in a
+# daemon thread, both logged on failure and never allowed to touch what the coach sees. The lead is
+# in our own database before either runs, so nothing is lost if HubSpot is down.
 
-
-def _ml_group_id(name):
-    """Group id for `name`, creating the group if it does not exist. None on any failure,
-    which callers treat as "push without a group" rather than as an error worth surfacing."""
-    if name in _ML_GROUPS:
-        return _ML_GROUPS[name]
-    if not MAILERLITE_API_KEY:
-        return None
-    hdrs = {"Authorization": f"Bearer {MAILERLITE_API_KEY}",
-            "Content-Type": "application/json", "Accept": "application/json"}
+def _hubspot_signup(token, email, first_name, answers, offered):
+    """Create or update the contact, then put the three answers on its timeline as one note. The
+    ids come back onto the lead row so the note can be rewritten when the coach picks a market."""
     try:
-        req = urllib.request.Request(
-            "https://connect.mailerlite.com/api/groups?limit=100", headers=hdrs)
-        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX) as r:
-            for g in (_json.loads(r.read().decode("utf-8")) or {}).get("data", []):
-                if (g.get("name") or "").strip().lower() == name.lower():
-                    _ML_GROUPS[name] = g["id"]
-                    return g["id"]
-        req = urllib.request.Request(
-            "https://connect.mailerlite.com/api/groups",
-            data=_json.dumps({"name": name}).encode("utf-8"),
-            headers=hdrs, method="POST")
-        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX) as r:
-            gid = ((_json.loads(r.read().decode("utf-8")) or {}).get("data") or {}).get("id")
-            if gid:
-                _ML_GROUPS[name] = gid
-            return gid
-    except urllib.error.HTTPError as e:
-        try:
-            detail = e.read().decode("utf-8", "replace")[:300]
-        except Exception:
-            detail = ""
-        print(f"[mailerlite] group lookup/create failed: HTTP {e.code} {detail}", flush=True)
-        return None
+        cid = _hubspot.upsert_contact(email, first_name)
+        if not cid:
+            return
+        update_trigger_lead(token, hubspot_contact_id=str(cid))
+        nid = _hubspot.create_note(cid, answers, _matcher.QUESTIONS, offered=offered)
+        if nid:
+            update_trigger_lead(token, hubspot_note_id=str(nid))
     except Exception as e:
-        print(f"[mailerlite] group lookup/create failed: {type(e).__name__}: {e}", flush=True)
-        return None
+        print(f"[hubspot] signup push failed: {type(e).__name__}: {e}", flush=True)
 
 
-def _push_mailerlite_trigger(email, first_name, last_name, niche_typed, niche_match):
-    """Fire-and-forget MailerLite upsert for a Buying Triggers opt-in. Same rules as the audit push:
-    daemon thread, never blocks the page, never raises. The lead is already safe in our own DB."""
-    if not MAILERLITE_API_KEY or not email:
-        return
+def _hubspot_chosen(token):
+    """The coach picked a card. Rewrite the note with the market on it. If the sign-up thread has
+    not finished yet, or failed, this does the whole job itself."""
     try:
-        body = {
-            "email": email,
-            "fields": {
-                "name": first_name or "",
-                "last_name": last_name or "",
-                "niche_typed": niche_typed or "",
-                "niche_match": niche_match or "",
-                "lead_source": "buying-triggers",
-            },
-        }
-        gid = _ml_group_id("Buying triggers")
-        if gid:
-            body["groups"] = [gid]
-        payload = _json.dumps(body).encode("utf-8")
-        req = urllib.request.Request(
-            "https://connect.mailerlite.com/api/subscribers",
-            data=payload,
-            headers={
-                "Authorization": f"Bearer {MAILERLITE_API_KEY}",
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX):
-            pass
-    except urllib.error.HTTPError as e:
+        lead = get_trigger_lead(token) or {}
+        answers = {k: lead.get(k, "") for k in _matcher.KEYS + ["q_more"]}
         try:
-            detail = e.read().decode("utf-8", "replace")[:300]
+            offered = _json.loads(lead.get("offered") or "[]")
         except Exception:
-            detail = ""
-        print(f"[mailerlite] subscriber push failed: HTTP {e.code} {detail}", flush=True)
+            offered = []
+        market = lead.get("niche_match", "")
+        if lead.get("hubspot_note_id"):
+            if _hubspot.update_note(lead["hubspot_note_id"], answers, _matcher.QUESTIONS, market, offered):
+                return
+        cid = lead.get("hubspot_contact_id") or _hubspot.upsert_contact(lead.get("email", ""),
+                                                                         lead.get("first_name", ""))
+        if not cid:
+            return
+        update_trigger_lead(token, hubspot_contact_id=str(cid))
+        nid = _hubspot.create_note(cid, answers, _matcher.QUESTIONS, market, offered)
+        if nid:
+            update_trigger_lead(token, hubspot_note_id=str(nid))
     except Exception as e:
-        print(f"[mailerlite] subscriber push failed: {type(e).__name__}: {e}", flush=True)
+        print(f"[hubspot] chosen push failed: {type(e).__name__}: {e}", flush=True)
+
+
+# Every reflection costs a model call, and the endpoint is open to anyone with a browser. A coach
+# needs at most nine (three questions, a nudge each, a retype each). This holds each address to a
+# modest number per ten minutes and answers the rest with an empty reflection, which the page treats
+# as "nothing to say, carry on", so a real coach behind a shared address is never shown an error.
+_REFLECT_HITS = {}
+_REFLECT_LOCK = threading.Lock()
+REFLECT_LIMIT = 40
+REFLECT_WINDOW = 600
+
+
+def _reflect_allowed(ip):
+    now = time.time()
+    with _REFLECT_LOCK:
+        hits = [t for t in _REFLECT_HITS.get(ip, []) if now - t < REFLECT_WINDOW]
+        if len(hits) >= REFLECT_LIMIT:
+            _REFLECT_HITS[ip] = hits
+            return False
+        hits.append(now)
+        _REFLECT_HITS[ip] = hits
+        if len(_REFLECT_HITS) > 5000:            # a flood of addresses must not grow this forever
+            for k in [k for k, v in _REFLECT_HITS.items() if not v or now - v[-1] > REFLECT_WINDOW]:
+                _REFLECT_HITS.pop(k, None)
+    return True
 
 
 def sev_class(v):
@@ -3160,31 +3143,35 @@ class Handler(BaseHTTPRequestHandler):
             self._send(mockup_social.render())
             return
         if path == "/triggers/report":
-            # The report itself. Open for now so the emailed link just works and so David can preview
-            # any market. If it ever needs locking to the person who asked, key it off the lead row.
+            # The report answers to the lead token and nothing else. It used to take a market name
+            # off the query string and render for anyone, which made every market a public page and
+            # the report nobody's in particular. Now a link only works for the coach it was built for,
+            # and the market comes off their row, so the gate on offered markets holds here too.
             qs = parse_qs(parsed.query)
-            # A stored token fills in the coach behind this report, so a link that has been mailed
-            # or bookmarked still knows who it belongs to.
             lead = get_trigger_lead((qs.get("lead", [""])[0]).strip())
+            if not lead or not lead.get("niche_match"):
+                self.send_response(302)
+                self._safety()
+                self.send_header("Location", "/")
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                return
             # Step two is the social page, not the website audit. The report's own closing words
-            # already say we will look at the profile first, so pointing this at the homepage sent
-            # a coach straight past the page that sentence promised them.
-            nxt = (f"{APP_BASE_URL}/social?lead={_url_quote(lead['token'], safe='')}"
-                   if lead else f"{APP_BASE_URL}/triggers")
+            # already say we will look at the profile first.
+            nxt = f"{APP_BASE_URL}/social?lead={_url_quote(lead['token'], safe='')}"
             self._send(_triggers.render_report(
-                niche      = (qs.get("niche", [""])[0]).strip() or (lead or {}).get("niche_match", ""),
-                first_name = (qs.get("first_name", [""])[0]).strip() or (lead or {}).get("first_name", ""),
+                niche      = lead.get("niche_match", ""),
+                first_name = lead.get("first_name", ""),
                 audit_url  = nxt,
             ))
             return
-        if path == "/triggers/niches.json":
-            # Names only. The research itself stays on the server.
-            body = _json.dumps(_triggers.niche_list()).encode("utf-8")
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Cache-Control", "public, max-age=3600")
-            self.end_headers()
-            self.wfile.write(body)
+        if path == "/triggers/none":
+            # The honest end for a coach whose market we have not read. Keyed to the lead like the
+            # report, so the page can say back what they called it.
+            qs = parse_qs(parsed.query)
+            lead = get_trigger_lead((qs.get("lead", [""])[0]).strip()) or {}
+            self._send(_triggers.render_none(lead.get("first_name", ""),
+                                             lead.get("q_more") or lead.get("q_who") or ""))
             return
         if path == "/salespage":
             qs = parse_qs(parsed.query)
@@ -3361,61 +3348,174 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/social":
             self._post_social()
             return
+        if parsed.path == "/triggers/reflect":
+            self._post_reflect()
+            return
+        if parsed.path == "/triggers/match":
+            self._post_match()
+            return
         if parsed.path != "/triggers":
             self.send_response(404); self.end_headers(); return
-        body = self._read_body(64 * 1024)   # a form this small has no business being bigger
+        self._post_pick()
+
+    def _send_json(self, obj, code=200):
+        data = _json.dumps(obj).encode("utf-8")
+        self.send_response(code)
+        self._safety()
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _client_ip(self):
+        # Render sits in front of the app, so the socket address is the proxy's.
+        fwd = (self.headers.get("X-Forwarded-For") or "").split(",")[0].strip()
+        return fwd or (self.client_address[0] if self.client_address else "")
+
+    def _post_reflect(self):
+        """One answer read back, as JSON, for the page's JavaScript. Always answers 200 with the
+        reflect shape, even when the model is unreachable or the caller is over the limit: the page
+        treats an empty reflection as "nothing to add" and moves on, and a coach never sees an error.
+        """
+        body = self._read_body(8 * 1024)
         if body is None:
             return
+        empty = {"reflection": "", "thin": False, "ask": ""}
+        try:
+            data = _json.loads(body.decode("utf-8", "replace")) or {}
+            step = int(data.get("step", 0))
+            answer = str(data.get("answer", ""))
+            answers = {k: str(v) for k, v in (data.get("answers") or {}).items() if k in _matcher.KEYS}
+        except Exception:
+            self._send_json(empty); return
+        if step not in (1, 2, 3) or not answer.strip() or not _reflect_allowed(self._client_ip()):
+            self._send_json(empty); return
+        self._send_json(_matcher.reflect(step, answers, answer))
+
+    def _form(self, limit=64 * 1024):
+        """A url-encoded form body, as a flat dict of cleaned strings. None if already refused."""
+        body = self._read_body(limit)
+        if body is None:
+            return None
         form = parse_qs(body.decode("utf-8", "replace"))
+        return {k: v[0] for k, v in form.items()}
+
+    def _post_match(self):
+        """The sign-up. Three answers, a first name and an email. Saves the lead, starts the HubSpot
+        push, matches the answers against the markets we hold, and returns the cards.
+
+        The page asks for a fragment so it can drop the cards in behind Angelo's progress bar. A
+        plain POST (no JavaScript) gets the whole page instead, with the same cards on it.
+        """
+        form = self._form()
+        if form is None:
+            return
         # Same control-character stripping the social form uses. A name or an email carrying a null
         # or an escape sequence is either a mistake or an attempt, and neither belongs in the
-        # database or in a MailerLite field.
-        def _f(name, limit):
-            return _mp.text({k: v[0] for k, v in form.items()}, name, limit)
-        first_name = _f("first_name", 80)
-        last_name  = _f("last_name", 80)
-        email      = _f("email", 160)
-        niche      = _f("niche", 120)
+        # database or in a note on somebody's timeline.
+        first_name = _mp.text(form, "first_name", 80)
+        email      = _mp.text(form, "email", 160)
+        answers = {k: _matcher.clean_answer(_mp.text(form, k, _matcher.ANSWER_LIMIT, keep_newlines=True))
+                   for k in _matcher.KEYS}
+        values = dict(answers, first_name=first_name, email=email)
 
         # Deliberately loose: a real address we cannot parse is worse than a typo we let through.
         bad = ""
-        if not first_name:
+        if any(len(answers[k]) < 2 for k in _matcher.KEYS):
+            bad = "Answer all three questions, even roughly, so we know which research to send."
+        elif not first_name:
             bad = "We need a first name, so the report knows who it is for."
         elif "@" not in email or "." not in email.split("@")[-1] or len(email) < 6:
             bad = "That email address does not look right. Have another look."
-        elif len(niche) < 2:
-            bad = "Tell us who you coach, even roughly, so we know which research to send."
         if bad:
-            self._send(_triggers.render_triggers(first_name, last_name, email, niche, error=bad))
+            self._send(_triggers.render_triggers(values, error=bad))
             return
 
-        matched = _triggers.have_triggers_for(niche)
-        # The token travels with the coach from here on, so the next step in the funnel already knows
-        # their name, their email and their market and never has to ask for any of it again.
         token = ""
         try:
-            token = save_trigger_lead(email, first_name, last_name, niche, matched)
-        except Exception:
-            pass                        # a DB hiccup must not cost the coach their report
-        threading.Thread(
-            target=_push_mailerlite_trigger,
-            args=(email, first_name, last_name, niche, matched),
-            daemon=True,
-        ).start()
-        # The page asks for a fragment so it can drop the report in behind Angelo's progress bar.
-        # A plain POST (no JavaScript) gets the whole page instead, and lands on the same report.
-        fragment = (form.get("fragment", [""])[0]).strip() == "1"
-        # The audit link carries the token too, so whatever they do next can be tied back to this
-        # coach and this market without a second form.
-        nxt = (f"{APP_BASE_URL}/social?lead={_url_quote(token, safe='')}"
-               if token else f"{APP_BASE_URL}/triggers")
-        self._send(_triggers.render_report(
-            niche      = matched or niche,
-            first_name = first_name,
-            audit_url  = nxt,
-            fragment   = fragment,
-        ))
-        return
+            token = save_trigger_lead(email, first_name, "", answers["q_who"], "",
+                                      q_who=answers["q_who"], q_problem=answers["q_problem"],
+                                      q_fix=answers["q_fix"])
+        except Exception as e:
+            print(f"[triggers] lead save failed: {type(e).__name__}: {e}", flush=True)
+        # The HubSpot push does not wait for the match. The match takes a few seconds, and a coach
+        # who closes the tab during it is still a lead. The note gets the offered and chosen
+        # markets written onto it when the coach picks a card.
+        if token:
+            threading.Thread(target=_hubspot_signup,
+                             args=(token, email, first_name, answers, []),
+                             daemon=True).start()
+        matches = _matcher.match(answers)
+        if token:
+            update_trigger_lead(token, offered=_json.dumps([m["name"] for m in matches]))
+        fragment = (form.get("fragment") or "").strip() == "1"
+        if not matches:
+            # The list is long and the fallback matcher nearly always finds something, so this is
+            # rare. The honest page rather than an empty grid.
+            self._send(_triggers.render_none(first_name, answers["q_who"]))
+            return
+        self._send(_triggers.render_cards(token, matches, first_name, fragment=fragment))
+
+    def _post_pick(self):
+        """A coach tapped a card, or said none of them fit.
+
+        token + niche: the chosen market. Checked against the complete list again, written onto the
+        lead, and the report returned. The HubSpot note is rewritten with the market on it.
+
+        token + more: none of the cards fit, and this is what they would call their market. One more
+        match with that added and the first cards excluded. A second "none" goes to the honest page.
+        """
+        form = self._form()
+        if form is None:
+            return
+        token = _mp.text(form, "token", 64)
+        lead = get_trigger_lead(token)
+        if not lead:
+            self.send_response(302)
+            self._safety()
+            self.send_header("Location", "/")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            return
+        fragment = (form.get("fragment") or "").strip() == "1"
+        niche = _mp.text(form, "niche", 160)
+        more  = _matcher.clean_answer(_mp.text(form, "more", _matcher.ANSWER_LIMIT, keep_newlines=True))
+        answers = {k: lead.get(k, "") for k in _matcher.KEYS}
+
+        if niche:
+            market = _matcher.market_by_name(niche)
+            # The gate, one more time: only a market on the complete list can be chosen, whatever
+            # name arrives in the form.
+            if not market or not _triggers.is_complete(market["name"]):
+                self._send(_triggers.render_none(lead.get("first_name", ""), niche))
+                return
+            update_trigger_lead(token, niche_match=market["name"])
+            threading.Thread(target=_hubspot_chosen, args=(token,), daemon=True).start()
+            nxt = f"{APP_BASE_URL}/social?lead={_url_quote(token, safe='')}"
+            self._send(_triggers.render_report(
+                niche      = market["name"],
+                first_name = lead.get("first_name", ""),
+                audit_url  = nxt,
+                fragment   = fragment,
+            ))
+            return
+
+        if more and not lead.get("q_more"):
+            try:
+                offered = _json.loads(lead.get("offered") or "[]")
+            except Exception:
+                offered = []
+            exclude = [m["id"] for m in (_matcher.market_by_name(n) for n in offered) if m]
+            update_trigger_lead(token, q_more=more)
+            matches = _matcher.match(answers, exclude_ids=exclude, extra=more)
+            if matches:
+                update_trigger_lead(token, offered=_json.dumps(offered + [m["name"] for m in matches]))
+                threading.Thread(target=_hubspot_chosen, args=(token,), daemon=True).start()
+                self._send(_triggers.render_cards(token, matches, lead.get("first_name", ""),
+                                                  asked_again=True, fragment=fragment))
+                return
+        self._send(_triggers.render_none(lead.get("first_name", ""), more or lead.get("q_more") or ""))
 
     def log_message(self, *a):
         pass  # quiet
@@ -3424,4 +3524,9 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     print(f"\n  Coaching Website Audit is running.")
     print(f"  Open this in your browser:  http://localhost:{PORT}\n")
+    if not _hubspot.enabled():
+        # Said once, loudly, at startup. Without the token every sign-up is saved here and
+        # nowhere else, and nothing on a page would ever show that.
+        print("  [hubspot] HUBSPOT_TOKEN is not set: leads will NOT reach HubSpot.\n", flush=True)
+    print(f"  [matcher] model {_matcher.MODEL}\n", flush=True)
     ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()

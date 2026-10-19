@@ -158,6 +158,15 @@ def init_leads():
             "website":      "TEXT NOT NULL DEFAULT ''",   # the domain, so the audit ties to the lead
             "website_at":   "TEXT NOT NULL DEFAULT ''",
             "sales_at":     "TEXT NOT NULL DEFAULT ''",   # when they reached the sales page
+            # The three answers behind the market match, exactly as typed, typos and all. They are
+            # the only record of how a coach describes their own buyer in their own words.
+            "q_who":        "TEXT NOT NULL DEFAULT ''",
+            "q_problem":    "TEXT NOT NULL DEFAULT ''",
+            "q_fix":        "TEXT NOT NULL DEFAULT ''",
+            "q_more":       "TEXT NOT NULL DEFAULT ''",   # the extra answer when no card fitted
+            "offered":      "TEXT NOT NULL DEFAULT ''",   # the market names shown as cards, JSON list
+            "hubspot_contact_id": "TEXT NOT NULL DEFAULT ''",
+            "hubspot_note_id":    "TEXT NOT NULL DEFAULT ''",
         }
         cols = {r[1] for r in conn.execute("PRAGMA table_info(trigger_leads)")}
         for name, decl in later.items():
@@ -166,22 +175,29 @@ def init_leads():
         conn.commit()
 
 
-def save_trigger_lead(email, first_name="", last_name="", niche_typed="", niche_match=""):
+def save_trigger_lead(email, first_name="", last_name="", niche_typed="", niche_match="",
+                      q_who="", q_problem="", q_fix=""):
     """One row per submission. Deliberately NOT deduped on email: a coach asking twice, or asking for
     a second market, is a real signal we want to keep.
 
     Returns the row's TOKEN, not its id. The token is what travels in a link to the next step, so a
     coach who has already told us their name, email and niche never has to type any of it again. An
-    id would work too, but a guessable one lets anyone walk through other people's records.
+    id would work too, but a guessable one lets anyone walk through other people's records. It is
+    also the only key the report answers to, so nobody reads a report that was not built for them.
+
+    niche_typed is kept for the rows written by the old typed-search box. New rows carry the three
+    answers instead, and niche_match is filled in when the coach picks a card.
     """
     now = datetime.utcnow().isoformat()
     token = secrets.token_urlsafe(16)
     with _connect() as conn:
         conn.execute(
             """INSERT INTO trigger_leads
-                   (token, email, first_name, last_name, niche_typed, niche_match, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (token, email, first_name, last_name, niche_typed, niche_match, now),
+                   (token, email, first_name, last_name, niche_typed, niche_match,
+                    q_who, q_problem, q_fix, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (token, email, first_name, last_name, niche_typed, niche_match,
+             q_who, q_problem, q_fix, now),
         )
         conn.commit()
     return token
@@ -204,7 +220,8 @@ def update_trigger_lead(token, **fields):
     Unknown column names are ignored rather than raising, so a caller cannot corrupt the row by
     passing a typo, and the step timestamps are set here rather than by every caller.
     """
-    allowed = {"banner_path", "bio", "last_post", "social_at", "website", "website_at", "sales_at"}
+    allowed = {"banner_path", "bio", "last_post", "social_at", "website", "website_at", "sales_at",
+               "niche_match", "q_more", "offered", "hubspot_contact_id", "hubspot_note_id"}
     fields = {k: v for k, v in fields.items() if k in allowed and v not in (None, "")}
     if not (token and fields):
         return False
