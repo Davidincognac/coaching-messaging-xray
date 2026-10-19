@@ -125,7 +125,7 @@ def get_audit(domain):
 
 
 def init_leads():
-    """The Buying Triggers opt-in. Kept in our own DB as well as MailerLite, so a lead is never lost
+    """The Buying Triggers opt-in. Kept in our own DB as well as HubSpot, so a lead is never lost
     to a failed API call, and so we can see which markets coaches actually ask for."""
     with _connect() as conn:
         conn.execute("""

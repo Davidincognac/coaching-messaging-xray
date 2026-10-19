@@ -45,7 +45,6 @@ import brand as _brand                  # palette, nav and footer: one source fo
 import pages as _pages                  # about, blog and the legal pages
 
 PORT = int(os.getenv("PORT", "8000"))
-MAILERLITE_API_KEY = os.getenv("MAILERLITE_API_KEY", "")
 # On Render, set APP_BASE_URL to your service URL (e.g. https://your-app.onrender.com).
 # Locally it falls back to localhost so email links still work during development.
 APP_BASE_URL = os.getenv("APP_BASE_URL", f"http://localhost:{PORT}").rstrip("/")
@@ -647,50 +646,21 @@ document.addEventListener('DOMContentLoaded',function(){
 """
 
 
-def _push_mailerlite(email, first_name, last_name, hero_quote, generic_tokens_found, global_score, salespage_url=""):
-    """Fire-and-forget MailerLite v3 subscriber upsert. Always runs in a daemon thread; never blocks the audit."""
-    if not MAILERLITE_API_KEY or not email:
-        return
+# HubSpot is the database and the sender for every lead: the Buying Triggers sign-up and the
+# website audit. Each push is two writes, the contact then a note, in a daemon thread, logged on
+# failure and never allowed to touch what the coach sees. The lead is in our own database before
+# either runs, so nothing is lost if HubSpot is down.
+
+def _hubspot_audit(email, first_name, domain, headline, score, salespage_url):
+    """A finished website audit. Tick "Website Audit" on the contact and put the headline we read,
+    the score they saw and the sales page link on the timeline as one note."""
     try:
-        tokens_str = (", ".join(generic_tokens_found) if isinstance(generic_tokens_found, list)
-                      else str(generic_tokens_found or ""))
-        payload = _json.dumps({
-            "email": email,
-            "fields": {
-                "name": first_name or "",
-                "last_name": last_name or "",
-                "current_headline": hero_quote or "",
-                "failed_tokens": tokens_str,
-                "global_score": str(global_score or ""),
-                "salespage_url": salespage_url,
-            },
-        }).encode("utf-8")
-        req = urllib.request.Request(
-            "https://connect.mailerlite.com/api/subscribers",
-            data=payload,
-            headers={
-                "Authorization": f"Bearer {MAILERLITE_API_KEY}",
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=10, context=_SSL_CTX):
-            pass
-    except urllib.error.HTTPError as e:
-        try:
-            detail = e.read().decode("utf-8", "replace")[:300]
-        except Exception:
-            detail = ""
-        print(f"[mailerlite] subscriber push failed: HTTP {e.code} {detail}", flush=True)
+        cid = _hubspot.upsert_contact(email, first_name, lead_magnet=_hubspot.LEAD_MAGNET_AUDIT)
+        if cid:
+            _hubspot.create_audit_note(cid, domain, headline, score, salespage_url)
     except Exception as e:
-        print(f"[mailerlite] subscriber push failed: {type(e).__name__}: {e}", flush=True)   # never let a MailerLite failure touch the audit result
+        print(f"[hubspot] audit push failed: {type(e).__name__}: {e}", flush=True)
 
-
-
-# HubSpot is the database and the sender for the Buying Triggers leads. Two writes, both in a
-# daemon thread, both logged on failure and never allowed to touch what the coach sees. The lead is
-# in our own database before either runs, so nothing is lost if HubSpot is down.
 
 def _hubspot_signup(token, email, first_name, answers, offered):
     """Create or update the contact, then put the three answers on its timeline as one note. The
@@ -3284,17 +3254,18 @@ class Handler(BaseHTTPRequestHandler):
                 salespage_url = f"{APP_BASE_URL}/salespage?domain={res.get('domain', url)}"
                 if lead:
                     salespage_url += f"&lead={_url_quote(lead['token'], safe='')}"
-                threading.Thread(
-                    target=_push_mailerlite,
-                    args=(
-                        email, first_name, last_name,
-                        res.get("hero_quote", ""),
-                        tokens_raw,
-                        res.get("global_score", ""),
-                        salespage_url,
-                    ),
-                    daemon=True,
-                ).start()
+                if email:
+                    threading.Thread(
+                        target=_hubspot_audit,
+                        args=(
+                            email, first_name,
+                            res.get("domain", url),
+                            res.get("hero_quote", ""),
+                            res.get("score_10_display", res.get("score_10", "")),
+                            salespage_url,
+                        ),
+                        daemon=True,
+                    ).start()
             self._send(frag)
             return
         if path in ("/", ""):

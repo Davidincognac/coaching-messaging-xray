@@ -622,8 +622,8 @@ unsubscribe link in any email.</p>
 <ul>
   <li><strong>Anthropic</strong> reads the text and screenshot of the website being
     audited so it can score it. Your name and email are not sent.</li>
-  <li><strong>MailerLite</strong> holds your name, email and which stage you reached, and
-    sends the emails.</li>
+  <li><strong>Our contact database</strong> holds your name, email and which stage you
+    reached, and sends the emails.</li>
   <li><strong>Stripe</strong> handles payment.</li>
   <li><strong>Render</strong> hosts the site and therefore stores the database.</li>
   <li><strong>Google Workspace</strong> carries the mail sent to and from

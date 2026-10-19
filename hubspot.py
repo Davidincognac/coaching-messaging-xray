@@ -1,12 +1,14 @@
-"""HubSpot, the database and sender for the Buying Triggers leads.
+"""HubSpot, the database and sender for every lead the app collects.
 
 Portal 149459867 (EU, "David Poole and Associates"). The token is a private app token in the
 HUBSPOT_TOKEN environment variable and is never in the repo.
 
-Two things get written. The contact: first name, email, the Lead magnets checkbox gains "Buying
-Triggers", the Brand dropdown is set to the brand. And one note on the contact's timeline holding the
-three answers as typed and, once chosen, the market. The answers go in a note and not in properties
-because the free property cap is tight and a note is where a human reads them anyway.
+Two things get written. The contact: first name, email, the Lead magnets checkbox gains the magnet
+they just took ("Buying Triggers" or "Website Audit"), the Brand dropdown is set to the brand. And
+one note on the contact's timeline. For Buying Triggers the note holds the three answers as typed
+and, once chosen, the market. For the website audit it holds the headline read, the score and the
+sales page link. These go in a note and not in properties because the free property cap is tight
+and a note is where a human reads them anyway.
 
 Nothing here raises. Every call logs its failure and returns None, and every caller runs it in a
 daemon thread, so a HubSpot outage can never cost a coach their report. The lead is already in our own
@@ -24,6 +26,7 @@ from datetime import datetime, timezone
 TOKEN = os.getenv("HUBSPOT_TOKEN", "")
 BASE = "https://api.hubapi.com"
 LEAD_MAGNET = "Buying Triggers"
+LEAD_MAGNET_AUDIT = "Website Audit"
 BRAND = "Going Beyond The Illusion"
 NOTE_TO_CONTACT = 202          # HubSpot's own association type: note to contact
 
@@ -65,7 +68,7 @@ def _call(method, path, body=None, ok404=False):
     return None
 
 
-def upsert_contact(email, first_name=""):
+def upsert_contact(email, first_name="", lead_magnet=LEAD_MAGNET):
     """Create the contact, or update the one that already has this email. Returns the contact id,
     or None. The Lead magnets checkbox is a multi-select, so the existing ticks are kept and this
     one is added. HubSpot stores a multi-select as values joined by semicolons."""
@@ -80,8 +83,8 @@ def upsert_contact(email, first_name=""):
     if existing and existing.get("id"):
         have = [v for v in ((existing.get("properties") or {}).get("lead_magnets") or "").split(";")
                 if v]
-        if LEAD_MAGNET not in have:
-            have.append(LEAD_MAGNET)
+        if lead_magnet not in have:
+            have.append(lead_magnet)
         props["lead_magnets"] = ";".join(have)
         # A first name they typed earlier stays unless they gave one this time.
         if not first_name:
@@ -89,7 +92,7 @@ def upsert_contact(email, first_name=""):
         res = _call("PATCH", f"/crm/v3/objects/contacts/{existing['id']}", {"properties": props})
         return existing["id"] if res is not None else None
     props["email"] = email
-    props["lead_magnets"] = LEAD_MAGNET
+    props["lead_magnets"] = lead_magnet
     res = _call("POST", "/crm/v3/objects/contacts", {"properties": props})
     return (res or {}).get("id")
 
@@ -108,19 +111,35 @@ def _note_body(answers, questions, market="", offered=()):
     return "<br><br>".join(lines)
 
 
-def create_note(contact_id, answers, questions, market="", offered=()):
-    """One note on the contact's timeline. Returns the note id, or None."""
+def _post_note(contact_id, body):
+    """One note on the contact's timeline, body already HTML. Returns the note id, or None."""
     if not (TOKEN and contact_id):
         return None
     now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     res = _call("POST", "/crm/v3/objects/notes", {
-        "properties": {"hs_timestamp": str(now_ms),
-                       "hs_note_body": _note_body(answers, questions, market, offered)},
+        "properties": {"hs_timestamp": str(now_ms), "hs_note_body": body},
         "associations": [{"to": {"id": str(contact_id)},
                           "types": [{"associationCategory": "HUBSPOT_DEFINED",
                                      "associationTypeId": NOTE_TO_CONTACT}]}],
     })
     return (res or {}).get("id")
+
+
+def create_note(contact_id, answers, questions, market="", offered=()):
+    """The Buying Triggers note: the three answers and the market. Returns the note id, or None."""
+    return _post_note(contact_id, _note_body(answers, questions, market, offered))
+
+
+def create_audit_note(contact_id, domain, headline, score, salespage_url):
+    """The website audit note: what their homepage said, the score they were shown, and the sales
+    page built from it. Returns the note id, or None."""
+    e = html.escape
+    lines = [f"<b>Website Audit</b><br>{e(domain or '')}",
+             f"<b>Headline read:</b><br>{e(headline) if headline else '(none found)'}",
+             f"<b>Score:</b> {e(str(score)) if score not in ('', None) else 'not scored'}/10"]
+    if salespage_url:
+        lines.append(f'<b>Sales page:</b><br><a href="{e(salespage_url)}">{e(salespage_url)}</a>')
+    return _post_note(contact_id, "<br><br>".join(lines))
 
 
 def update_note(note_id, answers, questions, market="", offered=()):
