@@ -207,8 +207,134 @@ CHROME_CSS = """
 """
 
 
+# ------------------------------------------------------------ the funnel's shared pieces
+
+# Three things the triggers pages and the social pages both use, kept here so the two halves of the
+# funnel cannot drift apart: the step tracker, Angelo in a framed card, and the six triggers as cards.
+FUNNEL_CSS = """
+  /* ---------- step tracker: where the coach is, out of three ---------- */
+  .gb-steps{display:flex;flex-wrap:wrap;align-items:center;gap:8px;list-style:none;margin:0 0 22px;padding:0}
+  /* is-done / is-now, not done / now: triggers.py already has a .done box with 30px of padding. */
+  .gb-steps li{margin:0;display:flex;align-items:center;gap:8px;padding:6px 13px 6px 7px;border-radius:var(--pill);
+    background:var(--navy-card);border:1px solid var(--navy-line);font-size:13px;font-weight:600;
+    color:var(--ivory-dim);line-height:1.2}
+  .gb-steps .sn{width:20px;height:20px;border-radius:50%;background:var(--navy-line);color:var(--ivory);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+  .gb-steps li.is-done{color:var(--ivory)}
+  .gb-steps li.is-done .sn{background:var(--good)}
+  .gb-steps li.is-now{color:#fff;border-color:var(--cta-soft);background:rgba(200,16,46,.14)}
+  .gb-steps li.is-now .sn{background:var(--cta)}
+  .gb-steps li.is-skip{opacity:.55}
+  @media(max-width:480px){.gb-steps li{font-size:12px;padding:5px 10px 5px 6px}}
+
+  /* ---------- Angelo in a frame, for the hero of an inner page ---------- */
+  .gb-angelo{width:155px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;flex-shrink:0;
+    border:1px solid var(--navy-line);box-shadow:0 12px 30px rgba(0,0,0,.45);background:#fff}
+  .gb-ihero{display:flex;gap:26px;align-items:center;justify-content:space-between;margin:0 0 26px}
+  .gb-ihero .gb-icopy{flex:1;min-width:0}
+  .gb-ihero h1{font-family:var(--display);font-weight:700;letter-spacing:-.03em;line-height:1.06;
+    font-size:clamp(30px,4.6vw,42px);margin:0 0 12px;color:#fff;text-wrap:balance}
+  .gb-ihero .gb-eyebrow{margin-bottom:10px}
+  .gb-ihero .gb-ilede{font-size:16px;line-height:1.65;color:var(--ivory-dim);margin:0;max-width:56ch}
+  @media(max-width:600px){
+    .gb-ihero{flex-direction:column-reverse;align-items:flex-start;gap:16px}
+    .gb-angelo{width:120px}}
+
+  /* ---------- the six triggers as cards ---------- */
+  .gb-six{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none}
+  .gb-six li{margin:0}
+  .gb-six a,.gb-six .gb-sixc{display:block;height:100%;background:var(--navy-card);border:1px solid var(--navy-line);
+    border-radius:10px;padding:14px 13px;text-decoration:none;color:var(--ivory)}
+  .gb-six a:hover{border-color:var(--cta-soft)}
+  .gb-six .n{width:22px;height:22px;border-radius:50%;background:var(--cta);color:#fff;font-size:11.5px;
+    font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 0 10px}
+  .gb-six .c{display:block;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ivory-dim);
+    font-weight:700;line-height:1.4;margin:0 0 5px}
+  .gb-six .t{display:block;font-family:var(--serif);font-size:16px;font-weight:600;line-height:1.3;color:#fff}
+  @media(max-width:700px){.gb-six{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:420px){.gb-six{grid-template-columns:1fr}}
+
+  /* ---------- Angelo working: one panel, used by both working screens ---------- */
+  .gb-work{max-width:760px;margin:20px auto 0;background:var(--navy-card);border:1px solid var(--navy-line);
+    border-radius:16px;padding:28px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  .gb-work-head{display:flex;gap:22px;align-items:center;margin:0 0 22px}
+  .gb-work-head img{width:180px;aspect-ratio:3/2;object-fit:cover;border-radius:12px;flex-shrink:0;
+    background:#fff;border:1px solid var(--navy-line);animation:gb-bob 2.6s ease-in-out infinite}
+  .gb-work-head .gb-eyebrow{font-size:11px;margin:0 0 6px}
+  .gb-work-head h3{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.025em;
+    line-height:1.12;margin:0 0 8px;color:#fff;text-align:left}
+  .gb-work-head p{font-size:14px;line-height:1.55;color:var(--ivory-dim);margin:0}
+  .gb-work-head p.gb-eyebrow{color:var(--cta-soft)}
+  .gb-work .pbar{height:8px;background:var(--navy-deep);border:1px solid var(--navy-line);border-radius:6px;
+    overflow:hidden;margin:0 0 10px}
+  .gb-work .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cta),var(--cta-soft));
+    border-radius:6px;transition:width .6s linear}
+  .gb-work ul{list-style:none;margin:0;padding:0}
+  .gb-work li{margin:0;display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--navy-line);
+    font-size:14.5px;line-height:1.45;color:var(--ivory-dim)}
+  .gb-work li:last-child{border-bottom:0}
+  .gb-work li .ic{width:20px;height:20px;border-radius:50%;border:2px solid var(--navy-line);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+  .gb-work li .st{margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    padding:4px 9px;border-radius:var(--pill);background:rgba(255,255,255,.06);color:var(--ivory-dim);white-space:nowrap}
+  .gb-work li.is-working{color:#fff;font-weight:600}
+  .gb-work li.is-working .ic{border-color:var(--navy-line);border-top-color:var(--cta-soft);animation:gb-spin .8s linear infinite}
+  .gb-work li.is-working .st{background:rgba(200,16,46,.18);color:var(--cta-soft)}
+  .gb-work li.is-done{color:var(--ivory)}
+  .gb-work li.is-done .ic{background:var(--good);border-color:var(--good)}
+  .gb-work li.is-done .ic::after{content:"\\2713"}
+  .gb-work li.is-done .st{background:rgba(42,123,86,.22);color:var(--good-glow)}
+  @keyframes gb-spin{to{transform:rotate(360deg)}}
+  @keyframes gb-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @media(prefers-reduced-motion:reduce){.gb-work-head img,.gb-work li.is-working .ic{animation:none}}
+  @media(max-width:560px){
+    .gb-work{padding:20px 16px}
+    .gb-work-head{flex-direction:column;align-items:flex-start;gap:14px}
+    .gb-work-head img{width:130px}
+    .gb-work-head h3{font-size:22px}}
+"""
+
+STEP_NAMES = ("Your buying triggers", "Your profile", "Your website", "Your file")
+
+
+def steps_html(current, skipped=()):
+    """The steps of the funnel. `current` is 1 to 4; anything before it shows ticked.
+
+    `skipped` holds step numbers the coach went past without doing, such as the website step for a
+    coach with no website. Those show a dash, not a tick, so we never claim they did something.
+    """
+    out = []
+    for i, name in enumerate(STEP_NAMES, start=1):
+        if i in skipped:
+            cls, mark = "is-skip", "&ndash;"
+        elif i < current:
+            cls, mark = "is-done", "&#10003;"
+        elif i == current:
+            cls, mark = "is-now", str(i)
+        else:
+            cls, mark = "", str(i)
+        cur = ' aria-current="step"' if i == current else ""
+        out.append(f'<li class="{cls}"{cur}><span class="sn">{mark}</span>{name}</li>')
+    return '<ol class="gb-steps" aria-label="Your progress">' + "".join(out) + "</ol>"
+
+
+def six_cards(items, link=False):
+    """The six triggers at a glance. `items` is [(category, name), ...] in trigger order.
+
+    With link=True each card jumps to that trigger further down the page (#t1 to #t6).
+    """
+    e = html.escape
+    out = []
+    for i, (cat, name) in enumerate(items, start=1):
+        inner = (f'<span class="n">{i}</span><span class="c">{e(cat)}</span>'
+                 f'<span class="t">{e(name)}</span>')
+        out.append(f'<li><a href="#t{i}">{inner}</a></li>' if link
+                   else f'<li><div class="gb-sixc">{inner}</div></li>')
+    return '<ul class="gb-six">' + "".join(out) + "</ul>"
+
+
 def nav_html(active="", links=True):
-    """The top bar. `active` is one of home, about, blog and just bolds that link.
+    """The top bar. `active` is one of home, about, blog, book and just bolds that link.
 
     links=False gives the brand bar with nothing to click, which is what the salespage
     and the report want: once somebody is reading their own result we are not offering
@@ -216,7 +342,8 @@ def nav_html(active="", links=True):
     """
     items = ""
     if links:
-        pages = [("home", "/", "Home"), ("about", "/about", "About"), ("blog", "/blog", "Blog")]
+        pages = [("home", "/", "Home"), ("about", "/about", "About"), ("blog", "/blog", "Blog"),
+                 ("book", "/book-a-call", "Book a call")]
         parts = []
         for key, href, label in pages:
             on = ' class="on"' if key == active else ""
@@ -254,6 +381,7 @@ def footer_html():
         <li><a href="/about">About</a></li>
         <li><a href="/blog">Blog</a></li>
         <li><a href="/methodology">How we score</a></li>
+        <li><a href="/book-a-call">Book a call</a></li>
         <li><a href="mailto:{c['email']}">{c['email']}</a></li>
       </ul>
     </div>
@@ -376,6 +504,7 @@ PUBLIC_PAGES = [
     ("/", "1.0", "weekly"),
     ("/about", "0.8", "monthly"),
     ("/blog", "0.7", "weekly"),
+    ("/book-a-call", "0.6", "monthly"),
     # Every post cites the corpus; this is the page that says what the corpus is.
     ("/methodology", "0.6", "yearly"),
     ("/website", "0.6", "monthly"),
@@ -466,7 +595,7 @@ def cta_block(heading="Want to know why your market buys?"):
     <li>The promises they have stopped believing</li>
     <li>Why they pick one coach over the next one</li>
   </ul>
-  <p class="gb-ctafoot">It opens on the page in about twenty seconds. Nothing to pay.</p>
+  <p class="gb-ctafoot">It opens on the page in about 20 seconds. Nothing to pay.</p>
   <a class="gb-btn primary" href="/">Show me my buying triggers</a>
 </aside>"""
 
@@ -481,7 +610,7 @@ def cta_inline():
     return """<aside class="gb-midcta">
   <p><b>Reading this because your enquiries are thin?</b> The same research behind these
      numbers will tell you what your own market buys and why, market by market.
-     <a href="/">See your buying triggers</a>, free, about twenty seconds.</p>
+     <a href="/">See your buying triggers</a>, free, about 20 seconds.</p>
 </aside>"""
 
 
@@ -658,48 +787,54 @@ def article_schema(title, description, path, date="", faqs=(), trail=(), image="
 # is about angel numbers. The rule here is one question, one successor, or leave it dead.
 LEGACY_REDIRECTS = {
     # getting clients
-    "/3-no-cost-ways-to-get-more-coaching-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/create-new-coaching-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/how-can-i-find-coaching-clients-in-2023": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/how-do-life-coaches-get-customers": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/where-do-life-coaches-find-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/how-do-i-sell-myself-as-a-life-coach": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/free-clients-from-google": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/get-clients-free-program": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/how-to-find-clients-as-a-life-coach-using-chatgpt": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/how-to-find-coaching-clients-with-the-law-of-attraction": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/networking-to-find-coaching-clients": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/how-a-life-coach-can-get-referrals": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/client-acquisition-breakdown": "/blog/2026-09-29-how-to-get-coaching-clients",
-    "/how-to-find-coaching-clients-without-a-website": "/blog/2026-09-29-coaching-clients-without-a-website",
-    "/attract-new-clients-with-free-webinars": "/blog/2026-09-29-attract-coaching-clients",
-    "/how-speaking-engagements-can-help-coaches-attract-clients": "/blog/2026-09-29-attract-coaching-clients",
-    "/why-sales-doesnt-work-for-coaches": "/blog/2026-09-29-attract-coaching-clients",
-    "/4-secret-things-your-coaching-clients-really-want": "/blog/2026-09-29-ideal-coaching-client",
+    "/3-no-cost-ways-to-get-more-coaching-clients": "/blog/how-to-get-coaching-clients",
+    "/create-new-coaching-clients": "/blog/how-to-get-coaching-clients",
+    "/how-can-i-find-coaching-clients-in-2023": "/blog/how-to-get-coaching-clients",
+    "/how-do-life-coaches-get-customers": "/blog/how-to-get-coaching-clients",
+    "/where-do-life-coaches-find-clients": "/blog/how-to-get-coaching-clients",
+    "/how-do-i-sell-myself-as-a-life-coach": "/blog/how-to-get-coaching-clients",
+    "/free-clients-from-google": "/blog/how-to-get-coaching-clients",
+    "/get-clients-free-program": "/blog/how-to-get-coaching-clients",
+    "/how-to-find-clients-as-a-life-coach-using-chatgpt": "/blog/how-to-get-coaching-clients",
+    "/how-to-find-coaching-clients-with-the-law-of-attraction": "/blog/how-to-get-coaching-clients",
+    "/networking-to-find-coaching-clients": "/blog/how-to-get-coaching-clients",
+    "/how-a-life-coach-can-get-referrals": "/blog/how-to-get-coaching-clients",
+    "/client-acquisition-breakdown": "/blog/how-to-get-coaching-clients",
+    "/how-to-find-coaching-clients-without-a-website": "/blog/coaching-clients-without-a-website",
+    "/attract-new-clients-with-free-webinars": "/blog/attract-coaching-clients",
+    "/how-speaking-engagements-can-help-coaches-attract-clients": "/blog/attract-coaching-clients",
+    "/why-sales-doesnt-work-for-coaches": "/blog/attract-coaching-clients",
+    "/4-secret-things-your-coaching-clients-really-want": "/blog/ideal-coaching-client",
     # niche
-    "/whats-the-difference-between-a-coaching-niche-and-an-avatar": "/blog/2026-09-29-niche-versus-audience",
-    "/how-to-find-a-great-coaching-niche": "/blog/2026-09-29-how-to-choose-a-coaching-niche",
-    "/stuck-at-finding-a-coaching-niche-you-love": "/blog/2026-09-29-how-to-choose-a-coaching-niche",
+    "/whats-the-difference-between-a-coaching-niche-and-an-avatar": "/blog/niche-versus-audience",
+    "/how-to-find-a-great-coaching-niche": "/blog/how-to-choose-a-coaching-niche",
+    "/stuck-at-finding-a-coaching-niche-you-love": "/blog/how-to-choose-a-coaching-niche",
     # websites
-    "/how-to-create-a-coaching-website": "/blog/2026-09-29-website-design-for-life-coaches",
-    "/how-to-make-a-coaching-website": "/blog/2026-09-29-website-design-for-life-coaches",
-    "/website-for-a-coaching-business": "/blog/2026-09-29-website-design-for-life-coaches",
+    "/how-to-create-a-coaching-website": "/blog/website-design-for-life-coaches",
+    "/how-to-make-a-coaching-website": "/blog/website-design-for-life-coaches",
+    "/website-for-a-coaching-business": "/blog/website-design-for-life-coaches",
     # marketing
-    "/life-coach-marketing": "/blog/2026-09-29-marketing-for-coaches",
-    "/better-marketing": "/blog/2026-09-29-marketing-for-coaches",
-    "/are-life-coaches-accidentally-investing-in-marketing": "/blog/2026-09-29-marketing-for-coaches",
-    "/the-1-marketing-hack-that-created-70-discovery-calls": "/blog/2026-09-29-marketing-for-coaches",
-    "/what-are-the-needle-movers-in-your-coaching-business": "/blog/2026-09-29-marketing-for-coaches",
-    "/a-marketing-plan-for-coaches": "/blog/2026-09-29-life-coach-marketing-plan",
-    "/5-key-strategies-for-marketing-your-life-coaching-business": "/blog/2026-09-29-life-coach-marketing-plan",
-    "/grow-your-coaching-business-with-social-media": "/blog/2026-09-29-social-media-marketing-for-coaches",
-    "/social-media-for-finding-clients": "/blog/2026-09-29-social-media-marketing-for-coaches",
-    "/how-to-create-a-youtube-channel-for-coaches": "/blog/2026-09-29-social-media-marketing-for-coaches",
-    "/blog-for-coaches": "/blog/2026-09-29-content-marketing-for-coaches",
-    "/blogging-for-coaches": "/blog/2026-09-29-content-marketing-for-coaches",
-    "/how-to-find-coaching-clients-with-blogging": "/blog/2026-09-29-content-marketing-for-coaches",
-    "/branding-coach": "/blog/2026-09-29-branding-coaching-business",
-    "/how-to-make-your-coaching-business-look-amazing-in-5-days": "/blog/2026-09-29-branding-coaching-business",
+    "/life-coach-marketing": "/blog/marketing-for-coaches",
+    "/better-marketing": "/blog/marketing-for-coaches",
+    "/are-life-coaches-accidentally-investing-in-marketing": "/blog/marketing-for-coaches",
+    "/the-1-marketing-hack-that-created-70-discovery-calls": "/blog/marketing-for-coaches",
+    "/what-are-the-needle-movers-in-your-coaching-business": "/blog/marketing-for-coaches",
+    "/a-marketing-plan-for-coaches": "/blog/life-coach-marketing-plan",
+    "/5-key-strategies-for-marketing-your-life-coaching-business": "/blog/life-coach-marketing-plan",
+    "/grow-your-coaching-business-with-social-media": "/blog/social-media-marketing-for-coaches",
+    "/social-media-for-finding-clients": "/blog/social-media-marketing-for-coaches",
+    "/how-to-create-a-youtube-channel-for-coaches": "/blog/social-media-marketing-for-coaches",
+    "/blog-for-coaches": "/blog/content-marketing-for-coaches",
+    "/blogging-for-coaches": "/blog/content-marketing-for-coaches",
+    "/how-to-find-coaching-clients-with-blogging": "/blog/content-marketing-for-coaches",
+    "/branding-coach": "/blog/branding-coaching-business",
+    "/how-to-make-your-coaching-business-look-amazing-in-5-days": "/blog/branding-coaching-business",
+    # Old addresses Google was still asking for in October 2026.
+    "/home": "/",
+    "/blindspots": "/",
+    "/marketing-coaches": "/blog/marketing-for-coaches",
+    "/high-ticket-coaching": "/blog/how-to-get-coaching-clients",
+    "/why-coaches-dont-need-to-define-a-niche": "/blog/niche-versus-audience",
 }
 
 

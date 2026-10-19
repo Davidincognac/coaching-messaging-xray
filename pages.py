@@ -178,6 +178,75 @@ def shell(body, title, desc="", active="", path="/", index=True, hero_html="", e
             .replace("__BODY__", body))
 
 
+# --------------------------------------------------------------------------- book a call
+
+# David's Google Calendar booking page. Google draws the calendar inside the frame and
+# we cannot style it, so the page crops off Google's own header (name, title, duration
+# repeated) and sits the rest in our own card.
+BOOKING_URL = ("https://calendar.google.com/calendar/appointments/schedules/"
+               "AcZssZ0tEQGA39O77oirvaB9qO0UQjl0QyUugvGJszyKAqBjXLI67IoN2-JbZiTZuIntFA7uBieFJn5C?gv=true")
+
+_BOOK_CSS = """<style>
+main.prose{display:none}
+.gb-hero.bk-hero{padding:0}
+.bk-wrap{max-width:1180px;margin:0 auto;padding:48px 24px 96px;display:grid;
+  grid-template-columns:1fr 1.25fr;gap:56px;align-items:start}
+.bk-wrap .gb-display{font-size:clamp(40px,5vw,64px)}
+.bk-list{list-style:none;padding:0;margin:28px 0 32px}
+.bk-list li{position:relative;padding:14px 0 14px 34px;border-top:1px solid var(--card-dark-line);
+  color:var(--ivory-dim);line-height:1.55}
+.bk-list li:last-child{border-bottom:1px solid var(--card-dark-line)}
+.bk-list li b{color:var(--ivory)}
+.bk-list li:before{content:"";position:absolute;left:4px;top:22px;width:10px;height:10px;
+  border-radius:50%;background:var(--cta)}
+.bk-me{display:flex;gap:14px;align-items:center;color:var(--ivory-dim);font-size:15px}
+.bk-me img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--cta-soft)}
+.bk-me strong{display:block;color:var(--ivory);font-size:16px}
+.bk-card{background:#fff;border-radius:18px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px var(--card-dark-line)}
+.bk-cardhead{background:var(--navy-card);padding:18px 24px;display:flex;justify-content:space-between;
+  align-items:center;color:var(--ivory);font-family:var(--display);font-weight:600;font-size:18px;
+  border-bottom:3px solid var(--cta)}
+.bk-cardhead span{font-weight:400;font-size:14px;color:var(--ivory-dim)}
+.bk-crop{height:860px;overflow:hidden}
+.bk-crop iframe{border:0;width:100%;height:1100px;display:block;margin-top:-238px}
+.bk-fallback{margin:14px 0 0;font-size:14px;color:var(--ivory-dim)}
+.bk-fallback a{color:var(--cta-soft)}
+@media(max-width:900px){.bk-wrap{grid-template-columns:1fr;gap:36px;padding-top:32px}}
+</style>"""
+
+
+def render_book_call():
+    e = html.escape(BOOKING_URL, quote=True)
+    hero_html = f"""<section class="gb-dark gb-hero bk-hero"><div class="bk-wrap">
+<div>
+  <p class="gb-eyebrow">Book a call</p>
+  <h1 class="gb-display">A <span class="gb-grad">free 30 minute call</span> with me</h1>
+  <p class="gb-lede">Tell me who you coach and what is going on with getting clients. If there
+     is a fit, I will tell you. If there isn't, I will tell you that too.</p>
+  <ul class="bk-list">
+    <li><b>Who you coach</b> and who is actually buying from you right now</li>
+    <li><b>Where the enquiries stop.</b> We look at what your market responds to, and what it ignores</li>
+    <li><b>A straight answer</b> on what I would change first. Yours to keep, whether we work together or not</li>
+  </ul>
+  <div class="bk-me"><img src="/david.jpg" alt="David Poole">
+    <div><strong>David Poole</strong>On Google Meet. You get the link when you book.</div></div>
+</div>
+<div>
+  <div class="bk-card">
+    <div class="bk-cardhead">Pick a time<span>30 minutes &middot; free</span></div>
+    <div class="bk-crop"><iframe src="{e}" title="Book a free 30 minute call with David Poole"
+         loading="lazy"></iframe></div>
+  </div>
+  <p class="bk-fallback">Calendar not loading? <a href="{e}" target="_blank" rel="noopener">Open it in a new tab</a>.</p>
+</div>
+</div></section>"""
+    return shell("", "Book a free 30 minute call",
+                 "Book a free 30 minute call with David Poole. Tell him who you coach and what is "
+                 "going on with getting clients, and get a straight answer on what to change first.",
+                 active="book", path="/book-a-call", hero_html=hero_html, extra_head=_BOOK_CSS)
+
+
 # --------------------------------------------------------------------------- about
 
 def render_about():
@@ -239,7 +308,7 @@ and 2,000 books their buyers actually paid for. 10,954 of those websites are the
 corpus every figure on the blog comes from, and
 <a href="/methodology">here is how they were scored</a>.</p>
 
-<p><a href="/blog/2026-09-28-average-coaching-website">The average website scored
+<p><a href="/blog/average-coaching-website">The average website scored
 {MARKET_AVG_10}</a>.</p>
 
 <p>That number is the reason I keep doing this. A coach who knows their subject cold, who
@@ -277,8 +346,39 @@ happens unless you want it to.</p>
 _FRONT = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
 
 
-def _read_posts():
-    """Every .md file in posts/, newest first.
+_DATED = re.compile(r"^(\d{4}-\d{2}-\d{2})-")
+
+
+_BLOG_LINK = re.compile(r"\[([^\]]+)\]\(/blog/([a-z0-9-]+)\)")
+
+
+def _read_posts(today=None):
+    """Every post that is live today, newest first.
+
+    A post dated in the future is written and pushed but not published yet. It stays off
+    the blog page, the sitemap, the feed and "Read next", and its address is a 404, until
+    its date comes round. The site reads posts on every request, so it appears that
+    morning with no deploy.
+
+    Links can be written to posts that are not out yet. Until the post is live, the link
+    is shown as its plain words so nobody lands on a 404. On the day it goes live, every
+    link pointing at it becomes a real link, on every page at once.
+    """
+    today = today or datetime.utcnow().strftime("%Y-%m-%d")
+    every = _read_all_posts()
+    live = [p for p in every if not p["date"] or p["date"] <= today]
+    live_slugs = {p["slug"] for p in live}
+
+    def unlink(m):
+        return m.group(0) if m.group(2) in live_slugs else m.group(1)
+
+    for p in live:
+        p["body"] = _BLOG_LINK.sub(unlink, p["body"])
+    return live
+
+
+def _read_all_posts():
+    """Every .md file in posts/, newest first, including ones dated in the future.
 
     Front matter is optional. Without it the filename becomes the slug and the title is
     the first heading, so a post can be published by saving a file and pushing.
@@ -305,9 +405,12 @@ def _read_posts():
                     meta[k.strip().lower()] = v.strip()
         title = meta.get("title") or _first_heading(body) or name[:-3].replace("-", " ")
         out.append({
-            "slug": meta.get("slug") or name[:-3],
+            # The date lives in the filename so posts sort on disk, but not in the address.
+            # A dated URL looks stale a year on and ties the page to the day it was written.
+            # The old dated addresses 301 to these in app.py.
+            "slug": meta.get("slug") or _DATED.sub("", name[:-3]),
             "title": title,
-            "date": meta.get("date", ""),
+            "date": meta.get("date", "") or (_DATED.match(name).group(1) if _DATED.match(name) else ""),
             "summary": meta.get("summary", ""),
             # `image:` in front matter is the picture the post shares itself with. A bare
             # filename means posts/images/, anything with a slash is taken as written.
@@ -590,8 +693,9 @@ def render_privacy():
 <p class="lede">What this site collects, why, and who else sees it. Written to match what
 the code actually does.</p>
 
-<div class="note">We set no cookies and run no analytics or advertising tags. There is no
-consent banner on this site because there is nothing to consent to.</div>
+<div class="note">We run no advertising tags. We use Microsoft Clarity to see how people
+use the site (where they click and scroll), but only if you click OK on the banner at the
+bottom of the page.</div>
 
 <h2>Who is responsible</h2>
 <p>{c['legal']}, {c['street']}, {c['town']} {c['postcode']}, {c['country']}.
@@ -626,6 +730,9 @@ unsubscribe link in any email.</p>
     reached, and sends the emails.</li>
   <li><strong>Stripe</strong> handles payment.</li>
   <li><strong>Render</strong> hosts the site and therefore stores the database.</li>
+  <li><strong>Microsoft Clarity</strong> records how pages are used (clicks, scrolling,
+    page visits) if you click OK on the cookie banner. Text you type into forms is hidden
+    from it. It never runs on your own report pages.</li>
   <li><strong>Google Workspace</strong> carries the mail sent to and from
     {c['email']}.</li>
 </ul>
@@ -716,10 +823,17 @@ def render_cookies():
     c = _brand.COMPANY
     body = f"""
 <h1>Cookies</h1>
-<p class="lede">This site sets none.</p>
+<p class="lede">One, and only if you say yes.</p>
 
-<p>No analytics, no advertising tags, no session cookies, nothing dropped in your browser
-by us. That is why there is no consent banner: there is nothing to ask you about.</p>
+<p>We use Microsoft Clarity to see how people use the site: which pages they visit, where
+they click and how far they scroll. It sets cookies to do that, so it only runs if you click
+OK on the line at the bottom of the page. Click "No thanks" and it never loads. Your own
+report pages never run it either way.</p>
+
+<p>We remember your answer in your browser so we don't ask on every page. To change it,
+clear this site's data in your browser and the question comes back.</p>
+
+<p>No advertising tags, ever.</p>
 
 <p>Two things worth knowing anyway.</p>
 
@@ -730,12 +844,11 @@ advertising data and we cannot read anything from it.</p>
 <p>When you buy, the payment page is Stripe's, and Stripe sets what it needs to take a
 payment safely. Their policy covers that page, not this one.</p>
 
-<p>If we ever add a tracking tag, this page changes first and a banner appears with it.
-Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.</p>
+<p>Question about any of it, email <a href="mailto:{c['email']}">{c['email']}</a>.</p>
 
 <p class="stamp">Last updated {datetime.utcnow().strftime('%d %B %Y')}</p>
 """
-    return shell(body, "Cookies", "This site sets no cookies, runs no analytics and shows no consent banner, because there is nothing to consent to. What that means in practice.", path="/cookies")
+    return shell(body, "Cookies", "The one tool on this site that sets cookies, Microsoft Clarity, and how it only runs if you click OK.", path="/cookies")
 
 
 _H2 = re.compile(r"<h2>")

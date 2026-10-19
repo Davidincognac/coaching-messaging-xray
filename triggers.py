@@ -209,6 +209,20 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   .whats .rl{font-size:15.5px;line-height:1.7;color:var(--ivory);margin:0 0 14px;max-width:64ch}
   .whats .rl:last-child{margin-bottom:0}
   .whats h2 + .rl{margin-top:-4px;margin-bottom:18px;color:var(--ivory-dim)}
+  /* The six triggers as cards, title on its own line, so the eye takes them one at a time. */
+  .whats:not(.real) ol{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:22px}
+  .whats:not(.real) li{margin:0;padding:18px;background:rgba(255,255,255,.03);border:1px solid var(--navy-line);
+    border-radius:10px;font-size:15px;line-height:1.55;color:rgba(244,245,247,.72)}
+  .whats:not(.real) li:before{position:static;margin-bottom:12px;width:32px;height:32px;font-size:15px}
+  .whats:not(.real) li b{display:block;color:var(--ivory);font-size:16.5px;font-weight:600;margin-bottom:6px;line-height:1.35}
+  .whats h2{font-family:Outfit,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-weight:700;font-size:30px;letter-spacing:-.01em;color:#fff}
+  .whats h2 + .rl{color:rgba(244,245,247,.85)}
+  /* The form needs to stand out from the page behind it. */
+  #trigform{border:2px solid rgba(255,255,255,.7);box-shadow:0 0 0 6px rgba(255,255,255,.04),0 10px 40px rgba(0,0,0,.4)}
+  #trigform input{border:1px solid rgba(255,255,255,.28)}
+  #trigform input:focus{border-color:#fff}
+  #trigform a{color:var(--ivory);text-decoration:underline}
   .closer{margin:40px 0 0;background:var(--navy-card);border:1px solid var(--cta);
     border-radius:12px;padding:30px}
   .closer h2{font-family:var(--serif);font-size:24px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
@@ -224,39 +238,27 @@ _CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
     .hero{gap:16px}
     .mascot{width:76px;height:76px}
   }
+  /* Angelo standing up beside the headline. Two classes, so this beats .mascot above, which used to
+     win and squash him into a small circle. */
+  .mascot.heromascot{width:250px;height:auto;aspect-ratio:auto;object-fit:contain;border-radius:0;
+    border:0;box-shadow:none}
+  @media(max-width:820px){.mascot.heromascot{width:150px}}
+  /* The way back up to the form is a real button now, not a small blue link. */
+  .backup a.gb-btn{color:var(--cta-ink);text-decoration:none;font-size:16px}
+  .backup a.gb-btn:hover{color:var(--cta-ink)}
 
   /* Angelo pulling the market. Same shape as the audit's progress panel, so the two pages feel
      like one product. */
-  #processing{display:none;margin:32px 0 0;padding:32px;border-radius:12px;
-    background:var(--navy-card);border:1px solid var(--navy-line)}
+  #processing{display:none}
   #processing.on{display:block}
   .angelo-loader{display:block;width:150px;aspect-ratio:1;object-fit:cover;margin:0 auto 20px;
     border-radius:50%;border:2px solid var(--glow);box-shadow:0 0 0 5px rgba(127,169,221,.18)}
-  #processing h3{font-size:21px;margin:0 0 8px;color:var(--ivory);text-align:center;font-weight:600}
-  .pbar{height:6px;background:var(--navy-deep);border:1px solid var(--navy-line);border-radius:4px;
-    overflow:hidden;margin:0 0 20px}
-  .pbar i{display:block;height:100%;width:0;background:var(--cta);border-radius:4px;
-    transition:width .6s linear}
   /* Two lists and two headings live in the panel, one for the match and one for the report.
-     The panel's data-mode picks which pair shows. */
-  #processing ul{list-style:none;margin:0 0 18px;padding:0;display:none}
+     The panel's data-mode picks which pair shows. brand.FUNNEL_CSS styles the panel itself. */
+  #processing ul{display:none}
   #processing h3{display:none}
   #processing[data-mode=match] [data-mode=match],
   #processing[data-mode=report] [data-mode=report]{display:block}
-  #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;
-    line-height:1.5;color:var(--ivory);display:flex;gap:8px;align-items:baseline}
-  #processing li .ps-status{margin-left:auto}
-  #processing li:last-child{border-bottom:0}
-  #processing li b{color:#fff;font-weight:600}
-  .ps-status{font-weight:700;font-size:13px;white-space:nowrap}
-  .ps-done{color:#5CB88C}
-  .ps-progress{color:var(--glow)}
-  .ps-waiting{color:var(--ivory-dim)}
-  #processing .p-note{font-size:13px;color:var(--ivory-dim);line-height:1.6;margin:0;text-align:center}
-  @media(max-width:640px){
-    #processing{padding:22px 18px}
-    #processing li{flex-direction:column;gap:3px}
-  }
 """
 
 _REPORT_CSS = """
@@ -330,14 +332,27 @@ _REPORT_CSS = """
     line-height:1.5;color:var(--ivory)}
   .books li:last-child{border-bottom:0}
   .books .au{display:block;font-size:13px;color:var(--ivory-dim);margin-top:2px}
-  .r-next{background:var(--navy-card);border:1px solid var(--cta);border-radius:12px;
-    padding:28px;margin:48px 0 0}
-  .r-next h2{font-family:var(--serif);font-size:25px;font-weight:600;margin:0 0 12px;color:var(--ivory)}
+  .r-head{display:flex;gap:26px;align-items:center;justify-content:space-between;margin:0 0 26px}
+  .r-headcopy{flex:1;min-width:0}
+  .r-head .r-eyebrow{color:var(--cta-soft)}
+  .r-head h1.r-title{font-family:var(--display);font-weight:700;letter-spacing:-.03em;color:#fff}
+  .r-head .r-for{margin:0}
+  .r-glance{margin:0 0 48px}
+  section.r{scroll-margin-top:20px}
+  .r-next{background:linear-gradient(160deg,rgba(200,16,46,.16),transparent 45%),var(--navy-card);
+    border:1px solid var(--cta-soft);border-radius:16px;padding:28px;margin:48px 0 0;
+    box-shadow:0 18px 50px rgba(0,0,0,.4)}
+  .r-next h2{font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:-.025em;
+    margin:0 0 12px;color:#fff}
+  .r-next .nextbtn{border-radius:var(--pill);padding:16px 30px;font-size:17px;margin-top:6px}
   .r-next p{font-size:16px;line-height:1.72;color:var(--ivory);margin:0 0 14px;max-width:64ch}
   .r-foot{margin:36px 0 0;padding-top:18px;border-top:1px solid var(--navy-line);
     font-size:13px;line-height:1.7;color:var(--ivory-dim)}
   @media(max-width:640px){
     .rwrap{padding:32px 18px 56px}
+    .r-head{flex-direction:column-reverse;align-items:flex-start;gap:16px}
+    .r-next{padding:22px 18px}
+    .r-next h2{font-size:25px}
     .jt div{grid-template-columns:1fr;gap:3px}
     /* The rail becomes a single line above the trigger. A 66px column is 66px a phone cannot spare,
        and the numeral still has to arrive before the words it belongs to. */
@@ -467,9 +482,9 @@ document.documentElement.className += ' js';
   var busy = false;
 
   function setStep(el, state){
-    el.textContent = '[' + state + ']';
-    el.className = 'ps-status ' + (state === 'DONE' ? 'ps-done'
-                 : state === 'WORKING' ? 'ps-progress' : 'ps-waiting');
+    el.className = state === 'DONE' ? 'is-done' : state === 'WORKING' ? 'is-working' : '';
+    var st = el.querySelector('.st');
+    if(st) st.textContent = state === 'DONE' ? 'Done' : state === 'WORKING' ? 'Working' : 'Waiting';
   }
 
   function run(form, mode, hold){
@@ -479,9 +494,9 @@ document.documentElement.className += ' js';
     hide.forEach(function(id){ var el = document.getElementById(id); if(el) el.style.display = 'none'; });
     slot.innerHTML = '';
     proc.setAttribute('data-mode', mode);
-    proc.className = 'on';
+    proc.className = 'gb-work on';
     var list = proc.querySelector('ul[data-mode="' + mode + '"]');
-    var items = list ? [].slice.call(list.querySelectorAll('.ps-status')) : [];
+    var items = list ? [].slice.call(list.querySelectorAll('li')) : [];
     var bar = proc.querySelector('.pbar i');
     var n = items.length;
     window.scrollTo({top: 0, behavior: 'smooth'});
@@ -510,7 +525,7 @@ document.documentElement.className += ' js';
           items.forEach(function(el){ setStep(el, 'DONE'); });
           if(bar) bar.style.width = '100%';
           setTimeout(function(){
-            proc.className = '';
+            proc.className = 'gb-work';
             slot.innerHTML = htmlText;
             window.scrollTo({top: 0, behavior: 'smooth'});
             busy = false;
@@ -519,7 +534,7 @@ document.documentElement.className += ' js';
       }).catch(function(){
         clearInterval(tick);
         busy = false;
-        proc.className = '';
+        proc.className = 'gb-work';
         form.submit();
       });
   }
@@ -564,7 +579,7 @@ __FOOTER__
 </body></html>"""
 
 
-_HOME_TITLE = "The 6 buying triggers that turn a stranger into a client"
+_HOME_TITLE = "6 buying triggers that turn strangers into coaching clients"
 
 
 def _title(suffix=""):
@@ -581,10 +596,10 @@ def _shell(body, title_suffix=""):
     # The report is injected into the landing page after the progress bar, so its stylesheet has to be
     # on every page, not only on the standalone report URL.
     return (_SHELL
-            .replace("__CSS__", _CSS + _REPORT_CSS)
+            .replace("__CSS__", _CSS + _brand.FUNNEL_CSS + _REPORT_CSS)
             .replace("__JS__", _JS)
             .replace("__SEO__", _brand.head_meta("/", _title(title_suffix),
-                     "Why your coaching market actually buys, worked out from 2,004 books they paid for and 1,547 things real buyers wrote. Free, and takes about twenty seconds.", True)
+                     "Why your coaching market actually buys, worked out from 2,004 books they paid for and 1,547 things real buyers wrote. Free, and takes about 20 seconds.", True)
                      + "\n" + _brand.site_schema())
             .replace("__NAV__", _brand.nav_html("home"))
             .replace("__FOOTER__", _brand.footer_html())
@@ -704,33 +719,29 @@ import matcher as _matcher
 
 # What Angelo is doing while the server works. Two lists: the match and the report.
 _PROCESSING = """
-  <div id="processing">
-    <img class="angelo-loader" src="/angelo_reading.png"
-         alt="Angelo reading your market">
-    <h3 data-mode="match">Angelo is reading your answers</h3>
-    <h3 data-mode="report">Angelo is pulling your market</h3>
+  <div id="processing" class="gb-work" aria-live="polite">
+    <div class="gb-work-head">
+      <img src="/angelo_reading.png" alt="Angelo at his desk, reading your market">
+      <div>
+        <p class="gb-eyebrow">Working on it</p>
+        <h3 data-mode="match">Angelo is reading your answers</h3>
+        <h3 data-mode="report">Angelo is pulling your market</h3>
+        <p>A few seconds. Leave this page open. It opens here on its own.</p>
+      </div>
+    </div>
     <div class="pbar"><i></i></div>
     <ul data-mode="match">
-      <li><b>One:</b> Reading your three answers
-          <span class="ps-status ps-progress">[WORKING]</span></li>
-      <li><b>Two:</b> Looking for your buyer in the markets we&rsquo;ve read
-          <span class="ps-status ps-waiting">[WAITING]</span></li>
-      <li><b>Three:</b> Lining up the closest ones
-          <span class="ps-status ps-waiting">[WAITING]</span></li>
+      <li class="is-working"><span class="ic"></span>Reading your three answers<span class="st">Working</span></li>
+      <li><span class="ic"></span>Looking for your buyer in the markets we&rsquo;ve read<span class="st">Waiting</span></li>
+      <li><span class="ic"></span>Lining up the closest ones<span class="st">Waiting</span></li>
     </ul>
     <ul data-mode="report">
-      <li><b>One:</b> Finding your market in the research
-          <span class="ps-status ps-progress">[WORKING]</span></li>
-      <li><b>Two:</b> Pulling what your buyers already spend money on
-          <span class="ps-status ps-waiting">[WAITING]</span></li>
-      <li><b>Three:</b> Reading what they say is wrong, in their words
-          <span class="ps-status ps-waiting">[WAITING]</span></li>
-      <li><b>Four:</b> Working out what they&rsquo;re really paying for
-          <span class="ps-status ps-waiting">[WAITING]</span></li>
-      <li><b>Five:</b> Putting your six triggers together
-          <span class="ps-status ps-waiting">[WAITING]</span></li>
+      <li class="is-working"><span class="ic"></span>Finding your market in the research<span class="st">Working</span></li>
+      <li><span class="ic"></span>Pulling what your buyers already spend money on<span class="st">Waiting</span></li>
+      <li><span class="ic"></span>Reading what they say is wrong, in their words<span class="st">Waiting</span></li>
+      <li><span class="ic"></span>Working out what they&rsquo;re really paying for<span class="st">Waiting</span></li>
+      <li><span class="ic"></span>Putting your six triggers together<span class="st">Waiting</span></li>
     </ul>
-    <p class="p-note">A few seconds. Leave this page open. It opens here on its own.</p>
   </div>
   <div id="reportslot"></div>
 """
@@ -756,7 +767,7 @@ def render_triggers(values=None, error=""):
     # What each trigger gives them. Paired with the real headings, in the report's own order.
     PROMISE = [
         "The deep thing your market is trying to get, or trying to get away from.",
-        "The moment it got too much for them, and they started looking for help.",
+        "The moment it got too much for them.",
         "The picture in their head of what life looks like once this is sorted.",
         "The fear that keeps their card in their pocket, and what they do instead of buying.",
         "The promises they have heard so often they no longer believe them.",
@@ -790,7 +801,7 @@ def render_triggers(values=None, error=""):
     <div class="gb-copy">
       <p class="gb-eyebrow">Buying triggers</p>
       <h1 class="gb-display">The 6 <span class="gb-grad">buying triggers</span> that turn a
-        stranger into a client</h1>
+        stranger into a coaching client</h1>
       <p class="gb-lede"><b>Your client buys for a reason, and they won't tell you what it
       is.</b> So we went and worked out what your market already buys, and why.</p>
     </div>
@@ -802,14 +813,14 @@ def render_triggers(values=None, error=""):
   <form method="post" action="/triggers/match" id="trigform" autocomplete="on" data-start=\"""" + start + """\">
     """ + err_html + """
     <h2 class="gb-display f-head">Tell us who you coach, and we will tell you why they&nbsp;buy</h2>
-    <p class="f-lead">Three questions, answered in your own words. Then your six triggers open on
+    <p class="f-lead">Three questions, answered in your own words. Then your 6 triggers open on
     this page. <span class="free">Nothing to pay.</span></p>
     <div class="prog"><i id="qbar"></i></div>
     <p class="prog-lab" id="qlab">Question 1 of 3</p>
     """ + steps + """
     <section class="step" data-step="4">
       <p class="q">Where do we send them?</p>
-      <p class="q-note">Your six triggers open on this page the moment you press the button.
+      <p class="q-note">Your 6 triggers open on this page the moment you press the button.
       <span class="free">Nothing to pay.</span> We built this research for our own work, so it
       costs us nothing to hand you a copy.</p>
       <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
@@ -826,7 +837,7 @@ def render_triggers(values=None, error=""):
 """ + _PROCESSING + """
   <div id="belowfold">
   <div class="whats" id="whatsin">
-    <h2>The six triggers Angelo pulls for your market</h2>
+    <h2>The <span class="gb-grad">6 triggers</span> Angelo pulls for your market</h2>
     <p class="rl">He does it on this page while you watch.</p>
     <ol>""" + gets + """</ol>
   </div>
@@ -845,7 +856,7 @@ def render_triggers(values=None, error=""):
     <h2>Your buyer already told us why they buy</h2>
     <p>They wrote it down. We went and read it. Costs you nothing to see, and the coaches you're up
     against are working without it.</p>
-    <p class="backup"><a href="#trigform" id="cta2">Take me back up to the questions</a></p>
+    <p class="backup"><a href="#trigform" id="cta2" class="gb-btn primary">Take me back up to the questions</a></p>
   </div>
 
   <p class="base" id="baseline">Buying Triggers comes from what your market already buys, and from your
@@ -1045,7 +1056,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
         # A numbered rail on the left, the trigger beside it. The six ARE a sequence, so numbering
         # them states something true rather than decorating. It also gives the page a steady beat
         # down the left edge, which is what stops wildly uneven block lengths reading as a lurch.
-        out = ('<section class="r">'
+        out = ('<section class="r" id="t' + str(i + 1) + '">'
                '<div class="r-rail"><span class="r-n">' + str(i + 1) + '</span>'
                '<span class="r-lab">Buying Trigger</span></div>'
                '<div class="r-main">'
@@ -1159,14 +1170,20 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
 
     # Built here, not inside the body string. A quote escaped next to the triple-quote terminator
     # silently produced "href= + e(audit_url) +" as literal text, and the button had no link at all.
+    glance = _brand.six_cards([(SECTION_CATS[i], H[i]) for i in range(6)], link=True)
     cta_link = ('<a class="nextbtn" href="' + e(audit_url, quote=True)
                 + '">Show me what a potential client sees</a>')
 
     body = """
   <div class="rwrap">
-  <p class="r-eyebrow">Your buying triggers are ready</p>
-  <h1 class="r-title">""" + e(shown) + """</h1>
-  <p class="r-for">""" + for_line + """</p>
+  <div class="r-head">
+    <div class="r-headcopy">
+      <p class="r-eyebrow">Your buying triggers are ready</p>
+      <h1 class="r-title">""" + e(shown) + """</h1>
+      <p class="r-for">""" + for_line + """</p>
+    </div>
+    <img class="gb-angelo" src="/angelo_up.png" alt="Angelo giving you a thumbs up">
+  </div>
   """ + ('<p class="r-parent">' + parent_line + "</p>" if parent_line else "") + """
 
   <div class="r-base"><b>We didn't guess at these triggers.</b> They're real. This isn't an AI making
@@ -1175,13 +1192,16 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
   competitors don't have this.</div>
 
   <p class="r-what">A trigger is anything that pushes your buyer towards you, or holds them back. Here
-  are the six in your market.</p>
+  are the 6 in your market.</p>
+
+  <nav class="r-glance" aria-label="The six at a glance">""" + glance + """</nav>
 
   """ + s1 + s2 + s3 + s4 + s5 + s6 + voice_section + """
 
 
 
   <div class="r-next">
+    """ + _brand.steps_html(2) + """
     <h2>Now let's look at you</h2>
     <p>We pulled those six in about 20 seconds, and they're an excellent view of your market. But
     there's more to find, and more you can use to your advantage. So let's look at your social media
@@ -1197,5 +1217,5 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
 """
     if fragment:
         return body
-    page = _shell(body, title_suffix="&mdash; " + e(shown))
+    page = _shell(body, title_suffix=" — " + shown)
     return page.replace("</style>", _REPORT_CSS + "</style>")

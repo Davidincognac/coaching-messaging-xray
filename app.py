@@ -29,7 +29,8 @@ except ImportError:
     pass
 
 from audit import (audit_url, LABELS, DEFINITIONS, DISPLAY_CRIT, websites_read_count,   # the engine we built
-                   PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH)   # market stats: single source of truth in audit.py
+                   PCT_FAIL_5SEC, BUYER_VOICE_1_IN, MARKET_AVG_10, TOP10_10, BENCH,
+                   COACH_WORDS)   # market stats: single source of truth in audit.py
 # "1 in 14 speak their buyer's language" => the other 93%. Derived, so the pair can never disagree.
 PCT_NOT_BUYER_VOICE = 100 - round(100 / BUYER_VOICE_1_IN)
 from storage import (save_audit, get_audit, save_trigger_lead, get_trigger_lead,
@@ -139,6 +140,128 @@ def mascot_img():
     """Show Angelo only if the file is actually there, so we never render a broken image."""
     return ('<img class="mascot" src="/angelo.png" alt="Angelo, who reads your website like a potential client">'
             if os.path.exists(MASCOT_PATH) else "")
+
+# The website step in the same dark look as the triggers and social steps. Two parts: the landing
+# band (heading, form, Angelo), and a remap that turns the report from a light page into a dark one.
+# The report's own classes are left alone. Inside #result the light colour tokens are pointed at the
+# dark ones, and the handful of hard-coded light tints are replaced, so render_result needs no change.
+_WEB_CSS = """
+  /* The red glow sits on the page, not on the band, so it does not stop in a hard line when the
+     band shrinks to nothing under a report. */
+  body::before{content:"";position:fixed;inset:0;background:var(--halo);pointer-events:none;z-index:0}
+  .gb-nav,.hero-band,#result,.gb-foot{position:relative;z-index:1}
+  .hero-band{background:transparent}
+  .hero-band .wrap{padding-top:44px}
+  .whero{display:flex;gap:30px;align-items:center;margin:0 0 26px}
+  .whero-copy{flex:1;min-width:0}
+  .whero h1.gb-display{font-size:clamp(34px,5.4vw,56px);color:#fff;margin:0 0 18px}
+  .whero .wlede{font-size:17px;line-height:1.65;color:var(--ivory);margin:0;max-width:58ch}
+  .whero .wlede b{color:#fff;font-weight:700}
+  .whero-angelo{width:200px;height:auto;flex-shrink:0}
+  @media(max-width:700px){.whero{flex-direction:column-reverse;align-items:flex-start;gap:14px}
+    .whero-angelo{width:130px}}
+  #auditform{border:2px solid rgba(255,255,255,.7);border-radius:14px;padding:22px;
+    box-shadow:0 0 0 6px rgba(255,255,255,.04),0 10px 40px rgba(0,0,0,.4)}
+  #auditform .f-head{font-size:clamp(22px,2.6vw,28px);margin:0 0 4px;color:#fff}
+  #auditform .f-lead{font-size:15px;line-height:1.6;color:var(--ivory);margin:0 0 6px}
+  #auditform .f-lead .free{color:var(--cta-soft);font-weight:700}
+  #auditform input{border:1px solid rgba(255,255,255,.28)}
+  #auditform input:focus{border-color:#fff;outline:2px solid var(--glow)}
+  #auditform button{border-radius:var(--pill);padding:17px 30px;font-size:17px}
+  .plan2{display:flex;gap:24px;align-items:center;border-radius:14px;padding:22px 24px}
+  .plan2 .plan-wrap{width:210px;flex-shrink:0;margin:0}
+  .plan2 .pbody{flex:1;min-width:0}
+  .plan2 .plan-say{margin:0}
+  .plan2 .ps-h{font-family:var(--display);font-weight:700;letter-spacing:-.02em}
+  .plan2 .ps-steps li::before{background:var(--cta);color:#fff}
+  .plan2 .p2-cap{text-align:left}
+  @media(max-width:640px){.plan2{flex-direction:column;align-items:flex-start}
+    .plan2 .plan-wrap{width:170px}}
+  #processing.gb-work{display:none}
+  #processing.gb-work.on{display:block}
+  .webhead-hide #webhead{display:none}
+  .webhead-hide .hero-band .wrap{padding-top:0;padding-bottom:0}
+
+  /* ---------- the report, dark ---------- */
+  #result{--surface:var(--navy-card);--paper:transparent;--ink:var(--ivory);--muted:var(--ivory-dim);
+    --line:var(--navy-line);--soft:rgba(111,174,217,.10);--accent-ink:var(--glow);--accent:#4F8FCB;
+    --critical:#F0707E;--warn-ink:#E4B456;--warn:#C9962F;color:var(--ivory)}
+  #result:not(:empty){padding:44px 24px 88px}
+  #result .gb-steps{max-width:760px;margin:0 auto 18px}
+  #result .card,#result .sec,#result .diag,#result .ev,#result .voice,#result .reveal,#result .steps{
+    box-shadow:0 18px 50px rgba(0,0,0,.35);border-radius:16px}
+  #result .card{border-color:var(--navy-line)}
+  #result .ev{box-shadow:0 18px 50px rgba(0,0,0,.35);border-color:rgba(111,174,217,.35)}
+  #result .sec-h,#result .scores-h,#result .ev .h,#result .voice h4,#result .diag h3,#result .steps-h,
+  #result .sum-h,#result .cta-h,#result .taste .th,#result .ps-h{font-family:var(--display);font-weight:700;
+    letter-spacing:-.02em;color:#fff}
+  #result .voice h4{color:#fff}
+  #result .voice.good h4{color:var(--good-glow)}
+  #result .num.good{color:var(--good-glow)}
+  #result .barwrap{background:rgba(255,255,255,.03)}
+  #result .track{background:var(--navy-deep)}
+  #result .chip.good{background:rgba(92,184,140,.15);color:var(--good-glow)}
+  #result .chip.warn{background:rgba(201,150,47,.16);color:var(--warn-ink)}
+  #result .chip.crit{background:rgba(240,112,126,.14);color:var(--critical)}
+  #result .mark.ok::before,#result .check.ok::before{color:var(--good-glow)}
+  #result .sum-good,#result .strength{background:rgba(92,184,140,.10);border-color:rgba(92,184,140,.35)}
+  #result .sum-good{border-left-color:var(--good)}
+  #result .sum-good b,#result .strength b{color:var(--good-glow)}
+  #result .checklist,#result .scope{background:var(--navy-deep)}
+  #result .fault{background:rgba(240,112,126,.08);border-color:rgba(240,112,126,.35)}
+  #result .pricing{background:rgba(201,150,47,.10);border-color:rgba(201,150,47,.35)}
+  #result .pricing b{color:var(--warn-ink)}
+  #result .media,#result .voice .statpane,#result .taste{border-color:rgba(111,174,217,.30)}
+  #result .qchip,#result .taste .bw{background:var(--navy-deep);color:#fff}
+  #result .taste .dvd{background:var(--navy-line)}
+  #result .tag.no{background:rgba(240,112,126,.14)}
+  #result .tag.neutral{background:rgba(255,255,255,.06)}
+  #result .verdict-note{color:var(--ivory)}
+  #result .cta,#result .positioning{background:linear-gradient(160deg,rgba(200,16,46,.16),transparent 45%),var(--navy-card);
+    border:1px solid var(--cta-soft);box-shadow:0 18px 50px rgba(0,0,0,.4)}
+  #result .cta-btn{border-radius:var(--pill);padding:16px 30px}
+  #result .verdict-img,#result .sec-angelo{border-radius:12px;aspect-ratio:4/3;object-fit:cover;
+    background:#fff;border:1px solid var(--navy-line);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+  #result .verdict-img{width:130px}
+  #result .sec-angelo{width:110px}
+  #result .thumb,#result .sum-shot{border-color:var(--navy-line)}
+  #result img[style*="#ddd"]{border-color:var(--navy-line)!important}
+  #result .dead{color:var(--cta-soft)}
+  #result .again{margin:18px 0 0}
+
+  /* Easier reading. Bigger type, more air between lines and paragraphs, shorter lines, and bold
+     phrases in plain white rather than blue, so they no longer look like links. */
+  #result .analysed p,#result .reframe p,#result .voice p,#result .diag .row p,#result .barnote p,
+  #result .sum-row p,#result .cta p,#result .steplist li{font-size:16.5px;line-height:1.75;max-width:62ch}
+  #result .voice p,#result .reframe p,#result .diag .row p{margin:0 0 18px}
+  #result .voice b,#result .reframe b,#result .analysed b,#result .diag b,#result .steplist li b,
+  #result .gap,#result .ben{color:#fff}
+  #result .ev .meta{font-size:14.5px;line-height:1.65}
+  #result .def{font-size:14px}
+  #result .gap{font-weight:500;font-size:14.5px;line-height:1.65}
+  #result .sum-next{margin:22px 0 0;padding:14px 16px;border-radius:10px;background:var(--navy-deep);
+    border:1px dashed rgba(255,255,255,.22);font-size:15px;line-height:1.6;color:var(--ivory)}
+  #result .sum-next b{color:#fff}
+  #result .verdict-card .secnum{margin-bottom:12px}
+  #result .gap{max-width:62ch}
+  #result .reveal .grade{flex-wrap:nowrap;align-items:flex-start}
+  #result .reveal .grade > div:not(.num){flex:1;min-width:0}
+  @media(max-width:560px){#result .reveal .grade{flex-wrap:wrap}}
+
+  /* The hand-over between parts: a short red rule, where you are, what comes next. */
+  #result .rnext{max-width:760px;margin:52px auto 18px;padding:0 4px;display:flex;flex-direction:column;
+    align-items:flex-start;gap:4px}
+  #result .rnext::before{content:"";width:44px;height:3px;border-radius:2px;background:var(--grad);margin:0 0 10px}
+  #result .rn-l{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--cta-soft)}
+  #result .rn-t{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em;color:#fff;line-height:1.2}
+  #result .report > .rnext + *{margin-top:0}
+
+  /* The ask between sections: outline, with room to breathe above and below. */
+  #result .cta-inline.mid{margin:40px auto 0}
+  #result .cta-btn.ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35)}
+  #result .cta-btn.ghost:hover{border-color:#fff;background:rgba(255,255,255,.06)}
+  @media(max-width:560px){#result:not(:empty){padding:30px 16px 64px}}
+"""
 
 PAGE = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -292,8 +415,6 @@ PAGE = """<!doctype html><html lang="en"><head>
   .verdict-note{{background:var(--soft);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;
     padding:16px 20px;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.6}}
   .verdict-note p{{margin:0 0 10px}} .verdict-note p:last-child{{margin:0}}
-  .diag h3+.row p:first-of-type::first-letter,.voice h4+p::first-letter{{font-family:var(--serif);
-    float:left;font-size:52px;line-height:.85;padding:4px 8px 0 0;font-weight:600;color:var(--accent-ink)}}
   .qchip{{display:inline-block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600}}
   .voice .statpane{{background:var(--soft);border:1px solid #CBD9EC;border-radius:10px;padding:16px 20px}}
@@ -477,46 +598,54 @@ PAGE = """<!doctype html><html lang="en"><head>
   .ev .h,.scores-h,.voice h4,.diag h3{{font-family:var(--serif);font-size:25px;font-weight:600;
     color:var(--ink);line-height:1.3;letter-spacing:-.01em}}
   .sec-lede{{font-size:16px;line-height:1.6;color:var(--muted);margin:0 0 18px;max-width:62ch}}
+""" + _brand.fmt(_brand.FUNNEL_CSS + _WEB_CSS) + """
 </style></head><body>""" + _brand.fmt(_brand.nav_html(links=False)) + """
 <div class="hero-band"><div class="wrap">
-  <div class="hero">
-    {mascot}
-    <div class="hero-copy">
-      <div class="eyebrow">{count} coaching websites read, and counting</div>
-      <h1 class="serif">Coaches: in five seconds, does your website say &ldquo;I can fix your problem&rdquo;?</h1>
-      <p class="sub"><b>That's all the time a potential client gives you.</b> If they don't see it, they leave, and you
+  <div id="webhead">
+  <!--STEPS-->
+  <div class="whero">
+    <div class="whero-copy">
+      <p class="gb-eyebrow" id="webeyebrow">{count} coaching websites read, and counting</p>
+      <h1 class="gb-display">Coaches: in five seconds, does your website say
+        <span class="gb-grad">&ldquo;I can fix your problem&rdquo;</span>?</h1>
+      <p class="wlede"><b>That's all the time a potential client gives you.</b> If they don't see it, they leave, and you
       never even know they came. Paste your coaching website in and in about half a minute Angelo shows you what that
       potential client sees, why they stay or go, and how you score against <b>{count}</b> other coaching sites. More than 8 in 10
       get it wrong. (83%, for those who like it exact.)</p>
     </div>
+    <img class="whero-angelo" src="/angelo.png" alt="Angelo, who reads your website like a potential client">
   </div>
   <form method="get" action="/website" id="auditform">
+    <h2 class="gb-display f-head">Paste in your website</h2>
+    <p class="f-lead">Your report opens on this page in about half a minute. <span class="free">Nothing to pay.</span></p>
     {identity}
     <input type="text" name="url" id="urlinput" placeholder="yourcoachingwebsite.com" value="{url_value}">
     <button type="submit">Show me what a potential client sees</button>
   </form>
-  <!-- Angelo explains the plan. The pad in the artwork stays BLANK and the words sit underneath as a
-       real subheading. Text baked into the picture shrinks with it (about 7px on a phone), and text
-       overlaid on the pad has to fit a small fixed area. Underneath, it stays crisp at every width. -->
+  <!-- Angelo explains the plan. The pad in the artwork stays BLANK and the words sit beside it as a
+       real subheading. Text baked into the picture shrinks with it (about 7px on a phone). -->
   <div class="plan2">
     <div class="plan-wrap">
       <img class="plan-img" src="/angelo_plan.png" alt="Angelo at his flipchart">
     </div>
-    <div class="plan-say">
-      <div class="ps-h">Your homepage is a mirror.</div>
-      <ol class="ps-steps">
-        <li>Your report. Free, about half a minute.</li>
-        <li>What to do about it.</li>
-      </ol>
+    <div class="pbody">
+      <div class="plan-say">
+        <div class="ps-h">Your homepage is a mirror.</div>
+        <ol class="ps-steps">
+          <li>Your report. Free, about half a minute.</li>
+          <li>What to do about it.</li>
+        </ol>
+      </div>
+      <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a potential client does.</p>
+      <p class="p2-note">One thing before you start. This is not consultancy, coaching or mentoring, and we are
+      not here to work on your mindset.</p>
+      <p class="p2-note">You can leave with the report straight away, it will nail a few things down for you.
+      And if you have 6 or 7 minutes more, there is a deeper dig waiting, into how to direct your marketing
+      and put you on the right track.</p>
     </div>
-    <p class="p2-cap">It shows how you <b>think</b> about your marketing, and Angelo reads it the way a potential client does.</p>
-    <p class="p2-note">One thing before you start. This is not consultancy, coaching or mentoring, and we are
-    not here to work on your mindset.</p>
-    <p class="p2-note">You can leave with the report straight away, it will nail a few things down for you.
-    And if you have 6 or 7 minutes more, there is a deeper dig waiting, into how to direct your marketing
-    and put you on the right track.</p>
   </div>
   <div class="hint">This messaging X-ray normally costs £127, but your private results are entirely free. Angelo takes about half a minute to read your homepage exactly as a potential client would, then saves your dashboard link straight to your inbox.</div>
+  </div>
   <!--PROGRESS-->
 </div></div>
 <div id="result">{result}</div>
@@ -526,55 +655,43 @@ PAGE = """<!doctype html><html lang="en"><head>
 # The live-progress overlay. Kept as a PLAIN string (real braces) and injected into PAGE after .format(), so its
 # CSS/JS braces don't collide with the template's format fields.
 PROGRESS_UI = """
-<style>
-  #processing{display:none;margin:32px 0 0;padding:32px;border-radius:10px;
-    background:var(--navy-card);border:1px solid var(--navy-line)}
-  #processing.on{display:block}
-  #processing .angelo-loader{display:block;width:150px;aspect-ratio:1;object-fit:cover;margin:0 auto 20px;
-    border-radius:50%;border:2px solid var(--accent);box-shadow:0 0 0 5px rgba(58,118,189,.18)}
-  #processing h3{font-family:"Inter",sans-serif;font-size:21px;margin:0 0 20px;color:var(--ivory);text-align:center}
-  #processing ul{list-style:none;margin:0 0 18px;padding:0}
-  #processing li{padding:11px 0;border-bottom:1px solid var(--navy-line);font-size:15px;line-height:1.5;color:var(--ivory)}
-  #processing li b{color:#fff}
-  #processing li:last-child{border-bottom:0}
-  .ps-status{font-weight:700}
-  .ps-done{color:var(--good-glow)}
-  .ps-progress{color:var(--glow)}
-  .ps-waiting{color:var(--ivory-dim)}
-  #processing .p-note{font-size:13px;color:var(--ivory-dim);line-height:1.5;margin:0;font-style:italic}
-</style>
-<div id="processing">
-  <img class="angelo-loader" src="/angelo_typing.png" alt="Angelo at work">
-  <h3>Angelo is actively analyzing your homepage copy&hellip;</h3>
+<div id="processing" class="gb-work" aria-live="polite">
+  <div class="gb-work-head">
+    <img src="/angelo_typing.png" alt="Angelo at his computer, reading your website">
+    <div>
+      <p class="gb-eyebrow">Working on it</p>
+      <h3>Angelo is reading your website</h3>
+      <p>About half a minute. Leave this page open. Your report opens here on its own.</p>
+    </div>
+  </div>
+  <div class="pbar"><i></i></div>
   <ul>
-    <li><b>Step 1:</b> Calibrating secure pipeline data and initializing target network links&hellip; <span class="ps-status ps-done" id="ps1">[DONE]</span></li>
-    <li><b>Step 2:</b> Launching Angelo&rsquo;s headless browser engine to lock down your above-the-fold hero matrix&hellip; <span class="ps-status ps-waiting" id="ps2">[WAITING]</span></li>
-    <li><b>Step 3:</b> Activating semantic text extraction algorithms to isolate core phrasing&hellip; <span class="ps-status ps-waiting" id="ps3">[WAITING]</span></li>
-    <li><b>Step 4:</b> Executing deep linguistic parsing arrays across target audience pain points&hellip; <span class="ps-status ps-waiting" id="ps4">[WAITING]</span></li>
-    <li><b>Step 5:</b> Angelo is compiling toxic token and clich&eacute; density data profiles&hellip; <span class="ps-status ps-waiting" id="ps5">[WAITING]</span></li>
-    <li><b>Step 6:</b> Formatting tactical copy adjustments and strategic alternative recommendations&hellip; <span class="ps-status ps-waiting" id="ps6">[WAITING]</span></li>
-    <li><b>Step 7:</b> Binding persistent database files and generating secure endpoint parameters&hellip; <span class="ps-status ps-waiting" id="ps7">[WAITING]</span></li>
-    <li><b>Step 8:</b> Angelo is finalizing your custom Marketing Intelligence File dashboard layout&hellip; <span class="ps-status ps-waiting" id="ps8">[WAITING]</span></li>
+    <li id="ps1" class="is-working"><span class="ic"></span>Opening your homepage<span class="st">Working</span></li>
+    <li id="ps2"><span class="ic"></span>Reading it the way a stranger would<span class="st">Waiting</span></li>
+    <li id="ps3"><span class="ic"></span>Finding your headline and what you offer<span class="st">Waiting</span></li>
+    <li id="ps4"><span class="ic"></span>Checking it against the ten things buyers look for<span class="st">Waiting</span></li>
+    <li id="ps5"><span class="ic"></span>Comparing you with every coaching site we've read<span class="st">Waiting</span></li>
+    <li id="ps6"><span class="ic"></span>Writing up your report<span class="st">Waiting</span></li>
   </ul>
-  <p class="p-note">This takes exactly 30 to 40 seconds. Do not close this window or hit refresh. Your personalized diagnostic dashboard will load automatically the moment processing concludes.</p>
 </div>
 <script>
+// The submit. Angelo works while the report is fetched behind him, then the report opens on this page.
+// Without JavaScript the form is a plain GET to /website, which returns the same report.
 document.addEventListener('DOMContentLoaded',function(){
   var form=document.getElementById('auditform');
   if(!form) return;
   var proc=document.getElementById('processing');
   var result=document.getElementById('result');
-  var busy=false;
+  var bar=proc.querySelector('.pbar i');
+  var STEPS=6, busy=false;
+  // Roughly where each step falls in a 30 second run. The last one waits for the real answer.
+  var AT=[0,4000,9000,15000,21000,27000];
 
-  function setStep(id,status){
-    var el=document.getElementById(id);
+  function setStep(n,state){
+    var el=document.getElementById('ps'+n);
     if(!el) return;
-    el.textContent='['+status+']';
-    el.className='ps-status '+(status==='DONE'?'ps-done':status==='IN PROGRESS'?'ps-progress':'ps-waiting');
-  }
-
-  function markAllDone(){
-    for(var i=1;i<=8;i++) setStep('ps'+i,'DONE');
+    el.className=state==='DONE'?'is-done':state==='WORKING'?'is-working':'';
+    el.querySelector('.st').textContent=state==='DONE'?'Done':state==='WORKING'?'Working':'Waiting';
   }
 
   form.addEventListener('submit',function(e){
@@ -591,21 +708,21 @@ document.addEventListener('DOMContentLoaded',function(){
     if(busy) return;
     busy=true;
 
-    setStep('ps1','DONE');
-    setStep('ps2','IN PROGRESS');
-    for(var i=3;i<=8;i++) setStep('ps'+i,'WAITING');
-
-    form.style.display='none';
+    // Just Angelo on screen while he works.
+    document.body.classList.add('webhead-hide');
     result.innerHTML='';
-    proc.className='on';
-    proc.scrollIntoView({behavior:'smooth',block:'center'});
-
-    var t2=setTimeout(function(){setStep('ps2','DONE');setStep('ps3','IN PROGRESS');},6000);
-    var t3=setTimeout(function(){setStep('ps3','DONE');setStep('ps4','IN PROGRESS');},13000);
-    var t4=setTimeout(function(){setStep('ps4','DONE');setStep('ps5','IN PROGRESS');},20000);
-    var t5=setTimeout(function(){setStep('ps5','DONE');setStep('ps6','IN PROGRESS');},25000);
-    var t6=setTimeout(function(){setStep('ps6','DONE');setStep('ps7','IN PROGRESS');},29000);
-    var t7=setTimeout(function(){setStep('ps7','DONE');setStep('ps8','IN PROGRESS');},33000);
+    proc.classList.add('on');
+    window.scrollTo(0,0);
+    for(var i=1;i<=STEPS;i++) setStep(i,i===1?'WORKING':'WAITING');
+    setTimeout(function(){bar.style.width='4%';},60);
+    var timers=[];
+    for(var k=1;k<STEPS;k++)(function(k){
+      timers.push(setTimeout(function(){
+        setStep(k,'DONE'); setStep(k+1,'WORKING');
+        bar.style.width=Math.round(k/STEPS*100)+'%';
+      },AT[k]));
+    })(k);
+    function stop(){ timers.forEach(clearTimeout); }
 
     var qs='url='+encodeURIComponent(url);
     if(fn) qs+='&first_name='+encodeURIComponent(fn);
@@ -614,30 +731,25 @@ document.addEventListener('DOMContentLoaded',function(){
     // The token instead of their details. Their email never goes in a URL.
     if(lead) qs+='&lead='+encodeURIComponent(lead);
 
-    var t0=Date.now();
     fetch('/audit?'+qs+'&_t='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(html){
-      clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
-      clearTimeout(t5); clearTimeout(t6); clearTimeout(t7);
-      markAllDone();
+      stop();
+      for(var i=1;i<=STEPS;i++) setStep(i,'DONE');
+      bar.style.width='100%';
       setTimeout(function(){
-        proc.className='';
-        form.style.display='';
+        proc.classList.remove('on');
         result.innerHTML=html;
-        var countEl=result.querySelector('[data-sites]');
-        if(countEl){
-          var nc=countEl.getAttribute('data-sites');
-          var ey=document.querySelector('.eyebrow');
-          if(ey) ey.textContent=nc+' coaching websites read, and counting';
-          var bbs=document.querySelectorAll('.sub b');
-          if(bbs.length>1) bbs[1].textContent=nc;
-        }
+        // A real report replaces the pitch. Anything else (a site we could not load, say) leaves the
+        // form on screen so they can try another address straight away.
         busy=false;
-        result.scrollIntoView({behavior:'smooth',block:'start'});
-      }, Math.max(0,500-(Date.now()-t0)));
+        if(result.querySelector('.report')){ window.scrollTo(0,0); return; }
+        document.body.classList.remove('webhead-hide');
+        result.scrollIntoView({block:'start'});
+      },450);
     }).catch(function(){
-      clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
-      clearTimeout(t5); clearTimeout(t6); clearTimeout(t7);
-      proc.className=''; form.style.display=''; busy=false;
+      stop();
+      proc.classList.remove('on');
+      document.body.classList.remove('webhead-hide');
+      busy=false;
       window.location.href='/website?'+qs;
     });
   });
@@ -1191,6 +1303,16 @@ def render_result(res, first_name="", lead_token=""):
     def _cta_block():
         return f'<div class="cta-inline"><a class="cta-btn" href="{_offer_href}">{_mid_btn}</a></div>'
 
+    def _mid_cta():
+        """The same ask between sections, as an outline button with room around it, so it does not
+        shout over the section underneath. The filled red stays for the summary and the close."""
+        return f'<div class="cta-inline mid"><a class="cta-btn ghost" href="{_offer_href}">{_mid_btn}</a></div>'
+
+    def _next(label, title):
+        """The hand-over between two parts of the report: a rule, where you are, and what is next."""
+        return (f'<div class="rnext"><span class="rn-l">{label}</span>'
+                f'<span class="rn-t">{title}</span></div>')
+
     # PART 1 — THE VERDICT. The whole report in one card for skim readers, in David's
     # bad / good / bad order, with the first CTA inside it. The score is stated here rather than
     # saved for the end: a reader who skims must still leave knowing the number and the next step.
@@ -1202,10 +1324,10 @@ def render_result(res, first_name="", lead_token=""):
     _report_head = (f'{_fn}, your report is ready.' if _fn else 'Your report is ready.')
     summary_html = (
         f'<div class="sec verdict-card {g}">'
+        f'<span class="secnum">Part 1 of 3: the quick summary</span>'
         f'<h2 class="sum-h">{_report_head}</h2>'
-        f'<p class="sec-lede">It comes in three parts. This is the quick summary, so if you read nothing else, '
-        f'read this. Below it is the deep dive, where we show you what we read on your {_page_word} and the '
-        f'reason behind every score. Then a closing statement, with what to do about it.</p>'
+        f'<p class="sec-lede">This is the quick summary. If you read nothing else, read this. The full version '
+        f'comes straight after it.</p>'
         f'{_sum_shot}'
         f'<div class="grade">'
         f'<div class="num {g}">{_score_disp}<span class="den">/10</span></div>'
@@ -1217,6 +1339,8 @@ def render_result(res, first_name="", lead_token=""):
         f'<div class="sum-good">{possibility_note(res)}</div>'
         f'<div class="sum-row"><div class="k">What it&rsquo;s costing you</div>'
         f'<p>{html.escape(_first_sentence(cr["why_it_costs_clients"]))}</p></div>'
+        f'<div class="sum-next"><b>That\'s the quick version.</b> The full report is below: what we read on '
+        f'your {_page_word}, every score with the reason behind it, then what to do about it.</div>'
         f'{_cta_block()}'
         f'</div>'
     )
@@ -1237,26 +1361,33 @@ def render_result(res, first_name="", lead_token=""):
             f'is the whole game.</div>'
         )
 
+    _n1 = _next("Next", f"Section 1 of 4: what we read on your {_page_word}") if evidence_html else ""
+    _n3 = _next("Next", "Section 3 of 4: whose words are these?") if voice_html else ""
     return f"""<div class="report" data-sites="{cnt}">
       {summary_html}
+      {_next("Part 2 of 3", "The full report")}
       <div class="sec">
       {opener}
       {reframe}
       {checklist_html}
       </div>
+      {_n1}
       {scope}
       {media}
       {popup}
       {evidence_html}
+      {_next("Next", "Section 2 of 4: your scores, one by one")}
       <div class="sec">
       <h3 class="scores-h"><span class="secnum">Section 2 of 4</span>Your scores, one by one</h3>
       <p class="sec-lede">Here is every score, with the reason behind it. A green tick means it's working for you. A red cross means it's costing you clients.</p>
       <div>{''.join(rows)}</div>
       </div>
-      {_cta_block()}
+      {_mid_cta()}
       {strength_html}
       {pricing_html}
+      {_n3}
       {voice_html}
+      {_next("Next", "Section 4 of 4: what a visitor sees")}
       <div class="diag">
         <h3><span class="secnum">Section 4 of 4</span>What a visitor sees{ai}</h3>
         <div class="row"><div class="k">The biggest thing in the way</div>{emph(para_split(cr['headline_problem']))}</div>
@@ -1264,7 +1395,8 @@ def render_result(res, first_name="", lead_token=""):
         <div class="row"><div class="k">The obvious fixes</div><ol class="fixlist">{fixes}</ol>{FIXES_CAVEAT}</div>
         <div class="row"><div class="k">Bottom line</div><div class="verdict-note">{para_split(cr['money_left_on_table'])}</div></div>
       </div>
-      {_cta_block()}
+      {_mid_cta()}
+      {_next("Part 3 of 3", "Where that leaves you, and what to do about it")}
       {score_reveal}
       <div class="taste">
         <div class="th">Here's the whole game, in two examples from the coaching world:</div>
@@ -1818,6 +1950,77 @@ _SALES_CSS = _brand.FONT_FACES + _brand.BRAND_TOKENS + _brand.CHROME_CSS + """
   .guarantee{font-size:13px;color:var(--ivory-dim);margin-top:14px;text-align:center;line-height:1.5}
   .btnwrap{text-align:center;margin-top:22px}
   .cta-btn.mid{width:auto;margin-top:0;padding:14px 26px}
+
+  /* ================= the dark funnel look =================
+     Same colours, type and pieces as the triggers, profile and website pages. The light tokens are
+     pointed at the dark ones on body, and the few hard-coded light tints are replaced below. */
+""" + _brand.FUNNEL_CSS + """
+  body{--paper:var(--navy);--surface:var(--navy-card);--ink:var(--ivory);--muted:var(--ivory-dim);
+    --line:var(--navy-line);--soft:rgba(111,174,217,.10);--accent-ink:var(--glow);--accent:#4F8FCB;
+    --critical:#F0707E;--warn-ink:#E4B456;background:var(--navy)}
+  body::before{content:"";position:fixed;inset:0;background:var(--halo);pointer-events:none;z-index:0}
+  .site-nav{z-index:100}
+  .first-fold-section,.wrap,.gb-foot{position:relative;z-index:1}
+  .first-fold-section{background:transparent}
+  .ff-header .gb-steps{margin-bottom:26px}
+  .ff-eyebrow{color:var(--cta-soft);letter-spacing:.16em;font-weight:700}
+  .ff-h1{font-family:var(--display);letter-spacing:-.03em;line-height:1.08}
+  .ff-body strong{color:#fff}
+  .hero-banner{display:block;width:100%;height:auto}
+  /* No website screenshot: Angelo with the file, centred, and no big empty frame around him. */
+  .screenshot-container.no-shot{min-height:0;background:transparent;border:0;box-shadow:none}
+  .screenshot-container.no-shot .sc-placeholder{display:flex;align-items:center;justify-content:center;
+    background:transparent;padding:0}
+  .screenshot-container.no-shot img{width:min(320px,80%);height:auto;object-fit:contain;border:0;box-shadow:none}
+  @media(max-width:800px){.screenshot-container.no-shot img{width:180px}}
+  h2,.area-h,.protocol-h,.protocol-container h3,.pitch-gate h2,.choice-block h3,.assumption h3,
+  .checkout-section h2,.voice h4{font-family:var(--display);font-weight:700;letter-spacing:-.02em;color:#fff}
+  .card,.crit-block,.protocol-container,.payoff-tile,.assumption,.narrative-bridge,.choice-block,
+  .next-section,.roots-map,.video-block,.voice,.product-reveal{border-radius:16px;
+    box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  .chip.good{background:rgba(92,184,140,.15);color:var(--good-glow)}
+  .chip.warn{background:rgba(201,150,47,.16);color:var(--warn-ink)}
+  .chip.crit{background:rgba(240,112,126,.14);color:var(--critical)}
+  .xray-panel.before{border-color:rgba(240,112,126,.4)}
+  .xray-panel.after{border-color:rgba(111,174,217,.4)}
+  .xray-panel.before .xray-screen{background:rgba(240,112,126,.10)}
+  .xray-panel.after .xray-screen{background:rgba(111,174,217,.10)}
+  .voice .statpane,.crit-fallback,.rm-pill,.cost-note,.guarantee-block{border-color:rgba(111,174,217,.30)}
+  .reveal-meta{border-top-color:var(--navy-line)}
+  .rm-missing{background:rgba(240,112,126,.08);border-color:rgba(240,112,126,.35)}
+  .rm-page,.rm-buyer{background:var(--navy-deep);color:#fff}
+  .step-lbl.dim{color:#7d8394}
+  .a-art{background:#fff;border-radius:12px;padding:6px}
+  .angelo-relax{box-shadow:none}
+  .choice-block:last-child{border-color:var(--cta-soft);
+    background:linear-gradient(160deg,rgba(200,16,46,.14),transparent 55%),var(--navy-card)}
+  .cta-btn{border-radius:var(--pill)}
+
+  /* ---------- everything we've looked at ---------- */
+  .know-section{margin:0 0 48px}
+  .know-card{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:16px;padding:24px 22px;
+    margin:0 0 14px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  .know-h{margin:0 0 16px}
+  .know-h .kn{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--glow);border:1px solid rgba(111,174,217,.55);border-radius:var(--pill);padding:3px 10px;margin:0 0 10px}
+  .know-h h3{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em;color:#fff;margin:0;line-height:1.25}
+  .know-card .gb-six .gb-sixc{background:var(--navy-deep)}
+  .know-banner,.know-shot{display:block;width:100%;border-radius:10px;border:1px solid var(--navy-line);margin:0 0 14px}
+  .know-shot{max-height:300px;object-fit:cover;object-position:top}
+  .know-k{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ivory-dim);
+    margin:14px 0 6px}
+  .know-q{font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.5;color:#fff;background:var(--navy-deep);
+    border-left:3px solid var(--cta);border-radius:0 8px 8px 0;padding:14px 18px;white-space:pre-line}
+  .know-q.sm{font-size:16px}
+  .know-score{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .ks-num{font-family:var(--serif);font-size:52px;font-weight:650;line-height:1;color:var(--warn-ink)}
+  .ks-den{color:var(--ivory-dim);font-size:15px}
+  .ks-lbl{color:var(--ivory-dim);font-size:14.5px;margin-left:8px}
+  .know-card p{font-size:16px;line-height:1.65}
+  .know-join{margin:18px 0 0;padding:18px 20px;border-radius:12px;border:1px dashed rgba(255,255,255,.25);
+    background:var(--navy-deep);font-size:16px;line-height:1.65;color:var(--ivory)}
+  .know-join b{color:#fff}
+  @media(max-width:560px){.know-card{padding:20px 16px}.ks-lbl{margin-left:0;flex-basis:100%}}
 """
 
 # The Stripe Payment Link the checkout button points at. Until it is set, the button stays
@@ -1953,11 +2156,31 @@ def _build_criteria_html(data, hero_quote):
         return _fallback
 
 
-def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_json=""):
+def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_json="", lead=None):
+    """The Marketing Intelligence File sales page. One page for every route through the funnel.
+
+    It shows whatever we actually hold on this coach and nothing we don't:
+      - their market (six buying triggers), when they came through the triggers page
+      - their profile (banner, bio, last post), when they did the social step
+      - their website (screenshot, score, weakest areas), when their site was read
+    A coach with no website never sees a website section, or a line about not having one. A coach
+    who came straight to the website tool, with no lead behind them, gets the website version alone.
+    """
     fn = html.escape(first_name)
-    fn_up = html.escape(first_name.upper())
     shot = html.escape(screenshot, quote=True)
     cnt = f"{websites_read_count():,}"
+    lead = lead or {}
+    has_site = bool(raw_json or screenshot)
+    rec = _triggers.report_data(lead.get("niche_match") or "") if lead.get("niche_match") else {}
+    if rec and not _triggers.is_complete(lead.get("niche_match") or ""):
+        rec = {}
+    audience = html.escape((rec or {}).get("audience", "") or "")
+    trigs = ([(_triggers.SECTION_CATS[k], _triggers._heading(k, rec)) for k in range(6)] if rec else [])
+    banner = lead.get("banner_path") or ""
+    banner_url = html.escape(f"/uploads/{banner}", quote=True) if banner else ""
+    bio = (lead.get("bio") or "").strip()
+    post = (lead.get("last_post") or "").strip()
+    has_profile = bool(banner_url or bio or post)
 
     # Parse the stored audit once. Every personalised block below degrades cleanly without it,
     # so the param-only fallback URL still renders a complete page.
@@ -1971,21 +2194,37 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     voice = (data or {}).get("voice") or {}
     critique = (data or {}).get("critique") or {}
 
-    # RULEBOOK §0: never claim "homepage" when a subpage was audited.
-    page_word = "homepage" if (data or {}).get("is_home", True) else "page"
+    # RULEBOOK §0: never claim "homepage" when a subpage was audited. With no website at all, the
+    # thing we read was their profile, so that is the word.
+    if has_site:
+        page_word = "homepage" if (data or {}).get("is_home", True) else "page"
+    else:
+        page_word = "profile"
+    # Where their writing lives, for the lines about using the file everywhere.
+    surface = "homepage" if has_site else "bio"
     # Prefer the stored 1-decimal score over the coarse URL param.
     sc = html.escape(str((data or {}).get("score_10_display") or score))
     # The coach's actual words from the voice sweep beat the old generic-tokens param.
     _terms = [t for t in voice.get("coach_terms", []) if t]
-    tok = html.escape(tokens or ", ".join(_terms) or "generic coaching terms")
+    if not has_site and (bio or post):
+        # No website, so the coach words come from what they pasted on the social step, checked
+        # against the same list the website audit uses.
+        _low = (bio + " " + post).lower()
+        _terms = sorted({w.strip() for w in COACH_WORDS if w in _low})[:6]
+    tok = html.escape(tokens or ", ".join(_terms) or "")
+    if not tok:
+        # Nothing on the list. Show the opening of their own bio instead, which is still their words.
+        tok = html.escape(social_section.first_line(bio or post, 90)) if (bio or post) else "generic coaching terms"
+    # The niche from the triggers page beats the one the website audit guessed.
     # Niche → "life coaching clients" (raw niche words don't work as an adjective on their own).
     _niche = ev.get("niche")
-    niche_word = f"{html.escape(_niche)} coaching clients " if _niche else "clients "
+    niche_word = (f"{audience} " if audience else
+                  f"{html.escape(_niche)} coaching clients " if _niche else "clients ")
 
-    hook_html = _sales_hook(data, page_word, niche_word)
-    voice_html = _sales_voice(voice, page_word, cnt)
-    cost_html = _sales_cost(critique)
-    criteria_html = _build_criteria_html(data, headline)
+    hook_html = _sales_hook(data, page_word, niche_word) if has_site else ""
+    voice_html = _sales_voice(voice, page_word, cnt) if has_site else ""
+    cost_html = _sales_cost(critique) if has_site else ""
+    criteria_html = _build_criteria_html(data, headline) if has_site else ""
 
     # Softer opener for low scorers (David's rule + his copy): under 5 there is no "brutal",
     # the average is framed as within reach, and the low score as easier to improve. 5 and up
@@ -2032,6 +2271,15 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             f'For context: across the {cnt} coaching homepages we have read, the average score is {MARKET_AVG_10} '
             f'out of 10, and the top 10% score {TOP10_10} or higher.</p>')
 
+    if not has_site:
+        _who = f"the six buying triggers for {audience}" if audience else "your six buying triggers"
+        opener_html = (
+            f'<p class="ff-body">Hi {fn}. You&rsquo;ve read {_who}, and you&rsquo;ve seen your profile the '
+            f'way a stranger sees it.</p>'
+            f'<p class="ff-body">Those two things have one question in common. Your buyer already has the '
+            f'words for their problem. <strong>Do yours match them?</strong></p>')
+        stranger_html = ""
+
     # Benefit-first headline (David + Ogilvy panel): name the prize, never the product the
     # reader hasn't met yet. The coach's name leads when we have it.
     h1_line = (f'{fn}, here&rsquo;s what your buyers actually want, and the exact words that bring them to you.'
@@ -2049,7 +2297,12 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
     # The stranger story must not contradict a top-tier opener ("you are one of them"):
     # strong pages get the same scene with a true ending, everyone else keeps the original.
-    if _sc_num >= TOP10_10:
+    if not has_site:
+        stranger_html = (
+            '<p class="ff-body">Someone found your profile yesterday. They&rsquo;d seen one of your posts '
+            'and clicked your name. They read your bio. If it didn&rsquo;t describe their problem, they '
+            'moved on. You never knew they were there.</p>')
+    elif _sc_num >= TOP10_10:
         stranger_html = (
             '<p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. '
             'They gave it five seconds. The closer your words sit to the ones already in their head, the '
@@ -2059,6 +2312,70 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
             '<p class="ff-body">Someone arrived on your page yesterday with a specific, painful problem. '
             'They gave it five seconds. Your words did not describe their problem. They left. You never knew '
             'they were there.</p>')
+
+    # Everything we have looked at, in one place. Each part appears only when we hold it.
+    _parts = []
+    if trigs:
+        _parts.append(
+            '<div class="know-card"><div class="know-h"><span class="kn">Your market</span>'
+            f'<h3>What {audience or "your buyers"} buy on</h3></div>'
+            + _brand.six_cards(trigs) + '</div>')
+    if has_profile:
+        _p = ""
+        if banner_url:
+            _p += f'<img class="know-banner" src="{banner_url}" alt="Your banner">'
+        if bio:
+            _p += f'<div class="know-k">Your bio</div><div class="know-q">{html.escape(bio)}</div>'
+        if post:
+            _p += (f'<div class="know-k">How your last post opens</div>'
+                   f'<div class="know-q sm">{html.escape(social_section.first_line(post))}</div>')
+        _parts.append(
+            '<div class="know-card"><div class="know-h"><span class="kn">Your profile</span>'
+            '<h3>What a stranger sees when they click your name</h3></div>' + _p + '</div>')
+    if has_site:
+        _w = ""   # the screenshot itself is already at the top of the page
+        _big = _first_sentence((critique or {}).get("headline_problem", ""))
+        _w += (f'<div class="know-score"><span class="ks-num">{sc}</span><span class="ks-den">/10</span>'
+               f'<span class="ks-lbl">Your {page_word} score. The average is {MARKET_AVG_10}.</span></div>')
+        if _big:
+            _w += f'<div class="know-k">The biggest thing in the way</div><p>{html.escape(_big)}</p>'
+        _parts.append(
+            '<div class="know-card"><div class="know-h"><span class="kn">Your website</span>'
+            f'<h3>What a stranger sees when they land on your {page_word}</h3></div>' + _w + '</div>')
+    _seen = [n for n, ok in (("your market", trigs), ("your profile", has_profile),
+                             ("your website", has_site)) if ok]
+    if len(_seen) > 1:
+        _seen_txt = ", ".join(_seen[:-1]) + " and " + _seen[-1]
+        _join = (f'<div class="know-join"><b>You&rsquo;ve now seen {_seen_txt}.</b> They should all be '
+                 'saying the same thing, in your buyer&rsquo;s words. Right now each one is written in '
+                 'yours. The rest of this page is about closing that gap.</div>')
+    else:
+        _join = ""
+    # A coach with only a website (no triggers, no profile) already has all of it in the hero above.
+    know_html = ("" if not (_parts and lead) else
+                 '<div class="know-section"><div class="section-eyebrow">Everything we&rsquo;ve looked at, '
+                 'in one place</div>' + "".join(_parts) + _join + '</div>')
+
+    # The hero picture: their website if we have it, otherwise Angelo with the file. Their banner
+    # sits in the section below, so it is not shown twice.
+    if shot:
+        hero_pic = f'<img src="{shot}" alt="Your coaching website homepage" loading="eager">'
+    else:
+        hero_pic = ('<div class="sc-placeholder"><img src="/angelo_file.png" alt="Angelo with your '
+                    'Marketing Intelligence File"></div>')
+
+    # Where they are in the funnel. A coach with no website skipped step 3.
+    _skipped = () if (has_site or not lead) else (3,)
+    steps_bar = _brand.steps_html(4, skipped=_skipped) if lead else ""
+    eyebrow = f"Prepared for {fn}" if first_name and first_name.lower() != "coach" else "Your Marketing Intelligence File"
+    if has_site:
+        bridge = ('So here is the plan. First, the areas that will grow your business fastest, the ones we '
+                  'found when we read your page. Then, why this happens to almost every coach. Once you can '
+                  'see the why, you can make a sound decision about what to do next.')
+    else:
+        bridge = ('So here is the plan. First, everything we&rsquo;ve looked at so far, in one place. Then, '
+                  'why this happens to almost every coach. Once you can see the why, you can make a sound '
+                  'decision about what to do next.')
 
     # Customer-safe checkout: a live Stripe link when configured, an honest note when not.
     if STRIPE_PAYMENT_LINK:
@@ -2087,7 +2404,8 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <div class="first-fold-section">
     <div class="ff-header">
-      <div class="ff-eyebrow">Prepared for {fn_up}</div>
+      {steps_bar}
+      <div class="ff-eyebrow">{eyebrow}</div>
       <h1 class="ff-h1">{h1_line}</h1>
     </div>
     <div class="first-fold-inner">
@@ -2096,15 +2414,14 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         {stranger_html}
       </div>
       <div class="ff-right">
-        <div class="screenshot-container">
-          {"" if not shot else f'<img src="{shot}" alt="Your coaching website homepage" loading="eager">'}
-          {"" if shot else '<div class="sc-placeholder"><img src="/angelo.png" alt="Angelo" style="width:72px;height:auto;opacity:.55"></div>'}
+        <div class="screenshot-container{'' if shot else ' no-shot'}">
+          {hero_pic}
         </div>
       </div>
     </div>
     {hook_html}
     <div class="ff-bridge">
-      <p>So here is the plan. First, the areas that will grow your business fastest, the ones we found when we read your page. Then, why this happens to almost every coach. Once you can see the why, you can make a sound decision about what to do next.</p>
+      <p>{bridge}</p>
     </div>
     <div class="steps-wrap">
       <img class="steps-img" src="/angelo_steps.png" alt="Angelo pointing up the three steps of this page">
@@ -2116,12 +2433,15 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
 
   <div class="wrap">
 
-  <!-- SECTION 2: THE AREAS — their own evidence, growth-framed heading (David's pick) -->
-  <div class="evidence-section">
+  {know_html}
+
+  <!-- SECTION 2: THE AREAS — their own evidence, growth-framed heading (David's pick).
+       Website only: these are the weakest of their website scores. -->
+  {"" if not has_site else f'''<div class="evidence-section">
     <h2 class="area-h">The areas that will grow your business fastest</h2>
     {criteria_html}
     {cost_html}
-  </div>
+  </div>'''}
 
   <!-- SECTION 3: THE WHY — the report said WHAT is wrong; this chapter explains WHY it happens.
        Thesis + their own words as live evidence, then the four roots. -->
@@ -2283,7 +2603,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <li><b>The one thing your buyer wants that you have never put into words.</b> It is the reason they pick one coach over another.</li>
       <li><b>Who is actually spending money in your market right now,</b> built from evidence, not an avatar exercise.</li>
       <li><b>The fears they do not say out loud,</b> and the outcome they picture when they imagine the problem gone.</li>
-      <li><b>The raw material for everything you write, from your homepage to your emails.</b> Load the file into any AI tool and what comes out stops sounding like every other coach alive.</li>
+      <li><b>The raw material for everything you write, from your {surface} to your emails.</b> Load the file into any AI tool and what comes out stops sounding like every other coach alive.</li>
     </ul>
     <p class="fasc-close">There is no template here and nothing to fill in yourself. This is real
     research into your specific market, built on {cnt} coaching websites read and 2,000 books your market
@@ -2309,7 +2629,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
         <div class="pt-icon">&#9997;&#65039;</div>
         <div class="pt-title">Writing stops being the hard part</div>
         <div class="pt-body">
-          <p>The file gives you the words for everything you write, from your homepage to your emails. No more staring at a blank page wondering what to say.</p>
+          <p>The file gives you the words for everything you write, from your {surface} to your emails. No more staring at a blank page wondering what to say.</p>
           <p>You read what your buyer says, and you answer it.</p>
         </div>
       </div>
@@ -2500,7 +2820,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
       <li><b>We run the research.</b> The engine reads the evidence for your specific market, and a
       person checks every file before it goes out.</li>
       <li><b>Your Marketing Intelligence File arrives in your inbox,</b> within 5 working days.</li>
-      <li><b>You put it to work everywhere.</b> Your homepage, your posts, your emails, your next offer.
+      <li><b>You put it to work everywhere.</b> Your {surface}, your posts, your emails, your next offer.
       One file, every surface, all of it pulling toward the same buyers.</li>
     </ol>
   </div>
@@ -2541,7 +2861,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
   <div class="narrative-bridge">
     <div class="nb-label">So what now?</div>
     <h2>You cannot write your way out of this.</h2>
-    <p>You can rewrite your homepage. You can hire a copywriter. You can ask AI to help. None of it
+    <p>You can rewrite your {page_word}. You can hire a copywriter. You can ask AI to help. None of it
     changes what your buyer is already thinking before they arrive.</p>
     <p>The only fix is finding out what they think, in their words. That is what the Marketing
     Intelligence File gives you.</p>
@@ -2561,7 +2881,7 @@ def _render_salespage(first_name, headline, tokens, score, screenshot="", raw_js
     <div class="choice-block">
       <div class="cb-num">Option 2</div>
       <h3>Rewrite it yourself</h3>
-      <p>Rewrite your homepage using the same instinct that wrote the current version.
+      <p>Rewrite your {page_word} using the same instinct that wrote the current version.
       The words will change. The facts behind them will not.</p>
     </div>
 
@@ -2657,8 +2977,12 @@ class Handler(BaseHTTPRequestHandler):
     timeout = 25
 
     def _social_page(self, frag):
-        """Wrap a fragment in the funnel shell. Styling shared with the audit, form not."""
-        return inner_page(frag, eyebrow=f"{websites_read_count():,} coaching websites read, and counting")
+        """Wrap a fragment in the social pages' own dark shell, the same look as the triggers pages.
+
+        It used to go through inner_page, the audit's light shell, which also printed a stray
+        "11,009 coaching websites read" line above everything.
+        """
+        return _social.page(frag)
 
     def _social_report(self, lead):
         """Their profile read back to them, then the two exits. No audit runs here.
@@ -2677,8 +3001,8 @@ class Handler(BaseHTTPRequestHandler):
             section_label = "Your profile",
         )
         trigs = [(_triggers.SECTION_CATS[k], _triggers._heading(k, rec)) for k in range(6)] if rec else []
-        return (combined_parts.opening(lead.get("first_name", "") or "", audience, True, False)
-                + (combined_parts.trigger_reminder(audience, trigs) if trigs else "")
+        return (_social.report_head(lead.get("first_name", "") or "", audience)
+                + (_social.reminder(audience, trigs) if trigs else "")
                 + frag
                 + _social.exits(lead.get("token", "") or "", lead.get("website") or "",
                                 f"{websites_read_count():,}"))
@@ -2803,7 +3127,31 @@ class Handler(BaseHTTPRequestHandler):
         for k, v in self.SAFETY_HEADERS:
             self.send_header(k, v)
 
+    # One-line cookie banner and Microsoft Clarity (heatmaps and recordings). Clarity only
+    # loads after the visitor clicks OK. Personal pages (noindex) get neither: a coach's
+    # own report is theirs and is never recorded.
+    CONSENT_BAR = (
+        '<div id="ck" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;'
+        'background:#111;color:#fff;font:14px/1.4 system-ui,sans-serif;padding:10px 16px;'
+        'text-align:center">This site uses cookies to see how pages are used. '
+        '<a href="/cookies" style="color:#fff">More</a> '
+        '<button id="ck-ok" style="margin-left:8px;padding:4px 12px;cursor:pointer">OK</button> '
+        '<button id="ck-no" style="margin-left:4px;padding:4px 12px;cursor:pointer">No thanks</button></div>'
+        '<script>(function(){var k="gbti_ck",v=null;try{v=localStorage.getItem(k)}catch(e){}'
+        'function go(){(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};'
+        't=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];'
+        'y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yxrw0ubway");}'
+        'if(v==="yes"){go();return}if(v==="no")return;var b=document.getElementById("ck");b.style.display="block";'
+        'function set(x){try{localStorage.setItem(k,x)}catch(e){}b.style.display="none";if(x==="yes")go()}'
+        'document.getElementById("ck-ok").onclick=function(){set("yes")};'
+        'document.getElementById("ck-no").onclick=function(){set("no")};})();</script>'
+    )
+
     def _send(self, body, code=200):
+        if (code == 200 and "</body>" in body and "noindex" not in body
+                and 'id="ck"' not in body):
+            i = body.rfind("</body>")
+            body = body[:i] + self.CONSENT_BAR + body[i:]
         self.send_response(code)
         self._safety()
         self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -2998,10 +3346,11 @@ class Handler(BaseHTTPRequestHandler):
             return
         # The pages that are not the funnel. Flat routes, no query strings, nothing
         # stored: these are the ones a stranger or a regulator reads.
-        if path in ("/about", "/blog", "/methodology", "/privacy", "/terms", "/cookies"):
+        if path in ("/about", "/blog", "/book-a-call", "/methodology", "/privacy", "/terms", "/cookies"):
             self._send({
                 "/about": _pages.render_about,
                 "/blog": _pages.render_blog_index,
+                "/book-a-call": _pages.render_book_call,
                 "/methodology": _pages.render_methodology,
                 "/privacy": _pages.render_privacy,
                 "/terms": _pages.render_terms,
@@ -3012,6 +3361,16 @@ class Handler(BaseHTTPRequestHandler):
             # The slug comes off the filename of a post WE wrote, so anything that is not
             # a plain slug is a probe rather than a reader. Send it back to the index.
             slug = path[len("/blog/"):].strip("/")
+            # Posts used to live at /blog/2026-09-29-slug. Those addresses are in Google and in
+            # sent emails, so a dated slug is a permanent move to the undated one.
+            _m = re.fullmatch(r"\d{4}-\d{2}-\d{2}-([a-z0-9-]{1,80})", slug)
+            if _m and any(p_["slug"] == _m.group(1) for p_ in _pages._read_posts()):
+                self.send_response(301)
+                self._safety()
+                self.send_header("Location", "/blog/" + _m.group(1))
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                return
             post = _pages.render_post(slug) if re.fullmatch(r"[a-z0-9-]{1,80}", slug) else None
             if post:
                 self._send(post)
@@ -3146,6 +3505,23 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/salespage":
             qs = parse_qs(parsed.query)
             domain = (qs.get("domain", [""])[0]).strip()
+            # A coach who came through the funnel carries a token. That gives us their market and
+            # their profile, and their website when it was read, so the page can show all of it.
+            lead = get_trigger_lead((qs.get("lead", [""])[0]).strip())
+            if lead:
+                mark_step(lead["token"], "sales")
+                site = domain or ((lead.get("website") or "").strip() if lead.get("website_at") else "")
+                row = get_audit(site) if site else None
+                self._send(_render_salespage(
+                    first_name = usable_name(lead.get("first_name", "")),
+                    headline   = (row or {}).get("headline", "") or "your website text",
+                    tokens     = (row or {}).get("tokens", ""),
+                    score      = (row or {}).get("score", "") or "0.0",
+                    screenshot = (row or {}).get("screenshot_path", "") or "",
+                    raw_json   = (row or {}).get("raw_json", "") or "",
+                    lead       = lead,
+                ))
+                return
             if domain:
                 row = get_audit(domain)
                 if row:
@@ -3225,6 +3601,8 @@ class Handler(BaseHTTPRequestHandler):
                     res["thumbnail"] = shot_path
             frag = (render_result(res, first_name=first_name,
                                   lead_token=(lead or {}).get("token", "")) if url else "")
+            if frag and lead and res.get("status") == "ok":
+                frag = _brand.steps_html(3) + frag
             # Subpage audits are never SAVED: the DB record for a domain is its homepage audit (the
             # salespage and email funnel key off it), and a subpage result must not overwrite that.
             if url and res.get("ok") and res.get("status") == "ok" and res.get("is_home", True):
@@ -3298,9 +3676,19 @@ class Handler(BaseHTTPRequestHandler):
                 res,
                 first_name=(lead or {}).get("first_name", "") or (qs.get("first_name", [""])[0]).strip(),
                 lead_token=(lead or {}).get("token", ""))
+        if result_html and lead and res.get("status") == "ok":
+            result_html = _brand.steps_html(3) + result_html
         page = PAGE.format(url_value=html.escape(prefill, quote=True), result=result_html,
                            identity=identity_block(lead),
                            count=f"{websites_read_count():,}", mascot=mascot_img())
+        if lead:
+            # The coach is on step 3 of 3. Say so, the same way the two steps before did.
+            page = page.replace("<!--STEPS-->", _brand.steps_html(3), 1)
+            page = page.replace(
+                f'<p class="gb-eyebrow" id="webeyebrow">{websites_read_count():,} coaching websites read, and counting</p>',
+                '<p class="gb-eyebrow" id="webeyebrow">Step 3: Your website</p>', 1)
+        if result_html and 'class="report"' in result_html:
+            page = page.replace("<body>", '<body class="webhead-hide">', 1)
         _seo = _brand.head_meta(
             "/website",
             "Have your coaching website read the way a stranger reads it",

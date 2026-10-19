@@ -5,7 +5,7 @@ summary: Coaching websites average 9.03 out of 10 on the build and 1.51 on proof
 ---
 If you're about to spend on a logo, a palette and a brand voice document, this is the number to see first.
 
-We scored 10,954 live coaching websites out of 10 on ten things a stranger needs. Technical health, which covers whether the site loads, works on a phone and is secure, averages 9.03 across the entire market. Proof averages 1.51. It's the same split [the counting finds everywhere else in coaching marketing](/blog/2026-09-29-marketing-for-coaches).
+We scored 10,954 live coaching websites out of 10 on ten things a stranger needs. Technical health, which covers whether the site loads, works on a phone and is secure, averages 9.03 across the entire market. Proof averages 1.51. It's the same split [the counting finds everywhere else in coaching marketing](/blog/marketing-for-coaches).
 
 Nearly every coaching website is well made. Almost none of them are believable.
 
@@ -59,7 +59,7 @@ After the sentence exists, and then genuinely do it.
 
 A designer can give the right words more weight, and can stop an old-looking site costing you trust. What they can't do is work out who you help, and if you hand them a brief that describes you rather than your buyer, they'll typeset that beautifully.
 
-The order is [in the marketing plan](/blog/2026-09-29-life-coach-marketing-plan), and what belongs on the page is [here](/blog/2026-09-29-what-to-put-on-a-coaching-homepage).
+The order is [in the marketing plan](/blog/life-coach-marketing-plan), and what belongs on the page is [here](/blog/what-to-put-on-a-coaching-homepage).
 
 ## What this doesn't measure
 
@@ -68,6 +68,8 @@ Ten criteria on one page, the homepage, scored by a program reading text. It can
 So this isn't evidence that design counts for nothing. It's evidence that design isn't what separates the coaching sites that work from the ones that don't, because both groups are designed to nearly the same standard.
 
 Is 1.3 points nothing? No, it's real and it's small next to 6.33. Spend in that proportion.
+
+If you want to keep reading on this, start with [content marketing for coaches](/blog/content-marketing-for-coaches).
 
 ## FAQ
 

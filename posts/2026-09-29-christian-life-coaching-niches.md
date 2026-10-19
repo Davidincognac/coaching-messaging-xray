@@ -7,7 +7,7 @@ Search for a Christian life coach and you'll get hundreds of people describing t
 
 So this is what it costs them, and what belongs on the page instead.
 
-Christian coaching works as a layer over a market rather than as a market of its own. We found that by reading what people buy on Amazon across [117 coaching markets](/blog/2026-09-29-coaching-niches) and almost 1,000 smaller ones underneath. Faith came back as the deciding thing in six of them, and those six sit under six completely different parent markets.
+Christian coaching works as a layer over a market rather than as a market of its own. We found that by reading what people buy on Amazon across [117 coaching markets](/blog/coaching-niches) and almost 1,000 smaller ones underneath. Faith came back as the deciding thing in six of them, and those six sit under six completely different parent markets.
 
 Which matters, because the man in one of them wants nothing like what the woman in another wants, and they'd both call themselves Christian.
 
@@ -27,7 +27,7 @@ Which matters, because the man in one of them wants nothing like what the woman 
 
 **Faith and reconciling sexuality.** Under LGBTQ and coming out. The conflict here is reconciling a faith and a sexuality without losing God, the community, or themselves. Telling people is the easy half. That's a different job. And a coach who treats it as coming out will lose them.
 
-**Religious and scrupulosity OCD.** Under OCD and intrusive thoughts. They want relief from religious and moral obsessions without losing their faith in the process, which is the fear that keeps them out of ordinary therapy.
+**Religious and [scrupulosity](https://en.wikipedia.org/wiki/Scrupulosity) OCD.** Under OCD and intrusive thoughts. They want relief from religious and moral obsessions without losing their faith in the process, which is the fear that keeps them out of ordinary therapy.
 
 **Faith and recovery.** Under bipolar disorder. Faith is added to a clinical picture rather than replacing it. They want meaning and stability alongside managing the condition.
 
@@ -49,7 +49,7 @@ Name the market first and the faith second.
 
 "Christian life coach" tells him half of it and leaves him guessing the rest. He won't guess. He'll go back to the search results.
 
-One fair exception. If you work in spirituality and meaning itself, then the faith is the market, so naming it does say what the job is. That's one of the six, not all six.
+One fair exception. If you work in spirituality and meaning itself, then the faith is the market, so naming it does say what the job is. That's one of the six, not all six. If that's you, [the spiritual coach website post](/blog/spiritual-coach-website) shows how to describe it in plain words.
 
 ## Could there be more than six?
 
@@ -58,6 +58,8 @@ Almost certainly. Six is what our reading supported, not a full map of faith in 
 Does it cover other faiths? No, and I'd rather say so than let you assume it does. What we read was what people buy on Amazon, and faith publishing leans heavily towards a handful of traditions, so what came back leans the same way. Everything above is about Christian buyers, because that's who the evidence was about.
 
 If you want to check whether your market or your faith is landing first on your own page, you can [see how it reads to a stranger](/website).
+
+If you want to keep reading on this, start with [how to choose a coaching niche](/blog/how-to-choose-a-coaching-niche) and [the most profitable coaching niches](/blog/most-profitable-coaching-niches).
 
 ## FAQ
 

@@ -81,18 +81,18 @@ Not because writing is cheaper than advertising, though it is. Because every cha
 
 Three things, in this order, and they're the same three wherever the traffic comes from.
 
-**Be findable on a problem somebody types.** In 38.9% of markets the buyer knows what's wrong and has no idea what fixes it. She isn't searching for a coach. That's [a niche question first](/blog/2026-09-29-coaching-niches), and a marketing one second.
+**Be findable on a problem somebody types.** In 38.9% of markets the buyer knows what's wrong and has no idea what fixes it. She isn't searching for a coach. That's [a niche question first](/blog/coaching-niches), and a marketing one second.
 
-**Be understandable in five seconds.** 86% of coaching websites aren't. Neither are 70.1% of the LinkedIn headlines. More on [why that one check decides so much](/blog/2026-09-29-five-second-test).
+**Be understandable in five seconds.** 86% of coaching websites aren't. Neither are 70.1% of the LinkedIn headlines. More on [why that one check decides so much](/blog/five-second-test).
 
-**Be believable before you ask.** Proof, a price or something like one, a human on the page. [The three jobs of getting clients](/blog/2026-09-29-how-to-get-coaching-clients) covers this in full.
+**Be believable before you ask.** Proof, a price or something like one, a human on the page. [The three jobs of getting clients](/blog/how-to-get-coaching-clients) covers this in full.
 
 Then pick a channel. The four posts below take one each.
 
-- [A life coach marketing plan](/blog/2026-09-29-life-coach-marketing-plan), in the order the evidence puts things.
-- [Social media marketing for coaches](/blog/2026-09-29-social-media-marketing-for-coaches), starting with the 11,377 headlines.
-- [Content marketing for coaches](/blog/2026-09-29-content-marketing-for-coaches), and what to actually write about.
-- [Branding for a coaching business](/blog/2026-09-29-branding-coaching-business), and why it's the last thing to fix.
+- [A life coach marketing plan](/blog/life-coach-marketing-plan), in the order the evidence puts things.
+- [Social media marketing for coaches](/blog/social-media-marketing-for-coaches), starting with the 11,377 headlines.
+- [Content marketing for coaches](/blog/content-marketing-for-coaches), and what to actually write about.
+- [Branding for a coaching business](/blog/branding-coaching-business), and why it's the last thing to fix.
 
 ## Where the counting stops
 
@@ -103,6 +103,8 @@ We scored homepages, headlines and markets. We didn't sit in on a discovery call
 Is a headline score a fair thing to measure? It's four checks on one line of text, and a human would disagree with it on any given coach. Across 11,377 it's consistent, and consistent is what a market average needs.
 
 Could all three datasets be wrong in the same direction? They'd have to be wrong about different things in the same way: one reads HTML, one reads a line of text, one reads books and buyer quotes. That they agree is the part I'd trust.
+
+If you want to keep reading on this, start with [website design for life coaches](/blog/website-design-for-life-coaches).
 
 ## FAQ
 

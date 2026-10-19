@@ -3,7 +3,7 @@ title: Website design for life coaches, and what actually counts
 date: 2026-09-29
 summary: We scored 10,954 coaching websites. Good ones and bad ones are built to almost the same standard. Four things separate them, and none is design.
 ---
-If you're about to pay somebody to design your coaching website, read this first. It'll save you spending the money on the wrong half of the job.
+If you're about to pay somebody to design your coaching website, read this first. It'll save you spending the money on the wrong half of the job. (Not sure you need a website yet? [Start here instead](/blog/coaching-clients-without-a-website).)
 
 We scored 10,954 live coaching websites out of 10, on ten things a stranger needs from a homepage. In this article I'm showing you which of those ten actually separate a site that works from one that doesn't.
 
@@ -11,7 +11,7 @@ Here's the bit that surprised me. Technical health, which covers whether the sit
 
 Nearly every coaching website is well built. The good ones score 9.91 on it. The poor ones score 8.60.
 
-So a designer can hand you something faster, prettier and better built than what you've got, and it'll score about the same as the site you replaced.
+So a designer can hand you something faster, prettier and better built than what you've got, and it'll score about the same as the site you replaced. Same goes for [spending on a logo and a palette](/blog/branding-coaching-business).
 
 ## Things to know
 
@@ -48,9 +48,9 @@ Technical health is second from bottom. That's the thing you'd be paying a desig
 
 Four things, in this order.
 
-**Who it's for and what you fix, in the first thing anybody reads.** Good sites average 9.25 on [the five-second read](/blog/2026-09-29-five-second-test). Poor ones average 2.92. Nothing else on this list comes close to that gap.
+**Who it's for and what you fix, in the first thing anybody reads.** Good sites average 9.25 on [the five-second read](/blog/five-second-test). Poor ones average 2.92. Nothing else on this list comes close to that gap.
 
-If you're not sure who yours is for yet, that's [a niche question rather than a website one](/blog/2026-09-29-coaching-niches).
+If you're not sure who yours is for yet, that's [a niche question rather than a website one](/blog/coaching-niches).
 
 **A price, or something like one.** 65% of the good sites show one. 7.3% of the poor ones do. I know why coaches hide it. A woman who can't tell whether you're £60 or £600 assumes the worst and closes the tab, and you never hear from her.
 
@@ -58,7 +58,7 @@ If you're not sure who yours is for yet, that's [a niche question rather than a 
 
 **Something of you on the page.** 90.7% of good sites tell a story. A third of the market has nothing human on it anywhere.
 
-Those four have an order, and [the order matters more than the list](/blog/2026-09-29-what-to-put-on-a-coaching-homepage).
+Those four have an order, and [the order matters more than the list](/blog/what-to-put-on-a-coaching-homepage).
 
 ## Should I not bother with a designer then?
 
@@ -74,7 +74,9 @@ It's ten criteria on one page, the homepage, and nothing else. Your about page, 
 
 Is the sample fair? It's 10,954 live sites from a list of 12,294. Of the 1,340 missing, 1,156 wouldn't load at all and 184 loaded with nothing readable on them. We left those out rather than scoring them zero and flattering the average.
 
-You can [read the full scorecard and where every mark goes](/blog/2026-09-28-average-coaching-website), see how [health and nutrition coaches score against everybody else](/blog/2026-09-29-health-coach-websites-scored), or [have your own homepage read the way a stranger reads it](/website) and find out which of the four you're missing.
+You can [read the full scorecard and where every mark goes](/blog/average-coaching-website), see how [health and nutrition coaches score against everybody else](/blog/health-coach-websites-scored), or [have your own homepage read the way a stranger reads it](/website) and find out which of the four you're missing.
+
+If you want to keep reading on this, start with [how to get coaching clients](/blog/how-to-get-coaching-clients) and [marketing for coaches](/blog/marketing-for-coaches).
 
 ## FAQ
 
