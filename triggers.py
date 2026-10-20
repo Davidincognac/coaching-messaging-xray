@@ -573,9 +573,9 @@ _SHELL = """<!doctype html><html lang="en"><head>
 __SEO__
 <style>__CSS__</style></head><body>
 __NAV__
-<div class="wrap">
+<main class="wrap">
 __BODY__
-</div>
+</main>
 __FOOTER__
 <script>__JS__</script>
 </body></html>"""
