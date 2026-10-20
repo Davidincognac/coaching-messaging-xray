@@ -15,6 +15,11 @@ pipeline.db
 # Coaches' uploaded banners. Their material, not ours, and never in the repo.
 uploads/
 *.webp
+# Our own small versions of Angelo and David, made for page speed. These do belong in the repo.
+!angelo-hero.webp
+!angelo-nav.webp
+!angelo_reading.webp
+!david-sm.webp
 
 # Local launch config for the preview. Machine-specific ports, not part of the app.
 .claude/

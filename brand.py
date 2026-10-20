@@ -114,12 +114,12 @@ CHROME_CSS = """
      fourth wrapped underneath and ran the full width, which read like a second footer. */
   .gb-foot .gb-fwrap{max-width:1060px;margin:0 auto;display:flex;gap:32px;flex-wrap:wrap}
   .gb-foot .gb-col{flex:1;min-width:190px}
-  .gb-foot h4{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  .gb-foot h2{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
     color:var(--ivory);margin:0 0 12px;font-weight:700}
   .gb-foot a{color:var(--ivory-dim);text-decoration:none}
   .gb-foot a:hover{color:var(--cta-soft)}
   .gb-foot p{margin:0 0 8px}
-  .gb-foot .gb-legal{font-size:12.5px;color:var(--muted)}
+  .gb-foot .gb-legal{font-size:12.5px;color:var(--ivory-dim)}
   .gb-foot ul{list-style:none;margin:0;padding:0}
   .gb-foot li{margin-bottom:7px}
   /* David, discreetly. Angelo fronts the pages; this is the one place a face appears. */
@@ -128,7 +128,7 @@ CHROME_CSS = """
     flex-shrink:0;border:1px solid var(--navy-line)}
   .gb-foot .gb-me p{font-size:13.5px;margin:0}
   .gb-foot .gb-rule{max-width:1060px;margin:32px auto 0;padding-top:18px;
-    border-top:1px solid var(--navy-line);font-size:12.5px;color:var(--muted)}
+    border-top:1px solid var(--navy-line);font-size:12.5px;color:var(--ivory-dim)}
 
   /* ---------- the craft layer ---------- */
   /* Borrowed in shape from noneed2shout.com, kept in David's colours: Outfit headings
@@ -351,7 +351,7 @@ def nav_html(active="", links=True):
         items = '<div class="gb-links">' + "".join(parts) + "</div>"
     return (
         '<nav class="gb-nav">'
-        '<img src="/angelo.png" alt="">'
+        '<img src="/angelo-nav.webp" width="38" height="34" alt="">'
         f'<a class="gb-name" href="/">{COMPANY["site"]}</a>'
         f"{items}</nav>"
     )
@@ -364,18 +364,18 @@ def footer_html():
     # The photo is optional on purpose. Until david.jpg is in the app directory the
     # footer runs the text on its own rather than showing a broken image icon.
     _here = os.path.dirname(os.path.abspath(__file__))
-    face = ('<img src="/david.jpg" alt="David Poole">'
-            if os.path.exists(os.path.join(_here, "david.jpg")) else "")
+    face = ('<img src="/david-sm.webp" width="46" height="46" loading="lazy" alt="David Poole">'
+            if os.path.exists(os.path.join(_here, "david-sm.webp")) else "")
     return f"""<footer class="gb-foot">
   <div class="gb-fwrap">
     <div class="gb-col">
-      <h4>{c['site']}</h4>
+      <h2>{c['site']}</h2>
       <p class="gb-legal">by {c['legal']}<br>
         {c['street']}<br>{c['town']}, {c['postcode']}<br>{c['country']}</p>
       <p class="gb-legal">SIRET {c['siret']}<br>VAT {c['vat']}</p>
     </div>
     <div class="gb-col">
-      <h4>Pages</h4>
+      <h2>Pages</h2>
       <ul>
         <li><a href="/">Buying triggers</a></li>
         <li><a href="/about">About</a></li>
@@ -386,7 +386,7 @@ def footer_html():
       </ul>
     </div>
     <div class="gb-col">
-      <h4>Legal</h4>
+      <h2>Legal</h2>
       <ul>
         <li><a href="/privacy">Privacy</a></li>
         <li><a href="/terms">Terms</a></li>
@@ -394,7 +394,7 @@ def footer_html():
       </ul>
     </div>
     <div class="gb-col">
-      <h4>Who runs this</h4>
+      <h2>Who runs this</h2>
       <div class="gb-me">
         {face}
         <p>David Poole. I research coaching markets and build the marketing

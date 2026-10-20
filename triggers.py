@@ -568,6 +568,8 @@ document.documentElement.className += ' js';
 
 _SHELL = """<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preload" href="/outfit.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="/favicon.ico">
 __SEO__
 <style>__CSS__</style></head><body>
 __NAV__
@@ -721,7 +723,7 @@ import matcher as _matcher
 _PROCESSING = """
   <div id="processing" class="gb-work" aria-live="polite">
     <div class="gb-work-head">
-      <img src="/angelo_reading.png" alt="Angelo at his desk, reading your market">
+      <img src="/angelo_reading.webp" width="560" height="373" loading="lazy" alt="Angelo at his desk, reading your market">
       <div>
         <p class="gb-eyebrow">Working on it</p>
         <h3 data-mode="match">Angelo is reading your answers</h3>
@@ -805,7 +807,7 @@ def render_triggers(values=None, error=""):
       <p class="gb-lede"><b>Your client buys for a reason, and they won't tell you what it
       is.</b> So we went and worked out what your market already buys, and why.</p>
     </div>
-    <img class="mascot heromascot" src="/angelo.png"
+    <img class="mascot heromascot" src="/angelo-hero.webp" width="250" height="222" fetchpriority="high"
          alt="Angelo, who works out what your market already buys">
   </div>
   </div>
@@ -823,9 +825,9 @@ def render_triggers(values=None, error=""):
       <p class="q-note">Your 6 triggers open on this page the moment you press the button.
       <span class="free">Nothing to pay.</span> We built this research for our own work, so it
       costs us nothing to hand you a copy.</p>
-      <input type="text"  name="first_name" id="fnameinput" placeholder="Your first name"
+      <input type="text"  name="first_name" id="fnameinput" aria-label="Your first name" placeholder="Your first name"
              autocomplete="given-name" value=\"""" + e(v.get("first_name", ""), quote=True) + """\" required>
-      <input type="email" name="email"      id="emailinput" placeholder="Your best email address"
+      <input type="email" name="email"      id="emailinput" aria-label="Your email address" placeholder="Your best email address"
              autocomplete="email" value=\"""" + e(v.get("email", ""), quote=True) + """\" required>
       <button type="submit">Show me my buying triggers</button>
       <!-- Says what actually happens to the address. The law wants people told at the point

@@ -3134,7 +3134,7 @@ class Handler(BaseHTTPRequestHandler):
         '<div id="ck" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;'
         'background:#111;color:#fff;font:14px/1.4 system-ui,sans-serif;padding:10px 16px;'
         'text-align:center">This site uses cookies to see how pages are used. '
-        '<a href="/cookies" style="color:#fff">More</a> '
+        '<a href="/cookies" style="color:#fff">Cookie policy</a> '
         '<button id="ck-ok" style="margin-left:8px;padding:4px 12px;cursor:pointer">OK</button> '
         '<button id="ck-no" style="margin-left:4px;padding:4px 12px;cursor:pointer">No thanks</button></div>'
         '<script>(function(){var k="gbti_ck",v=null;try{v=localStorage.getItem(k)}catch(e){}'
@@ -3228,11 +3228,14 @@ class Handler(BaseHTTPRequestHandler):
                     "/angelo_cta.png", "/angelo_relaxed.png", "/angelo_steps.png", "/angelo_plan.png",
                     "/angelo_board.png",
                     "/belief1.png", "/belief2.png", "/belief3.png", "/belief4.png",
-                    "/david.jpg"):
+                    "/david.jpg", "/angelo-hero.webp", "/angelo-nav.webp", "/angelo_reading.webp",
+                    "/david-sm.webp", "/favicon.ico"):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), path.lstrip("/"))
             if os.path.exists(fpath):
                 ctype = ("font/woff2" if path.endswith(".woff2")
-                         else "image/jpeg" if path.endswith(".jpg") else "image/png")
+                         else "image/jpeg" if path.endswith(".jpg")
+                         else "image/webp" if path.endswith(".webp")
+                         else "image/x-icon" if path.endswith(".ico") else "image/png")
                 with open(fpath, "rb") as f:
                     # A year, because these are our own fonts and drawings and they change
                     # about never. When one does change it needs a new filename, which is
