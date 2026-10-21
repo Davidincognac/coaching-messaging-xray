@@ -269,6 +269,16 @@ _REPORT_CSS = """
     margin:0 0 10px;color:var(--ivory);letter-spacing:-.015em}
   .r-for{font-size:17px;color:var(--ivory);margin:0 0 8px;line-height:1.6;max-width:60ch}
   .r-parent{font-size:15px;color:var(--ivory-dim);margin:0 0 26px;line-height:1.6;max-width:60ch}
+  /* The pair: the coach's words, then the buyer's, and white space between. No rule, no arrow, no
+     score. Two plain lines is the whole point. */
+  .r-pair{margin:8px 0 36px;padding:22px 24px;border-left:3px solid var(--cta-soft);
+    background:var(--navy-card);border-radius:0 10px 10px 0;max-width:64ch}
+  .r-pair p{margin:0;font-size:18px;line-height:1.6;color:var(--ivory)}
+  .r-pair p + p{margin-top:18px}
+  .r-pair-lab{display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--ivory-dim);font-weight:600;margin:0 0 6px}
+  .r-pair q{quotes:"\\201C" "\\201D";font-family:var(--serif);font-style:italic}
+  .r-pair-them q{color:var(--cta-soft)}
   .r-base{background:var(--navy-card);border:1px solid var(--navy-line);border-radius:10px;
     padding:18px 20px;font-size:14px;line-height:1.7;color:var(--ivory);margin:0 0 40px}
   .r-base b{font-weight:600}
@@ -1023,7 +1033,45 @@ def _strip_levers(text):
     return re.sub(r"\s+", " ", t).strip(" ,;")
 
 
-def render_report(niche, first_name="", audit_url="/", fragment=False):
+def _pair_block(lead, voice):
+    """The coach's own words about their buyer, next to a real buyer's words. One pair, no score,
+    no verdict. The reader sees the distance, or the match, on their own.
+
+    Needs a lead with answers behind it. A report rendered with no lead (the copy checks, a plain
+    market preview) shows nothing here. Any failure shows nothing here too; the report never breaks
+    for it.
+    """
+    if not lead:
+        return ""
+    answers = {k: (lead.get(k) or "") for k in _matcher.KEYS}
+    if not any(answers.values()):
+        return ""
+    quotes, seen = [], set()
+    for key, _label in VOICE_LABELS:
+        if key == "jargon":
+            continue
+        for phrase in (voice.get(key) or []):
+            phrase = _clean(phrase)
+            if phrase and phrase.lower() not in seen:
+                seen.add(phrase.lower())
+                quotes.append(phrase)
+    try:
+        got = _matcher.pair(answers, quotes)
+    except Exception as ex:   # belt and braces: pair() already catches its own
+        print(f"[triggers] pair failed: {type(ex).__name__}: {ex}", flush=True)
+        got = None
+    if not got:
+        return ""
+    e = html.escape
+    return ('<div class="r-pair">'
+            '<p class="r-pair-you"><span class="r-pair-lab">You said</span>'
+            '<q>' + e(got["you_said"]) + '</q></p>'
+            '<p class="r-pair-them"><span class="r-pair-lab">Your buyers say</span>'
+            '<q>' + e(got["they_say"]) + '</q></p>'
+            '</div>')
+
+
+def render_report(niche, first_name="", audit_url="/", fragment=False, lead=None):
     """One market's buying triggers, straight off the research.
 
     Three rules the copy obeys, all for the same reason. We never name the frameworks the research was
@@ -1176,6 +1224,17 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
     cta_link = ('<a class="nextbtn" href="' + e(audit_url, quote=True)
                 + '">Show me what a potential client sees</a>')
 
+    # The pair sits under the headline, before anything else, because it is the one line in the
+    # report that is about this coach rather than about the market.
+    pair_html = _pair_block(lead, voice)
+    bridge = ("That pair came from three sentences you typed. Next you see your own words the way a "
+              "stranger sees them, and the four questions they're asking while they read. It's free "
+              "like this one&hellip;"
+              if pair_html else
+              "You've just read the words your buyers use. Next you see your own words the way a "
+              "stranger sees them, and the four questions they're asking while they read. It's free "
+              "like this one&hellip;")
+
     body = """
   <div class="rwrap">
   <div class="r-head">
@@ -1187,6 +1246,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
     <img class="gb-angelo" src="/angelo_up.png" alt="Angelo giving you a thumbs up">
   </div>
   """ + ('<p class="r-parent">' + parent_line + "</p>" if parent_line else "") + """
+  """ + pair_html + """
 
   <div class="r-base"><b>We didn't guess at these triggers.</b> They're real. This isn't an AI making
   things up when it doesn't know. You see, we went direct to your niche, worked out exactly what they
@@ -1208,8 +1268,7 @@ def render_report(niche, first_name="", audit_url="/", fragment=False):
     <p>We pulled those six in about 20 seconds, and they're an excellent view of your market. But
     there's more to find, and more you can use to your advantage. So let's look at your social media
     profile, and your website if you have one.</p>
-    <p>You've just read the words your buyers use. Next you see your own words the way a stranger
-    sees them, and the four questions they're asking while they read. It's free like this one&hellip;</p>
+    <p>""" + bridge + """</p>
     """ + cta_link + """
   </div>
 

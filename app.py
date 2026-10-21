@@ -3495,6 +3495,7 @@ class Handler(BaseHTTPRequestHandler):
                 niche      = lead.get("niche_match", ""),
                 first_name = lead.get("first_name", ""),
                 audit_url  = nxt,
+                lead       = lead,
             ))
             return
         if path == "/triggers/none":
@@ -3860,6 +3861,7 @@ class Handler(BaseHTTPRequestHandler):
                 first_name = lead.get("first_name", ""),
                 audit_url  = nxt,
                 fragment   = fragment,
+                lead       = lead,
             ))
             return
 

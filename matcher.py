@@ -179,6 +179,38 @@ and "why" (the one-sentence reason).
 The list:
 """
 
+_PAIR_SYSTEM = _VOICE + """
+
+A coach has answered three questions about the people they coach. After the answers is a numbered
+list of things real buyers in that market have said about their own problem, in their own words.
+
+Do two things.
+
+First, copy ONE short run of words out of the coach's second or third answer that says what the
+coach thinks these buyers come with or want. Copy it letter for letter as typed, typos and all. Do
+not tidy it, shorten words, or fix spelling. Keep it under twelve words. It must appear in the answer
+exactly as you copy it. Prefer the coach's own description of the buyer over a description of the
+coach or the coaching.
+
+Second, pick the ONE line off the numbered list that is closest in topic to that run of words. The
+closest line is the one about the same worry, the same want or the same situation. If no line on
+the list is anywhere near it, answer -1.
+
+Return JSON with "you_said" (the copied run of words) and "quote" (the number off the list, or -1).
+
+The list:
+"""
+
+_PAIR_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "you_said": {"type": "string"},
+        "quote": {"type": "integer"},
+    },
+    "required": ["you_said", "quote"],
+    "additionalProperties": False,
+}
+
 _MATCH_SCHEMA = {
     "type": "object",
     "properties": {
@@ -292,6 +324,56 @@ def reflect(step, answers, answer):
     out = {"reflection": "" if thin else scrub(data.get("reflection", "")),
            "thin": thin and bool(ask), "ask": ask}
     return out
+
+
+def _squash(text):
+    """Lower case, one space between words, for a does-this-appear-in-that check that does not
+    trip on a line break or a double space."""
+    return re.sub(r"\s+", " ", str(text or "")).strip().lower()
+
+
+def pair(answers, quotes):
+    """The coach's own words about their buyer next to a real buyer's words.
+
+    answers: the three answers by key. quotes: the market's buyer quotes, already cleaned, as a list
+    of strings. Returns {"you_said": str, "they_say": str} or None. None means the report shows no
+    pair, and nothing else changes.
+
+    Two gates on the way out, so the model can only ever choose, never write. The coach phrase must
+    appear in what the coach actually typed, and the buyer line must be one off the list we gave it.
+    Anything else is dropped and the block is left off.
+    """
+    answers = {k: clean_answer(answers.get(k, "")) for k in KEYS}
+    quotes = [q for q in (str(x or "").strip() for x in quotes) if q][:24]
+    if not quotes or not (answers.get("q_problem") or answers.get("q_fix")):
+        return None
+    user = ""
+    for i, q in enumerate(QUESTIONS):
+        user += f"Question {i + 1}: {q['ask']}\nAnswer: {answers[q['key']] or '(no answer)'}\n\n"
+    listing = "\n".join(f"{i}\t{q}" for i, q in enumerate(quotes))
+    started = time.time()
+    try:
+        resp = _client().messages.create(**_kwargs(
+            [{"type": "text", "text": _PAIR_SYSTEM + listing}],
+            user, _PAIR_SCHEMA, 200))
+        _log_usage("pair", resp, started)
+        data = _json_of(resp)
+    except Exception as e:
+        print(f"[matcher] pair failed: {type(e).__name__}: {e}", flush=True)
+        return None
+    said = re.sub(r"\s+", " ", str(data.get("you_said", ""))).strip().strip('"“”\'').strip()
+    try:
+        idx = int(data.get("quote", -1))
+    except (TypeError, ValueError):
+        idx = -1
+    if not said or len(said.split()) > 14 or idx < 0 or idx >= len(quotes):
+        return None
+    # The phrase has to be the coach's, as typed. Case and spacing aside, it must sit inside one of
+    # the answers. The model copying it is the instruction; this is the check.
+    typed = _squash(answers["q_problem"]) + " \n " + _squash(answers["q_fix"]) + " \n " + _squash(answers["q_who"])
+    if _squash(said) not in typed:
+        return None
+    return {"you_said": said, "they_say": quotes[idx]}
 
 
 def _keyword_match(answers, exclude_ids=()):
