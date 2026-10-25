@@ -38,6 +38,9 @@ _PROSE_CSS = """
   @media(max-width:720px){.gb-hero{padding:48px 20px 54px}}
   .prose{max-width:680px;margin:0 auto;padding:56px 24px 78px}
   .prose > h2:first-child{margin-top:0}
+  /* The citation line on /methodology, set apart so it can be copied as one block. */
+  .prose .gb-cite{border-left:3px solid var(--cta);padding:10px 16px;background:var(--surface);
+    font-size:15px;line-height:1.6;word-break:break-word}
   .prose h1{font-family:var(--display);font-weight:700;font-size:clamp(32px,5vw,46px);
     line-height:1.06;letter-spacing:-.035em;margin:0 0 28px;color:#111111}
   .prose h2{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.4vw,32px);
@@ -980,11 +983,81 @@ already, which is the only reason it is worth having.</p>
 
 <p>If you want to see the scoring run on your own homepage, the
 <a href="/website">website X-ray</a> uses the same ten checks against the same corpus.</p>
+
+<h2>Two counts you will see, and why they differ</h2>
+
+<p>The <a href="/about">about page</a> shows a live counter of websites read, and it goes up
+by one every time somebody runs the X-ray. The 10,954 on this page and in every post is the
+scored corpus, fixed when the scoring was run, so that a figure quoted in a post stays
+checkable. Quote 10,954 if you quote anything.</p>
+
+<h2>How to cite this</h2>
+
+<p>You are welcome to quote any figure on this site, with a link back to this page so your
+readers can check the method. A plain form that works for most publications:</p>
+
+<p class="gb-cite">Poole, D. (2026). <i>How we scored 10,954 coaching websites.</i> Going
+Beyond The Illusion, David Poole and Associates.
+<a href="https://goingbeyondtheillusion.com/methodology">goingbeyondtheillusion.com/methodology</a></p>
+
+<p>If you want a figure that is not on the blog, or the breakdown for one niche, email
+<a href="mailto:david@goingbeyondtheillusion.com">david@goingbeyondtheillusion.com</a> and
+say what you are writing. The raw scorecard is not published, because it names 10,954
+coaches by domain and the point was never to rank individuals.</p>
 """
     return shell(body, "How we scored 10,954 coaching websites",
                  "The corpus behind every figure on this blog: 12,294 domains attempted, "
                  "10,954 scored on ten things, and what the scoring cannot see.",
-                 path="/methodology")
+                 path="/methodology", extra_head=_methodology_schema())
+
+
+def _methodology_schema():
+    """The two datasets, declared as datasets.
+
+    A journalist or a model looking for something to cite reads this page as a methods note.
+    Dataset markup is how a search engine knows it is one, and the creator ids point at the
+    same Organization and Person every post already declares, so authorship joins up.
+    """
+    base = _brand.BASE_URL
+    creator = {"@id": base + "/#organisation"}
+    author = {"@id": base + "/#david"}
+    return _brand._jsonld({"@context": "https://schema.org", "@graph": [
+        {
+            "@type": "Dataset",
+            "@id": base + "/methodology#websites",
+            "name": "Coaching website scorecard, 10,954 live homepages",
+            "description": "12,294 coaching domains attempted, 10,954 loaded with readable "
+                           "text and were scored 0 to 10 on ten criteria by a program reading "
+                           "the homepage. Weighted average 3.65 out of 10.",
+            "url": base + "/methodology",
+            "creator": creator,
+            "author": author,
+            "temporalCoverage": "2026",
+            "isAccessibleForFree": True,
+            "variableMeasured": [
+                "Five-second read", "Being specific", "Offer clarity", "Proof",
+                "Lead capture", "Credibility", "Story", "Clear next step",
+                "Technical health", "Pricing shown", "Overall score out of 10",
+            ],
+            "citation": "Poole, D. (2026). How we scored 10,954 coaching websites. "
+                        "Going Beyond The Illusion. " + base + "/methodology",
+        },
+        {
+            "@type": "Dataset",
+            "@id": base + "/methodology#triggers",
+            "name": "Coaching buying triggers, 117 niches and 918 sub-markets",
+            "description": "117 coaching niches and 918 sub-markets, each tagged for what "
+                           "drives the purchase, buyer awareness and persuasion type, built "
+                           "from 2,004 books buyers paid for and 1,547 things buyers wrote.",
+            "url": base + "/methodology",
+            "creator": creator,
+            "author": author,
+            "temporalCoverage": "2026",
+            "isAccessibleForFree": True,
+            "citation": "Poole, D. (2026). How we scored 10,954 coaching websites. "
+                        "Going Beyond The Illusion. " + base + "/methodology",
+        },
+    ]})
 
 
 # ------------------------------------------------------------------- tiny markdown
