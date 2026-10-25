@@ -167,10 +167,11 @@ CLAIMS += [
 sys.path.insert(0, HERE)
 import brand as _b, pages as _p
 _slugs = {x["slug"] for x in _p._read_posts()}
-_dead = sorted(t for t in _b.LEGACY_REDIRECTS.values() if t.split("/blog/")[-1] not in _slugs)
+# "/" is a real page too: /home and /blindspots send the old WordPress front page here.
+_dead = sorted(t for t in _b.LEGACY_REDIRECTS.values() if t != "/" and t.split("/blog/")[-1] not in _slugs)
 CLAIMS += [
     ("legacy redirects all land on a real post", _dead, []),
-    ("legacy redirect map size",                 len(_b.LEGACY_REDIRECTS), 39),
+    ("legacy redirect map size",                 len(_b.LEGACY_REDIRECTS), 44),
 ]
 
 bad = 0
