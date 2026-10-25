@@ -337,6 +337,15 @@ happens unless you want it to.</p>
 
 <p>If you would rather just talk, I am at
 <a href="mailto:{_brand.COMPANY['email']}">{_brand.COMPANY['email']}</a>.</p>
+
+<h2>The other things I run</h2>
+
+<p>This site is one of five under {_brand.COMPANY['legal']}. The others are
+<a href="https://noneed2shout.com">No Need 2 Shout</a>, marketing for fractional executives;
+<a href="https://findafractionalcmo.com">Find a Fractional CMO</a>, for owners thinking of hiring one;
+<a href="https://marketing4drivingschools.co.uk">Marketing 4 Driving Schools</a>, the ebook from
+the driving-instructor years; and <a href="https://reservezdirect.com">Réservez Direct</a>, a
+French magazine for independent restaurants.</p>
 """
     return shell(body, "About David Poole", "David Poole: twelve years building a driving-instructor "
                  "market, sold in 2019, now counting coaching websites. Why the research comes "

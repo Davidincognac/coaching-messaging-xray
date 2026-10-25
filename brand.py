@@ -127,10 +127,6 @@ CHROME_CSS = """
   .gb-foot .gb-me img{width:46px;height:46px;border-radius:50%;object-fit:cover;
     flex-shrink:0;border:1px solid var(--navy-line)}
   .gb-foot .gb-me p{font-size:13.5px;margin:0}
-  /* The four sister sites, one line under the face. Same legal entity, so a plain
-     followed link is the honest markup; a search engine reads them as one group. */
-  .gb-foot .gb-sisters{margin:14px 0 0;line-height:1.7}
-  .gb-foot .gb-sisters a{text-decoration:underline;text-decoration-color:var(--navy-line)}
   .gb-foot .gb-rule{max-width:1060px;margin:32px auto 0;padding-top:18px;
     border-top:1px solid var(--navy-line);font-size:12.5px;color:var(--ivory-dim)}
 
@@ -404,11 +400,6 @@ def footer_html():
         <p>David Poole. I research coaching markets and build the marketing
            around what the research finds. <a href="/about">More about me</a>.</p>
       </div>
-      <p class="gb-legal gb-sisters">Also by {c['legal']}:
-        <a href="https://noneed2shout.com" rel="noopener">No Need 2 Shout</a>,
-        <a href="https://findafractionalcmo.com" rel="noopener">Find a Fractional CMO</a>,
-        <a href="https://marketing4drivingschools.co.uk" rel="noopener">Marketing 4 Driving Schools</a>,
-        <a href="https://reservezdirect.com" rel="noopener">Réservez Direct</a>.</p>
     </div>
   </div>
   <div class="gb-rule">&copy; {c['legal']}. Angelo is our own illustration.</div>
