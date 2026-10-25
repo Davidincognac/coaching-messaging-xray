@@ -11,6 +11,8 @@ In this article I'm showing you where those marks actually go, because it isn't 
 
 That isn't a story about lazy coaches. Every one of those sites was built by somebody who knows their subject, and a fair few of them look lovely.
 
+![Bar chart of how 10,954 coaching websites scored out of 10. Most score 2, 3 or 4. The average is 3.7 and only 13 sites scored strong.](coaching-website-scores.svg)
+
 ## Things to know
 
 - The average live coaching site scores 3.7 out of 10, and the median is 4.

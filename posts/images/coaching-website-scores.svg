@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="t d" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<title id="t">How 10,954 coaching websites scored out of 10</title>
+<desc id="d">Bar chart. Most sites score 2, 3 or 4. The average is 3.7. Only 56 score 8 or more.</desc>
+<rect width="1200" height="800" fill="#FFFFFF"/>
+<text x="90" y="52" font-size="30" font-weight="700" fill="#111111">How 10,954 coaching websites scored out of 10</text>
+<text x="90" y="84" font-size="18" fill="#333333">Homepages read by a program and scored on ten things a stranger needs. Number of sites at each score.</text>
+<line x1="90" x2="1160" y1="690.0" y2="690.0" stroke="#D8D8DC" stroke-width="1"/>
+<text x="78" y="695.0" font-size="15" fill="#6B6B70" text-anchor="end">0</text>
+<line x1="90" x2="1160" y1="595.0" y2="595.0" stroke="#D8D8DC" stroke-width="1"/>
+<text x="78" y="600.0" font-size="15" fill="#6B6B70" text-anchor="end">500</text>
+<line x1="90" x2="1160" y1="500.0" y2="500.0" stroke="#D8D8DC" stroke-width="1"/>
+<text x="78" y="505.0" font-size="15" fill="#6B6B70" text-anchor="end">1,000</text>
+<line x1="90" x2="1160" y1="405.0" y2="405.0" stroke="#D8D8DC" stroke-width="1"/>
+<text x="78" y="410.0" font-size="15" fill="#6B6B70" text-anchor="end">1,500</text>
+<line x1="90" x2="1160" y1="310.0" y2="310.0" stroke="#D8D8DC" stroke-width="1"/>
+<text x="78" y="315.0" font-size="15" fill="#6B6B70" text-anchor="end">2,000</text>
+<line x1="90" x2="1160" y1="215.0" y2="215.0" stroke="#D8D8DC" stroke-width="1"/>
+<text x="78" y="220.0" font-size="15" fill="#6B6B70" text-anchor="end">2,500</text>
+<line x1="90" x2="1160" y1="120.0" y2="120.0" stroke="#D8D8DC" stroke-width="1"/>
+<text x="78" y="125.0" font-size="15" fill="#6B6B70" text-anchor="end">3,000</text>
+<path d="M103.6,690.0 V689.6 Q103.6,689.2 104.0,689.2 H173.3 Q173.7,689.2 173.7,689.6 V690.0 Z" fill="#2E75B6"/>
+<text x="138.6" y="681.2" font-size="15" fill="#333333" text-anchor="middle">4</text>
+<path d="M200.9,690.0 V599.0 Q200.9,595.0 204.9,595.0 H266.9 Q270.9,595.0 270.9,599.0 V690.0 Z" fill="#2E75B6"/>
+<text x="235.9" y="587.0" font-size="15" fill="#333333" text-anchor="middle">500</text>
+<path d="M298.2,690.0 V316.5 Q298.2,312.5 302.2,312.5 H364.2 Q368.2,312.5 368.2,316.5 V690.0 Z" fill="#2E75B6"/>
+<text x="333.2" y="304.5" font-size="15" fill="#333333" text-anchor="middle">1,987</text>
+<path d="M395.4,690.0 V170.4 Q395.4,166.4 399.4,166.4 H461.5 Q465.5,166.4 465.5,170.4 V690.0 Z" fill="#2E75B6"/>
+<text x="430.5" y="158.4" font-size="15" fill="#333333" text-anchor="middle">2,756</text>
+<path d="M492.7,690.0 V147.6 Q492.7,143.6 496.7,143.6 H558.7 Q562.7,143.6 562.7,147.6 V690.0 Z" fill="#2E75B6"/>
+<text x="527.7" y="135.6" font-size="15" fill="#333333" text-anchor="middle">2,876</text>
+<path d="M590.0,690.0 V392.1 Q590.0,388.1 594.0,388.1 H656.0 Q660.0,388.1 660.0,392.1 V690.0 Z" fill="#2E75B6"/>
+<text x="625.0" y="380.1" font-size="15" fill="#333333" text-anchor="middle">1,589</text>
+<path d="M687.3,690.0 V515.2 Q687.3,511.2 691.3,511.2 H753.3 Q757.3,511.2 757.3,515.2 V690.0 Z" fill="#2E75B6"/>
+<text x="722.3" y="503.2" font-size="15" fill="#333333" text-anchor="middle">941</text>
+<path d="M784.5,690.0 V647.5 Q784.5,643.5 788.5,643.5 H850.6 Q854.6,643.5 854.6,647.5 V690.0 Z" fill="#2E75B6"/>
+<text x="819.5" y="635.5" font-size="15" fill="#333333" text-anchor="middle">245</text>
+<path d="M881.8,690.0 V683.5 Q881.8,679.5 885.8,679.5 H947.8 Q951.8,679.5 951.8,683.5 V690.0 Z" fill="#2E75B6"/>
+<text x="916.8" y="671.5" font-size="15" fill="#333333" text-anchor="middle">55</text>
+<path d="M979.1,690.0 V689.9 Q979.1,689.8 979.2,689.8 H1049.0 Q1049.1,689.8 1049.1,689.9 V690.0 Z" fill="#2E75B6"/>
+<text x="1014.1" y="681.8" font-size="15" fill="#333333" text-anchor="middle">1</text>
+<line x1="90" x2="1160" y1="690.0" y2="690.0" stroke="#333333" stroke-width="1.5"/>
+<text x="138.6" y="718.0" font-size="17" fill="#111111" text-anchor="middle">0</text>
+<text x="235.9" y="718.0" font-size="17" fill="#111111" text-anchor="middle">1</text>
+<text x="333.2" y="718.0" font-size="17" fill="#111111" text-anchor="middle">2</text>
+<text x="430.5" y="718.0" font-size="17" fill="#111111" text-anchor="middle">3</text>
+<text x="527.7" y="718.0" font-size="17" fill="#111111" text-anchor="middle">4</text>
+<text x="625.0" y="718.0" font-size="17" fill="#111111" text-anchor="middle">5</text>
+<text x="722.3" y="718.0" font-size="17" fill="#111111" text-anchor="middle">6</text>
+<text x="819.5" y="718.0" font-size="17" fill="#111111" text-anchor="middle">7</text>
+<text x="916.8" y="718.0" font-size="17" fill="#111111" text-anchor="middle">8</text>
+<text x="1014.1" y="718.0" font-size="17" fill="#111111" text-anchor="middle">9</text>
+<text x="1111.4" y="718.0" font-size="17" fill="#111111" text-anchor="middle">10</text>
+<text x="625.0" y="752.0" font-size="16" fill="#6B6B70" text-anchor="middle">Score out of 10</text>
+<line x1="493.8" x2="493.8" y1="120" y2="690.0" stroke="#C8102E" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="503.8" y="110" font-size="16" font-weight="700" fill="#C8102E">Average 3.7</text>
+<text x="916.8" y="540.0" font-size="15" fill="#333333" text-anchor="middle">13 sites</text>
+<text x="916.8" y="560.0" font-size="15" fill="#333333" text-anchor="middle">scored strong</text>
+<line x1="916.8" x2="916.8" y1="572.0" y2="665.5" stroke="#6B6B70" stroke-width="1"/>
+<text x="90" y="776" font-size="14" fill="#6B6B70">Source: Going Beyond The Illusion, 10,954 live coaching websites scored in 2026. Method at goingbeyondtheillusion.com/methodology</text>
+</svg>
