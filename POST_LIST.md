@@ -1,6 +1,6 @@
 # GBTI blog: the scheduled list (posts 1-50)
 
-Weekly, Mondays. Written posts live in posts/. Topics 29-50 rebuilt 13 Oct 2026 from
+Weekly, Mondays. Written posts live in posts/. All 50 written as of 26 Oct 2026. Topics 29-50 rebuilt 13 Oct 2026 from
 research-keywords.xlsx (Keyword Planner, UK+US+CA) and the seed list, skipping anything already covered.
 
 | # | Date | Slug | Status |
@@ -29,29 +29,29 @@ research-keywords.xlsx (Keyword Planner, UK+US+CA) and the seed list, skipping a
 | 22 | 2027-03-15 | mental-health-coach-website | written |
 | 23 | 2027-03-22 | coaching-website-examples | written |
 | 24 | 2027-03-29 | coaching-testimonials | written |
-| 25 | 2027-04-05 | lead-magnet-ideas-for-coaches | picture ready |
-| 26 | 2027-04-12 | how-to-sell-coaching | picture ready |
-| 27 | 2027-04-19 | coaching-discovery-call | picture ready |
-| 28 | 2027-04-26 | coaching-packages | picture ready |
-| 29 | 2027-05-03 | how-to-start-a-coaching-business | |
-| 30 | 2027-05-10 | life-coach-website | |
-| 31 | 2027-05-17 | wellness-coach-website | |
-| 32 | 2027-05-24 | coaching-clients-on-linkedin | |
-| 33 | 2027-05-31 | coaching-clients-on-facebook | |
-| 34 | 2027-06-07 | coaching-clients-without-social-media | |
-| 35 | 2027-06-14 | coaching-website-mistakes | |
-| 36 | 2027-06-21 | how-to-describe-what-you-do-as-a-coach | |
-| 37 | 2027-06-28 | high-ticket-coaching-niches | |
-| 38 | 2027-07-05 | business-coaching-niches | |
-| 39 | 2027-07-12 | how-to-become-a-life-coach | |
-| 40 | 2027-07-19 | how-to-become-a-business-coach | |
-| 41 | 2027-07-26 | how-to-become-an-executive-coach | |
-| 42 | 2027-08-02 | how-to-become-a-divorce-coach | |
-| 43 | 2027-08-09 | how-to-become-a-menopause-coach | |
-| 44 | 2027-08-16 | how-to-become-an-adhd-coach | |
-| 45 | 2027-08-23 | how-to-become-a-parenting-coach | |
-| 46 | 2027-08-30 | how-to-become-a-burnout-coach | |
-| 47 | 2027-09-06 | marketing-for-business-coaches | |
-| 48 | 2027-09-13 | how-to-advertise-a-coaching-business | |
-| 49 | 2027-09-20 | one-page-coaching-website | |
-| 50 | 2027-09-27 | unique-coaching-niches | |
+| 25 | 2027-04-05 | lead-magnet-ideas-for-coaches | written |
+| 26 | 2027-04-12 | how-to-sell-coaching | written |
+| 27 | 2027-04-19 | coaching-discovery-call | written |
+| 28 | 2027-04-26 | coaching-packages | written |
+| 29 | 2027-05-03 | how-to-start-a-coaching-business | written |
+| 30 | 2027-05-10 | life-coach-website | written |
+| 31 | 2027-05-17 | wellness-coach-website | written |
+| 32 | 2027-05-24 | coaching-clients-on-linkedin | written |
+| 33 | 2027-05-31 | coaching-clients-on-facebook | written |
+| 34 | 2027-06-07 | coaching-clients-without-social-media | written |
+| 35 | 2027-06-14 | coaching-website-mistakes | written, needs picture |
+| 36 | 2027-06-21 | how-to-describe-what-you-do-as-a-coach | written, needs picture |
+| 37 | 2027-06-28 | high-ticket-coaching-niches | written, needs picture |
+| 38 | 2027-07-05 | business-coaching-niches | written, needs picture |
+| 39 | 2027-07-12 | how-to-become-a-life-coach | written |
+| 40 | 2027-07-19 | how-to-become-a-business-coach | written |
+| 41 | 2027-07-26 | how-to-become-an-executive-coach | written |
+| 42 | 2027-08-02 | how-to-become-a-divorce-coach | written |
+| 43 | 2027-08-09 | how-to-become-a-menopause-coach | written |
+| 44 | 2027-08-16 | how-to-become-an-adhd-coach | written |
+| 45 | 2027-08-23 | how-to-become-a-parenting-coach | written |
+| 46 | 2027-08-30 | how-to-become-a-burnout-coach | written |
+| 47 | 2027-09-06 | marketing-for-business-coaches | written |
+| 48 | 2027-09-13 | how-to-advertise-a-coaching-business | written |
+| 49 | 2027-09-20 | one-page-coaching-website | written |
+| 50 | 2027-09-27 | unique-coaching-niches | written |
