@@ -3127,8 +3127,8 @@ class Handler(BaseHTTPRequestHandler):
         for k, v in self.SAFETY_HEADERS:
             self.send_header(k, v)
 
-    # One-line cookie banner and Microsoft Clarity (heatmaps and recordings). Clarity only
-    # loads after the visitor clicks OK. Personal pages (noindex) get neither: a coach's
+    # One-line cookie banner, Microsoft Clarity (heatmaps and recordings) and Google Analytics 4.
+    # Both only load after the visitor clicks OK. Personal pages (noindex) get neither: a coach's
     # own report is theirs and is never recorded.
     CONSENT_BAR = (
         '<div id="ck" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9999;'
@@ -3140,7 +3140,10 @@ class Handler(BaseHTTPRequestHandler):
         '<script>(function(){var k="gbti_ck",v=null;try{v=localStorage.getItem(k)}catch(e){}'
         'function go(){(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};'
         't=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];'
-        'y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yxrw0ubway");}'
+        'y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","yxrw0ubway");'
+        'var g=document.createElement("script");g.async=1;g.src="https://www.googletagmanager.com/gtag/js?id=G-44PR8ZZ71X";'
+        'document.head.appendChild(g);window.dataLayer=window.dataLayer||[];'
+        'window.gtag=function(){dataLayer.push(arguments)};gtag("js",new Date());gtag("config","G-44PR8ZZ71X");}'
         'if(v==="yes"){go();return}if(v==="no")return;var b=document.getElementById("ck");b.style.display="block";'
         'function set(x){try{localStorage.setItem(k,x)}catch(e){}b.style.display="none";if(x==="yes")go()}'
         'document.getElementById("ck-ok").onclick=function(){set("yes")};'
