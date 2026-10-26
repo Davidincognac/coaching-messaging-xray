@@ -1,10 +1,10 @@
 ---
-title: Coaching pricing: should you show your prices?
+title: Life coach rates: should you show your prices?
 date: 2026-10-19
 image: coaching-pricing-menus.jpg
-summary: 82.3% of coaching websites hide their prices, but 65% of the sites that did best show one. How to make either choice work, and what to write if you don't.
+summary: 82% of coaching websites hide their prices, but 65% of the best ones show a price. How to set out your life coach rates, and what to write if you don't.
 ---
-82.3% of coaching websites don't show a price anywhere. The sites that did best in my report show a price 65% of the time. Here's why hiding your price can cost you, and what you can write if you don't feel right putting your prices on your site.
+82.3% of coaching websites don't show a price anywhere. The sites that did best in my report show a price 65% of the time. Here's why hiding your life coach rates can cost you, and what you can write if you don't feel right putting your prices on your site.
 
 I'll be honest, this is one of the subjects that winds me up a bit. Coaches get told two completely different things about it, and both come from people who sound very sure of themselves. One lot says never put your prices up: get them on a call, build the relationship, and talk money once they can see the value. The other lot says put everything up, be transparent, people respect it. And you're stuck in the middle wondering who to believe.
 
@@ -91,7 +91,13 @@ Hardly ever. "Only two spots left" and "the price goes up on Friday" are what's 
 
 So if you've been told to pressure people with deadlines while keeping the actual number hidden, you've been told to do the thing that helps least and skip the thing that helps a lot. I'd sooner see a clear price and a couple of real testimonials than a countdown timer any day. If you want to go further into this, [how to sell coaching](/blog/how-to-sell-coaching) picks it up.
 
+Once you've settled on a price, three more things follow from it. [How much life coaches make](/blog/how-much-do-life-coaches-make) shows what your price turns into over a year, [a coaching contract template](/blog/coaching-contract-template) puts it in writing, and [a group coaching program](/blog/group-coaching-program) is a way to charge each person less without earning less yourself.
+
 ## FAQ
+
+### What are typical life coach rates?
+
+The ICF's 2023 study put the average fee for a one-hour coaching session at $244 globally and $272 in North America. That's an average across every kind of coach, executive coaches included, so plenty of life coaches charge less. I've gone through what those figures really mean in [how much life coaches make](/blog/how-much-do-life-coaches-make).
 
 ### Is "prices start from" enough?
 

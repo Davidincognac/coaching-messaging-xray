@@ -73,6 +73,8 @@ Does a low score mean you're a bad coach? Not remotely. We only read the homepag
 
 If you want to keep reading on this, start with [what to put on a coaching homepage](/blog/what-to-put-on-a-coaching-homepage) and [how health coach websites score](/blog/health-coach-websites-scored).
 
+If you're working on the page itself, two more posts go with this one. [The photos a coach actually needs](/blog/coaching-photos) covers the picture that sits next to your headline, and [the coaching industry statistics page](/blog/coaching-industry-statistics) has every figure from this research in one place, if you want to quote any of it.
+
 ## FAQ
 
 ### What does the five-second test actually measure?

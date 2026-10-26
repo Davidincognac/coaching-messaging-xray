@@ -228,6 +228,8 @@ One more thing worth saying. We've [scored 10,954 live coaching homepages out of
 
 If you want to keep reading on this, start with [what an ideal coaching client actually is](/blog/ideal-coaching-client), [how to get coaching clients](/blog/how-to-get-coaching-clients), [marketing for coaches](/blog/marketing-for-coaches) and [website design for life coaches](/blog/website-design-for-life-coaches).
 
+If you're still working out what kind of coach you are, [the types of coaches](/blog/types-of-coaches) puts the main groups side by side. There are also closer looks at [how to become a communication coach](/blog/how-to-become-a-communication-coach) and what [a transformational life coach](/blog/transformational-life-coach) actually means to the person buying.
+
 ## FAQ
 
 ### How many coaching niches are there?

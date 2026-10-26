@@ -106,6 +106,8 @@ Could all three datasets be wrong in the same direction? They'd have to be wrong
 
 If you want to keep reading on this, start with [website design for life coaches](/blog/website-design-for-life-coaches).
 
+Three posts go further on the bits people ask me about. [SEO for coaches](/blog/seo-for-coaches) is about being found on Google, [email marketing for coaches](/blog/email-marketing-for-coaches) is about staying in touch with the people who aren't ready yet, and [a one-page coaching business plan](/blog/coaching-business-plan) puts the numbers behind all of it.
+
 ## FAQ
 
 ### What is the best marketing for life coaches?

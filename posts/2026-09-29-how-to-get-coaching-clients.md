@@ -103,6 +103,8 @@ You can [have your own homepage read the way a stranger reads it](/website) and 
 
 If you want to keep reading on this, start with [marketing for coaches](/blog/marketing-for-coaches).
 
+Some of the next steps have their own posts. [How to start an online coaching business](/blog/how-to-start-an-online-coaching-business) goes from nothing to your first clients, [a coaching referral program](/blog/coaching-referral-program) covers getting word of mouth without begging, and [a coaching application form](/blog/coaching-application-form) helps when you're choosing who gets in. And if you're thinking of paying someone to help, read [what to check in a business coach for coaches](/blog/business-coach-for-coaches) before you hand over any money.
+
 ## FAQ
 
 ### How do coaches get most of their clients?

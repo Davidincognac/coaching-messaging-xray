@@ -1,10 +1,10 @@
 ---
-title: How to sell coaching without feeling pushy
+title: How to sell coaching online without feeling pushy
 date: 2027-04-12
 image: how-to-sell-coaching-video-call.jpg
-summary: Selling your coaching feels awkward when you're scared of coming across as pushy. In this article we show how to sell coaching using what I learned from years of selling things to people directly.
+summary: Scared of coming across as pushy when you sell coaching online? In this article we show how to sell it, using what I learned selling to people face to face.
 ---
-The way to sell coaching without feeling pushy is to stop trying to talk people into it and start finding out whether you can actually help them. You ask good questions, you listen properly, you say your price out loud like you mean it, and then you let the person decide. If you can't help them, you tell them. That's it, and none of it needs a script that makes you squirm.
+The way to sell coaching online, or face to face, without feeling pushy is to stop trying to talk people into it and start finding out whether you can actually help them. You ask good questions, you listen properly, you say your price out loud like you mean it, and then you let the person decide. If you can't help them, you tell them. None of it needs a script that makes you squirm.
 
 ![A coach listening on a video call, chin on hand, while the person on screen talks](how-to-sell-coaching-video-call.jpg)
 

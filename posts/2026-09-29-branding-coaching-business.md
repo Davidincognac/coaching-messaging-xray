@@ -71,6 +71,8 @@ Is 1.3 points nothing? No, it's real and it's small next to 6.33. Spend in that 
 
 If you want to keep reading on this, start with [content marketing for coaches](/blog/content-marketing-for-coaches).
 
+And if it's the name you're stuck on, [how to name a coaching business](/blog/coaching-business-names) goes through it with a few made-up coaches.
+
 ## FAQ
 
 ### Does branding help a coaching business?
