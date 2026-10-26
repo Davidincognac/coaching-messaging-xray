@@ -39,10 +39,10 @@ research-keywords.xlsx (Keyword Planner, UK+US+CA) and the seed list, skipping a
 | 32 | 2027-05-24 | coaching-clients-on-linkedin | written |
 | 33 | 2027-05-31 | coaching-clients-on-facebook | written |
 | 34 | 2027-06-07 | coaching-clients-without-social-media | written |
-| 35 | 2027-06-14 | coaching-website-mistakes | written, needs picture |
-| 36 | 2027-06-21 | how-to-describe-what-you-do-as-a-coach | written, needs picture |
-| 37 | 2027-06-28 | high-ticket-coaching-niches | written, needs picture |
-| 38 | 2027-07-05 | business-coaching-niches | written, needs picture |
+| 35 | 2027-06-14 | coaching-website-mistakes | written |
+| 36 | 2027-06-21 | how-to-describe-what-you-do-as-a-coach | written |
+| 37 | 2027-06-28 | high-ticket-coaching-niches | written |
+| 38 | 2027-07-05 | business-coaching-niches | written |
 | 39 | 2027-07-12 | how-to-become-a-life-coach | written |
 | 40 | 2027-07-19 | how-to-become-a-business-coach | written |
 | 41 | 2027-07-26 | how-to-become-an-executive-coach | written |
