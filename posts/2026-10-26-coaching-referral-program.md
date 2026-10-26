@@ -1,9 +1,12 @@
 ---
 title: Coaching referral program: get referrals without begging
 date: 2026-10-26
+image: coaching-referral-program.jpg
 summary: Asking for referrals feels like begging, so you don't ask. In this article we build a coaching referral program: when to ask, what to say and how to thank.
 ---
 A coaching referral program is just a simple, repeatable way of getting happy clients and other professionals to send people your way. You ask at the right moment (straight after a client sees a result), you ask for one specific type of person, you give them a line they can forward, and you thank them properly. Then you add referral partners, people who meet your buyers before you do.
+
+![Two friends in a cafe, one showing the other something on her phone](coaching-referral-program.jpg)
 
 None of that needs begging. It needs a plan, so you're not making it up on the spot and feeling awkward every time.
 

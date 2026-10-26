@@ -1,9 +1,12 @@
 ---
 title: Business coach for coaches: how to check one first
 date: 2026-10-26
+image: business-coach-for-coaches.jpg
 summary: Every business coach for coaches says they can get you clients, and they can't all be right. In this article we show how to check one before you pay.
 ---
 A business coach for coaches helps you with the business side of coaching: finding clients, pricing, your offer and how you talk about it. A good one asks questions that make you see your business differently, and has sold something like what you sell. Before you pay anyone, check they've done it themselves, that they ask more than they tell, and that they can show you evidence you could check.
+
+![Two coaches talking over coffee in a cafe, one explaining while the other listens and takes notes](business-coach-for-coaches.jpg)
 
 You'll also see them called a coach for coaches, a business mentor or a business strategist (that's the name they give themselves). The title tells you very little. What they actually do with you on a call tells you nearly everything, so that's what I'm going to go through.
 

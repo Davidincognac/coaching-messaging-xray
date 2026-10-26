@@ -1,9 +1,12 @@
 ---
 title: Group coaching program: when it works and how to build one
 date: 2026-10-26
+image: group-coaching-program.jpg
 summary: A group coaching program sounds like more clients for less time, but it can go wrong. In this article we cover when it works and how to build one step by step.
 ---
 A group coaching program works when everyone in it wants the same result and is at roughly the same stage, and it goes wrong when people need very different things or one person takes over. To create one, decide the outcome, the length, the group size, what each session looks like, what support there is between sessions, and the price, in that order.
+
+![A coach leading a small group sitting in a circle of chairs, with notebooks on their laps](group-coaching-program.jpg)
 
 I've sold and run masterminds, and I sold international retreats in the life coaching world, so I've seen the good side of groups and the messy side. I'll start with the messy side, because it's the bit nobody puts in the brochure.
 

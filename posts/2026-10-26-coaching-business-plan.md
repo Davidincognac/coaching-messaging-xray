@@ -1,9 +1,12 @@
 ---
 title: Coaching business plan: a one-page example you can copy
 date: 2026-10-26
+image: coaching-business-plan.jpg
 summary: A coaching business plan sounds like a 30-page bank document, so it never gets written. In this article we fill in a one-page plan for a made-up coach.
 ---
 A coaching business plan only needs one page. It says who you help, what problem you solve, what your offer is and what it costs, how many clients you need for the income you want, where those clients will come from, what it costs to run, and what you'll check each month. Below is one filled in for a made-up coach, with the sums shown.
+
+![A woman at a wooden table writing a plan on a single sheet of paper, with a calculator and laptop beside her](coaching-business-plan.jpg)
 
 You don't need a 30-page document unless a bank or investor is asking for one. For a coach working on their own, a page you'll actually look at is worth far more than a big one sitting in a folder.
 

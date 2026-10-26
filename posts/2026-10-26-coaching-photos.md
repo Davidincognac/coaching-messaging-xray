@@ -1,9 +1,12 @@
 ---
 title: Coaching photoshoot: the photos a coach actually needs
 date: 2026-10-26
+image: coaching-photos.jpg
 summary: Paid for a coaching photoshoot and still don't know which photos to use? In this article we go through the shot list a coach needs and how to brief it.
 ---
 For a coaching photoshoot you need fewer photos than you think. You want one clear photo of your face for the top of your homepage, a few of you working with someone like your client, and a handful of plain shots for your about page, social profiles and blog. Brief the photographer on who your client is before you talk about outfits or locations.
+
+![A photographer kneeling to take a picture of a smiling coach sitting in an armchair in a bright room](coaching-photos.jpg)
 
 I say that because the photo at the top of your homepage is part of the first five seconds, and the first five seconds is where coaching websites lose people. If the picture doesn't help a stranger work out what you do and who it's for, it's taking up the best space on the page for nothing.
 

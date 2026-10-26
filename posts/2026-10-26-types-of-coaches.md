@@ -1,9 +1,12 @@
 ---
 title: Types of coaches, and what each one actually helps with
 date: 2026-10-26
+image: types-of-coaches.jpg
 summary: So many types of coaches it's hard to say which one you are. In this article we list the types of coaches in groups, what each helps with and who pays.
 ---
 The main types of coaches are life coaches, career coaches, health and wellbeing coaches, relationship and family coaches, business and executive coaches, money coaches, spiritual coaches and skills coaches like communication or public speaking. Each group helps with a different part of someone's life, and the big split is who pays: the person themselves, or a company paying for staff.
+
+![A busy room of people in one-to-one conversations, with a coach in the middle talking to a client](types-of-coaches.jpg)
 
 Below is the list, grouped, with what each type of coach helps with and who usually pays. The groups come from our own mapping of the coaching market, where we found 117 coaching niches and 918 smaller markets underneath them, all worked out from what buyers are already spending money on.
 

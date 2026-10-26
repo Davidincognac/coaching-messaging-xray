@@ -1,9 +1,12 @@
 ---
 title: Transformational life coach: what it means to a buyer
 date: 2026-10-26
+image: transformational-life-coach.jpg
 summary: Calling yourself a transformational life coach tells a stranger very little. In this article we look at what buyers search for and how to make it mean more.
 ---
 A transformational life coach is a coach who says they help people make a big change in their life, rather than fix one small thing. The trouble is that buyers don't search for "transformation". They search for the change they want, like leaving a job they hate or getting over a divorce, so the label only works when you say exactly what changes and for who.
+
+![A coach and a client walking side by side through a park in autumn, deep in conversation](transformational-life-coach.jpg)
 
 I've got nothing against the word itself. I just think it's doing a lot less for you than you hope, and if you've been calling yourself one for a while, you've probably felt it. People nod, say it sounds lovely, and then don't book.
 

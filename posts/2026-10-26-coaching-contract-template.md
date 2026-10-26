@@ -1,9 +1,12 @@
 ---
 title: Coaching contract template: what to put in yours
 date: 2026-10-26
+image: coaching-contract-template.jpg
 summary: A vague coaching agreement leads to rows over refunds and missed sessions. In this article we go through each part of a coaching contract with example wording.
 ---
 A coaching contract template should cover six things: what's included, how sessions and rescheduling work, payment and refunds, confidentiality and its limits, a line saying coaching isn't therapy or medical, legal or financial advice, and how either of you can end it early. Write each part in words your client understands without a lawyer, then get it checked where you live.
+
+![A woman signing a short coaching agreement at a cafe table while the coach sits beside her](coaching-contract-template.jpg)
 
 I'm not a lawyer, and nothing on this page is legal advice. What I can give you is plain example wording for each section and the reason it's there. The rules on contracts, refunds and cancelling change from country to country, so once you've written yours, have someone qualified where you live read it before you use it.
 

@@ -1,9 +1,12 @@
 ---
 title: Coaching industry statistics from 10,954 live websites
 date: 2026-10-26
+image: coaching-industry-statistics.jpg
 summary: Looking for coaching industry statistics you can trust and quote? In this article we share what we found scoring 10,954 coaching websites and 918 markets.
 ---
 Here are the coaching industry statistics we've gathered ourselves. We scored 10,954 live coaching websites out of 10, and the average was 3.7. 86% can't be understood by a stranger in five seconds, 82% show no price, and about two thirds show no proof at all. We've also mapped 918 coaching markets across 117 niches and scored 11,377 coaching LinkedIn headlines.
+
+![A man at a desk studying printed charts and graphs spread out in front of him](coaching-industry-statistics.jpg)
 
 Every figure below links to the article where we talk about it properly. Where I've used somebody else's numbers, I've said so and linked the source.
 

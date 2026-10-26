@@ -1,9 +1,12 @@
 ---
 title: Life coach salary: what coaches really earn, and why
 date: 2026-10-26
+image: how-much-do-life-coaches-make.jpg
 summary: Life coach salary figures online are all over the place. In this article we look at the real ICF numbers, what they leave out, and the sum behind income.
 ---
 There isn't a life coach salary as such, because life coaches don't usually have an employer paying them a wage, they charge clients. The best public figures come from the International Coaching Federation's survey, which put average yearly income from coaching at $67,800 in North America, $52,400 in Western Europe and $52,800 worldwide. Those are averages before costs, from coaches who chose to answer, and plenty earn far less.
+
+![A man at his kitchen table in the evening working out sums in a notebook, with a calculator and laptop](how-much-do-life-coaches-make.jpg)
 
 So that's the headline. The more useful answer to "how much do life coaches make" is a sum you can do yourself on the back of an envelope, and I'll show you it with a made-up coach further down.
 

@@ -1,9 +1,12 @@
 ---
 title: Communication coach: what they do and how to become one
 date: 2026-10-26
+image: how-to-become-a-communication-coach.jpg
 summary: Want to be a communication coach but unsure who'd pay? In this article we cover what the job is, the rules, and how to pick a slice that gets you clients.
 ---
 A communication coach helps people speak, write and listen better in a particular situation, like presenting to a board, running a team meeting, handling a job interview or having a hard conversation at home. To become one you don't legally need a licence or a qualification, although training helps. What gets you clients is picking one type of person and one type of conversation, rather than "communication" in general.
+
+![A man practising a talk in front of a whiteboard while a coach sits at the table taking notes](how-to-become-a-communication-coach.jpg)
 
 That last bit is where people get stuck. First, though, what the job actually is.
 

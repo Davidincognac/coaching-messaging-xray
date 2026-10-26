@@ -1,9 +1,12 @@
 ---
 title: Coaching business names: how to pick one that works
 date: 2026-10-26
+image: coaching-business-names.jpg
 summary: Stuck on coaching business names and scared of picking the wrong one? In this article we choose a name step by step, check it's free and build examples.
 ---
 A good coaching business name is easy to say, easy to spell and tells people what you do or who you are. Use your own name if you're the product and plan to stay a one-person business. Use a brand name if you want to grow, hire or sell one day. Then check it's free: company register, trade marks, domain and social handles, before you print anything.
+
+![A woman standing at a wall of sticky notes, pen in hand, thinking about a name](coaching-business-names.jpg)
 
 And try not to lose sleep over it. The name does far less work than you'd think, and I'll show you what does more work further down.
 

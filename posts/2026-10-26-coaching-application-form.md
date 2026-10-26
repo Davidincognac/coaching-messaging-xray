@@ -1,9 +1,12 @@
 ---
 title: Coaching application form: when to use one, and what to ask
 date: 2026-10-26
+image: coaching-application-form.jpg
 summary: Not sure if a coaching application form helps or puts people off? In this article we cover when to use one, when it gets in the way, and what to ask.
 ---
 A coaching application form is a short set of questions someone fills in before they can book a call or join your programme. It makes sense for expensive one-to-one work and for group programmes, where you need to know someone's a good fit before you both spend time on it. For lower-priced coaching it usually just puts people off, so let them book directly instead.
+
+![A woman in her home office reading through a short form on her laptop, with a mug of tea beside her](coaching-application-form.jpg)
 
 A coaching intake form is a slightly different thing. That's the form a client fills in after they've said yes, so you know where they're starting from. I'll give you both, written out, further down.
 

@@ -1,9 +1,12 @@
 ---
 title: SEO for coaches: a plain-English guide to being found
 date: 2026-10-26
+image: seo-for-coaches.jpg
 summary: SEO for coaches sounds technical, so it gets put off. In this article we go through the six jobs that get a coach found on Google, in plain English.
 ---
 SEO for coaches means getting your pages shown on Google when the people you help search for their problem. In practice it's six jobs: find the searches your buyers really type, write one page for each question, put the answer first, link your pages together, set up a Google Business Profile if you see people locally, and make sure the page they arrive on makes sense.
+
+![A woman on her sofa typing a question into a search bar on her phone](seo-for-coaches.jpg)
 
 None of that needs a developer. It does need patience, because it's slow, and the numbers you'll be chasing are smaller than you might expect. I'll be straight with you about both further down.
 

@@ -1,9 +1,12 @@
 ---
 title: Email marketing for coaches, written to one person
 date: 2026-10-26
+image: email-marketing-for-coaches.jpg
 summary: Posting every day and still no clients? In this article we cover email marketing for coaches: who to email, what to send, how often, and a welcome sequence.
 ---
 Email marketing for coaches means sending useful emails to people who asked to hear from you, so they remember you when they're ready to pay. Send one useful thing per email, write it to one person, send it on the same day every week or fortnight, and start with a short welcome sequence. Only ever email people who signed up.
+
+![A man on a train reading an email on his phone, looking interested](email-marketing-for-coaches.jpg)
 
 That last bit isn't me being fussy. Adding people from LinkedIn, buying a list or emailing strangers isn't email marketing, it's cold emailing, and in the UK it can break the law. More on that below.
 

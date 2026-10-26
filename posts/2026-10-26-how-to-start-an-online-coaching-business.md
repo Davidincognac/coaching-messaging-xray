@@ -1,9 +1,12 @@
 ---
 title: How to start an online coaching business, step by step
 date: 2026-10-26
+image: how-to-start-an-online-coaching-business.jpg
 summary: Starting an online coaching business gets buried under logos and funnels. In this article we go through the steps in order, from who you help to first clients.
 ---
 To start an online coaching business, decide who you help and with what problem, make one clear offer, set a price, and find where those people already ask questions online. Then put up a simple page that says what you do, add a way to book and pay, and get your first clients from real conversations. Logos, funnels and courses can all wait.
+
+![A coach wearing headphones on a video call with a client at her desk by the window](how-to-start-an-online-coaching-business.jpg)
 
 That's the order I'd do it in, and below I'll take you through each step with a made-up coach so you can see what it looks like in practice.
 
