@@ -444,7 +444,7 @@ def page_title(title):
         return COMPANY["site"]
     if COMPANY["site"].lower() in title.lower():
         return title
-    return title + TITLE_SUFFIX if len(title) + len(TITLE_SUFFIX) <= 60 else title
+    return title + TITLE_SUFFIX if len(title) + len(TITLE_SUFFIX) <= 60 else title + " | GBTI"
 
 
 def head_meta(path="/", title="", description="", index=True, image=""):
@@ -708,12 +708,11 @@ def tool_schema(name, description, path):
     """
     return _jsonld({"@context": "https://schema.org", "@graph": [
         {
-            "@type": "WebApplication",
+            "@type": "Service",
             "name": name,
             "description": description,
             "url": BASE_URL + path,
-            "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Any",
+            "serviceType": "Website messaging review",
             "provider": {"@id": BASE_URL + "/#organisation"},
             "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
         },
