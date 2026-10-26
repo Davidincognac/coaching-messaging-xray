@@ -684,13 +684,16 @@ def render_post(slug):
         # percent, once at the end for the one who finishes. Halfway is measured in
         # headings rather than characters, so it never lands mid-argument.
         prose = _mid_cta(markdown(rest))
+        # The first picture sits just under the opening answer, so it is on screen when the page
+        # opens. Lazy-loading it makes the browser wait, which is the slowest thing on the page.
+        prose = prose.replace(' loading="lazy" decoding="async">', ' fetchpriority="high" decoding="async">', 1)
 
         body = ((know_html or short) + prose + faq_html + source_html
                 + _brand.cta_block() + rel_html)
 
         extra = _brand.article_schema(p_["title"], p_["summary"], path, p_["date"],
                                       [(q, plain(a)) for q, a in faqs], trail,
-                                      image=p_.get("image", ""))
+                                      image=share_image(p_.get("image", "")))
         return shell(body, p_["title"], p_["summary"], active="blog", path=path,
                      hero_html=hero_html, extra_head=extra, image=p_.get("image", ""))
     return None
