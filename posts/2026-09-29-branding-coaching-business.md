@@ -59,7 +59,7 @@ After the sentence exists, and then genuinely do it.
 
 A designer can give the right words more weight, and can stop an old-looking site costing you trust. What they can't do is work out who you help, and if you hand them a brief that describes you rather than your buyer, they'll typeset that beautifully.
 
-The order is [in the marketing plan](/blog/life-coach-marketing-plan), and what belongs on the page is [here](/blog/what-to-put-on-a-coaching-homepage).
+The order is [in the marketing plan](/blog/life-coach-marketing-plan), and what belongs on the page is in [what to put on a coaching homepage](/blog/what-to-put-on-a-coaching-homepage).
 
 ## What this doesn't measure
 
