@@ -1,8 +1,10 @@
 ---
-title: What an ideal coaching client actually is
+title: Ideal coaching client: what it is and how to find yours
 date: 2026-09-29
-summary: 90.6% of coaching niches hold buyers at more than one stage of awareness. Her age and income can't tell you which one you're writing to.
+summary: An ideal coaching client is someone with a specific reason to get help now, who can name their problem, and whose problem you've already solved. Age and income can't tell you who that is. 90.6% of coaching niches hold buyers at more than one stage of awareness.
 ---
+An ideal coaching client is someone with a specific reason to get help now, who can name their problem, and whose problem you've solved before. That's it. Budget, personality and age come after those three.
+
 You've probably filled in an ideal client worksheet. Name her, age her, give her a job, an income bracket, a podcast she listens to, a fear she'd never admit. Then you wrote your homepage and it still didn't sound like it was for anybody.
 
 What actually separates one coaching buyer from another is below, taken from 918 coaching markets we mapped from 2,004 books and 1,547 things real buyers wrote down. Get this wrong and none of [the three jobs that turn a stranger into a client](/blog/how-to-get-coaching-clients) can be done, because all three depend on knowing who's reading.
@@ -26,6 +28,27 @@ Three things, and none of them are on the worksheet.
 **Whether she knows what fixes it.** We tagged all 918 markets for this. 38.9% are markets where the buyer knows exactly what's wrong and has no idea what to do about it. 52.2% are markets where she already knows the kind of solution she wants and is choosing between them. Those two people need opposite first sentences. One needs her problem named. The other needs to know why your version is different.
 
 **What she's afraid of about buying.** Every market has one and it's specific. Am I just lazy. Will people think I couldn't cope. Is this going to be another thing I start and drop. Say it out loud and you handle the objection before she makes it.
+
+## What are the traits of an ideal coaching client?
+
+Here's what to look for, in plain words. Your ideal client:
+
+1. **Has a reason to act now.** Something happened. A row, a scan, a missed promotion, a quiet house after the kids left.
+2. **Can say what's wrong.** Maybe not the fix, but the problem, in their own words.
+3. **Has a problem you've solved before.** For you, or for people like them.
+4. **Has already tried something.** A book, an app, a course. It didn't hold, which is why they're looking at you.
+5. **Wants the result more than the chat.** They're paying for a change, not company.
+6. **Can afford you without it hurting.** Coaching on money they haven't got adds pressure the coaching can't fix.
+7. **Will do the work between sessions.** Coaching only works if they act on it.
+8. **Is someone you want to work with.** You'll do better work, and they'll tell their friends.
+
+The first three decide who you write your page for. The rest decide who you say yes to on a call.
+
+## How do you find your ideal coaching client with one question?
+
+Ask people you've helped, or people you'd like to help: "What happened just before you started looking for help?"
+
+The answers give you the push, in their words. If five people give you five different answers that all point at the same moment (the first year after a divorce, say, or the first month in a management job), that moment is your ideal client. Write your homepage for the person living it.
 
 ## Why doesn't the demographic version work?
 
@@ -83,6 +106,10 @@ By writing down the event that made her look and the words she'd search, rather 
 ### Is an ideal client avatar worth doing?
 
 The demographic version predicts almost nothing. Replace it with four lines: what pushed her, what she'd search, what she's already tried, and what she's afraid is true about her.
+
+### Who is my ideal client as a coach?
+
+The person whose problem you've solved before, who has a reason to act now and can say what's wrong in their own words. Start from the moment that made them look for help, not from their age or job title.
 
 ### How specific should my ideal client be?
 

@@ -1,8 +1,8 @@
 ---
-title: Coaching photoshoot: the photos a coach actually needs
+title: Life coach photoshoot ideas: 20 shots a coach actually needs
 date: 2026-10-26
 image: coaching-photos.jpg
-summary: Paid for a coaching photoshoot and still don't know which photos to use? In this article we go through the shot list a coach needs and how to brief it.
+summary: Life coach photoshoot ideas that earn their place on your website: the homepage photo, you with a client, 20 settings and poses to try, and how to brief the photographer so you don't end up with 200 photos you never use.
 ---
 For a coaching photoshoot you need fewer photos than you think. You want one clear photo of your face for the top of your homepage, a few of you working with someone like your client, and a handful of plain shots for your about page, social profiles and blog. Brief the photographer on who your client is before you talk about outfits or locations.
 
@@ -47,6 +47,44 @@ Here's what I'd ask for. Every shot has a job, and if you can't say where it'll 
 7. **One or two with space for text.** You on one side, empty wall or sky on the other. Handy for social media graphics and event pages.
 
 That's roughly 10 to 15 photos you'll actually use. A photographer may well give you 200, and that's fine, but you only need the ones that fit the list.
+
+## 20 life coach photoshoot ideas
+
+The shot list says what you need. These are ideas for where and how to take them, so the photos don't all look the same. Pick the ones that look like your client's world.
+
+**Working with people**
+
+1. Sitting across a kitchen table from a client, both with mugs, mid-conversation.
+2. On a video call at your desk, laptop open, you nodding and listening.
+3. Walking and talking with a client in a park or along a street.
+4. Running a small group session, people in a circle, you listening.
+5. At a whiteboard or flip chart, drawing something simple for someone.
+6. Speaking at a workshop or talk, taken from the side of the room.
+
+**You on your own**
+
+7. At your desk writing in a notebook, natural window light.
+8. Laughing at something off camera. The best photo of the day is often this one.
+9. Looking out of a window, thinking, coffee in hand.
+10. Reading in an armchair with a pile of books beside you.
+11. Recording a podcast or video, mic in front of you.
+12. On the phone, walking, mid-sentence.
+13. Leaning on a doorway or wall, arms relaxed, looking at the camera.
+
+**Places that fit your niche**
+
+14. A business coach in an office, a cafe or a co-working space.
+15. A health or wellness coach outdoors, on a walk, in a park, by water.
+16. A career coach somewhere that looks like work: a meeting room, a train, a city street.
+17. A relationship or family coach at home, in a warm, lived-in room.
+
+**Details for blog and social posts**
+
+18. Your hands writing in a notebook.
+19. Your desk from above: notebook, coffee, phone, glasses.
+20. Two mugs on a table, chairs pulled out. Says "come and talk" without anyone in it.
+
+Wear what you'd wear to coach. If your clients see you in jeans and a jumper, that's what goes on camera.
 
 ## How do you brief a photographer?
 

@@ -1,8 +1,8 @@
 ---
-title: Coaching business names: how to pick one that works
+title: Coaching business names: 60 ideas and how to pick one that works
 date: 2026-10-26
 image: coaching-business-names.jpg
-summary: Stuck on coaching business names and scared of picking the wrong one? In this article we choose a name step by step, check it's free and build examples.
+summary: 60 coaching business name ideas by niche, plus how to choose: your own name or a brand, plain or clever, and how to check the name is free before you print anything.
 ---
 A good coaching business name is easy to say, easy to spell and tells people what you do or who you are. Use your own name if you're the product and plan to stay a one-person business. Use a brand name if you want to grow, hire or sell one day. Then check it's free: company register, trade marks, domain and social handles, before you print anything.
 
@@ -92,6 +92,102 @@ Then the practical checks, which take ten minutes:
 - Google the name in quotes and see what comes up. If another coach is using it in your country, or something you'd hate to be confused with, move on.
 - Say it out loud to somebody and ask them to spell it. If they get it wrong, so will everybody you tell it to over the phone.
 
+## 60 coaching business name ideas, by niche
+
+These are made up to show the patterns that work. Every one tells a stranger what it does or who it's for. Some might already be taken, so check any you like before you use them (the checks are above).
+
+**Life coaching**
+
+1. Next Chapter Coaching
+2. The Second Half Coach
+3. Fresh Start Life Coaching
+4. Clear Head Coaching
+5. Back on Track Coaching
+6. The Big Decision Coach
+
+**Career coaching**
+
+7. Career Change Coaching
+8. The Job Move Coach
+9. New Manager Coaching
+10. Back to Work Coaching
+11. Promotion Ready Coaching
+12. The Career Reset Coach
+
+**Business coaching**
+
+13. Small Business Growth Coaching
+14. The Solo Business Coach
+15. Owner Off the Tools Coaching
+16. First Hire Coaching
+17. Trades Business Coaching
+18. The Founder's Coach
+
+**Health and wellness**
+
+19. Menopause Sleep Coaching
+20. Strong After Fifty
+21. Back Into Fitness Coaching
+22. The Desk Worker's Health Coach
+23. Steady Energy Coaching
+24. New Mum Wellness Coaching
+
+**Relationships and family**
+
+25. Marriage Reset Coaching
+26. Calm Co-Parenting
+27. After Divorce Coaching
+28. The Dating Again Coach
+29. Teen and Parent Coaching
+30. The Empty Nest Coach
+
+**Money**
+
+31. Debt-Free Plan Coaching
+32. Freelance Money Coaching
+33. The Budget Coach
+34. Money Talk Coaching (for couples)
+35. Steady Income Coaching
+36. Pay Yourself First Coaching
+
+**Executive and leadership**
+
+37. First-Time Leader Coaching
+38. The Boardroom Coach
+39. Leading Through Change
+40. Team Lead Coaching
+41. The Founder-to-CEO Coach
+42. Executive Presence Coaching
+
+**Confidence, mindset and wellbeing**
+
+43. Speak Up Coaching
+44. The Calm Confidence Coach
+45. Imposter Feeling Coaching
+46. The Overthinker's Coach
+47. Burnout Recovery Coaching
+48. The Boundaries Coach
+
+**Your name, done well**
+
+49. Sarah Lee, Career Coach
+50. James Patel Coaching, for new managers
+51. Coaching with Emma (menopause and sleep)
+52. Tom Byrne, Business Coach for Tradespeople
+53. Priya Shah Coaching
+54. Lorna Grant, Divorce Coach
+
+**Short brands that still say what they do**
+
+55. MoveOn Coaching
+56. NextJob Coaching
+57. SleepWell Coaching
+58. ClearDebt Coaching
+59. LeadWell Coaching
+60. FitAgain Coaching
+
+Notice what they've got in common. A real word for the problem or the person, plus "coaching" or "coach". None of them lean on rise, thrive or soar.
+
 ## What about a coaching business name generator?
 
 They're fine for a bit of fun, and sometimes they jog your memory. But they mostly spit out exactly the sort of clever, vague names I've been warning you about, because they're built on words like rise, thrive and soar. Use one if you're stuck, then put the results through the same test as everything else. Can a stranger tell what you do?
@@ -107,6 +203,14 @@ That's why a plain name helps. It gives that first line a head start. But even a
 So pick something clear, check it's free, and spend the rest of your energy on [what to put on your coaching homepage](/blog/what-to-put-on-a-coaching-homepage). If you want to see how yours reads to a stranger, you can [score your homepage against the 10,954](/website).
 
 ## FAQ
+
+### What is a good name for a coaching business?
+
+One that's easy to say, easy to spell, and tells a stranger what you do or who it's for, like "Career Change Coaching" or "Sarah Lee, Career Coach". Check it's free before you use it.
+
+### What is a unique name for a coaching business?
+
+Unique comes from being specific, not clever. "Menopause Sleep Coaching" is far rarer than "Thrive Coaching", and it tells people what you do.
 
 ### Should I use my name for my coaching business?
 
