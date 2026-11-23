@@ -1,9 +1,12 @@
 ---
 title: Coaching business model: the 5 that work, and how to pick yours
 date: 2026-11-23
+image: coaching-business-model.jpg
 summary: A coaching business model is how you swap your time and know-how for money. There are five common ones: one-to-one, packages, group, courses and memberships. Here's how each makes money and which suits which coach.
 ---
 A coaching business model is simply how you turn your time and know-how into money. There are five common ones: one-to-one sessions, one-to-one packages, group coaching, online courses and memberships. A lot of coaches end up mixing two of them, but almost everyone should start with one-to-one, because it's where you learn what your buyers actually want.
+
+![A woman in her fifties at a desk sketching three columns of boxes in a notebook, with a cup of coffee beside her](coaching-business-model.jpg)
 
 ## Things to know
 

@@ -1,9 +1,12 @@
 ---
 title: How to create a coaching program people actually buy
 date: 2026-11-23
+image: how-to-create-a-coaching-program.jpg
 summary: To create a coaching program, start with the result your client wants, work out the 3 to 6 steps to get there, set a length and a format, give it a plain name and a price. A signature coaching program is simply that one program, done well and sold as your main offer.
 ---
 To create a coaching program, start with the result your client wants and work backwards. Write the 3 to 6 steps it takes to get there, decide how long it runs and how you'll deliver it, give it a name a buyer understands, and put a price on it. A signature coaching program is that same thing, the one main program you're known for.
+
+![A woman leaning over a wooden table laying out a row of handwritten index cards in order](how-to-create-a-coaching-program.jpg)
 
 ## Things to know
 

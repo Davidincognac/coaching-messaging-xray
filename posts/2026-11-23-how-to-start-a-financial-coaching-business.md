@@ -1,9 +1,12 @@
 ---
 title: How to start a financial coaching business without crossing into advice
 date: 2026-11-23
+image: how-to-start-a-financial-coaching-business.jpg
 summary: To start a financial coaching business, pick one money problem for one group, stay on the coaching side of the investment advice line, build one package with a price, and find people where they already talk about money worries.
 ---
 To start a financial coaching business, pick one money problem for one group of people, stay clearly on the coaching side of the advice line, build one package with a price, do the client sum, and go where your group already talks about money. The line between coaching and regulated financial advice is the thing that sets this niche apart, so get that clear before anything else.
+
+![A couple at their kitchen table going through a paper budget and a calculator with a coach sitting opposite them](how-to-start-a-financial-coaching-business.jpg)
 
 If you're still deciding whether to train, [how to become a financial coach](/blog/how-to-become-a-financial-coach) covers that side.
 

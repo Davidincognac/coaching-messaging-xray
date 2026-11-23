@@ -1,9 +1,12 @@
 ---
 title: How to start a health coaching business (and a wellness one)
 date: 2026-11-23
+image: how-to-start-a-health-coaching-business.jpg
 summary: To start a health coaching business, pick one health problem for one group of people, build a package with a price, stay on the right side of the medical line, write a one-page plan, and find clients where that group already talks.
 ---
 To start a health or wellness coaching business, pick one health goal for one group of people, build one package with a price, stay clearly on the coaching side of the medical line, write a one-page plan with the client sum on it, and go where that group already asks for help. The training is the easy bit. The business side is where health coaches get stuck.
+
+![Two women walking and talking along a park path on a sunny autumn morning](how-to-start-a-health-coaching-business.jpg)
 
 This is about the business. If you're still deciding whether to train, [how to become a health coach](/blog/how-to-become-a-health-coach) covers that.
 

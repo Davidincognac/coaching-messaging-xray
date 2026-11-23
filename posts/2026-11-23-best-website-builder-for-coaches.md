@@ -1,9 +1,12 @@
 ---
 title: Best website builder for coaches: pick by what you need, not the logo
 date: 2026-11-23
+image: best-website-builder-for-coaches.jpg
 summary: The best website builder for coaches is the one you'll actually keep updated that handles booking and payments. For a lot of coaches that's an easy drag-and-drop builder. The words on the page count for far more than the builder.
 ---
 The best website builder for coaches is the one you'll actually keep up to date, that lets people book a call and pay you without fuss. For a lot of coaches that's a simple drag-and-drop builder. Coaches selling courses or memberships may want an all-in-one coaching platform. But the builder is the small decision. What decides whether a coaching website gets clients is what it says.
+
+![A man at a home desk looking at a simple website layout on a laptop, with a sketched page plan in a notebook beside him](best-website-builder-for-coaches.jpg)
 
 ## Things to know
 

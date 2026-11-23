@@ -1,9 +1,12 @@
 ---
 title: Starting a coaching business checklist: 15 things, in order
 date: 2026-11-23
+image: starting-a-coaching-business-checklist.jpg
 summary: A starting a coaching business checklist only works if it's in the right order. Here are 15 steps, from picking who you help to your first month of numbers, with the ones people skip marked.
 ---
 Starting a coaching business comes down to 15 jobs, and the order is what makes it work. Decide who you help and what you sell first. Then sort the legal and money basics. Then build the few things people see. Then go and talk to people. A lot of new coaches do it backwards and build the website first.
+
+![A man at a wooden kitchen table ticking off a handwritten checklist on a clipboard, with a mug of tea beside him](starting-a-coaching-business-checklist.jpg)
 
 Below is the full list, with a line on why each one is there. If you want the longer walk-through of each stage, [how to start an online coaching business](/blog/how-to-start-an-online-coaching-business) goes through it step by step.
 

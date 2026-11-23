@@ -1,9 +1,12 @@
 ---
 title: How to scale a coaching business without working every evening
 date: 2026-11-23
+image: how-to-scale-a-coaching-business.jpg
 summary: To scale a coaching business, first make sure clients come in steadily, then raise your price, then move people into groups, then cut the admin. Scaling before the clients are steady just makes a bigger mess.
 ---
 To scale a coaching business, get a steady flow of clients first. Then raise your price, move some people into group coaching, and hand off or automate the admin that eats your week. Do it in that order. Scaling a business where clients come in by luck just gives you a bigger version of the same worry.
+
+![A coach leading a small group of adults sitting in a circle with notebooks in a bright room](how-to-scale-a-coaching-business.jpg)
 
 ## Things to know
 

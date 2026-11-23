@@ -1,9 +1,12 @@
 ---
 title: Marketing agency for coaches: do you need one, and what to check first
 date: 2026-11-23
+image: marketing-agency-for-coaches.jpg
 summary: A marketing agency for coaches can save you time, but it can't fix an unclear message. If people don't know who you help and what you fix within five seconds, an agency just sends more people to a page that doesn't work.
 ---
 A marketing agency for coaches can do the work you don't have time for: ads, posts, emails, a new website. What it can't do is decide who you help and what you fix. If that isn't clear yet, an agency will spend your money sending more people to a message that doesn't work. Get the message right first, then decide if you need help pushing it out.
+
+![A man with his hand on his chin looking unsure at a laptop while two younger people show him something in a cafe](marketing-agency-for-coaches.jpg)
 
 ## Things to know
 

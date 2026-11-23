@@ -1,9 +1,12 @@
 ---
 title: Does a life coach need a business license? What the rules actually say
 date: 2026-11-23
+image: does-a-life-coach-need-a-business-license.jpg
 summary: In the US, life coaching isn't a licensed profession, so you don't need a coaching license. You may still need a general business license from your city or county, and some things coaches say can cross into licensed work like therapy.
 ---
 No, not a coaching license. Life coaching isn't a licensed profession in the US, so no state requires a license to call yourself a life coach. But that's not the whole answer. Your city, county or state may still want a general business license for any business run there, and if your coaching strays into therapy, medical or investment advice, you're into work that does need a license.
+
+![A man at a home desk filling in a paper form with a pen, with a folder of documents and a laptop beside him](does-a-life-coach-need-a-business-license.jpg)
 
 This is general information, not legal advice. The rules change from place to place, so check with your city or county office before you start.
 
