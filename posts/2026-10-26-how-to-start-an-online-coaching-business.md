@@ -70,7 +70,7 @@ This isn't legal or tax advice, and the rules depend on where you live, so check
 
 In the UK, the government says you [must register for Self Assessment as a sole trader](https://www.gov.uk/become-sole-trader) if you earn more than £1,000 from self-employment in a tax year. In the US, the Small Business Administration says you're [automatically a sole proprietorship](https://www.sba.gov/business-guide/launch-your-business/choose-business-structure) if you do business activities and don't register as anything else, and that you can be held personally liable for the business's debts.
 
-You'll also want a written agreement with each client, saying what's included, what happens with missed sessions, and how payment works. [The coaching contract template](/blog/coaching-contract-template) has an example you can adapt. And check what insurance you need where you are.
+You'll also want a written agreement with each client, saying what's included, what happens with missed sessions, and how payment works. [The coaching contract template](/blog/coaching-contract-template) has an example you can adapt. And check what insurance you need where you are. If you're in the US and wondering about licences, [does a life coach need a business license](/blog/does-a-life-coach-need-a-business-license) covers it.
 
 ## Step 6: find where your buyers already ask questions
 
@@ -113,6 +113,8 @@ If you've got no testimonials yet and you're worried nobody will trust you, [get
 If you start with the logo and the Instagram grid, you can spend six months building something and still have nobody to sell to, and by then you're tired, out of pocket and wondering if coaching works at all.
 
 If you go in this order, the worst case is you have a few conversations and find out your offer needs changing. That's cheap to fix. Once you've got clients coming in, [how to get coaching clients](/blog/how-to-get-coaching-clients) shows what the data says about getting more of them.
+
+If you want all of this as a tick-list, there's a [starting a coaching business checklist](/blog/starting-a-coaching-business-checklist). For choosing between one-to-one, groups and courses, see [coaching business models](/blog/coaching-business-model). If your niche is health or money, read [how to start a health coaching business](/blog/how-to-start-a-health-coaching-business) or [how to start a financial coaching business](/blog/how-to-start-a-financial-coaching-business), because both have rules about what you can advise on. And once clients come in steadily, [how to scale a coaching business](/blog/how-to-scale-a-coaching-business) is the next step.
 
 ## FAQ
 

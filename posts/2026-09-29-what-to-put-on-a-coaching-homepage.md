@@ -57,7 +57,7 @@ It goes fourth because it's the one that turns a page you believe into a person 
 
 Have a clear next step, but stop worrying about it. Good sites score 5.90 on that and poor ones score 5.39. Everybody's already got a button.
 
-The same goes for how the site's built. Technical health averages 9 out of 10 across the market and separates good from poor by 1.3 points. It's [the half of the job most coaches spend the money on](/blog/website-design-for-life-coaches), and it's close to solved already.
+The same goes for how the site's built. Technical health averages 9 out of 10 across the market and separates good from poor by 1.3 points. It's [the half of the job most coaches spend the money on](/blog/website-design-for-life-coaches), and it's close to solved already. If you're still choosing what to build it on, [best website builder for coaches](/blog/best-website-builder-for-coaches) keeps that decision short.
 
 ## Does the order actually matter?
 

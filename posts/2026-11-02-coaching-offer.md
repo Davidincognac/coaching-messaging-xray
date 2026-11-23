@@ -82,6 +82,8 @@ Lead with one. If you've got three things on your homepage that all look equally
 
 If you genuinely sell more than one thing, put your main offer first and give the others a clear way in further down, each written the same way: who it's for, what changes, what they get, what next. Think of a menu with sections, not a page where everything shouts at once.
 
+If you're building your main offer from scratch, [how to create a coaching program](/blog/how-to-create-a-coaching-program) takes you through it step by step.
+
 ## What about "irresistible offers" and bonus stacks?
 
 You'll have seen the advice. Pile on the bonuses, add a free workbook, a private group, a recorded masterclass, then show a crossed-out price ten times bigger than the real one. Some people swear by it.
